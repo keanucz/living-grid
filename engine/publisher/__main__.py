@@ -12,6 +12,7 @@ import time
 import httpx
 import pandas as pd
 
+from engine.ghost_wind import costs as ghost_wind_costs
 from engine.publisher import Publisher, ReducerError, from_env, prune_before, sources
 
 log = logging.getLogger("engine.publisher")
@@ -29,6 +30,9 @@ def run_once(pub: Publisher, hours_back: float, now: pd.Timestamp | None = None)
     ):
         if df is not None and len(df):
             sent[kind] = pub.publish(kind, df)
+    gw = ghost_wind_costs.publish_rows(cutoff, now)
+    if len(gw):
+        sent["ghost_wind"] = pub.publish("ghost_wind", gw)
     prune_before(pub.client, cutoff - pd.Timedelta(hours=24))
     return sent
 
