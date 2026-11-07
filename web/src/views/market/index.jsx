@@ -228,7 +228,7 @@ function Phone() {
       {s.status === 'connecting' && <p className="mk-muted">Connecting…</p>}
       {s.status === 'offline' && <p className="mk-muted">The game server is out of reach. Check the Wi-Fi and reload.</p>}
       {error && <p className="mk-error">{error}</p>}
-      {s.status === 'live' && !round && <p className="mk-card mk-muted">No round is running. The host starts one from the engine.</p>}
+      {s.status === 'live' && !round && <p className="mk-card mk-muted">No round is running right now. Stay on this page: the host starts a round for the room and you can join as soon as it opens. You can also try the <a href="#/game">room game</a>.</p>}
       {round && <Reveal round={round} />}
       {s.status === 'live' && round && !s.player && <Join busy={busy} onJoin={(name) => call(() => api.current.join(name))} />}
       {s.player && round && (

@@ -14,6 +14,7 @@ const TABS = [
   { id: 'events', label: 'Events', icon: 'sim', mode: 'simulate', panels: ['simDock', 'statTiles'] },
   { id: 'scores', label: 'Scores', icon: 'chart', mode: 'overview', panels: ['kpis', 'scoreboard', 'botLeague', 'battery', 'compute', 'leaderboard'] },
   { id: 'tonight', label: 'Tonight', icon: 'phone', mode: 'overview', view: '/household' },
+  { id: 'play', label: 'Play', icon: 'play', mode: 'overview', view: '/market' },
 ]
 
 const byId = Object.fromEntries(PANELS.map((p) => [p.id, p]))

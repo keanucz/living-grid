@@ -7,6 +7,8 @@ const PAGES = [
   { icon: 'replay', label: 'Replay: 26 October storm', href: '#/replay' },
   { icon: 'calendar', label: 'Day-ahead reveal', href: '#/reveal' },
   { icon: 'phone', label: 'Household: cheapest hours', href: '#/household' },
+  { icon: 'play', label: 'Mystery-day market', href: '#/market' },
+  { icon: 'battery', label: 'Room game: battery', href: '#/game' },
 ]
 
 export default function Rail() {
