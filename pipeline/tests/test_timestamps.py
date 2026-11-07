@@ -91,7 +91,7 @@ def test_write_stores_ns_utc():
 
 def test_markets_validate_accepts_naive_dates_like_yfinance_returns():
     df = pd.DataFrame(
-        {"ts": pd.to_datetime(["2026-11-03", "2026-11-04"]), "series": "gas_ttf", "value": [30.0, 31.0], "unit": "EUR/MWh", "source": "TTE=F"}
+        {"ts": pd.to_datetime(["2026-11-03", "2026-11-04"]), "series": "gas_ttf", "value": [30.0, 31.0], "unit": "EUR/MWh", "source": markets.GAS_SOURCE}
     )
     out = markets.validate(df)
     assert out["ts"].dtype == NS and out["ts"].iloc[0] == pd.Timestamp("2026-11-03", tz="UTC")
@@ -99,12 +99,12 @@ def test_markets_validate_accepts_naive_dates_like_yfinance_returns():
 
 @pytest.mark.parametrize("new_unit,new_tz", [("s", dt.UTC), ("us", None), ("ns", ZI)])
 def test_markets_write_merges_into_a_cache_stored_with_other_units(new_unit, new_tz):
-    old = pd.DataFrame({"ts": stamps("ms", ZI), "series": "gas_ttf", "value": [30.0, 31.0, 32.0], "unit": "EUR/MWh", "source": "TTE=F"})
+    old = pd.DataFrame({"ts": stamps("ms", ZI), "series": "gas_ttf", "value": [30.0, 31.0, 32.0], "unit": "EUR/MWh", "source": markets.GAS_SOURCE})
     p = cache.path(markets.NAME)
     p.parent.mkdir(parents=True)
     old.to_parquet(p, index=False)
     new = pd.DataFrame(
-        {"ts": stamps(new_unit, new_tz, ("2026-11-03", "2026-11-04")), "series": "gas_ttf", "value": [99.0, 40.0], "unit": "EUR/MWh", "source": "TTE=F"}
+        {"ts": stamps(new_unit, new_tz, ("2026-11-03", "2026-11-04")), "series": "gas_ttf", "value": [99.0, 40.0], "unit": "EUR/MWh", "source": markets.GAS_SOURCE}
     )
     assert markets.write(markets.validate(new)) == [markets.NAME]
     out = cache.read(markets.NAME)
@@ -150,7 +150,7 @@ def test_scheduler_runs_on_a_cache_with_mixed_units_and_naive_stamps(monkeypatch
         p.parent.mkdir(parents=True, exist_ok=True)
         df.to_parquet(p, index=False)
     gas = pd.DataFrame(
-        {"ts": stamps("ms", ZI, ("2026-11-04", "2026-11-05", "2026-11-06")), "series": "gas_ttf", "value": [30.0, 31.0, 32.0], "unit": "EUR/MWh", "source": "TTE=F"}
+        {"ts": stamps("ms", ZI, ("2026-11-04", "2026-11-05", "2026-11-06")), "series": "gas_ttf", "value": [30.0, 31.0, 32.0], "unit": "EUR/MWh", "source": markets.GAS_SOURCE}
     )
     cache.path(markets.NAME).parent.mkdir(parents=True, exist_ok=True)
     gas.to_parquet(cache.path(markets.NAME), index=False)
