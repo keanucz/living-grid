@@ -45,11 +45,12 @@ export function ResultCard({ result, scenario, runKey }) {
         <span style={{ flex: 1 }} />
         <span className="tag">{live ? 'Modelled' : 'Pre-computed'}</span>
       </div>
-      <div className="cost-label faint">Cost to consumers over {duration(hours)}</div>
+      <div className="cost-label faint">{result?.cost_basis === 'consumer' ? 'Cost to consumers' : 'Extra wholesale cost'} over {duration(hours)}</div>
       <div className="cost num" data-testid="cost">{fmt.money(shown)}</div>
       {p.p10 != null && p.p90 != null && (
         <div className="faint cost-range">Likely range {fmt.money(p.p10)} to {fmt.money(p.p90)}</div>
       )}
+      <div className="faint cost-basis">What the wholesale market pays if every MWh trades at the new price. Household bills follow later, through suppliers’ hedging and the quarterly price cap.</div>
       <p className="why">{sentence}</p>
       {zones.length > 0 && (
         <div className="zdeltas">

@@ -37,7 +37,7 @@ function StatTiles({ ctx }) {
   const worst = deltas.sort((a, b) => b[1] - a[1])[0]
 
   const items = [
-    { label: 'Cost to consumers', value: sc ? fmt.money(cost) : '—', note: sc ? `over ${sc.hours >= 168 ? `${Math.round(sc.hours / 168)} weeks` : `${sc.hours} h`}` : 'Run a scenario', hot: true },
+    { label: 'Extra wholesale cost', value: sc ? fmt.money(cost) : '—', note: sc ? `over ${sc.hours >= 168 ? `${Math.round(sc.hours / 168)} weeks` : `${sc.hours} h`}` : 'Run a scenario', hot: true },
     { label: 'GB price', value: gb ? `£${gbNow.toFixed(1)}` : '—', delta: sc ? gbDelta : null, note: 'per MWh now' },
     { label: 'Hardest hit', value: worst ? worst[0] : '—', note: worst ? zoneDelta(worst[0], worst[1]) : 'no event' },
     { label: 'Ghost wind', value: `${sc?.ghost_wind_mwh ? ((sc.ghost_wind_mwh * sc.scale) / 1000).toFixed(1) : '0.0'} GWh`, note: 'paid to switch off' },
