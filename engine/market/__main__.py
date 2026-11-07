@@ -1,5 +1,6 @@
 """Run one mystery-day market round in SpacetimeDB.
 
+    uv run python -m engine.market load-days [--days ...]   # fill the module's day pool (engine/market/pool.py)
     uv run python -m engine.market [--day 2026-10-26] [--start 12] [--end 18] [--seconds 30] [--dry-run]
 
 Starts a round with questions from data/replay/<day>.json, lets the model trade, then advances the clock one
@@ -69,6 +70,12 @@ def run(client: Client | None, day: date, start: int, end: int, seconds: int, sl
 
 
 def main() -> None:
+    import sys
+
+    if sys.argv[1:2] == ["load-days"]:
+        from engine.market import pool
+
+        raise SystemExit(pool.main(sys.argv[2:]))
     ap = argparse.ArgumentParser()
     ap.add_argument("--day", type=date.fromisoformat, default=replay.HEADLINE_EVENT)
     ap.add_argument("--start", type=int, default=12)
