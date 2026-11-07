@@ -16,7 +16,7 @@ const LIGHTING = new LightingEffect({
 
 const VIEWS = {
   overview: { longitude: 6.5, latitude: 53.2, zoom: 4.15, pitch: 0, bearing: 0 },
-  simulate: { longitude: 2.2, latitude: 54.2, zoom: 4.85, pitch: 52, bearing: -14 },
+  simulate: { longitude: 4.2, latitude: 51.4, zoom: 4.35, pitch: 56, bearing: -16 },
 }
 
 // ?still freezes animation (screenshots, slow software GL).
