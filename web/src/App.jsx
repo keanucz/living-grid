@@ -13,11 +13,15 @@ import { sectionById } from './shell/sections.js'
 import MobileShell from './shell/mobile/MobileShell.jsx'
 import { useNarrow } from './shell/mobile/useNarrow.js'
 import { normaliseResult } from './api/normalise.js'
+import LensBar from './shell/lensBar/LensBar.jsx'
+import Welcome from './shell/lensBar/Welcome.jsx'
+import { activeMapView, initLens } from './shell/lensBar/lenses.js'
 
 const ASSET_FOR = { hormuz: 'gas', nuclear_outage: 'nuclear', scottish_storm: 'wind', interconnector_trip: 'hydro' }
 const SLOTS = ['left', 'bottomRight', 'bottom', 'right']
 
 setState({ layers: Object.fromEntries(LAYERS.map((l) => [l.id, l.defaultOn !== false])) })
+initLens(!matchView(location.hash))
 
 function useGeo() {
   const [geo, setGeo] = useState(null)
@@ -39,8 +43,11 @@ function useHashView() {
 
 export default function App() {
   const view = useHashView()
+  const lens = useStore((s) => s.lens)
+  const narrow = useNarrow()
   if (view) {
     document.title = `${view.title} · The Living Grid`
+    if (lens && !narrow) return <><LensBar page /><view.Component /></>
     return <view.Component />
   }
   return <MapApp />
@@ -82,7 +89,11 @@ function MapApp() {
 
   const visibleLayers = LAYERS.filter((l) => l.modes.includes(ui.mode))
   const section = sectionById[ui.section] ?? sectionById.overview
-  const inSection = (p) => (section.panels ? section.panels.includes(p.id) : p.modes.includes(ui.mode))
+  const lensView = activeMapView(ui)
+  const simOnView = lensView && ui.mode === 'simulate' && lensView.section !== 'simulate'
+  const panelIds = lensView?.panels ? [...lensView.panels, ...(simOnView ? ['simDock'] : [])] : section.panels
+  const inSection = (p) => (panelIds ? panelIds.includes(p.id) : p.modes.includes(ui.mode))
+  const title = lensView?.title ?? section.title
   if (narrow) return <MobileShell ctx={ctx} at={state.data?.at} source={state.source} />
 
   return (
@@ -92,11 +103,11 @@ function MapApp() {
         <MapView ctx={ctx} />
         <TopBar at={state.data?.at} source={state.source} />
 
-        {section.title && (
+        {title && !simOnView && (
           <div className="headline">
-            <div className="kicker">{section.label}</div>
-            <h1>{section.title}</h1>
-            <p>{section.blurb}</p>
+            <div className="kicker">{lensView?.label ?? section.label}</div>
+            <h1>{title}</h1>
+            <p>{lensView?.blurb ?? section.blurb}</p>
           </div>
         )}
 
@@ -126,6 +137,7 @@ function MapApp() {
           </div>
         </div>
       </main>
+      {ui.welcome && <Welcome />}
     </div>
   )
 }
