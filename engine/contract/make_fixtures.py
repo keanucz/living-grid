@@ -447,6 +447,39 @@ def household() -> dict:
     }
 
 
+def compute() -> dict:
+    """A 1 MW job for 6 hours: cheapest start per zone over the next 24 hours."""
+    start = NOW + timedelta(hours=1)
+    kw, n = 1000.0, 6
+    rows = []
+    for zone in ZONES:
+        prices = []
+        for t in hours(start, 24):
+            b = band(price(zone, t), max(0, (t - NOW).seconds // 3600))
+            cleared = t < NOW.replace(hour=23)
+            prices.append({"ts": iso(t), **({q: b["p50"] for q in b} if cleared else b), "kind": "actual" if cleared else "forecast"})
+        def cost(i: int, q: str) -> float:
+            return sum(p[q] for p in prices[i : i + n]) * kw / 1000
+        i = min(range(24 - n + 1), key=lambda i: cost(i, "p50"))
+        fx = EUR_PER_GBP if CURRENCY[zone] == "GBP" else 1.0
+        c = {q: round(cost(i, q), 2) for q in ("p10", "p50", "p90")}
+        now_ = {q: round(cost(0, q), 2) for q in ("p10", "p50", "p90")}
+        sv = dict(zip(("p10", "p50", "p90"), sorted(round(now_[q] - c[q], 2) for q in c)))
+        rows.append({
+            "zone": zone, "currency": CURRENCY[zone], "unit": unit(zone),
+            "start": iso(start + timedelta(hours=i)), "end": iso(start + timedelta(hours=i + n)),
+            "avg_price": {q: round(v / n, 2) for q, v in c.items()}, "cost": c, "cost_now": now_, "saving": sv,
+            "cost_eur": {q: round(v * fx, 2) for q, v in c.items()}, "saving_eur": {q: round(v * fx, 2) for q, v in sv.items()},
+            "kind": "forecast" if i + n > 10 else "actual", "prices": prices,
+        })
+    rows.sort(key=lambda r: r["cost_eur"]["p50"])
+    return {
+        "generated_at": iso(NOW), "kw": kw, "hours": n, "deadline": iso(start + timedelta(hours=24)),
+        "eur_per_gbp": EUR_PER_GBP, "zones": rows, "cheapest_zone": rows[0]["zone"],
+        "note": "Sample data. Wholesale day-ahead energy only: no network charges, levies or taxes.",
+    }
+
+
 def replay() -> dict:
     start = datetime(2026, 10, 26, tzinfo=timezone.utc)
     series = []
@@ -508,6 +541,7 @@ def build() -> dict[str, tuple[type, dict]]:
         "household": (s.HouseholdResponse, household()),
         "replay": (s.ReplayResponse, replay()),
         "reveal": (s.RevealResponse, reveal()),
+        "compute": (s.ComputeResponse, compute()),  # last: it draws from the shared rng
     }
 
 

@@ -383,6 +383,44 @@ class HouseholdResponse(Model):
     note: str
 
 
+# ---------- GET /compute?kw=&hours=&zones=&deadline= ----------
+
+
+class ComputePrice(Model):
+    ts: datetime
+    p10: float
+    p50: float
+    p90: float
+    kind: Kind = Field(description="actual where the day-ahead auction has cleared, forecast beyond it")
+
+
+class ComputeZone(Model):
+    zone: Zone
+    currency: Currency
+    unit: str = Field(description="Price unit, e.g. EUR/MWh")
+    start: datetime = Field(description="Best start hour before the deadline")
+    end: datetime
+    avg_price: Quantiles = Field(description="Mean wholesale price over the best window, in unit")
+    cost: Quantiles = Field(description="Energy cost of the job in the best window, in currency")
+    cost_now: Quantiles = Field(description="Energy cost if started at the next hour, in currency")
+    saving: Quantiles = Field(description="cost_now minus cost, in currency")
+    cost_eur: Quantiles = Field(description="cost converted to EUR so zones compare")
+    saving_eur: Quantiles
+    kind: Kind = Field(description="actual only when every hour of both windows has a cleared price")
+    prices: list[ComputePrice] = Field(description="Hourly prices from the next hour to the deadline")
+
+
+class ComputeResponse(Model):
+    generated_at: datetime
+    kw: float
+    hours: int
+    deadline: datetime
+    eur_per_gbp: float
+    zones: list[ComputeZone] = Field(description="Cheapest first by cost_eur.p50; zones without prices are left out")
+    cheapest_zone: Zone | None
+    note: str
+
+
 # ---------- GET /replay?event= ----------
 
 

@@ -277,6 +277,220 @@
     "title": "CarbonResponse",
     "type": "object"
    },
+   "ComputePrice": {
+    "additionalProperties": false,
+    "properties": {
+     "kind": {
+      "description": "actual where the day-ahead auction has cleared, forecast beyond it",
+      "enum": [
+       "actual",
+       "forecast",
+       "modelled",
+       "estimated",
+       "scenario"
+      ],
+      "title": "Kind",
+      "type": "string"
+     },
+     "p10": {
+      "title": "P10",
+      "type": "number"
+     },
+     "p50": {
+      "title": "P50",
+      "type": "number"
+     },
+     "p90": {
+      "title": "P90",
+      "type": "number"
+     },
+     "ts": {
+      "format": "date-time",
+      "title": "Ts",
+      "type": "string"
+     }
+    },
+    "required": [
+     "ts",
+     "p10",
+     "p50",
+     "p90",
+     "kind"
+    ],
+    "title": "ComputePrice",
+    "type": "object"
+   },
+   "ComputeResponse": {
+    "additionalProperties": false,
+    "properties": {
+     "cheapest_zone": {
+      "anyOf": [
+       {
+        "enum": [
+         "GB",
+         "FR",
+         "DE-LU",
+         "NL",
+         "BE",
+         "NO2"
+        ],
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Cheapest Zone"
+     },
+     "deadline": {
+      "format": "date-time",
+      "title": "Deadline",
+      "type": "string"
+     },
+     "eur_per_gbp": {
+      "title": "Eur Per Gbp",
+      "type": "number"
+     },
+     "generated_at": {
+      "format": "date-time",
+      "title": "Generated At",
+      "type": "string"
+     },
+     "hours": {
+      "title": "Hours",
+      "type": "integer"
+     },
+     "kw": {
+      "title": "Kw",
+      "type": "number"
+     },
+     "note": {
+      "title": "Note",
+      "type": "string"
+     },
+     "zones": {
+      "description": "Cheapest first by cost_eur.p50; zones without prices are left out",
+      "items": {
+       "$ref": "#/components/schemas/ComputeZone"
+      },
+      "title": "Zones",
+      "type": "array"
+     }
+    },
+    "required": [
+     "generated_at",
+     "kw",
+     "hours",
+     "deadline",
+     "eur_per_gbp",
+     "zones",
+     "cheapest_zone",
+     "note"
+    ],
+    "title": "ComputeResponse",
+    "type": "object"
+   },
+   "ComputeZone": {
+    "additionalProperties": false,
+    "properties": {
+     "avg_price": {
+      "$ref": "#/components/schemas/Quantiles",
+      "description": "Mean wholesale price over the best window, in unit"
+     },
+     "cost": {
+      "$ref": "#/components/schemas/Quantiles",
+      "description": "Energy cost of the job in the best window, in currency"
+     },
+     "cost_eur": {
+      "$ref": "#/components/schemas/Quantiles",
+      "description": "cost converted to EUR so zones compare"
+     },
+     "cost_now": {
+      "$ref": "#/components/schemas/Quantiles",
+      "description": "Energy cost if started at the next hour, in currency"
+     },
+     "currency": {
+      "enum": [
+       "GBP",
+       "EUR"
+      ],
+      "title": "Currency",
+      "type": "string"
+     },
+     "end": {
+      "format": "date-time",
+      "title": "End",
+      "type": "string"
+     },
+     "kind": {
+      "description": "actual only when every hour of both windows has a cleared price",
+      "enum": [
+       "actual",
+       "forecast",
+       "modelled",
+       "estimated",
+       "scenario"
+      ],
+      "title": "Kind",
+      "type": "string"
+     },
+     "prices": {
+      "description": "Hourly prices from the next hour to the deadline",
+      "items": {
+       "$ref": "#/components/schemas/ComputePrice"
+      },
+      "title": "Prices",
+      "type": "array"
+     },
+     "saving": {
+      "$ref": "#/components/schemas/Quantiles",
+      "description": "cost_now minus cost, in currency"
+     },
+     "saving_eur": {
+      "$ref": "#/components/schemas/Quantiles"
+     },
+     "start": {
+      "description": "Best start hour before the deadline",
+      "format": "date-time",
+      "title": "Start",
+      "type": "string"
+     },
+     "unit": {
+      "description": "Price unit, e.g. EUR/MWh",
+      "title": "Unit",
+      "type": "string"
+     },
+     "zone": {
+      "enum": [
+       "GB",
+       "FR",
+       "DE-LU",
+       "NL",
+       "BE",
+       "NO2"
+      ],
+      "title": "Zone",
+      "type": "string"
+     }
+    },
+    "required": [
+     "zone",
+     "currency",
+     "unit",
+     "start",
+     "end",
+     "avg_price",
+     "cost",
+     "cost_now",
+     "saving",
+     "cost_eur",
+     "saving_eur",
+     "kind",
+     "prices"
+    ],
+    "title": "ComputeZone",
+    "type": "object"
+   },
    "ConstraintCost": {
     "additionalProperties": false,
     "properties": {
@@ -2236,6 +2450,110 @@
  },
  "openapi": "3.1.0",
  "paths": {
+  "/compute": {
+   "get": {
+    "description": "Cheapest start per zone for a job drawing `kw` for `hours`, before `deadline` (default 24 h ahead).\n\n`zones` is a comma-separated list (default all); `at` replays the answer as of an earlier time.",
+    "operationId": "compute_compute_get",
+    "parameters": [
+     {
+      "in": "query",
+      "name": "kw",
+      "required": false,
+      "schema": {
+       "default": 1000.0,
+       "title": "Kw",
+       "type": "number"
+      }
+     },
+     {
+      "in": "query",
+      "name": "hours",
+      "required": false,
+      "schema": {
+       "default": 6,
+       "title": "Hours",
+       "type": "integer"
+      }
+     },
+     {
+      "in": "query",
+      "name": "zones",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Zones"
+      }
+     },
+     {
+      "in": "query",
+      "name": "deadline",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "format": "date-time",
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Deadline"
+      }
+     },
+     {
+      "in": "query",
+      "name": "at",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "format": "date-time",
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "At"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ComputeResponse"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Compute",
+    "tags": [
+     "household"
+    ]
+   }
+  },
   "/explain": {
    "get": {
     "operationId": "explain_explain_get",
