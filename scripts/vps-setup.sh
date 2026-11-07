@@ -27,6 +27,7 @@ mkdir -p "$ROOT"/{agents,logs}
 chgrp -R "$GROUP" "$ROOT"
 chmod 2775 "$ROOT" "$ROOT"/agents "$ROOT"/logs
 
+git config --system --add safe.directory '*'
 BARE="$ROOT/repo.git"
 if [ ! -d "$BARE" ]; then
   git init -q --bare --shared=group -b main "$BARE"
@@ -37,7 +38,6 @@ if [ ! -d "$BARE" ]; then
 fi
 install -m 0775 "$SRC/scripts/pre-receive" "$BARE/hooks/pre-receive"
 
-git config --system --add safe.directory '*'
 touch "$ROOT/hub.db" && chgrp "$GROUP" "$ROOT/hub.db" && chmod 0664 "$ROOT/hub.db"
 
 clone() {
