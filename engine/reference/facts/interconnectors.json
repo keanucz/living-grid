@@ -1,0 +1,194 @@
+[
+  {
+    "id": "ic_britned_capacity",
+    "question": "What is the rated capacity in MW of the BritNed interconnector between the Netherlands and Great Britain?",
+    "used_by": "#35",
+    "processor": "core",
+    "run_id": "srun_051cfaf41dc045324be9e2f451ab5dc7",
+    "retrieved_at": "2026-11-07T14:00:38+00:00",
+    "value": "1,000 MW",
+    "unit": "MW",
+    "as_of": "Published 01/04/2026",
+    "caveat": "A 2025 Ofgem document describes BritNed as a 1016 MW interconnector; BritNed and TenneT state its capacity as 1,000 MW.",
+    "confidence": "medium",
+    "sources": [
+      {
+        "url": "https://www.tennet.eu/news/britned-marks-15-years-cross-border-electricity-trading",
+        "quote": "With a capacity of 1,000 MW, [BritNed"
+      },
+      {
+        "url": "https://www.ofgem.gov.uk/sites/default/files/2025-06/BritNed-Modified-Access-Rules-2025-decision-letter.pdf",
+        "quote": "BritNed is a 1016 MW high voltage direct current (HVDC) interconnector"
+      }
+    ],
+    "verified": true,
+    "verification": "'1000' found in an independent fetch of https://www.tennet.eu/news/britned-marks-15-years-cross-border-electricity-trading"
+  },
+  {
+    "id": "ic_eleclink_capacity",
+    "question": "What is the rated capacity in MW of the ElecLink interconnector through the Channel Tunnel between France and Great Britain?",
+    "used_by": "#35",
+    "processor": "core",
+    "run_id": "srun_051cfaf41dc04532fedee399d147a392",
+    "retrieved_at": "2026-11-07T14:00:38+00:00",
+    "value": "1000MW",
+    "unit": "MW",
+    "as_of": "",
+    "caveat": "none",
+    "confidence": "high",
+    "sources": [
+      {
+        "url": "https://www.eleclink.co.uk/about-us/what-we-do",
+        "quote": "Own and operate an exempted 1000MW electricity interconnector through the Channel Tunnel"
+      }
+    ],
+    "verified": true,
+    "verification": "'1000' found in an independent fetch of https://www.eleclink.co.uk/about-us/what-we-do"
+  },
+  {
+    "id": "ic_ifa2_capacity",
+    "question": "What is the rated capacity in MW of the IFA2 interconnector between France and Great Britain?",
+    "used_by": "#35",
+    "processor": "core",
+    "run_id": "srun_051cfaf41dc04532b1d3e446a60c77f1",
+    "retrieved_at": "2026-11-07T14:00:38+00:00",
+    "value": "1,000MW",
+    "unit": "MW",
+    "as_of": "",
+    "caveat": "none",
+    "confidence": "high",
+    "sources": [
+      {
+        "url": "https://www.ofgem.gov.uk/sites/default/files/docs/2020/06/schedule_4_-_ifa2_licence_guidance_0.pdf",
+        "quote": "RC means the Rated Capacity of IFA2’s interconnector and has a value of 1,000MW"
+      }
+    ],
+    "verified": true,
+    "verification": "'000' found in an independent fetch of https://www.ofgem.gov.uk/sites/default/files/docs/2020/06/schedule_4_-_ifa2_licence_guidance_0.pdf"
+  },
+  {
+    "id": "ic_ifa_capacity",
+    "question": "What is the rated capacity in MW of the IFA (Interconnexion France-Angleterre) interconnector between France and Great Britain?",
+    "used_by": "#35",
+    "processor": "core",
+    "run_id": "srun_051cfaf41dc0453264c8e4efa04df4dc",
+    "retrieved_at": "2026-11-07T14:00:38+00:00",
+    "value": "2000MW",
+    "unit": "MW",
+    "as_of": "",
+    "caveat": "none",
+    "confidence": "high",
+    "sources": [
+      {
+        "url": "https://www.ofgem.gov.uk/sites/default/files/2023-04/Approval%20of%20the%20modified%20Access%20Rules%20and%20the%20modified%20Charging%20Methodology%20for%20the%20Interconnexion%20France%20%281%29.pdf",
+        "quote": "1 The IFA interconnector is a 2000MW high voltage direct current (HVDC) link, connecting the transmission systems of Great Britain (GB) and France."
+      }
+    ],
+    "verified": true,
+    "verification": "'2000' found in an independent fetch of https://www.ofgem.gov.uk/sites/default/files/2023-04/Approval%20of%20the%20modified%20Access%20Rules%20and%20the%20modified%20Charging%20Methodology%20for%20the%20Interconnexion%20France%20%281%29.pdf"
+  },
+  {
+    "id": "ic_nemo_capacity",
+    "question": "What is the rated capacity in MW of the Nemo Link interconnector between Belgium and Great Britain?",
+    "used_by": "#35",
+    "processor": "core",
+    "run_id": "srun_051cfaf41dc0453298f4e243077c8cf8",
+    "retrieved_at": "2026-11-07T14:00:38+00:00",
+    "value": "1,000MW",
+    "unit": "MW",
+    "as_of": "15 November 2016 (publication date of Ofgem guidance)",
+    "caveat": "This is the Ofgem-defined rated capacity. Nemo Link separately describes auction capacity as up to 1,012 MW; that is a different measure.",
+    "confidence": "high",
+    "sources": [
+      {
+        "url": "https://www.ofgem.gov.uk/sites/default/files/docs/2016/11/nemo_licence_guidance.pdf",
+        "quote": "RC means the Rated Capacity of Nemo Link’s interconnector and has a value of 1,000MW"
+      },
+      {
+        "url": "https://www.nemolink.co.uk/",
+        "quote": "The interconnector enables traders to buy up to 1012 MW capacity in auctions over a number of timeframes. Nemo Link capacity can be procured through explicit auctions on the [eCAT Platform](https://ecat.jao.eu/ca/web/pages/login.jsp) managed by the [Joint Allocation Office (JAO)](https://www.jao.eu/main) ."
+      }
+    ],
+    "verified": true,
+    "verification": "'000' found in an independent fetch of https://www.ofgem.gov.uk/sites/default/files/docs/2016/11/nemo_licence_guidance.pdf"
+  },
+  {
+    "id": "ic_neuconnect_status",
+    "question": "As of November 2026, is the NeuConnect interconnector between Germany and Great Britain in commercial operation, and what is its rated capacity in MW?",
+    "used_by": "#35",
+    "processor": "core",
+    "run_id": "srun_051cfaf41dc04532330ae0f5d85577ae",
+    "retrieved_at": "2026-11-07T14:00:38+00:00",
+    "value": "No — the project was still in construction, with converter-station fit-out underway; full operations were expected in 2028. Rated capacity: 1,400 MW (stated as 1.4GW).",
+    "unit": "MW",
+    "as_of": "November 2026; the latest explicit official construction update cited here is dated September 25, 2026.",
+    "caveat": "The November status is inferred from the latest official progress update found (September 25, 2026), which reports ongoing construction; 2028 was a forecast for full operations, not a confirmed commissioning date.",
+    "confidence": "medium",
+    "sources": [
+      {
+        "url": "https://neuconnect-interconnector.com/neuconnect-moves-into-next-stage-of-construction/",
+        "quote": "September 25, 2026 … ## **NeuConnect moves into next stage of construction with Converter Station fit out works now underway** … * **Key mechanical and electrical systems and equipment being installed to** **help to power vital new UK-German energy link** … NeuConnect has moved into the next stage of construction with fit out works now underway at its huge Converter Stations in the UK and Germany – the works will see key mechanical and electrical systems being installed to help to power the first direct energy link between the UK and Germany. … Led by global investors [Meridiam](https://www.me"
+      },
+      {
+        "url": "https://neuconnect-interconnector.com/neuconnect-project-highlighted-during-historic-uk-german-state-visit-copy",
+        "quote": "January 20, 2026 … * **Agreement with one of Europe’s fastest growing tech companies marks another important step towards NeuConnect’s start of operations** … * **State-of-the-art Market Integration Platform will allow for nomination of transmission rights between the UK and German electricity markets** … NeuConnect – the first direct energy link under construction between the UK and Germany – has appointed Supercharge as its Market Integration Platform provider. The platform will play a crucial customer-facing role in NeuConnect’s cross-border operations, enabling energy traders to nominate c"
+      }
+    ],
+    "verified": true,
+    "verification": "'2028' found in an independent fetch of https://neuconnect-interconnector.com/neuconnect-project-highlighted-during-historic-uk-german-state-visit-copy"
+  },
+  {
+    "id": "ic_nsl_capacity",
+    "question": "What is the rated transmission capacity in MW of the North Sea Link (NSL) interconnector between Norway (Kvilldal) and Great Britain (Blyth)?",
+    "used_by": "#35",
+    "processor": "core",
+    "run_id": "srun_051cfaf41dc0453217bde5982d8e0e3b",
+    "retrieved_at": "2026-11-07T14:00:38+00:00",
+    "value": "1400MW",
+    "unit": "MW",
+    "as_of": "",
+    "caveat": "Statnett separately states that the maximum capacity was set to 1100 MW from the installed capacity of 1400 MW.",
+    "confidence": "high",
+    "sources": [
+      {
+        "url": "http://www.jao.eu/sites/default/files/2026-08/1786626651698-nsl-access-rules-charging-methodology---ofgem-approved-aug2026.pdf",
+        "quote": "NSL is a 1400MW Interconnector, connecting between Blyth, Northumberland in GB and Kvilldal in Norway."
+      },
+      {
+        "url": "https://www.statnett.no/en/about-statnett/news-and-press-releases/news-archive-2023/reduced-capacity-on-norway-uk-interconnector",
+        "quote": "Statnett has decided to reduce the maximum capacity on North Sea Link, the interconnector between Norway and the UK, in accordance with the interconnector Government License. Capacity will be set to a maximum of 1100 MW from the installed capacity of 1400 MW."
+      }
+    ],
+    "verified": true,
+    "verification": "'1400' found in an independent fetch of http://www.jao.eu/sites/default/files/2026-08/1786626651698-nsl-access-rules-charging-methodology---ofgem-approved-aug2026.pdf"
+  },
+  {
+    "id": "ic_viking_capacity",
+    "question": "What is the rated capacity in MW of the Viking Link interconnector between Denmark and Great Britain?",
+    "used_by": "#35",
+    "processor": "core",
+    "run_id": "srun_051cfaf41dc04532e5ffe19ad97dc10d",
+    "retrieved_at": "2026-11-07T14:00:38+00:00",
+    "value": "1400 MW",
+    "unit": "MW",
+    "as_of": "15 June 2026",
+    "caveat": "This is the rated capacity; actual available transfer can be lower depending on operating and grid conditions.",
+    "confidence": "high",
+    "sources": [
+      {
+        "url": "https://www.ofgem.gov.uk/sites/default/files/2026-06/Approval-of-the-Access-Rules-and-Charging-Methodology-submitted-by-Viking-Link.pdf",
+        "quote": "Viking Link is a 1400 MW high voltage direct current (HVDC) interconnector, connecting the transmission systems of Great Britain (GB) and Denmark (DK)."
+      },
+      {
+        "url": "https://www.ofgem.gov.uk/sites/default/files/docs/2020/09/appendix_4_-_ghd_interconnector_availabilty_viking_link_report.pdf",
+        "quote": "Project Detail Value/Technology Unit Rated Capacity 1400 MW"
+      },
+      {
+        "url": "https://www.nib.int/articles/the-viking-link-bridging-time-and-energy",
+        "quote": "The current capacity of the Viking Link varies between 1,100 MW and 1,400 MW depending on conditions in the onshore grid. The top limit cannot now always be met, because onshore grid in the Western part of Jutland is being reinforced. Looking ahead, the Viking Link is expected to reach its full capacity of 1,400 MW in 2026, once the Danish electricity grid is fully prepared."
+      }
+    ],
+    "verified": true,
+    "verification": "'1400' found in an independent fetch of https://www.ofgem.gov.uk/sites/default/files/2026-06/Approval-of-the-Access-Rules-and-Charging-Methodology-submitted-by-Viking-Link.pdf"
+  }
+]

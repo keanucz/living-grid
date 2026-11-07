@@ -1,0 +1,115 @@
+[
+  {
+    "id": "em_coal",
+    "question": "What direct-combustion CO2 emission factor in gCO2 per kWh of electricity does the GB Carbon Intensity API (National Grid ESO / NESO methodology) use for coal generation?",
+    "used_by": "#49 #45",
+    "processor": "core",
+    "run_id": "srun_051cfaf41dc04532a03ece7969a1f0f2",
+    "retrieved_at": "2026-11-07T14:00:43+00:00",
+    "value": "937",
+    "unit": "gCO2/kWh",
+    "as_of": "Methodology issue: May 2024; included in a NESO document dated 24 November 2025.",
+    "caveat": "NESO describes this as a carbon-intensity factor, based on output-weighted average GB generation efficiency and DUKES CO2 emission factors for fuels.",
+    "confidence": "high",
+    "sources": [
+      {
+        "url": "https://www.neso.energy/document/373936/download",
+        "quote": "consumption [3]. Table 1 shows the peer-reviewed carbon intensity factors of GB fuel types used in this methodology. Carbon intensity factors are based on the output-weight average efficiency of generation in GB and DUKES CO2 emission factors for fuels [4]. … ### **Interconnector carbon intensity factors** … Daily at 6am, the average generation mix of each network the GB grid is connected to through interconnectors is collected for the previous 24 hours through the ENTSO-E Transparency Platform API [6]. … The factors from Table 1 are applied to each technology type for each import generation m"
+      }
+    ],
+    "verified": true,
+    "verification": "'937' found in an independent fetch of https://www.neso.energy/document/373936/download"
+  },
+  {
+    "id": "em_gas_ccgt_ci_api",
+    "question": "What emission factors in gCO2 per kWh does the GB Carbon Intensity API methodology use for gas CCGT and gas OCGT generation?",
+    "used_by": "#49 #45",
+    "processor": "core",
+    "run_id": "srun_051cfaf41dc04532ed49cd944fcdaee7",
+    "retrieved_at": "2026-11-07T14:00:44+00:00",
+    "value": "Gas (Combined Cycle): 394; Gas (Open Cycle): 651",
+    "unit": "gCO2/kWh",
+    "as_of": "Published API factors retrieved 2026-11-07; the methodology does not state an effective date.",
+    "caveat": "The methodology describes these as “Gas (Combined Cycle)” and “Gas (Open Cycle)” and says the factors are based on output-weight average efficiency of generation in GB and DUKES CO2 emission factors for fuels.",
+    "confidence": "high",
+    "sources": [
+      {
+        "url": "https://www.neso.energy/document/373936/download",
+        "quote": "# **Carbon Intensity Forecast Methodology** … ### Publicly Available … 2 … consumption [3]. Table 1 shows the peer-reviewed carbon intensity factors of GB fuel types used in this methodology. Carbon intensity factors are based on the output-weight average efficiency of generation in GB and DUKES CO2 emission factors for fuels [4]. … ### **Interconnector carbon intensity factors** … Daily at 6am, the average generation mix of each network the GB grid is connected to through interconnectors is collected for the previous 24 hours through the ENTSO-E Transparency Platform API [6]. … The factors fr"
+      },
+      {
+        "url": "https://api.carbonintensity.org.uk/intensity/factors",
+        "quote": "{  …   \"data\":[{  …     \"Biomass\": 120, …     \"Coal\": 937, …     \"Dutch Imports\": 474, …     \"French Imports\": 53, …     \"Gas (Combined Cycle)\": 394, …     \"Gas (Open Cycle)\": 651, …     \"Hydro\": 0, …     \"Irish Imports\": 458, …     \"Nuclear\": 0, …     \"Oil\": 935, …     \"Other\": 300, …     \"Pumped Storage\": 0, …     \"Solar\": 0, …     \"Wind\": 0 …   }] … }"
+      }
+    ],
+    "verified": true,
+    "verification": "'394' found in an independent fetch of https://www.neso.energy/document/373936/download"
+  },
+  {
+    "id": "em_ipcc_lifecycle",
+    "question": "What are the IPCC AR5 median lifecycle emission factors in gCO2eq per kWh for coal, gas combined cycle, nuclear, onshore wind, offshore wind, solar PV and hydro?",
+    "used_by": "#49 #45",
+    "processor": "core",
+    "run_id": "srun_051cfaf41dc04532875fcc7a006b96ad",
+    "retrieved_at": "2026-11-07T14:00:44+00:00",
+    "value": "Coal — PC: 820; gas — combined cycle: 490; nuclear: 12; onshore wind: 11; offshore wind: 12; solar PV — rooftop: 41; solar PV — utility: 48; hydropower: 24.",
+    "unit": "gCO2eq / kWh",
+    "as_of": "IPCC AR5 (2014), Table A.III.2; currently commercially available technologies.",
+    "caveat": "Solar PV is split into rooftop and utility values; the table reports lifecycle emissions including the albedo effect.",
+    "confidence": null,
+    "sources": [
+      {
+        "url": "https://www.ipcc.ch/site/assets/uploads/2018/02/ipcc_wg3_ar5_annex-iii.pdf",
+        "quote": "Schlömer S., T. Bruckner, L. Fulton, E. Hertwich, A. McKinnon, D. Perczyk, J. Roy, R. Schaeffer, R. Sims, P. Smith, and R. Wiser, 2014: Annex III: Technology-specific cost and performance parameters. In: Climate Change 2014: Mitigation of Climate Change. Contribution of Working Group III to the Fifth Assessment Report of the Intergovernmental Panel on Climate Change [Edenhofer, O., R. Pichs-Madruga, Y. Sokona, E. Farahani, S. Kadner, K. Seyboth, A. Adler, I. Baum, S. Brunner, P. Eickemeier, B. Kriemann, J. Savolainen, S. Schlömer, C. von Stechow, T. Zwickel and J.C. Minx (eds.)]. Cambridge Uni"
+      }
+    ],
+    "verified": true,
+    "verification": "'820' found in an independent fetch of https://www.ipcc.ch/site/assets/uploads/2018/02/ipcc_wg3_ar5_annex-iii.pdf"
+  },
+  {
+    "id": "em_lignite",
+    "question": "What is a standard direct CO2 emission factor in gCO2 per kWh for lignite (brown coal) power generation in Germany?",
+    "used_by": "#49 #45",
+    "processor": "core",
+    "run_id": "srun_051cfaf41dc04532d46acb953308140e",
+    "retrieved_at": "2026-11-07T14:00:44+00:00",
+    "value": "1,049 g CO₂/kWh el (mean)",
+    "unit": "g CO₂/kWh el",
+    "as_of": "UBA 2022 fuel-factor basis; no specific operating year stated for the mean.",
+    "caveat": "This is a representative mean, not a universal plant value: the source gives 1,173 g CO₂/kWh el for old plants and 831 for modern plants. A separate Germany-specific empirical study reports 1,125.56 gCO₂/kWh for lignite, so actual factors vary with plant characteristics and methodology.",
+    "confidence": "medium",
+    "sources": [
+      {
+        "url": "https://www.volker-quaschning.de/datserv/CO2-spez/index_e.php",
+        "quote": "Specific CO ₂ \\-emissions of different fuels in power generation … |**Fuel type** |**Power Plant Efficiency** |**direct CO ₂ \\-­emis­sions 1)** |**Emis­sions incl. upstream chain 2)** | … | --- | --- | --- | --- | … | |% |g CO ₂ /kWh el |g CO ₂ ‑eq/kWh el | … |**Lignite** | | | | … |old |34 3) |1173 |1200 | … |modern |48 3) |831 |850 | … |mean |**38** 3) |**1049** |1073 | … |**Hard coal** | | | | … |old |36 3) |939 |1051 | … |modern |51 3) |663 |742 | … |mean |**39** 3) |**867** |970 | … |**Natural Gas** | | | | … |new (turbine) |39,2 |512 |624 | … |new (CCGT) |59 |340 |415 | … |mean |**56,1**"
+      },
+      {
+        "url": "https://www.sciencedirect.com/science/article/pii/S2772783122000176",
+        "quote": "Table 5 displays the calculated emission factors per technology for each country, and gives an overview of the underlying data. We assume an EF to be representative for a country and a technology if the corresponding coverage as calculated in Eq. (6) is larger than . In Table 5 , we list for each country and technology the number of power plants and their aggregated capacity as contained in the ENTSO-E per unit generation time series dataset, the subset which we have matched to power plants from the EUTL, and the final validated matched dataset, which fulfills the coverage criterion of . It sh"
+      }
+    ],
+    "verified": true,
+    "verification": "'1049' found in an independent fetch of https://www.volker-quaschning.de/datserv/CO2-spez/index_e.php"
+  },
+  {
+    "id": "em_oil_biomass",
+    "question": "What emission factors in gCO2 per kWh does the GB Carbon Intensity API methodology use for oil and biomass generation?",
+    "used_by": "#49 #45",
+    "processor": "core",
+    "run_id": "srun_051cfaf41dc045323a54cd2346724418",
+    "retrieved_at": "2026-11-07T14:00:44+00:00",
+    "value": "Biomass: 120; Oil: 935.",
+    "unit": "gCO2/kWh",
+    "as_of": "24 November 2025",
+    "caveat": "For biomass, the methodology notes that under ‘consumption-based’ accounting its carbon intensity is reported as 120 ± 120 gCO2/kWh, with large uncertainty related to biomass supply chains and quantifying non-biogenic emissions.",
+    "confidence": "high",
+    "sources": [
+      {
+        "url": "https://www.neso.energy/document/373936/download",
+        "quote": "# **Carbon Intensity Forecast Methodology** … ### Publicly Available … 2 … consumption [3]. Table 1 shows the peer-reviewed carbon intensity factors of GB fuel types used in this methodology. Carbon intensity factors are based on the output-weight average efficiency of generation in GB and DUKES CO2 emission factors for fuels [4]. … ### **Interconnector carbon intensity factors** … Daily at 6am, the average generation mix of each network the GB grid is connected to through interconnectors is collected for the previous 24 hours through the ENTSO-E Transparency Platform API [6]. … The factors fr"
+      }
+    ],
+    "verified": true,
+    "verification": "'120' found in an independent fetch of https://www.neso.energy/document/373936/download"
+  }
+]

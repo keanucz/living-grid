@@ -1,0 +1,202 @@
+[
+  {
+    "id": "bc_carbon_intensity_range",
+    "question": "What is the maximum date range per request of the GB Carbon Intensity API (api.carbonintensity.org.uk) regional endpoints?",
+    "used_by": "#49",
+    "processor": "core",
+    "run_id": "srun_051cfaf41dc0453270eec389cc9c8522",
+    "retrieved_at": "2026-11-07T14:00:46+00:00",
+    "value": "14 days (two weeks) per request.",
+    "unit": "days",
+    "as_of": "",
+    "caveat": "The official regional-range endpoint description does not itself specify a maximum; the 14-day figure is supported by the API’s stated intensity-range limit and Energy Systems Catapult’s API-wide two-week limit in the context of regional-range calls.",
+    "confidence": "medium",
+    "sources": [
+      {
+        "url": "https://es.catapult.org.uk/insight/demystifying-the-carbon-intensity-api-will-rowe/",
+        "quote": "#### Behind the scenes: CO2 API tips … 1. **Call limitations** : If you’re after all the historic intensity data you can get, be patient. The API has its limits. It’ll only serve you two weeks’ worth of data at a time. So, be patient, you’ll need to loop and make calls for subsequent two-week periods. This can take time (a few minutes for years of data), but good things come to those who wait… … 2. **Local data cache** : We found it really helpful to make a local cache of the data rather than requesting all the data on every run. By saving the data where our code can reach it faster, we’ve spe"
+      },
+      {
+        "url": "https://carbon-intensity.github.io/api-definitions/",
+        "quote": "_Get Carbon Intensity data between specified datetimes for GB regions_ … Get Regional Carbon Intensity data between specified datetimes. All times provided in UTC (+00:00). … ### Parameters … |Parameter |In |Type |Required |Description | … | --- | --- | --- | --- | --- | … |from |path |string |true |Start datetime in in ISO8601 format YYYY-MM-DDThh:mmZ e.g. 2017-08-25T12:35Z | … |to |path |string |true |End datetime in in ISO8601 format YYYY-MM-DDThh:mmZ e.g. 2017-08-25T12:35Z | … _Get Carbon Intensity data between from and to datetime_ … Get Carbon Intensity data between the {from} and {to} d"
+      }
+    ],
+    "verified": true,
+    "verification": "'14' found in an independent fetch of https://carbon-intensity.github.io/api-definitions/"
+  },
+  {
+    "id": "bc_elexon_system_price_lag",
+    "question": "How long after the end of each settlement period does Elexon publish the initial GB system price (System Sell / Buy Price) on the Insights Solution (BMRS)?",
+    "used_by": "#64",
+    "processor": "core",
+    "run_id": "srun_051cfaf41dc0453289cdc5886ab624cb",
+    "retrieved_at": "2026-11-07T14:00:46+00:00",
+    "value": "“approximately 15 minutes after any given Settlement Period”",
+    "unit": "minutes",
+    "as_of": "Elexon article last updated 26 February 2024; the current System Prices page also states 15 minutes.",
+    "caveat": "This is the initial indicative price; the calculations are refreshed at D+1 (the following day) to account for late actions or changes by the System Operator.",
+    "confidence": "high",
+    "sources": [
+      {
+        "url": "https://www.elexon.co.uk/bsc/article/indicative-settlement-price-data-now-available-on-the-insights-solution",
+        "quote": "We have set the Indicative Settlement Price data to be ready approximately 15 minutes after any given Settlement Period, any sooner than this and the data will not reflect bid/offer acceptances, and [Balancing Services Adjustment Data.](https://www.elexon.co.uk/bsc/glossary/balancing-services-adjustment-data/)"
+      },
+      {
+        "url": "https://bmrs.elexon.co.uk/system-prices",
+        "quote": "The indicative price calculation is published 15 minutes after the effective Settlement Period based on parameters available at the time the calculations were run."
+      }
+    ],
+    "verified": true,
+    "verification": "'15' found in an independent fetch of https://www.elexon.co.uk/bsc/article/indicative-settlement-price-data-now-available-on-the-insights-solution"
+  },
+  {
+    "id": "bc_energy_charts_rate_limit",
+    "question": "What is the current public rate limit of the Energy-Charts API (api.energy-charts.info) per client IP, per endpoint and for the /price endpoint?",
+    "used_by": "brief",
+    "processor": "core",
+    "run_id": "srun_051cfaf41dc04532a2acc79b7e981a00",
+    "retrieved_at": "2026-11-07T14:00:46+00:00",
+    "value": "The default is 2 requests per minute with a burst of 4; /price 2 per minute (burst 2).",
+    "unit": "requests per minute; burst requests",
+    "as_of": "Current documentation, accessed 2026-11-07 (no effective date stated).",
+    "caveat": "The limits are adjusted dynamically to current server load, so the effective limit can be lower during peak times. On HTTP 429, honor the Retry-After header.",
+    "confidence": "high",
+    "sources": [
+      {
+        "url": "https://api.energy-charts.info/",
+        "quote": "#### Rate Limiting … Requests are limited per client IP **and** per endpoint (token bucket, so short bursts are allowed). The default is 2 requests per minute with a burst of 4; `/signal` allows 20 per minute (burst 40), `/price` 2 per minute (burst 2), and every `/v2` endpoint inherits the limit of its v1 counterpart. In addition, the limits are adjusted dynamically to the current server load, so the effective limit can be lower during peak times. … Exceeding a limit returns **HTTP 429** with a `Retry-After` header giving the number of seconds to wait. Clients should honour that header instea"
+      }
+    ],
+    "verified": false,
+    "verification": "no numeric figure in the answer to check; needs a human"
+  },
+  {
+    "id": "bc_gb_dst",
+    "question": "On which date in 2026 did British Summer Time end (clocks went back to GMT) in the UK?",
+    "used_by": "all",
+    "processor": "core",
+    "run_id": "srun_051cfaf41dc04532bdf9c324b6eee437",
+    "retrieved_at": "2026-11-07T14:00:47+00:00",
+    "value": "25 October 2026",
+    "unit": "n/a",
+    "as_of": "2026",
+    "caveat": "none",
+    "confidence": "medium",
+    "sources": [
+      {
+        "url": "https://time-and-date.uk.com/british-summer-time-bst",
+        "quote": "In 2026, BST begins on 29 March and ends on 25 October."
+      }
+    ],
+    "verified": true,
+    "verification": "'25' found in an independent fetch of https://time-and-date.uk.com/british-summer-time-bst"
+  },
+  {
+    "id": "bc_n2ex_timing",
+    "question": "What are the gate closure time and result publication time (UK time) of the Nord Pool N2EX day-ahead auction for Great Britain?",
+    "used_by": "#54 #55",
+    "processor": "core",
+    "run_id": "srun_051cfaf41dc04532efb7c722beda2155",
+    "retrieved_at": "2026-11-07T14:00:46+00:00",
+    "value": "Gate closure: 09:50 UK time; results are published at latest 10:00 UK time.",
+    "unit": "UK time",
+    "as_of": "Daily UK N2EX Day Ahead Auction (delivery the following day); Nord Pool support page modified 26 Jul 2022.",
+    "caveat": "Nord Pool states results are published “at latest” 10:00 GMT, while North Sea Link describes preliminary results finalized by 10:00 UK time. Nord Pool operational notices show that actual final-result publication can occur later.",
+    "confidence": "medium",
+    "sources": [
+      {
+        "url": "https://support.nordpoolgroup.com/support/solutions/articles/8000088463-about-the-n2ex-day-ahead-auction",
+        "quote": "The N2EX Day Ahead Auction in the UK is a daily auction with physical delivery the following day (d+1). Gate closure time is 09:50 GMT / 10:50 CET and results are published at latest 10:00 GMT / 11:00 CET."
+      },
+      {
+        "url": "https://www.northsealink.com/en/trade-with-us/register",
+        "quote": "The established N2EX auction in Great Britain, and a counterpart auction in Norway’s NO2 bidding area, offers market participants this capacity. Nord Pool’s N2EX auction gate closure time is 09:50 UK time (NO2 auction - 10:50 CET), with preliminary results finalised by 10:00 UK time (11:00 CET)."
+      },
+      {
+        "url": "https://www.nordpoolgroup.com/en/trading/Operational-Message-List/2026/08/n2ex-day-ahead-final-results-published-20260805090200",
+        "quote": "05 August 2026 11:02 N2EX Day-Ahead: Final results published Final results for the N2EX Day-Ahead auction with delivery 06.08.2026 have now been published."
+      }
+    ],
+    "verified": true,
+    "verification": "'09' found in an independent fetch of https://support.nordpoolgroup.com/support/solutions/articles/8000088463-about-the-n2ex-day-ahead-auction"
+  },
+  {
+    "id": "bc_nordpool_history",
+    "question": "How far back in time does the free Nord Pool data portal (data.nordpoolgroup.com) API allow day-ahead price history to be queried without a subscription?",
+    "used_by": "#19",
+    "processor": "core",
+    "run_id": "srun_051cfaf41dc04532d6d8c53f9aa7456c",
+    "retrieved_at": "2026-11-07T14:00:46+00:00",
+    "value": "2021-01-01",
+    "unit": "n/a",
+    "as_of": "Earliest date shown in the portal’s yearly day-ahead price table; 2021-01-01 to 2021-12-31.",
+    "caveat": "The public portal table shows 2021 as its earliest year. Nord Pool says historical data is limited for non-subscribers and a Data Portal subscription provides the full available history, but does not specify an exact API cutoff; 2021-01-01 is therefore the earliest date confirmed in the public rendering.",
+    "confidence": "medium",
+    "sources": [
+      {
+        "url": "https://data.nordpoolgroup.com/auction/day-ahead/prices?aggregation=YearlyAggregate&currency=EUR&deliveryAreas=NO2%2CNO3%2CNO4%2CNO5&deliveryDate=latest",
+        "quote": "# Day-ahead … ## Prices [Become a Certified Day-Ahead Trader](https://www.nordpoolgroup.com/en/services/nord-pool-academy/nord-pool-day-ahead-trader-course/) … Time interval Currency … Filters expand\\_less Hide Graph … Areas … Baltic EE ELE LT LV … CWE AT BE ELES FR GER KT NL PL … Nordic DK1 DK2 FI FRE NO1 NO2 NO3 NO4 NO5 SE SE1 SE2 SE3 SE4 … SEE BG TEL … System SYS … UK UK … |Year |Delivery Date Start (CET) |Delivery Date End (CET) |NO2 (EUR) |NO3 (EUR) |NO4 (EUR) |NO5 (EUR) | … | --- | --- | --- | --- | --- | --- | --- | … |2026 |2026-01-01 |2026-11-08 |112,97 |84,96 |32,74 |108,14 | … |2025"
+      },
+      {
+        "url": "https://www.nordpoolgroup.com/en/services/power-market-data-services/faq/faq-premium-container/what-data-is-available-in-the-data-portal",
+        "quote": "Historical data is limited for non-subscribers, while a Data Portal ## Historical data is limited for non-subscribers, while a Data Portal subscription provides access to the full available history and enables download"
+      }
+    ],
+    "verified": false,
+    "verification": "manual downgrade: '2021' appears only in the portal's yearly web table; Nord Pool says non-subscriber history is limited, and the team's ingest (#18) observed ~60 days via the API. Do not plan a backfill on this."
+  },
+  {
+    "id": "bc_open_meteo_limit",
+    "question": "What is the free-tier daily API call limit of Open-Meteo for non-commercial use, and does a single call with multiple coordinates count as one call?",
+    "used_by": "#47",
+    "processor": "core",
+    "run_id": "srun_051cfaf41dc0453223e3c45619d38061",
+    "retrieved_at": "2026-11-07T14:00:46+00:00",
+    "value": "The free non-commercial API limit is “Less than 10'000 API calls per day.” A request with multiple coordinates is not necessarily counted as one call: locations factor into its call weight (`weight = nLocations * (nDays / 14) * (nVariables / 10)`).",
+    "unit": "API calls per day; weighted API calls for multi-coordinate requests",
+    "as_of": "Open-Meteo's published terms and multiple-location guidance; neither states an effective date.",
+    "caveat": "The terms also list limits of 5,000 calls per hour and 600 per minute. The weight depends on locations, days, and variables (and may include models/ensemble members). Open-Meteo's pricing FAQ still describes multiple-location APIs as a future feature, which conflicts with its separate multiple-location guidance; the latter directly addresses location-based weighting.",
+    "confidence": "medium",
+    "sources": [
+      {
+        "url": "https://open-meteo.com/en/terms",
+        "quote": "By using the Free API for non-commercial use you agree to following terms: … * Less than 10'000 API calls per day, 5'000 per hour and 600 per minute. … * You may only use the free API services for non-commercial purposes."
+      },
+      {
+        "url": "https://openmeteo.substack.com/p/weather-data-for-multiple-locations",
+        "quote": "### Multiple Locations and API Rate Limiting … Our free, non-commercial API offers of 10,000 daily calls, which suffices for most standard use cases related to weather forecast data. However, the specifics of the API limit are more complex. … When it comes to historical weather data, a single API call can get data spanning 80 years for various weather variables. Now, consider multiplying this by querying data for 1,000 locations simultaneously, and you're dealing with a potential data volume that could reach multiple gigabytes. Surprisingly, the API is capable of handling such extensive reques"
+      },
+      {
+        "url": "https://open-meteo.com/en/pricing",
+        "quote": "#### How is one API call defined? … Typically, one API call corresponds to one HTTP API request. However, if you select 200 … weather variables simultaneously and make extensive use of the API, the number of API … calls can increase. Requests for data covering more than 10 weather variables or extending … over a period of more than 2 weeks for a single location are considered multiple API … calls. … To calculate the number of API calls accurately, fractional counts are used. For example, … a request for 2 weeks of data with 15 weather variables will be calculated as 1.5 API … calls, while 4 we"
+      }
+    ],
+    "verified": true,
+    "verification": "'10' found in an independent fetch of https://open-meteo.com/en/terms"
+  },
+  {
+    "id": "bc_sdac_timing",
+    "question": "What are the gate closure time and the result publication time (CET) of the European Single Day-Ahead Coupling (SDAC) auction?",
+    "used_by": "#54 #55",
+    "processor": "core",
+    "run_id": "srun_051cfaf41dc045323cc2c64d03c661f6",
+    "retrieved_at": "2026-11-07T14:00:46+00:00",
+    "value": "Gate closure: 12:00; preliminary results: not before 12:55; final results: no predefined fixed time.",
+    "unit": "CET/CEST (the manual's time convention)",
+    "as_of": "SDAC normal-day process; Fallback Manual, Version 1.4",
+    "caveat": "The current SDAC manual distinguishes preliminary from final publication: preliminary results cannot be published before 12:55, while the final publication time is not fixed. An EPEX timing document separately lists regular publication at 12:45 for preliminary results and 12:57 for final results, so those older schedule figures differ.",
+    "confidence": "medium",
+    "sources": [
+      {
+        "url": "https://eepublicdownloads.blob.core.windows.net/public-cdn-container/clean-documents/Network%20codes%20documents/NC%20CACM/SDAC%202025/SDAC_Fallback_Manual.pdf",
+        "quote": "**12:55 ~ 13:05 By 14:30 12:00 09:30-10:30** … **SDAC CZCs made available by TSOs** … **Post-coupling, including nominations** … **Closure of orderbook Final publication of results Preliminary publication of results** … ▪ NEMOs send their orderbooks … to the central market coupling … system. … ▪ Calculation of the market … coupling results (30 minutes as of the 15’ MTU Go Live). … ▪ First round of results validation by all … the NEMOs (also called “preliminary confirmation of the results”), usually lasting up to 8 minutes. … ### **Important to know:** … ✓ Preliminary publication of the results"
+      },
+      {
+        "url": "https://www.epexspot.com/sites/default/files/download_center_files/Day-Ahead%20MRC%20Processes%20%2802.07.2019%29.pdf",
+        "quote": "### **Regular publication time of the Market Coupling Results** … • … ### Regular time for publishing the Preliminary Market Coupling Results is 12:45. … ### Regular time for publishing the Final Market Coupling Results is 12:57. … ### As the publication is not a fully coordinated process, the publication time may slightly differ among the NEMOs. … ### **Post-coupling** … ### Nomination process following the publication of the Final Market Coupling Results _(see the dedicated Nomination Deadlines Slides for an overview of the Nomination deadlines)_ . … # Market Results Publication … # _Regular"
+      }
+    ],
+    "verified": true,
+    "verification": "'12' found in an independent fetch of https://eepublicdownloads.blob.core.windows.net/public-cdn-container/clean-documents/Network%20codes%20documents/NC%20CACM/SDAC%202025/SDAC_Fallback_Manual.pdf"
+  }
+]

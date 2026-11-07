@@ -1,0 +1,160 @@
+[
+  {
+    "id": "ev_fr_nuclear_capacity",
+    "question": "What is the total installed nuclear generating capacity in France in GW as of 2026, and how many reactors are in operation?",
+    "used_by": "#50",
+    "processor": "core",
+    "run_id": "srun_051cfaf41dc045329b62dbad3a12eed6",
+    "retrieved_at": "2026-11-07T14:00:39+00:00",
+    "value": "63 GW (63 000 MW(e) Net Capacity); 57 Nuclear Power Reactors in Operation",
+    "unit": "GW (net electrical capacity); reactors",
+    "as_of": "Data as of 2026-11-06 from IAEA Power Reactor Information System",
+    "caveat": "The 63 GW figure is net capacity; the World Nuclear Association separately lists 65,690 MWe gross capacity as of 1 October 2026.",
+    "confidence": "medium",
+    "sources": [
+      {
+        "url": "https://cnpp.iaea.org/public/countries/FR/profile/highlights",
+        "quote": "57 Nuclear Power Reactors in Operation bolt 63 000 MWe total capacity 0 Nuclear Power Reactors being constructed 14 Nuclear Power Reactors shut down bolt 5 549 MWe total capacity 68 Nuclear share of total electricity produced Data as of 2026-11-06 from IAEA Power Reactor Information System. ... France has 57 nuclear power reactors in operation (63 000 MW(e) Net Capacity), including one EPR reactor at the Flamanville site commissioned in December 2024."
+      },
+      {
+        "url": "https://world-nuclear.org/our-association/publications/world-nuclear-outlook-report/france---world-nuclear-outlook-report",
+        "quote": "**Table Fr.1 Nuclear capacity status (as of 1 October 2026)** |Operable reactors |Operable reactors net capacity (MWe) |Operable reactors gross capacity (MWe) |Reactors under construction |Reactors under construction gross capacity (MWe) |Carbon dioxide emissions avoided (cf. coal) (MtCO ₂ ) | |57 |63,000 |65,690 |0 |\\- |14,846 |"
+      }
+    ],
+    "verified": true,
+    "verification": "'63' found in an independent fetch of https://cnpp.iaea.org/public/countries/FR/profile/highlights"
+  },
+  {
+    "id": "ev_fr_reactor_size",
+    "question": "What are the typical net capacities in MW of French nuclear reactors in the 900 MW, 1300 MW and 1450 MW series, and of Flamanville 3?",
+    "used_by": "#50",
+    "processor": "core",
+    "run_id": "srun_051cfaf41dc04532e86ddae8a218a5ab",
+    "retrieved_at": "2026-11-07T14:00:40+00:00",
+    "value": "900 MW(e), 1,300 MW(e), and 1,450 MW(e) for the standard series; Flamanville 3: 1,630 MW(e) reference unit net capacity (1,620 MW(e) design net capacity).",
+    "unit": "MW(e)",
+    "as_of": "EDF 2025 series figures; Flamanville 3 PRIS record listed as Operational (first grid connection: 21 Dec 2024).",
+    "caveat": "EDF gives Flamanville 3 as 1,600 MWe (approximately); IAEA PRIS distinguishes the 1,630 MW(e) reference-unit net capacity from the 1,620 MW(e) design net capacity. Series figures are nominal class ratings, not exact per-reactor capacities.",
+    "confidence": "medium",
+    "sources": [
+      {
+        "url": "https://www-pub.iaea.org/mtcd/publications/pdf/cnpp-2021/countryprofiles/France/France.htm",
+        "quote": "Over time, the unit capacity of France’s reactors increased from 900 MW(e) to 1300 MW(e) and later to 1450 MW(e). ... NUCLEAR POWER PLANTS: OVERVIEW 2\\.2.1. Status and performance of nuclear power plants After the Fessenheim closure in 2020 (two 900 Mwe units), nuclear power in France’s electricity supply system amounts to 61 370 MW(e). It consists of 56 PWRs (32 reactors at 900 MW(e), 20 reactors at 1300 MW(e), and 4 reactors at 1450 MW(e)) (Fig."
+      },
+      {
+        "url": "https://pris.iaea.org/pris/CountryStatistics/ReactorDetails.aspx?current=873",
+        "quote": "FLAMANVILLE-3 Operational Reactor Details |Reactor Type |Model |Owner |Operator | |##### PWR |##### EPR |##### [ÉLECTRICITÉ DE FRANCE](http://www.edf.fr/) |##### [ÉLECTRICITÉ DE FRANCE](http://www.edf.fr/) | |Reference Unit Power (Net Capacity) |Design Net Capacity |Gross Capacity |Thermal Capacity | |##### 1630 MW e |##### 1620 MW e |##### 1650 MW e |##### 4300 MW t |"
+      },
+      {
+        "url": "https://www.edf.fr/sites/groupe/files/2026-04/2026-04-02-edf-facts-and-figures-2025.pdf",
+        "quote": "**57 reactors** generating **67\\.4%** of French power generation in 2025 (1) **A unique technology** : Pressurised Water Reactors with a capacity of 63GW in 4 series: • **32 reactors** of 900MW (42Y average age) • **20 reactors** of 1,300MW (36Y average age) • **4 reactors** of 1,450MW (23Y average age) • **1 EPR reactor** of 1,600MW (to be commissioned in 2026)"
+      },
+      {
+        "url": "https://www.edf.fr/centrale-nucleaire-flamanville3",
+        "quote": "1600 MWe de puissance 1200 salariés d'EDF et d'entreprises partenaires La centrale de Flamanville possède également 2 réacteurs en fonctionnement appelés \"Flamanville 1-2\" d'une puissance de 1300 MWe. [Consulter le site de Flamanville 1-2](https://www.edf.fr/centrale-nucleaire-flamanville) EPR, un réacteur de nouvelle génération Le réacteur de Flamanville 3 est un réacteur à eau pressurisée de type EPR d'environ 1 600 MWe."
+      }
+    ],
+    "verified": true,
+    "verification": "'900' found in an independent fetch of https://www-pub.iaea.org/mtcd/publications/pdf/cnpp-2021/countryprofiles/France/France.htm"
+  },
+  {
+    "id": "ev_fr_temp_sensitivity",
+    "question": "According to RTE, by how many MW does French electricity demand rise for each 1 degree Celsius drop in temperature in winter?",
+    "used_by": "#50",
+    "processor": "core",
+    "run_id": "srun_051cfaf41dc045323578da5fc4b8b40c",
+    "retrieved_at": "2026-11-07T14:00:40+00:00",
+    "value": "Environ 2 400 MW par degré Celsius en moins en hiver.",
+    "unit": "MW per °C decrease",
+    "as_of": "Winter; average estimate in RTE’s Bilan électrique 2020.",
+    "caveat": "RTE notes that temperature sensitivity varies throughout the day.",
+    "confidence": "high",
+    "sources": [
+      {
+        "url": "https://assets.rte-france.com/prod/public/2021-03/Bilan%20electrique%202020_0.pdf",
+        "quote": "## **En hiver, la consommation augmente de 2 400 MW par degré perdu** … La consommation d’électricité en France dépend fortement de la température, notamment pendant les mois d’hiver en raison du parc de chauffages électriques. … Pour établir les chiffres de consommation corrigée de l’aléa de température, RTE utilise un modèle qui vise à séparer la consommation en une part thermosensible et une part non thermosensible. La forme de la courbe de la consommation totale est imposée par la composante thermosensible. … Cette sensibilité à la température de la consommation d’électricité est variable "
+      }
+    ],
+    "verified": true,
+    "verification": "'2400' found in an independent fetch of https://assets.rte-france.com/prod/public/2021-03/Bilan%20electrique%202020_0.pdf"
+  },
+  {
+    "id": "ev_gb_temp_sensitivity",
+    "question": "By how many MW or GW does Great Britain's electricity demand change per 1 degree Celsius change in temperature in winter, according to NESO (National Grid ESO) or academic sources?",
+    "used_by": "#50",
+    "processor": "pro",
+    "run_id": "srun_051cfaf41dc045328283d9b607804181",
+    "retrieved_at": "2026-11-07T14:00:40+00:00",
+    "value": "A 1 °C reduction in daily winter temperature typically gives a ∼1% increase in daily electricity demand.",
+    "unit": "% change in daily demand per 1 °C",
+    "as_of": "Electricity-demand data period: 1975 to 2013.",
+    "caveat": "The academic source gives a percentage, not an absolute MW/GW change; it describes the relationship as typical over the data period. The NESO review does not state a specific per-degree MW/GW figure.",
+    "confidence": "high",
+    "sources": [
+      {
+        "url": "https://iopscience.iop.org/article/10.1088/1748-9326/11/11/114015",
+        "quote": "Over the data period, a 1 °C reduction in daily temperature in winter typically gives a ∼1% increase in daily electricity demand and a 3%–4% increase in gas demand."
+      },
+      {
+        "url": "https://centaur.reading.ac.uk/68474/",
+        "quote": "The daily relationship of electricity and gas demand with temperature in Great Britain is analysed from 1975 to 2013 and 1996 to 2013 respectively."
+      },
+      {
+        "url": "https://www.neso.energy/document/354451/download",
+        "quote": "o Literature reviewed reveals that historically, there has been a moderate correlation between temperature and electricity demand for Great Britain (0.5 < _R_ _2_ < 0.8; _R_ _2_ is the regression coefficient) (Thornton et al 2016)."
+      }
+    ],
+    "verified": false,
+    "verification": "no numeric figure in the answer to check; needs a human"
+  },
+  {
+    "id": "ev_gb_wind_capacity",
+    "question": "What is the total installed wind generation capacity in Great Britain in GW (onshore and offshore separately) as of 2026?",
+    "used_by": "#50",
+    "processor": "core",
+    "run_id": "srun_051cfaf41dc045321c99d84456dc5497",
+    "retrieved_at": "2026-11-07T14:00:40+00:00",
+    "value": "Onshore: 14.3 GW; offshore: 16.0 GW",
+    "unit": "GW",
+    "as_of": "June 2026",
+    "caveat": "These are the operational figures in the July 2026 DESNZ Renewable Energy Planning Database extract; its table covers larger projects. The same briefing’s 14.2 GW onshore and 14.8 GW offshore figures are earlier reference levels from the Clean Power Action Plan, based on end-2023 or mid-2024 data.",
+    "confidence": "medium",
+    "sources": [
+      {
+        "url": "https://researchbriefings.files.parliament.uk/documents/CBP-10182/CBP-10182.pdf",
+        "quote": "Source: DESNZ, Renewable Energy Planning Database: quarterly extract: July 2026 … GW, Great Britain, June 2026 … Operational … Under … Construction … Awaiting … Wind Offshore 16.0 11.8 30.8 … Wind Onshore 14.3 2.0 6.8"
+      }
+    ],
+    "verified": true,
+    "verification": "'14.3' found in an independent fetch of https://researchbriefings.files.parliament.uk/documents/CBP-10182/CBP-10182.pdf"
+  },
+  {
+    "id": "ev_scotland_wind_capacity",
+    "question": "What is the total installed wind generation capacity (onshore plus offshore) in Scotland in GW, as of the latest Scottish Government energy statistics in 2026?",
+    "used_by": "#50 #47",
+    "processor": "core",
+    "run_id": "srun_051cfaf41dc04532cf8ed8e9dcb2c342",
+    "retrieved_at": "2026-11-07T14:00:40+00:00",
+    "value": "Approximately 15.0 GW (10.7 GW onshore + 4.3 GW offshore).",
+    "unit": "GW",
+    "as_of": "Q2 2026 (end of June 2026; Scottish Government bulletin published 29 September 2026)",
+    "caveat": "The latest Scottish Government bulletin reports total renewable capacity of 18.4 GW and onshore wind growth, but does not state a separate onshore-plus-offshore wind total in its text. The 10.7 GW and 4.3 GW components are reported in a separate August 2026 source; their sum is rounded.",
+    "confidence": "medium",
+    "sources": [
+      {
+        "url": "https://www.scotsman.com/news/politics/scottish-government-net-zero-onshore-renewable-wind-power-8920495",
+        "quote": "Scotland has a capacity of 10.7GW of onshore wind power, compared to just 4.3GW for the more high-profile offshore wind. But SNP ministers, who have not published a full energy strategy in nine years, have set a target to deploy 20GW of onshore wind by 2030. ..."
+      },
+      {
+        "url": "https://www.gov.scot/publications/energy-statistics-for-scotland-q2-2026/pages/renewable-electricity-capacity/",
+        "quote": "Energy Statistics for Scotland - Q2 2026 Published **29 September 2026**"
+      },
+      {
+        "url": "https://www.gov.scot/publications/energy-statistics-for-scotland-q2-2026/pages/key-notes/",
+        "quote": "Scotland’s capacity for electricity generation from renewable sources has continued to increase and currently stands at 18.4 GW – a 3.3% increase compared to 17.8 GW at the end of the second quarter of 2025. There was 1,663 MW of operational electricity storage in Scotland as of the end of June 2026."
+      }
+    ],
+    "verified": false,
+    "verification": "'15.0' not found in independent fetches of the top 3 cited sources"
+  }
+]

@@ -1,0 +1,119 @@
+[
+  {
+    "id": "con_2026_10_26_cost",
+    "question": "What were Great Britain's total balancing or constraint costs (in GBP) on 26 October 2026, a stormy day, according to NESO data or news coverage?",
+    "used_by": "#48 #53",
+    "processor": "pro",
+    "run_id": "srun_051cfaf41dc045321f07d1b2eed34b25",
+    "retrieved_at": "2026-11-07T14:00:43+00:00",
+    "value": "Summing NESO’s six GBP cost categories: £38,650,310.28 total balancing costs; the “Constraints” category alone was £36,530,868.70.",
+    "unit": "GBP (£)",
+    "as_of": "26 October 2026 (48 settlement periods)",
+    "caveat": "The constraints figure is included in the total balancing costs; do not add it to the total. News coverage’s figure of more than £561 million refers to October as a whole, not 26 October alone.",
+    "confidence": "medium",
+    "sources": [
+      {
+        "url": "https://api.neso.energy/api/3/action/datastore_search_sql?sql=SELECT%20COUNT(*)%20AS%20n,%20SUM(%22Energy%20Imbalance%22)%20AS%20energy,%20SUM(%22Frequency%20Control%22)%20AS%20frequency,%20SUM(%22Positive%20Reserve%22)%20AS%20positive_reserve,%20SUM(%22Constraints%22)%20AS%20constraints,%20SUM(%22Negative%20Reserve%22)%20AS%20negative_reserve,%20SUM(%22Other%22)%20AS%20other%20FROM%20%221d040751-f77f-4641-9130-d49f8cbfe54f%22%20WHERE%20%22SETT_DATE%22%20=%20%272026-10-26%27",
+        "quote": "{\"help\": \"https://api.neso.energy/api/3/action/help_show?name=datastore_search_sql\", \"success\": true, \"result\": {\"records\": [{\"energy\": \"2128436.893\", \"n\": \"48\", \"frequency\": \"69069.60164681099133\", \"negative_reserve\": \"99282.00503711229222\", \"positive_reserve\": \"-20234.8796405622807\", \"other\": \"-157112.041717296528529600000000000000000009719900000000000001\", \"constraints\": \"36530868.70167393613\"}], \"fields\": [{\"type\": \"int8\", \"id\": \"n\"}, {\"type\": \"numeric\", \"id\": \"energy\"}, {\"type\": \"numeric\", \"id\": \"frequency\"}, {\"type\": \"numeric\", \"id\": \"positive_reserve\"}, {\"type\": \"numeric\", \"id\": \"constr"
+      },
+      {
+        "url": "https://api.neso.energy/api/3/action/datastore_search?resource_id=1d040751-f77f-4641-9130-d49f8cbfe54f&sort=_id+asc",
+        "quote": "{\"help\": \"https://api.neso.energy/api/3/action/help_show?name=datastore_search\", \"success\": true, \"result\": {\"sort\": \"_id asc\", \"include_total\": true, \"resource_id\": \"1d040751-f77f-4641-9130-d49f8cbfe54f\", \"fields\": [{\"type\": \"int\", \"id\": \"_id\"}, {\"info\": {\"comment\": \"\", \"description\": \"The Payment Date in relation to an Initial Settlement Run.\", \"title\": \"Settlement Date\", \"type\": \"date\", \"example\": \"13/04/2023\", \"unit\": \"\"}, \"type\": \"date\", \"id\": \"SETT_DATE\"}, {\"info\": {\"comment\": \"\", \"description\": \"A period of 30 minutes beginning on the hour or the half-hour\\r\\n\", \"title\": \"Settlement Per"
+      },
+      {
+        "url": "https://www.bloomberg.com/news/articles/2026-11-02/uk-spent-record-561-million-to-balance-power-grid-in-october",
+        "quote": "The UK spent more than £561 million ($753 million) to balance the power grid in October, as soaring gas prices and bottlenecks in the country’s aging network pushed up the cost of keeping the lights on."
+      }
+    ],
+    "verified": true,
+    "verification": "manual 2026-11-07 14:02 UTC: re-ran the cited NESO datastore SQL query directly; 48 periods, Constraints = 36530868.70 GBP, six categories sum to 38650310.28 GBP"
+  },
+  {
+    "id": "con_annual_cost",
+    "question": "What were Great Britain's total annual transmission constraint costs in GBP for the most recent full year (2025 or financial year 2025/26), according to NESO?",
+    "used_by": "#48",
+    "processor": "core",
+    "run_id": "srun_051cfaf41dc045326c12d11d55823a26",
+    "retrieved_at": "2026-11-07T14:00:43+00:00",
+    "value": "£1.9 billion",
+    "unit": "GBP",
+    "as_of": "2025-26 financial year",
+    "caveat": "Thermal constraint costs, stated in 2024 prices; not total balancing costs.",
+    "confidence": "medium",
+    "sources": [
+      {
+        "url": "https://www.nao.org.uk/wp-content/uploads/2026/09/Upgrading-the-electricity-transmission-network-summary.pdf",
+        "quote": "As a result, thermal constraint costs have risen from £0.6 billion in 2018-19 to £1.9 billion in 2025-26 (in 2024 prices). The majority goes to generators to increase output at short notice."
+      }
+    ],
+    "verified": true,
+    "verification": "'1.9' found in an independent fetch of https://www.nao.org.uk/wp-content/uploads/2026/09/Upgrading-the-electricity-transmission-network-summary.pdf"
+  },
+  {
+    "id": "con_b4_capability",
+    "question": "What is the transfer capability in MW of the B4 transmission boundary (SSEN to SP Transmission, within Scotland) as of 2025 or 2026, according to NESO publications?",
+    "used_by": "#48",
+    "processor": "pro",
+    "run_id": "srun_051cfaf41dc045320628cf8f9888723c",
+    "retrieved_at": "2026-11-07T14:00:43+00:00",
+    "value": "4,000 MW (NESO states “4 GW”).",
+    "unit": "MW",
+    "as_of": "ETYS 2025",
+    "caveat": "B4 is the SSEN Transmission to SP Transmission boundary. NESO states that its capability is limited by a thermal constraint on the Tealing - Westfield 275kV circuit. The MW figure is converted from the published 4 GW.",
+    "confidence": "high",
+    "sources": [
+      {
+        "url": "https://www.neso.energy/sites/neso.energy/files/documents/ETYS%202025_June%202026_Final_0.pdf",
+        "quote": "Boundary B4 – SSEN Transmission to SP Transmission … The boundary capability is limited to **4 GW** due to thermal constraint on the **Tealing - Westfield 275kV circuit**"
+      }
+    ],
+    "verified": false,
+    "verification": "'4000' not found in independent fetches of the top 1 cited sources"
+  },
+  {
+    "id": "con_b6_capability",
+    "question": "What is the transfer capability in MW of the B6 transmission boundary (the Scotland to England boundary) in Great Britain as of 2025 or 2026, according to NESO's Electricity Ten Year Statement or other NESO publications?",
+    "used_by": "#48",
+    "processor": "pro",
+    "run_id": "srun_051cfaf41dc04532b91dd0782dbff2db",
+    "retrieved_at": "2026-11-07T14:00:43+00:00",
+    "value": "“6.7 GW” (6,700 MW)",
+    "unit": "MW",
+    "as_of": "ETYS 2025; the statement describes future transmission capability over the next 10 years. The B6 figure is not explicitly assigned to a particular 2025 or 2026 rating year.",
+    "caveat": "NESO says the capability is limited by a thermal constraint on the Harker-Moffat 400 kV circuit.",
+    "confidence": "high",
+    "sources": [
+      {
+        "url": "https://www.neso.energy/sites/neso.energy/files/documents/ETYS%202025_June%202026_Final_0.pdf",
+        "quote": "The boundary capability is limited to **6\\.7 GW** due to thermal"
+      }
+    ],
+    "verified": true,
+    "verification": "'6.7' found in an independent fetch of https://www.neso.energy/sites/neso.energy/files/documents/ETYS%202025_June%202026_Final_0.pdf"
+  },
+  {
+    "id": "con_wind_curtailment_2025",
+    "question": "How many TWh of wind generation were curtailed (paid to switch off) in Great Britain in 2025, and what was the cost of these payments in GBP?",
+    "used_by": "#46 #48",
+    "processor": "core",
+    "run_id": "srun_051cfaf41dc045325333cf26a73f1ad1",
+    "retrieved_at": "2026-11-07T14:00:43+00:00",
+    "value": "10.241336 TWh (10,241,336 MWh); £382,108,508 in payments to constrain wind-farm output.",
+    "unit": "TWh; GBP",
+    "as_of": "January–December 2025",
+    "caveat": "This is the sum of REF’s monthly Balancing Mechanism wind-farm constraint entries. Montel separately reports £363m in total Great Britain curtailment payments across renewables, so the totals differ by source/measure and the Montel figure is not a wind-only annual amount.",
+    "confidence": "medium",
+    "sources": [
+      {
+        "url": "https://www.ref.org.uk/constraints?tab=mt&yr=all",
+        "quote": "|2025-12 |£36,602,793 |1,009,096 |£36 |93 | … |2025-11 |£33,803,890 |960,816 |£35 |89 | … |2025-10 |£53,165,552 |1,293,483 |£41 |90 | … |2025-09 |£52,275,145 |1,084,030 |£48 |92 | … |2025-08 |£38,716,984 |812,131 |£48 |94 | … |2025-07 |£20,477,168 |427,920 |£48 |93 | … |2025-06 |£52,296,659 |1,152,277 |£45 |102 | … |2025-05 |£20,532,173 |483,451 |£42 |85 | … |2025-04 |£9,786,757 |307,060 |£32 |77 | … |2025-03 |£23,416,690 |999,503 |£23 |91 | … |2025-02 |£31,100,395 |1,153,412 |£27 |89 | … |2025-01 |£9,934,302 |558,157 |£18 |89 | … ## Balancing Mechanism Wind Farm Constraint Payments … (New use"
+      },
+      {
+        "url": "https://montel.energy/resources/reports/2025-gb-and-ireland-curtailment-report",
+        "quote": "Over 10TWh of renewable electricity was curtailed in GB, enough to meet the demand of every domestic household in London in 2025. The total cost of curtailment payments was £363m, representing a 10% decrease year-on-year. The total cost of upward actions to replace lost wind power where necessary was at least £1bn, a 20% rise year-on-year. Over 98% of the curtailed volume and 94% of curtailment costs were due to turning down wind turbines in Scotland."
+      }
+    ],
+    "verified": false,
+    "verification": "'10.241336' not found in independent fetches of the top 2 cited sources"
+  }
+]

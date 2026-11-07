@@ -1,0 +1,180 @@
+[
+  {
+    "id": "gas_ccgt_co2_intensity",
+    "question": "What is the direct CO2 emission intensity of electricity from a typical CCGT gas plant, in tonnes CO2 per MWh of electricity?",
+    "used_by": "#36",
+    "processor": "core",
+    "run_id": "srun_051cfaf41dc04532cd20df97a6361cc4",
+    "retrieved_at": "2026-11-07T14:00:39+00:00",
+    "value": "Approximately 334 kgCO₂/MWh (0.334 tCO₂/MWh)",
+    "unit": "tCO₂/MWh",
+    "as_of": "Published 16 November 2024",
+    "caveat": "Approximate: the cited figure is for state-of-the-art CCGTs and is not a universal plant-specific value.",
+    "confidence": "medium",
+    "sources": [
+      {
+        "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11603766/",
+        "quote": "State-of-the-art combined cycle gas turbines … (CCGTs) generate electricity … with direct CO ₂ emissions of approximately 334 kgCO ₂ /MWh ¹⁴ and also cause substantial … indirect GHG emissions and other environmental impacts. 15 − 17 Postcombustion carbon capture and storage (CCS) can effectively"
+      }
+    ],
+    "verified": true,
+    "verification": "'334' found in an independent fetch of https://pmc.ncbi.nlm.nih.gov/articles/PMC11603766/"
+  },
+  {
+    "id": "gas_ccgt_efficiency",
+    "question": "What is the typical net electrical efficiency (LHV or HHV, state which) of a modern combined-cycle gas turbine (CCGT) plant in Europe, and the corresponding MWh of gas burned per MWh of electricity?",
+    "used_by": "#36",
+    "processor": "core",
+    "run_id": "srun_051cfaf41dc045328015e040a4b7adc3",
+    "retrieved_at": "2026-11-07T14:00:39+00:00",
+    "value": "For new CCGTs, EU BAT-AEELs give net electrical efficiency of 53–58.5% for 50–600 MWth units and 57–60.5% for units ≥600 MWth (LHV). For a representative large plant at about 58% net efficiency, that is about 1.72 MWh of gas input (LHV) per MWh of net electricity; across the ≥600 MWth range it is about 1.65–1.75 MWh_LHV/MWh_net.",
+    "unit": "Efficiency: % (LHV); gas input: MWh_LHV per MWh of net electricity",
+    "as_of": "Commission Implementing Decision (EU) 2021/2326, adopted 30 November 2021",
+    "caveat": "These are EU BAT-associated ranges for new units, not a measured fleet-average ‘typical’ value. The BAT definition is net output after auxiliary imports divided by fuel input on an LHV basis, and the BAT-AEEL applies to electricity-only generation at full load. Gas input figures are calculated as the reciprocal of efficiency.",
+    "confidence": "medium",
+    "sources": [
+      {
+        "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/PDF?uri=CELEX%3A32021D2326",
+        "quote": "BAT-associated energy efficiency levels (BAT-AEELs) for the combustion of natural gas … **Type of combustion unit** … **BAT-AEELs** ( ¹ ) ( ² ) … **Net electrical efficiency (%) Net total fuel utilisation (%)** ( ³ ) ( ⁴ ) … **Net mechanical energy efficiency (%)** ( ⁴ ) ( ⁵ ) … **New unit Existing unit New unit Existing unit** … **Gas engine** 39,5–44 ( ⁶ ) 35–44 ( ⁶ ) 56–85 ( ⁶ ) No BAT-AEEL. … **Gas-fired boiler** 39–42,5 38–40 78–95 No BAT-AEEL. … **Open cycle gas turbine, ≥ 50 MWth** 36–41,5 33–41,5 No BAT-AEEL 36,5–41 33,5–41 … **Combined cycle gas turbine (CCGT)** … CCGT, 50–600 MWth 53"
+      }
+    ],
+    "verified": true,
+    "verification": "'53' found in an independent fetch of https://eur-lex.europa.eu/legal-content/EN/TXT/PDF?uri=CELEX%3A32021D2326"
+  },
+  {
+    "id": "gas_gb_marginal_share",
+    "question": "In what share of hours does gas-fired generation set the marginal wholesale electricity price in Great Britain, according to UK government, Ofgem or UKERC analysis, and for which year?",
+    "used_by": "#36 #33",
+    "processor": "pro",
+    "run_id": "srun_051cfaf41dc045324e57dc4298c391b5",
+    "retrieved_at": "2026-11-07T14:00:39+00:00",
+    "value": "Historical estimate: “97% of the time” (ONS, also quoted by UKERC). A newer UK government statement gives “around 60% today” for Britain.",
+    "unit": "% of time setting the wholesale electricity price",
+    "as_of": "2021 for the 97% estimate; 21 April 2026 for the government statement reporting around 60%.",
+    "caveat": "An earlier UCL working paper reports “98%” for 2021 rather than 97%. The historical sources label their coverage “UK”, whereas the April 2026 government statement explicitly refers to Britain. Sources express the figures as shares of time, not gas’s share of electricity generation.",
+    "confidence": "medium",
+    "sources": [
+      {
+        "url": "https://www.ons.gov.uk/economy/economicoutputandproductivity/output/articles/theimpactofhigherenergycostsonukbusinesses/2021to2024",
+        "quote": "The article [The role of natural gas in setting electricity prices in Europe](https://www.sciencedirect.com/science/article/pii/S2352484723013057) , published in the Energy Reports journal, states that although in 2021 gas-fired power stations accounted for 43% of electricity generation in the UK, this form of generation set the system price 97% of the time."
+      },
+      {
+        "url": "https://ukerc.rl.ac.uk/publications/policy_briefing_paper/175720_UKERC_Mission_on_bills_brochure_v6acc.pdf",
+        "quote": "Research from 2021 indicated that gas fired power plants set the wholesale electricity price in the UK 97% of the time."
+      },
+      {
+        "url": "https://www.gov.uk/government/news/decisive-action-to-break-influence-of-gas-on-electricity-prices",
+        "quote": "Britain has already moved from gas setting the price of electricity around 90% of the time in the early 2020s, to around 60% today."
+      },
+      {
+        "url": "https://www.ucl.ac.uk/bartlett/sites/bartlett/files/the_role_of_natural_gas_in_electricity_prices_in_europe_updated_may_2023.pdf",
+        "quote": "This paper quantifies the role of fossil-fuelled vs. low-carbon electricity generation in shaping wholesale electricity prices across European countries, based on historical data using open, sub/hourly power system data between 2015-2021. We find that, despite a declining share in electricity generation, fossil fuels are still the main power plants “at the margin”, and hence setting the wholesale electricity price. With updated analysis, we find that averaged across Europe overall, in 2021 fossil fuels set the price about 58% of the time whilst generating only 34% of electricity per year. This"
+      }
+    ],
+    "verified": true,
+    "verification": "'97' found in an independent fetch of https://www.ons.gov.uk/economy/economicoutputandproductivity/output/articles/theimpactofhigherenergycostsonukbusinesses/2021to2024"
+  },
+  {
+    "id": "gas_hormuz_lng_share",
+    "question": "What share of global LNG trade passes through the Strait of Hormuz (mainly Qatar and UAE exports), as a percentage, according to the IEA or EIA?",
+    "used_by": "#36",
+    "processor": "pro",
+    "run_id": "srun_051cfaf41dc045326736de41128d37da",
+    "retrieved_at": "2026-11-07T14:00:39+00:00",
+    "value": "“almost 20%” of global LNG trade (IEA).",
+    "unit": "%",
+    "as_of": "2025",
+    "caveat": "EIA similarly reports “about 20%” for 2024, primarily from Qatar, with UAE exports also passing through the strait. These are annual historical shares, not real-time transit figures.",
+    "confidence": "high",
+    "sources": [
+      {
+        "url": "https://www.iea.org/about/oil-security-and-emergency-response/strait-of-hormuz",
+        "quote": "Qatar and the UAE supplied almost 7 bcm to Kuwait in 2025, while the total volume of LNG transiting the Strait was just over 112 bcm in 2025, equating to almost 20% of global LNG trade."
+      },
+      {
+        "url": "https://www.eia.gov/todayinenergy/detail.php?id=65584",
+        "quote": "In 2024, about 20% of global liquefied natural gas (LNG) trade transited the Strait of Hormuz, primarily from Qatar. The strait is a critical route for [oil and petroleum products](https://www.eia.gov/todayinenergy/detail.php?id=65504) as well. … Qatar exported about 9.3 billion cubic feet per day (Bcf/d) of LNG through the Strait of Hormuz in 2024, and the United Arab Emirates (UAE) exported about 0.7 Bcf/d, accounting for nearly all LNG flows from the Persian Gulf through Hormuz."
+      }
+    ],
+    "verified": true,
+    "verification": "'20' found in an independent fetch of https://www.iea.org/about/oil-security-and-emergency-response/strait-of-hormuz"
+  },
+  {
+    "id": "gas_natgas_emission_factor",
+    "question": "What is the standard CO2 emission factor of natural gas combustion in tonnes CO2 per MWh of thermal energy (IPCC default or UK government conversion factor)?",
+    "used_by": "#36",
+    "processor": "core",
+    "run_id": "srun_051cfaf41dc045321a2bdefe6c49eeb9",
+    "retrieved_at": "2026-11-07T14:00:39+00:00",
+    "value": "56,100 kg/TJ (equivalent to 0.202 tCO₂/MWh thermal)",
+    "unit": "tCO₂/MWh thermal",
+    "as_of": "2006 IPCC Guidelines",
+    "caveat": "The IPCC factor is on a net calorific value basis; the table gives a 95% confidence interval of 54,300–58,300 kg/TJ. The default is suggested when country-specific factors are unavailable.",
+    "confidence": null,
+    "sources": [],
+    "verified": false,
+    "verification": "'56100' not found in independent fetches of the top 0 cited sources"
+  },
+  {
+    "id": "gas_qatar_eu_lng_share",
+    "question": "What share of EU plus UK LNG imports came from Qatar in 2025, as a percentage?",
+    "used_by": "#36",
+    "processor": "pro",
+    "run_id": "srun_051cfaf41dc04532b441ddac603480ef",
+    "retrieved_at": "2026-11-07T14:00:39+00:00",
+    "value": "Approximately 7.8% (estimated by volume-weighting the reported “8% of EU LNG imports” and “6.0 per cent of LNG imports” for the UK).",
+    "unit": "%",
+    "as_of": "2025",
+    "caveat": "No source located states a combined EU+UK percentage directly. This estimate uses separately reported, rounded shares. EU LNG-import totals also differ between sources: the European Commission reports 131 bcm for 2025, while ACER's 311 bcm total gas imports and 47% LNG imply about 146 bcm; either denominator gives approximately 7.8% when combined with the UK's reported 12.9 bcm of LNG imports.",
+    "confidence": "medium",
+    "sources": [
+      {
+        "url": "https://www.acer.europa.eu/sites/default/files/documents/Publications/ACER-LNG-Monitoring-Report-2026.pdf",
+        "quote": "36 Imports from Qatar, the EU’s third-largest LNG supplier, accounted for 8% of EU LNG imports and around 4% of EU gas consumption."
+      },
+      {
+        "url": "https://assets.publishing.service.gov.uk/media/6a69f4232c4b5ba9d1242a67/DUKES_2026_Chapter_4.pdf",
+        "quote": "Qatar was the fourth largest import source in 2025 accounting for 6.0 per cent of LNG imports,1.8 per cent of total imports."
+      },
+      {
+        "url": "https://energy.ec.europa.eu/document/download/73b16f0c-1c65-478f-a004-d991d8bd0b2f_en?filename=New%20Quarterly%20Report%20on%20European%20Gas%20Markets%20Q4%202025.pdf&prefLang=nl",
+        "quote": "**_Annual overview of EU LNG imports for 2025:_** Source: LSEG. In 2025 **EU LNG imports increased by 29%** compared to 2024 and amounted to **131 bcm** . The US increased its market share by 13 percentage points from 45% to 58%, whereas Russia reduced its share by 7 percentage points from 20% to 13%."
+      },
+      {
+        "url": "https://montelnews.com/news/b0ab0fe0-80fc-49dc-a1e6-4688f03d0acb/uk-lng-imports-surge-23-to-13bcm-in-2025",
+        "quote": "(Montel) The UK’s LNG imports rose by almost a quarter last year to 12.9bcm, with the fuel increasingly used to meet heating demand rather than placed into storage, an analyst told Montel."
+      }
+    ],
+    "verified": false,
+    "verification": "'7.8' not found in independent fetches of the top 3 cited sources"
+  },
+  {
+    "id": "gas_ttf_2022_peak",
+    "question": "What was the peak daily closing price of the Dutch TTF front-month natural gas contract in August 2022, in EUR per MWh, and on what date?",
+    "used_by": "#36",
+    "processor": "core",
+    "run_id": "srun_051cfaf41dc04532014cdcfb6f7ecba0",
+    "retrieved_at": "2026-11-07T14:00:39+00:00",
+    "value": "€339.20/MWh, reached on August 26.",
+    "unit": "EUR/MWh",
+    "as_of": "August 26, 2022",
+    "caveat": "This is the ICE front-month settlement; Platts’ distinct month-ahead assessment was Eur319.98/MWh on the same date.",
+    "confidence": "medium",
+    "sources": [
+      {
+        "url": "https://aleasoft.com/gas-european-electricity-markets-prices-break-records-again-august/",
+        "quote": "The fear of a possible global economic recession contributed to the monthly average price falling in August compared to the previous month. However, the announcement of measures to favour the economy in China and the prospects of a recovery in US demand exerted their upward influence towards the end of the month. … As for settlement prices of **TTF gas** futures in the ICE market for the Front‑Month, they maintained an upward trend for most of the month, with values above €200/MWh. The monthly maximum settlement price, of €339.20/MWh, was reached on August 26 and it was the highest in history."
+      },
+      {
+        "url": "https://www.oxfordenergy.org/wpcms/wp-content/uploads/2022/12/EU-Commission-proposal-for-joint-gas-purchasing-price-caps-and-collective-allocation-of-gas-an-assessment-NG-176.pdf",
+        "quote": "Thanks to a combination of more supply and active demand reduction, along with a helping hand from much milder weather than normal at this time of year, the TTF front month gas prices have fallen from a high of €339.20/MWh on 26 August 2022 to €114.80 on 8 November 2022. ⁸¹ The following chart shows how prices have evolved in $/MMbtu. However there remains the risk that prices could rise again if there is a cold winter or increased competition for LNG supplies from Asian markets."
+      },
+      {
+        "url": "https://www.spglobal.com/commodityinsights/plattscontent/_assets/_files/en/productsservices/market-reports/european-gas-daily-060818.pdf",
+        "quote": "Platts, part of S&P Global Commodity Insights, assessed the benchmark Dutch TTF month-ahead price at an all-time high of Eur319.98/MWh on Aug. 26, 2022."
+      }
+    ],
+    "verified": true,
+    "verification": "'339.20' found in an independent fetch of https://aleasoft.com/gas-european-electricity-markets-prices-break-records-again-august/"
+  }
+]
