@@ -20,6 +20,9 @@ CONTRIBUTIONS = "carbon/import_contributions"
 BASE_NOTE = "Emission factors are standard estimates; consumption intensity is modelled."
 # A zone "looks clean but imports dirty power" when imports raise its intensity by at least this much.
 HIDDEN_MIN_G, HIDDEN_MIN_SHARE = 10.0, 0.10
+# Zones finish their latest hour at different times (Energy-Charts lags Elexon by a few hours): take each zone's
+# latest row at or before the requested hour, no older than this.
+AS_OF_TOLERANCE = pd.Timedelta(hours=6)
 
 
 def _read(name: str) -> pd.DataFrame | None:
@@ -59,10 +62,14 @@ def build(at=None, consumption: pd.DataFrame | None = None, contributions: pd.Da
         return None
     contrib = _read(CONTRIBUTIONS) if contributions is None else contributions
     hour = _hour(cons, at)
-    rows = cons[pd.to_datetime(cons["ts"], utc=True) == hour]
+    cons = cons.assign(ts=pd.to_datetime(cons["ts"], utc=True))
+    window = cons[(cons["ts"] <= hour) & (cons["ts"] > hour - AS_OF_TOLERANCE)]
+    rows = window.sort_values("ts").groupby("zone", as_index=False).last()
+    zone_hour = dict(zip(rows["zone"], rows["ts"], strict=True))
     imports = {}
     if contrib is not None and len(contrib):
-        c = contrib[(pd.to_datetime(contrib["ts"], utc=True) == hour) & (contrib["from_zone"] != contrib["zone"])]
+        c = contrib.assign(ts=pd.to_datetime(contrib["ts"], utc=True))
+        c = c[(c["ts"] == c["zone"].map(zone_hour)) & (c["from_zone"] != c["zone"])]
         for r in c.sort_values("contribution_gco2_kwh", ascending=False).itertuples():
             imports.setdefault(r.zone, []).append({
                 "from_zone": r.from_zone, "mw": float(r.mw),
