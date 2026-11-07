@@ -369,5 +369,19 @@
   "used_by": "all",
   "processor": "core",
   "question": "On which date in 2026 did British Summer Time end (clocks went back to GMT) in the UK?"
+ },
+ {
+  "id": "hh_price_cap_unit_rates",
+  "topic": "household",
+  "used_by": "#178",
+  "processor": "manual",
+  "question": "Ofgem price cap electricity unit rate by region, 1 October to 31 December 2026 (derived by hand from Ofgem's cap tables PDF)"
+ },
+ {
+  "id": "hh_tumble_dryer_kwh",
+  "topic": "household",
+  "used_by": "#178",
+  "processor": "manual",
+  "question": "kWh per tumble dryer load, Energy Saving Trust"
  }
 ]

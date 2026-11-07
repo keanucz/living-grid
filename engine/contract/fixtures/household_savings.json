@@ -1,0 +1,121 @@
+{
+ "region": "N",
+ "name": "South Scotland",
+ "generated_at": "2026-11-07T12:00:00Z",
+ "cap": {
+  "p_kwh": 26.11,
+  "period": "1 October to 31 December 2026, Direct Debit, single-rate meter, no VAT on electricity",
+  "source": "Ofgem energy price cap tables, period 17a: https://www.ofgem.gov.uk/sites/default/files/2026-08/17a-PDF-Cap-Tables.pdf"
+ },
+ "fixed_p_kwh": null,
+ "devices": [
+  {
+   "device": "ev",
+   "label": "Charge your car",
+   "kwh_per_use": 21.0,
+   "uses_per_week": 3.0,
+   "hours": 3.0,
+   "basis": "assumption: 7 kW home charger for 3 hours, 3 charges a week",
+   "assumption": true
+  },
+  {
+   "device": "dishwasher",
+   "label": "Run the dishwasher",
+   "kwh_per_use": 0.9,
+   "uses_per_week": 5.0,
+   "hours": 1.0,
+   "basis": "Energy Saving Trust winter guide, November 2022: 0.9 kWh a cycle; 5 cycles a week and 1 hour are assumptions",
+   "assumption": false
+  }
+ ],
+ "tonight": [
+  {
+   "device": "ev",
+   "label": "Charge your car",
+   "start": "2026-11-07T22:00:00Z",
+   "end": "2026-11-08T01:00:00Z",
+   "kind": "forecast",
+   "cost_gbp": {
+    "p10": 1.6,
+    "p50": 2.1,
+    "p90": 2.9
+   },
+   "saving_vs_cap_gbp": {
+    "p10": 2.6,
+    "p50": 3.4,
+    "p90": 3.9
+   },
+   "saving_vs_6pm_gbp": {
+    "p10": 1.8,
+    "p50": 2.5,
+    "p90": 3.1
+   },
+   "saving_vs_fixed_gbp": null
+  },
+  {
+   "device": "dishwasher",
+   "label": "Run the dishwasher",
+   "start": "2026-11-07T22:00:00Z",
+   "end": "2026-11-07T23:00:00Z",
+   "kind": "forecast",
+   "cost_gbp": {
+    "p10": 0.07,
+    "p50": 0.09,
+    "p90": 0.12
+   },
+   "saving_vs_cap_gbp": {
+    "p10": 0.11,
+    "p50": 0.14,
+    "p90": 0.16
+   },
+   "saving_vs_6pm_gbp": {
+    "p10": 0.06,
+    "p50": 0.1,
+    "p90": 0.13
+   },
+   "saving_vs_fixed_gbp": null
+  }
+ ],
+ "months": [
+  {
+   "month": "2026-08",
+   "days": 31,
+   "partial": false,
+   "saving_vs_6pm_gbp": 9.8,
+   "saving_vs_cap_gbp": null,
+   "agile_cost_gbp": 14.1
+  },
+  {
+   "month": "2026-09",
+   "days": 30,
+   "partial": false,
+   "saving_vs_6pm_gbp": 10.6,
+   "saving_vs_cap_gbp": null,
+   "agile_cost_gbp": 15.0
+  },
+  {
+   "month": "2026-10",
+   "days": 31,
+   "partial": false,
+   "saving_vs_6pm_gbp": 12.4,
+   "saving_vs_cap_gbp": 6.9,
+   "agile_cost_gbp": 17.3
+  }
+ ],
+ "annual": {
+  "months_used": 3,
+  "saving_vs_6pm_gbp": {
+   "low": 117.6,
+   "mean": 133.6,
+   "high": 148.8
+  },
+  "saving_vs_cap_today_gbp": {
+   "low": 70.0,
+   "mean": 84.0,
+   "high": 96.0
+  }
+ },
+ "history_from": "2026-08-01T00:00:00Z",
+ "history_to": "2026-11-07T23:00:00Z",
+ "note": "Unit rates only: standing charges are the same however you use the energy. Illustrative fixture values."
+}

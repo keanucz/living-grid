@@ -447,6 +447,37 @@ def household() -> dict:
     }
 
 
+def household_savings() -> dict:
+    start = NOW.replace(hour=22, minute=0)
+    q = lambda a, b, c: {"p10": a, "p50": b, "p90": c}
+    months = [("2026-08", 31, False, 9.8, None, 14.1), ("2026-09", 30, False, 10.6, None, 15.0), ("2026-10", 31, False, 12.4, 6.9, 17.3)]
+    return {
+        "region": "N", "name": "South Scotland", "generated_at": iso(NOW),
+        "cap": {"p_kwh": 26.11, "period": "1 October to 31 December 2026, Direct Debit, single-rate meter, no VAT on electricity",
+                "source": "Ofgem energy price cap tables, period 17a: https://www.ofgem.gov.uk/sites/default/files/2026-08/17a-PDF-Cap-Tables.pdf"},
+        "fixed_p_kwh": None,
+        "devices": [
+            {"device": "ev", "label": "Charge your car", "kwh_per_use": 21.0, "uses_per_week": 3.0, "hours": 3.0,
+             "basis": "assumption: 7 kW home charger for 3 hours, 3 charges a week", "assumption": True},
+            {"device": "dishwasher", "label": "Run the dishwasher", "kwh_per_use": 0.9, "uses_per_week": 5.0, "hours": 1.0,
+             "basis": "Energy Saving Trust winter guide, November 2022: 0.9 kWh a cycle; 5 cycles a week and 1 hour are assumptions",
+             "assumption": False},
+        ],
+        "tonight": [
+            {"device": "ev", "label": "Charge your car", "start": iso(start), "end": iso(start + timedelta(hours=3)), "kind": "forecast",
+             "cost_gbp": q(1.6, 2.1, 2.9), "saving_vs_cap_gbp": q(2.6, 3.4, 3.9), "saving_vs_6pm_gbp": q(1.8, 2.5, 3.1), "saving_vs_fixed_gbp": None},
+            {"device": "dishwasher", "label": "Run the dishwasher", "start": iso(start), "end": iso(start + timedelta(hours=1)), "kind": "forecast",
+             "cost_gbp": q(0.07, 0.09, 0.12), "saving_vs_cap_gbp": q(0.11, 0.14, 0.16), "saving_vs_6pm_gbp": q(0.06, 0.1, 0.13), "saving_vs_fixed_gbp": None},
+        ],
+        "months": [{"month": m, "days": d, "partial": part, "saving_vs_6pm_gbp": a, "saving_vs_cap_gbp": c, "agile_cost_gbp": g}
+                   for m, d, part, a, c, g in months],
+        "annual": {"months_used": 3, "saving_vs_6pm_gbp": {"low": 117.6, "mean": 133.6, "high": 148.8},
+                   "saving_vs_cap_today_gbp": {"low": 70.0, "mean": 84.0, "high": 96.0}},
+        "history_from": iso(NOW.replace(month=8, day=1, hour=0, minute=0)), "history_to": iso(NOW.replace(hour=23)),
+        "note": "Unit rates only: standing charges are the same however you use the energy. Illustrative fixture values.",
+    }
+
+
 def compute() -> dict:
     """A 1 MW job for 6 hours: cheapest start per zone over the next 24 hours."""
     start = NOW + timedelta(hours=1)
@@ -539,6 +570,7 @@ def build() -> dict[str, tuple[type, dict]]:
         "scenarios": (s.ScenariosResponse, sc),
         "scores": (s.ScoresResponse, scores()),
         "household": (s.HouseholdResponse, household()),
+        "household_savings": (s.HouseholdSavingsResponse, household_savings()),
         "replay": (s.ReplayResponse, replay()),
         "reveal": (s.RevealResponse, reveal()),
         "compute": (s.ComputeResponse, compute()),  # last: it draws from the shared rng

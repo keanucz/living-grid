@@ -383,6 +383,72 @@ class HouseholdResponse(Model):
     note: str
 
 
+class SavingsDevice(Model):
+    device: str
+    label: str
+    kwh_per_use: float
+    uses_per_week: float
+    hours: float
+    basis: str = Field(description="Where the kWh and usage figures come from, or 'assumption'")
+    assumption: bool
+
+
+class SavingsCap(Model):
+    p_kwh: float = Field(description="Ofgem price cap electricity unit rate for the region, Direct Debit, no VAT in this period")
+    period: str
+    source: str
+
+
+class SavingsTonight(Model):
+    device: str
+    label: str
+    start: datetime
+    end: datetime
+    kind: Kind
+    cost_gbp: Quantiles = Field(description="Cost of the use in the best window")
+    saving_vs_cap_gbp: Quantiles
+    saving_vs_6pm_gbp: Quantiles
+    saving_vs_fixed_gbp: Quantiles | None = Field(None, description="Only when fixed_p_kwh is given")
+
+
+class SavingsMonth(Model):
+    month: str = Field(description="YYYY-MM, UK local")
+    days: int = Field(description="Days with complete published Agile prices")
+    partial: bool = Field(description="Fewer than 20 days: shown but left out of the range and annual figures")
+    saving_vs_6pm_gbp: float
+    saving_vs_cap_gbp: float | None = Field(None, description="Only for months inside the cap period we hold rates for")
+    agile_cost_gbp: float
+
+
+class SavingsRange(Model):
+    low: float
+    mean: float
+    high: float
+
+
+class SavingsAnnual(Model):
+    months_used: int
+    saving_vs_6pm_gbp: SavingsRange = Field(description="Per year: lowest, mean and highest complete month, each scaled to 12 months")
+    saving_vs_cap_today_gbp: SavingsRange | None = Field(
+        None, description="Per year, if the whole year had been billed at today's cap rate; excludes standing charges"
+    )
+
+
+class HouseholdSavingsResponse(Model):
+    region: str
+    name: str
+    generated_at: datetime
+    cap: SavingsCap
+    fixed_p_kwh: float | None
+    devices: list[SavingsDevice]
+    tonight: list[SavingsTonight]
+    months: list[SavingsMonth]
+    annual: SavingsAnnual | None
+    history_from: datetime | None
+    history_to: datetime | None
+    note: str
+
+
 # ---------- GET /compute?kw=&hours=&zones=&deadline= ----------
 
 

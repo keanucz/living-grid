@@ -18,6 +18,7 @@ GETS = {
     "/scenarios": ("scenarios", s.ScenariosResponse),
     "/scores": ("scores", s.ScoresResponse),
     "/household?region=N": ("household", s.HouseholdResponse),
+    "/household/savings?region=N": ("household_savings", s.HouseholdSavingsResponse),
     "/compute?at=2026-11-07T23:00:00Z": ("compute", s.ComputeResponse),
     "/replay?event=2026-10-26": ("replay", s.ReplayResponse),
     "/reveal": ("reveal", s.RevealResponse),

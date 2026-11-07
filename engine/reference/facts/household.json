@@ -236,5 +236,49 @@
     "verification": "cross-check disagrees: I found a directly stated Octopus Energy figure, “2,900 kWh”, tied to an annual mileage assumption of “10,000 miles”. This differs from the claimed absence of a qualifying figure, although it must be described as a comparison assumption rather than an observed national average.",
     "figures_route": {},
     "corroborated_by_other_domain": false
+  },
+  {
+    "id": "hh_price_cap_unit_rates",
+    "question": "Ofgem price cap electricity unit rate by region, 1 October to 31 December 2026",
+    "used_by": "#178",
+    "retrieved_at": "2026-11-07T00:00:00+00:00",
+    "value": "Electricity price cap unit rate, single-rate meter, Direct Debit, 1 October to 31 December 2026, pence per kWh, no VAT on electricity in this period. A Eastern England: 26.61; B East Midlands: 25.36; C London: 26.60; D Merseyside and Northern Wales: 27.86; E West Midlands: 25.60; F North Eastern England: 25.46; G North Western England: 26.49; H Southern England: 26.47; J South Eastern England: 26.88; K Southern Wales: 26.55; L South Western England: 26.58; M Yorkshire: 25.60; N Southern Scotland: 26.11; P Northern Scotland: 26.35. Great Britain average 26.32.",
+    "unit": "p/kWh",
+    "as_of": "Ofgem cap period 17a, 1 October to 31 December 2026; next cap announced 25 November 2026 for January to March 2027.",
+    "caveat": "Derived as (annual bill at 2,500 kWh minus annual bill at nil kWh) / 2,500 from Ofgem's cap tables PDF, 'Other Payment Method' single-rate columns, which are exclusive of VAT; electricity VAT is zero 1 Oct 2026 to 31 Mar 2027. Region names in the PDF map to letters by DNO area. Does not apply after 31 December 2026.",
+    "confidence": "high",
+    "sources": [
+      {
+        "url": "https://www.ofgem.gov.uk/sites/default/files/2026-08/17a-PDF-Cap-Tables.pdf",
+        "quote": "East Midlands £187.80 £821.68 (nil kWh, 2,500 kWh); London £156.64 £821.53; Merseyside and Northern Wales £246.95 £943.50"
+      },
+      {
+        "url": "https://www.ofgem.gov.uk/your-energy-supply/your-energy-bill/energy-price-cap-unit-rates-and-standing-charges",
+        "quote": "26.32 pence per kWh 54.83 pence daily standing charge ... There is no VAT on electricity from 1 October 2026 to 31 March 2027."
+      }
+    ],
+    "verified": true,
+    "verification": "stefan-5 derived every region from the Ofgem PDF on 2026-11-07; 12 of 14 results (all but G and H) also match britishenergycompliance.co.uk's Ofgem-sourced table and the East Midlands 25.36 and Merseyside 27.86 extremes match taupia.com; GB average 26.32 from Ofgem's page",
+    "manual_override": true
+  },
+  {
+    "id": "hh_tumble_dryer_kwh",
+    "question": "kWh per tumble dryer load",
+    "used_by": "#178",
+    "retrieved_at": "2026-11-07T00:00:00+00:00",
+    "value": "Tumble dryer: 3 kWh per load.",
+    "unit": "kWh per load",
+    "as_of": "Energy Saving Trust winter guide, published November 2022.",
+    "caveat": "Broad guide figure.",
+    "confidence": "medium",
+    "sources": [
+      {
+        "url": "https://energysavingtrust.org.uk/wp-content/uploads/2022/11/Energy-Saving-Trust-Warm-Home-Hacks-guide-final.pdf",
+        "quote": "One load of washing in the tumble dryer 3 kWhs £1.02"
+      }
+    ],
+    "verified": true,
+    "verification": "quote already recorded in hh_dishwasher_kwh sources, fetched by the research pipeline",
+    "manual_override": true
   }
 ]

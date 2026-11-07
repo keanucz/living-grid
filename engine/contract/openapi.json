@@ -1207,6 +1207,113 @@
     "title": "HouseholdResponse",
     "type": "object"
    },
+   "HouseholdSavingsResponse": {
+    "additionalProperties": false,
+    "properties": {
+     "annual": {
+      "anyOf": [
+       {
+        "$ref": "#/components/schemas/SavingsAnnual"
+       },
+       {
+        "type": "null"
+       }
+      ]
+     },
+     "cap": {
+      "$ref": "#/components/schemas/SavingsCap"
+     },
+     "devices": {
+      "items": {
+       "$ref": "#/components/schemas/SavingsDevice"
+      },
+      "title": "Devices",
+      "type": "array"
+     },
+     "fixed_p_kwh": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Fixed P Kwh"
+     },
+     "generated_at": {
+      "format": "date-time",
+      "title": "Generated At",
+      "type": "string"
+     },
+     "history_from": {
+      "anyOf": [
+       {
+        "format": "date-time",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "History From"
+     },
+     "history_to": {
+      "anyOf": [
+       {
+        "format": "date-time",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "History To"
+     },
+     "months": {
+      "items": {
+       "$ref": "#/components/schemas/SavingsMonth"
+      },
+      "title": "Months",
+      "type": "array"
+     },
+     "name": {
+      "title": "Name",
+      "type": "string"
+     },
+     "note": {
+      "title": "Note",
+      "type": "string"
+     },
+     "region": {
+      "title": "Region",
+      "type": "string"
+     },
+     "tonight": {
+      "items": {
+       "$ref": "#/components/schemas/SavingsTonight"
+      },
+      "title": "Tonight",
+      "type": "array"
+     }
+    },
+    "required": [
+     "region",
+     "name",
+     "generated_at",
+     "cap",
+     "fixed_p_kwh",
+     "devices",
+     "tonight",
+     "months",
+     "annual",
+     "history_from",
+     "history_to",
+     "note"
+    ],
+    "title": "HouseholdSavingsResponse",
+    "type": "object"
+   },
    "HouseholdWindow": {
     "additionalProperties": false,
     "properties": {
@@ -2150,6 +2257,246 @@
     "title": "RevealZone",
     "type": "object"
    },
+   "SavingsAnnual": {
+    "additionalProperties": false,
+    "properties": {
+     "months_used": {
+      "title": "Months Used",
+      "type": "integer"
+     },
+     "saving_vs_6pm_gbp": {
+      "$ref": "#/components/schemas/SavingsRange",
+      "description": "Per year: lowest, mean and highest complete month, each scaled to 12 months"
+     },
+     "saving_vs_cap_today_gbp": {
+      "anyOf": [
+       {
+        "$ref": "#/components/schemas/SavingsRange"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "description": "Per year, if the whole year had been billed at today's cap rate; excludes standing charges"
+     }
+    },
+    "required": [
+     "months_used",
+     "saving_vs_6pm_gbp"
+    ],
+    "title": "SavingsAnnual",
+    "type": "object"
+   },
+   "SavingsCap": {
+    "additionalProperties": false,
+    "properties": {
+     "p_kwh": {
+      "description": "Ofgem price cap electricity unit rate for the region, Direct Debit, no VAT in this period",
+      "title": "P Kwh",
+      "type": "number"
+     },
+     "period": {
+      "title": "Period",
+      "type": "string"
+     },
+     "source": {
+      "title": "Source",
+      "type": "string"
+     }
+    },
+    "required": [
+     "p_kwh",
+     "period",
+     "source"
+    ],
+    "title": "SavingsCap",
+    "type": "object"
+   },
+   "SavingsDevice": {
+    "additionalProperties": false,
+    "properties": {
+     "assumption": {
+      "title": "Assumption",
+      "type": "boolean"
+     },
+     "basis": {
+      "description": "Where the kWh and usage figures come from, or 'assumption'",
+      "title": "Basis",
+      "type": "string"
+     },
+     "device": {
+      "title": "Device",
+      "type": "string"
+     },
+     "hours": {
+      "title": "Hours",
+      "type": "number"
+     },
+     "kwh_per_use": {
+      "title": "Kwh Per Use",
+      "type": "number"
+     },
+     "label": {
+      "title": "Label",
+      "type": "string"
+     },
+     "uses_per_week": {
+      "title": "Uses Per Week",
+      "type": "number"
+     }
+    },
+    "required": [
+     "device",
+     "label",
+     "kwh_per_use",
+     "uses_per_week",
+     "hours",
+     "basis",
+     "assumption"
+    ],
+    "title": "SavingsDevice",
+    "type": "object"
+   },
+   "SavingsMonth": {
+    "additionalProperties": false,
+    "properties": {
+     "agile_cost_gbp": {
+      "title": "Agile Cost Gbp",
+      "type": "number"
+     },
+     "days": {
+      "description": "Days with complete published Agile prices",
+      "title": "Days",
+      "type": "integer"
+     },
+     "month": {
+      "description": "YYYY-MM, UK local",
+      "title": "Month",
+      "type": "string"
+     },
+     "partial": {
+      "description": "Fewer than 20 days: shown but left out of the range and annual figures",
+      "title": "Partial",
+      "type": "boolean"
+     },
+     "saving_vs_6pm_gbp": {
+      "title": "Saving Vs 6Pm Gbp",
+      "type": "number"
+     },
+     "saving_vs_cap_gbp": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "description": "Only for months inside the cap period we hold rates for",
+      "title": "Saving Vs Cap Gbp"
+     }
+    },
+    "required": [
+     "month",
+     "days",
+     "partial",
+     "saving_vs_6pm_gbp",
+     "agile_cost_gbp"
+    ],
+    "title": "SavingsMonth",
+    "type": "object"
+   },
+   "SavingsRange": {
+    "additionalProperties": false,
+    "properties": {
+     "high": {
+      "title": "High",
+      "type": "number"
+     },
+     "low": {
+      "title": "Low",
+      "type": "number"
+     },
+     "mean": {
+      "title": "Mean",
+      "type": "number"
+     }
+    },
+    "required": [
+     "low",
+     "mean",
+     "high"
+    ],
+    "title": "SavingsRange",
+    "type": "object"
+   },
+   "SavingsTonight": {
+    "additionalProperties": false,
+    "properties": {
+     "cost_gbp": {
+      "$ref": "#/components/schemas/Quantiles",
+      "description": "Cost of the use in the best window"
+     },
+     "device": {
+      "title": "Device",
+      "type": "string"
+     },
+     "end": {
+      "format": "date-time",
+      "title": "End",
+      "type": "string"
+     },
+     "kind": {
+      "enum": [
+       "actual",
+       "forecast",
+       "modelled",
+       "estimated",
+       "scenario"
+      ],
+      "title": "Kind",
+      "type": "string"
+     },
+     "label": {
+      "title": "Label",
+      "type": "string"
+     },
+     "saving_vs_6pm_gbp": {
+      "$ref": "#/components/schemas/Quantiles"
+     },
+     "saving_vs_cap_gbp": {
+      "$ref": "#/components/schemas/Quantiles"
+     },
+     "saving_vs_fixed_gbp": {
+      "anyOf": [
+       {
+        "$ref": "#/components/schemas/Quantiles"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "description": "Only when fixed_p_kwh is given"
+     },
+     "start": {
+      "format": "date-time",
+      "title": "Start",
+      "type": "string"
+     }
+    },
+    "required": [
+     "device",
+     "label",
+     "start",
+     "end",
+     "kind",
+     "cost_gbp",
+     "saving_vs_cap_gbp",
+     "saving_vs_6pm_gbp"
+    ],
+    "title": "SavingsTonight",
+    "type": "object"
+   },
    "Scenario": {
     "additionalProperties": false,
     "properties": {
@@ -2894,6 +3241,75 @@
      }
     },
     "summary": "Household",
+    "tags": [
+     "household"
+    ]
+   }
+  },
+  "/household/savings": {
+   "get": {
+    "operationId": "household_savings_household_savings_get",
+    "parameters": [
+     {
+      "in": "query",
+      "name": "region",
+      "required": false,
+      "schema": {
+       "default": "N",
+       "title": "Region",
+       "type": "string"
+      }
+     },
+     {
+      "in": "query",
+      "name": "devices",
+      "required": false,
+      "schema": {
+       "default": "ev,dishwasher,washing_machine",
+       "title": "Devices",
+       "type": "string"
+      }
+     },
+     {
+      "in": "query",
+      "name": "fixed_p_kwh",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "number"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Fixed P Kwh"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HouseholdSavingsResponse"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Household Savings",
     "tags": [
      "household"
     ]
