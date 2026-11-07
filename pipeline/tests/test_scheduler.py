@@ -2,7 +2,7 @@ import pandas as pd
 import pytest
 
 from pipeline import cache, forecast_log, scheduler
-from pipeline.ingest import carbon_intensity, elexon, energy_charts, markets, nordpool, octopus, open_meteo
+from pipeline.ingest import boalf, carbon_intensity, elexon, energy_charts, markets, metered, neso, nordpool, octopus, open_meteo
 
 T1 = pd.Timestamp("2026-11-07T14:00Z")
 T2 = pd.Timestamp("2026-11-07T15:00Z")
@@ -50,7 +50,8 @@ def test_refresh_is_skipped_offline(monkeypatch):
     def boom(*a, **k):
         raise AssertionError("network used while offline")
 
-    for mod, fn in ((elexon, "run"), (energy_charts, "fetch"), (nordpool, "run"), (markets, "run"), (carbon_intensity, "run"), (octopus, "run")):
+    for mod, fn in ((elexon, "run"), (energy_charts, "fetch"), (nordpool, "run"), (markets, "run"), (carbon_intensity, "run"), (octopus, "run"),
+                    (boalf, "run"), (metered, "run"), (neso, "run")):
         monkeypatch.setattr(mod, fn, boom)
     assert scheduler.refresh(T1) == []
 
@@ -73,8 +74,11 @@ def test_failing_source_does_not_stop_the_forecast(monkeypatch):
     monkeypatch.setattr(octopus, "run", ok("oc"))
     monkeypatch.setattr(open_meteo, "fetch_live", ok("om"))
     monkeypatch.setattr(open_meteo, "write", lambda *a, **k: "weather/live_forecast")
-    assert scheduler.refresh(T1) == ["elexon"]
-    assert called == ["ec", "np", "mk", "ci", "oc", "om"]
+    monkeypatch.setattr(boalf, "run", ok("bo"))
+    monkeypatch.setattr(metered, "run", ok("me"))
+    monkeypatch.setattr(neso, "run", boom)
+    assert scheduler.refresh(T1) == ["elexon", "neso"]
+    assert called == ["ec", "np", "mk", "ci", "oc", "om", "bo", "me"]
     monkeypatch.setenv("LG_OFFLINE", "1")
     assert scheduler.run_once(now=T1, do_refresh=False) > 0
 

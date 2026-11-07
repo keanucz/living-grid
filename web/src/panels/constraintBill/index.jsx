@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { area, curveMonotoneX } from 'd3-shape'
 import { scaleLinear } from 'd3-scale'
-import { load, useGhostWind, WINDOWS, STORM_CONSTRAINT_GBP } from '../../layers/ghostWind/data.js'
+import { load, useGhostWind, WINDOWS, constraintBill } from '../../layers/ghostWind/data.js'
 import { fmt } from '../../styles/tokens.js'
 
 function useCountUp(target, ms = 1400) {
@@ -54,7 +54,8 @@ function ConstraintBill({ ctx }) {
   const boalf = d?.total_boalf_mwh ?? 0
   const gap = d?.total_weather_gap_mwh ?? 0
   const gwh = useCountUp(on ? boalf / 1000 : 0)
-  const cost = d?.constraint_cost_total_gbp || (gw.window === 'storm' ? STORM_CONSTRAINT_GBP : 0)
+  const bill = constraintBill(d, gw.window)
+  const cost = bill.gbp
   const costUp = useCountUp(on ? cost : 0, 1800)
   if (!on) return null
 
@@ -81,12 +82,12 @@ function ConstraintBill({ ctx }) {
         <div>
           <div className="faint klabel">Constraint bill</div>
           <div className="kval num">{cost ? fmt.money(costUp) : '—'}</div>
-          <div className="faint knote">{d?.constraint_cost_total_gbp ? 'NESO, ~1 week lag' : gw.window === 'storm' ? 'NESO constraints, 26 Oct' : 'not yet published'}</div>
+          <div className="faint knote">{bill.note}</div>
         </div>
         <div>
           <div className="faint klabel">Weather gap</div>
           <div className="kval num">{gap ? `${(gap / 1000).toFixed(1)} GWh` : '—'}</div>
-          <div className="faint knote">{gap ? 'implied minus metered' : 'needs metered output'}</div>
+          <div className="faint knote">{gap ? 'implied minus metered' : 'no metered output for this window'}</div>
         </div>
         <div>
           <div className="faint klabel">Homes for a day</div>

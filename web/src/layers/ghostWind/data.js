@@ -8,8 +8,18 @@ export const WINDOWS = {
   storm: { label: '26 Oct storm', from: '2026-10-26T00:00:00Z', to: '2026-10-27T00:00:00Z' },
 }
 
-// NESO "Constraints" category for 26 Oct 2026 (engine/reference/facts/constraints.json, con_2026_10_26_cost).
-export const STORM_CONSTRAINT_GBP = 36_530_869
+const DAY = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', timeZone: 'UTC' })
+
+// One NESO daily figure from the API, never a hardcoded one: the window's own day when it covers one
+// (the storm), else the newest published day (NESO publishes about a week late).
+export function constraintBill(d, key) {
+  const costs = [...(d?.constraint_costs ?? [])].sort((a, b) => String(a.date).localeCompare(String(b.date)))
+  const day = WINDOWS[key]?.from?.slice(0, 10)
+  const c = day ? costs.find((x) => String(x.date) === day) : costs.at(-1)
+  if (!c) return { gbp: 0, note: day ? 'not published for that day' : 'not yet published' }
+  const when = DAY.format(new Date(`${c.date}T00:00:00Z`))
+  return { gbp: c.gbp, note: day ? `NESO, ${when}` : `NESO, ${when} (newest, ~1 week lag)` }
+}
 
 let state = { window: null, data: null, source: null, loading: false, auto: false }
 const subs = new Set()

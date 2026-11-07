@@ -13,7 +13,7 @@ import time
 import pandas as pd
 
 from pipeline import cache, commit_chain, features, forecast_log
-from pipeline.ingest import carbon_intensity, elexon, energy_charts, markets, nordpool, octopus, open_meteo
+from pipeline.ingest import boalf, carbon_intensity, elexon, energy_charts, markets, metered, neso, nordpool, octopus, open_meteo
 from pipeline.models import quantile
 
 log = logging.getLogger("pipeline.scheduler")
@@ -35,6 +35,11 @@ def refresh(now: pd.Timestamp) -> list[str]:
         "carbon_intensity": lambda: carbon_intensity.run(recent, now),
         "octopus": lambda: octopus.run(recent, ahead),
         "open_meteo_live": lambda: [open_meteo.write(open_meteo.fetch_live(now=now), "live_forecast")],
+        # The unseen layer: wind bids (BOAV), metered wind (B1610 lags ~5 days, PN fills the gap), and NESO
+        # constraint costs (~1 week late, so look back 3 weeks) and day-ahead boundary flows.
+        "boalf": lambda: boalf.run(recent, now),
+        "metered": lambda: metered.run(now - pd.Timedelta(days=7), now),
+        "neso": lambda: neso.run(now - pd.Timedelta(days=21), ahead),
     }
     failed = []
     for name, job in jobs.items():
