@@ -18,6 +18,11 @@ const VIEWS = {
   overview: { longitude: 6.5, latitude: 53.2, zoom: 4.15, pitch: 0, bearing: 0 },
   simulate: { longitude: 4.2, latitude: 51.4, zoom: 4.35, pitch: 56, bearing: -16 },
 }
+// Phones frame the same zones in a short, narrow map.
+if (typeof matchMedia !== 'undefined' && matchMedia('(max-width: 700px)').matches) {
+  VIEWS.overview = { longitude: 3.6, latitude: 54.2, zoom: 3.15, pitch: 0, bearing: 0 }
+  VIEWS.simulate = { longitude: 3.8, latitude: 52.6, zoom: 3.35, pitch: 50, bearing: -12 }
+}
 
 // ?still freezes animation (screenshots, slow software GL).
 const STILL = new URLSearchParams(location.search).has('still')

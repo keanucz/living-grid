@@ -9,6 +9,8 @@ import { api, useApi, overlayState, currentHour } from './api/client.js'
 import { actions, setState, useStore } from './store/store.js'
 import { PRICE_LEGEND } from './styles/tokens.js'
 import { matchView } from './views/index.js'
+import MobileShell from './shell/mobile/MobileShell.jsx'
+import { useNarrow } from './shell/mobile/useNarrow.js'
 import { normaliseResult } from './api/normalise.js'
 
 const ASSET_FOR = { hormuz: 'gas', nuclear_outage: 'nuclear', scottish_storm: 'wind', interconnector_trip: 'hydro' }
@@ -45,6 +47,7 @@ export default function App() {
 
 function MapApp() {
   const ui = useStore()
+  const narrow = useNarrow()
   const geo = useGeo()
   const zones = useApi(api.zones)
   // /state takes seconds, so fetch it only when the hour changes (or a new hour starts); live table updates are
@@ -77,6 +80,7 @@ function MapApp() {
   }, [geo, zones.data, state.data, scenarios.data, assets.data, ui])
 
   const visibleLayers = LAYERS.filter((l) => l.modes.includes(ui.mode))
+  if (narrow) return <MobileShell ctx={ctx} at={state.data?.at} source={state.source} />
 
   return (
     <div className={`app mode-${ui.mode}`}>
