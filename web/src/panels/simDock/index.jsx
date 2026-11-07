@@ -3,6 +3,7 @@ import { api } from '../../api/client.js'
 import { ResultCard, RESULT_CSS, duration } from './Result.jsx'
 import { Icon } from '../../shell/icons.jsx'
 import { actions } from '../../store/store.js'
+import Builder from '../../views/datacentre/Builder.jsx'
 
 // World events menu: Run posts to /intervene and shows the live result; if the API is unreachable it falls back
 // to the pre-computed /scenarios result. The map keeps reading the scenario shape from the store, as before.
@@ -23,6 +24,7 @@ function SimDock({ ctx }) {
   const [mag, setMag] = useState(sc?.magnitude ?? 0)
   useEffect(() => setMag(sc?.magnitude ?? 0), [armed, sc?.magnitude])
   const [run, setRun] = useState({ status: 'idle', result: null, key: 0, type: null })
+  const [dcOpen, setDcOpen] = useState(false)
   useEffect(() => setRun((r) => (r.type === armed ? r : { status: 'idle', result: null, key: r.key, type: null })), [armed])
   const runIt = async () => {
     const key = Date.now()
@@ -98,6 +100,15 @@ function SimDock({ ctx }) {
         </div>
       </section>
 
+      <section className="sim-card fade-in">
+        <button className="sim-row dc-toggle" onClick={() => setDcOpen((v) => !v)} aria-expanded={dcOpen}>
+          <span className="sim-title">Data centre builder</span>
+          <span style={{ flex: 1 }} />
+          <span className="faint" style={{ fontSize: 12 }}>{dcOpen ? 'Hide' : 'Cost, carbon and grid for a GPU site'}</span>
+        </button>
+        {dcOpen && <div style={{ marginTop: 12 }}><Builder initialZone={ctx.ui.selectedZone} /></div>}
+      </section>
+
       {(run.status === 'done' || run.status === 'fallback') && (
         <ResultCard result={run.result} scenario={sc} runKey={run.key} />
       )}
@@ -149,6 +160,7 @@ ${RESULT_CSS}
 .wl { display: flex; flex-direction: column; gap: 8px; }
 .wl > div { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: 12px; }
 .wl .faint { width: 58px; }
+.dc-toggle { width: 100%; background: none; color: var(--text); text-align: left; }
 .mode-simulate .slot-left { overflow-y: auto; scrollbar-width: none; }
 `
 
