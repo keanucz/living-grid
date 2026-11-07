@@ -115,7 +115,7 @@ export type FeedRow = { label: string; value: number; unit: string };
 export function clearRound(ctx: any, lobby: number) {
   const PK: Record<string, string> = {
     market_question: 'id', market_answer: 'question_id', market_position: 'key', market_feed: 'key',
-    market_bot: 'key', market_bot_p: 'key', market_profile: 'question_id', market_account: 'key',
+    market_bot: 'key', market_bot_p: 'key', market_profile: 'question_id', market_account: 'key', clue_purchase: 'key',
   };
   for (const tbl of Object.keys(PK)) {
     const pk = PK[tbl];

@@ -5,4 +5,5 @@ export * from './reducers/publish';
 export * from './reducers/game';
 export * from './reducers/market';
 export * from './reducers/lobby';
+export * from './reducers/clues';
 export * from './reducers/matchmaking';

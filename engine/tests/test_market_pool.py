@@ -70,7 +70,7 @@ def test_a_sound_day_becomes_a_pool_put_call(root):
     assert all(12 < q["target_hour"] <= 18 for q in qs)
     assert any(q["bot_p"] for q in qs), "the bots' as-of probabilities travel with the questions"
     assert set(json.loads(row["feed"])) == {str(h) for h in range(12, 19)}
-    assert row["clues"] == "{}"
+    assert set(json.loads(row["clues"])) <= {x["id"] for x in qs}
 
 
 def test_the_pool_text_hides_outcomes_and_the_date(root):

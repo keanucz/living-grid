@@ -14,8 +14,10 @@ import logging
 import sys
 from datetime import date
 
+import pandas as pd
+
 from engine import replay
-from engine.market import botdata, questions
+from engine.market import botdata, clues, questions
 from engine.market.__main__ import boalf_gb
 from pipeline import replay_days
 
@@ -36,7 +38,20 @@ def regime_of(day: date, r: dict) -> str:
     return reg
 
 
-def day_row(day: date, start: int = 12, end: int = 18, boalf=None, allow_no_bots: bool = False) -> dict:
+def explanations_for(r: dict, qs: list) -> dict[str, str]:
+    """The replay's own sentence for the hour a price question asks about, when it has one."""
+    by = {(s["zone"], s["target"]): s for s in r["series"]}
+    out = {}
+    for q in qs:
+        parts = q.id.rsplit("-", 1)[0].split("-", 1)
+        s = by.get((parts[0], parts[1])) if len(parts) == 2 else None
+        for p in (s or {}).get("points", []):
+            if p.get("explanation") and pd.Timestamp(p["ts"]).hour == q.target_hour:
+                out[q.id] = p["explanation"]
+    return out
+
+
+def day_row(day: date, start: int = 12, end: int = 18, boalf=None, allow_no_bots: bool = False, feats=None) -> dict:
     """The pool_put arguments for one day, as a dict in the reducer's argument order."""
     r = replay.load(day)
     if r is None:
@@ -49,12 +64,19 @@ def day_row(day: date, start: int = 12, end: int = 18, boalf=None, allow_no_bots
     qs = [q for q in questions.build(r, boalf, end, start, league=league, choices=True) if q.target_hour > start]
     if not qs:
         raise ValueError(f"{day}: no questions could be built")
+    shop = {}
+    try:
+        shop = clues.build(day, qs, clues.features_for(day) if feats is None else feats, explanations_for(r, qs))
+    except clues.ClueLeak:
+        raise
+    except Exception as e:  # the game works without clues; say so rather than failing the whole day
+        log.warning("%s: no clues (%s: %s)", day, type(e).__name__, e)
     return {
         "day": day.isoformat(), "regime": regime, "start_hour": start, "end_hour": end,
         "questions_json": json.dumps([questions.league_public(q) for q in qs]),
         "answers_json": json.dumps([{"question_id": q.id, "outcome": q.outcome, "actual": q.actual} for q in qs]),
         "feed_json": json.dumps({str(h - 1): questions.feed(r, boalf, h - 1) for h in range(start + 1, end + 2)}),
-        "clues_json": "{}",
+        "clues_json": json.dumps(shop),
     }
 
 

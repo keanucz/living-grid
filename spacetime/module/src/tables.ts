@@ -363,6 +363,23 @@ export const market_day_pool = table(
   }
 );
 
+// What a player has paid to see. Private: the text is the clue itself, so it reaches only the buyer, through
+// the my_clues view. The catalogue lives in market_day_pool.clues_json (see reducers/clues.ts).
+export const clue_purchase = table(
+  { name: 'clue_purchase' },
+  {
+    key: t.string().primaryKey(), // '<question id>|<identity hex>|<clue id>' (the question id carries the lobby prefix)
+    lobby_id: t.u32().index('btree'),
+    identity: t.identity().index('btree'),
+    question_id: t.string(),
+    clue_id: t.string(),
+    label: t.string(),
+    body: t.string(),
+    cost: t.f64(),
+    bought_hour: t.u32(),
+  }
+);
+
 export const lobby_day_played = table(
   { name: 'lobby_day_played' },
   { key: t.string().primaryKey(), lobby_id: t.u32().index('btree'), day: t.string() }
