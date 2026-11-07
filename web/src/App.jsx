@@ -5,7 +5,7 @@ import TopBar from './shell/TopBar.jsx'
 import { Icon } from './shell/icons.jsx'
 import { LAYERS } from './layers/registry.js'
 import { PANELS } from './panels/registry.js'
-import { api, useApi } from './api/client.js'
+import { api, useApi, overlayState, currentHour } from './api/client.js'
 import { actions, setState, useStore } from './store/store.js'
 import { PRICE_LEGEND } from './styles/tokens.js'
 import { matchView } from './views/index.js'
@@ -47,7 +47,11 @@ function MapApp() {
   const ui = useStore()
   const geo = useGeo()
   const zones = useApi(api.zones)
-  const state = useApi(() => api.state(ui.at), [ui.at, ui.live?.version])
+  // /state takes seconds, so fetch it only when the hour changes (or a new hour starts); live table updates are
+  // overlaid in the browser. Refetching on every SpacetimeDB bump cancelled each response before it landed.
+  const hour = ui.at ?? currentHour()
+  const apiState = useApi(() => api.state(ui.at), [hour])
+  const state = useMemo(() => overlayState(apiState, ui.at), [apiState, ui.at, ui.live?.version])
   const scenarios = useApi(api.scenarios)
   const assets = useApi(api.assets)
 

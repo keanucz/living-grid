@@ -60,6 +60,17 @@ async function state(at) {
   return { ...res, data: withLive(res.data, at ?? currentHour(), GBP_EUR) }
 }
 
+// Re-apply the live overlay to an already-fetched state (no network), for SpacetimeDB updates.
+export function overlayState(res, at) {
+  if (!res?.data) return res
+  const data = withLive(res.data, at ?? currentHour(), GBP_EUR)
+  if (data === res.data) return res
+  const live = data.source === 'live'
+  return { ...res, data: live ? { ...data, at: at ?? currentHour() } : data, source: live ? 'live' : res.source }
+}
+
+export { currentHour }
+
 async function stateFromApi(at) {
   return liveOr(stateFixture, '/state', async () => {
     const [raw, z] = await Promise.all([fetchLive('/state', { at: at ?? currentHour() }), zones()])
