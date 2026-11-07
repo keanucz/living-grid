@@ -1,0 +1,835 @@
+{
+ "anchor": "2026-11-07T17:00:00Z",
+ "base": "https://htb.stefvuck.dev/api",
+ "captured_at": "2026-11-07T17:46:17Z",
+ "entries": {
+  "GET /explain?ts=2026-11-07T11%3A00%3A00Z&zone=BE": {
+   "file": "get__explain_7e81d4af.json",
+   "status": 404
+  },
+  "GET /explain?ts=2026-11-07T11%3A00%3A00Z&zone=DE-LU": {
+   "file": "get__explain_69009f70.json",
+   "status": 404
+  },
+  "GET /explain?ts=2026-11-07T11%3A00%3A00Z&zone=FR": {
+   "file": "get__explain_eab49c9d.json",
+   "status": 404
+  },
+  "GET /explain?ts=2026-11-07T11%3A00%3A00Z&zone=GB": {
+   "file": "get__explain_2f94e24f.json",
+   "status": 404
+  },
+  "GET /explain?ts=2026-11-07T11%3A00%3A00Z&zone=NL": {
+   "file": "get__explain_07640d1f.json",
+   "status": 404
+  },
+  "GET /explain?ts=2026-11-07T11%3A00%3A00Z&zone=NO2": {
+   "file": "get__explain_adf111c8.json",
+   "status": 404
+  },
+  "GET /explain?ts=2026-11-07T12%3A00%3A00Z&zone=BE": {
+   "file": "get__explain_3c3bbecc.json",
+   "status": 404
+  },
+  "GET /explain?ts=2026-11-07T12%3A00%3A00Z&zone=DE-LU": {
+   "file": "get__explain_1c714cc5.json",
+   "status": 404
+  },
+  "GET /explain?ts=2026-11-07T12%3A00%3A00Z&zone=FR": {
+   "file": "get__explain_2783dde4.json",
+   "status": 404
+  },
+  "GET /explain?ts=2026-11-07T12%3A00%3A00Z&zone=GB": {
+   "file": "get__explain_613af8b3.json",
+   "status": 404
+  },
+  "GET /explain?ts=2026-11-07T12%3A00%3A00Z&zone=NL": {
+   "file": "get__explain_40471104.json",
+   "status": 404
+  },
+  "GET /explain?ts=2026-11-07T12%3A00%3A00Z&zone=NO2": {
+   "file": "get__explain_c269a875.json",
+   "status": 404
+  },
+  "GET /explain?ts=2026-11-07T13%3A00%3A00Z&zone=BE": {
+   "file": "get__explain_a8d2ea76.json",
+   "status": 404
+  },
+  "GET /explain?ts=2026-11-07T13%3A00%3A00Z&zone=DE-LU": {
+   "file": "get__explain_a71b2c1e.json",
+   "status": 404
+  },
+  "GET /explain?ts=2026-11-07T13%3A00%3A00Z&zone=FR": {
+   "file": "get__explain_743826dd.json",
+   "status": 404
+  },
+  "GET /explain?ts=2026-11-07T13%3A00%3A00Z&zone=GB": {
+   "file": "get__explain_4d29cf77.json",
+   "status": 404
+  },
+  "GET /explain?ts=2026-11-07T13%3A00%3A00Z&zone=NL": {
+   "file": "get__explain_0d742aee.json",
+   "status": 404
+  },
+  "GET /explain?ts=2026-11-07T13%3A00%3A00Z&zone=NO2": {
+   "file": "get__explain_58600804.json",
+   "status": 404
+  },
+  "GET /explain?ts=2026-11-07T14%3A00%3A00Z&zone=BE": {
+   "file": "get__explain_7efefcc3.json",
+   "status": 404
+  },
+  "GET /explain?ts=2026-11-07T14%3A00%3A00Z&zone=DE-LU": {
+   "file": "get__explain_e675cc1e.json",
+   "status": 404
+  },
+  "GET /explain?ts=2026-11-07T14%3A00%3A00Z&zone=FR": {
+   "file": "get__explain_7e16cc50.json",
+   "status": 404
+  },
+  "GET /explain?ts=2026-11-07T14%3A00%3A00Z&zone=GB": {
+   "file": "get__explain_7c4ca717.json",
+   "status": 404
+  },
+  "GET /explain?ts=2026-11-07T14%3A00%3A00Z&zone=NL": {
+   "file": "get__explain_e3ce7567.json",
+   "status": 404
+  },
+  "GET /explain?ts=2026-11-07T14%3A00%3A00Z&zone=NO2": {
+   "file": "get__explain_fa221bc7.json",
+   "status": 404
+  },
+  "GET /explain?ts=2026-11-07T15%3A00%3A00Z&zone=BE": {
+   "file": "get__explain_22e2bd33.json",
+   "status": 404
+  },
+  "GET /explain?ts=2026-11-07T15%3A00%3A00Z&zone=DE-LU": {
+   "file": "get__explain_4783caaa.json",
+   "status": 404
+  },
+  "GET /explain?ts=2026-11-07T15%3A00%3A00Z&zone=FR": {
+   "file": "get__explain_444bbfb7.json",
+   "status": 404
+  },
+  "GET /explain?ts=2026-11-07T15%3A00%3A00Z&zone=GB": {
+   "file": "get__explain_69e2a23e.json",
+   "status": 404
+  },
+  "GET /explain?ts=2026-11-07T15%3A00%3A00Z&zone=NL": {
+   "file": "get__explain_31c620e4.json",
+   "status": 404
+  },
+  "GET /explain?ts=2026-11-07T15%3A00%3A00Z&zone=NO2": {
+   "file": "get__explain_26782239.json",
+   "status": 404
+  },
+  "GET /explain?ts=2026-11-07T16%3A00%3A00Z&zone=BE": {
+   "file": "get__explain_a09ffa93.json",
+   "status": 404
+  },
+  "GET /explain?ts=2026-11-07T16%3A00%3A00Z&zone=DE-LU": {
+   "file": "get__explain_da1db7c8.json",
+   "status": 404
+  },
+  "GET /explain?ts=2026-11-07T16%3A00%3A00Z&zone=FR": {
+   "file": "get__explain_142b5496.json",
+   "status": 404
+  },
+  "GET /explain?ts=2026-11-07T16%3A00%3A00Z&zone=GB": {
+   "file": "get__explain_bd604a1e.json",
+   "status": 404
+  },
+  "GET /explain?ts=2026-11-07T16%3A00%3A00Z&zone=NL": {
+   "file": "get__explain_ce849b4e.json",
+   "status": 404
+  },
+  "GET /explain?ts=2026-11-07T16%3A00%3A00Z&zone=NO2": {
+   "file": "get__explain_f731c3dc.json",
+   "status": 404
+  },
+  "GET /explain?ts=2026-11-07T17%3A00%3A00Z&zone=BE": {
+   "file": "get__explain_1abf98f0.json",
+   "status": 404
+  },
+  "GET /explain?ts=2026-11-07T17%3A00%3A00Z&zone=DE-LU": {
+   "file": "get__explain_d6feb168.json",
+   "status": 404
+  },
+  "GET /explain?ts=2026-11-07T17%3A00%3A00Z&zone=FR": {
+   "file": "get__explain_715a83a8.json",
+   "status": 404
+  },
+  "GET /explain?ts=2026-11-07T17%3A00%3A00Z&zone=GB": {
+   "file": "get__explain_54309157.json",
+   "status": 404
+  },
+  "GET /explain?ts=2026-11-07T17%3A00%3A00Z&zone=NL": {
+   "file": "get__explain_46f0e9b1.json",
+   "status": 404
+  },
+  "GET /explain?ts=2026-11-07T17%3A00%3A00Z&zone=NO2": {
+   "file": "get__explain_47561535.json",
+   "status": 404
+  },
+  "GET /explain?ts=2026-11-07T18%3A00%3A00Z&zone=BE": {
+   "file": "get__explain_352b62e8.json",
+   "status": 200
+  },
+  "GET /explain?ts=2026-11-07T18%3A00%3A00Z&zone=DE-LU": {
+   "file": "get__explain_d656f201.json",
+   "status": 200
+  },
+  "GET /explain?ts=2026-11-07T18%3A00%3A00Z&zone=FR": {
+   "file": "get__explain_0541278c.json",
+   "status": 200
+  },
+  "GET /explain?ts=2026-11-07T18%3A00%3A00Z&zone=GB": {
+   "file": "get__explain_c29f3e05.json",
+   "status": 200
+  },
+  "GET /explain?ts=2026-11-07T18%3A00%3A00Z&zone=NL": {
+   "file": "get__explain_7a381fbd.json",
+   "status": 200
+  },
+  "GET /explain?ts=2026-11-07T18%3A00%3A00Z&zone=NO2": {
+   "file": "get__explain_cbdd3773.json",
+   "status": 200
+  },
+  "GET /explain?ts=2026-11-07T19%3A00%3A00Z&zone=BE": {
+   "file": "get__explain_a7a28550.json",
+   "status": 200
+  },
+  "GET /explain?ts=2026-11-07T19%3A00%3A00Z&zone=DE-LU": {
+   "file": "get__explain_0e95baa3.json",
+   "status": 200
+  },
+  "GET /explain?ts=2026-11-07T19%3A00%3A00Z&zone=FR": {
+   "file": "get__explain_71087d5e.json",
+   "status": 200
+  },
+  "GET /explain?ts=2026-11-07T19%3A00%3A00Z&zone=GB": {
+   "file": "get__explain_c10c53b7.json",
+   "status": 200
+  },
+  "GET /explain?ts=2026-11-07T19%3A00%3A00Z&zone=NL": {
+   "file": "get__explain_74c767f4.json",
+   "status": 200
+  },
+  "GET /explain?ts=2026-11-07T19%3A00%3A00Z&zone=NO2": {
+   "file": "get__explain_6d4f94c5.json",
+   "status": 200
+  },
+  "GET /explain?ts=2026-11-07T20%3A00%3A00Z&zone=BE": {
+   "file": "get__explain_0bcb81d0.json",
+   "status": 200
+  },
+  "GET /explain?ts=2026-11-07T20%3A00%3A00Z&zone=DE-LU": {
+   "file": "get__explain_a9023115.json",
+   "status": 200
+  },
+  "GET /explain?ts=2026-11-07T20%3A00%3A00Z&zone=FR": {
+   "file": "get__explain_d750a4b1.json",
+   "status": 200
+  },
+  "GET /explain?ts=2026-11-07T20%3A00%3A00Z&zone=GB": {
+   "file": "get__explain_a1dca459.json",
+   "status": 200
+  },
+  "GET /explain?ts=2026-11-07T20%3A00%3A00Z&zone=NL": {
+   "file": "get__explain_f4d17ae7.json",
+   "status": 200
+  },
+  "GET /explain?ts=2026-11-07T20%3A00%3A00Z&zone=NO2": {
+   "file": "get__explain_3d9863f5.json",
+   "status": 200
+  },
+  "GET /explain?ts=2026-11-07T21%3A00%3A00Z&zone=BE": {
+   "file": "get__explain_388489ce.json",
+   "status": 200
+  },
+  "GET /explain?ts=2026-11-07T21%3A00%3A00Z&zone=DE-LU": {
+   "file": "get__explain_110f86de.json",
+   "status": 200
+  },
+  "GET /explain?ts=2026-11-07T21%3A00%3A00Z&zone=FR": {
+   "file": "get__explain_ad339e7e.json",
+   "status": 200
+  },
+  "GET /explain?ts=2026-11-07T21%3A00%3A00Z&zone=GB": {
+   "file": "get__explain_88fefa54.json",
+   "status": 200
+  },
+  "GET /explain?ts=2026-11-07T21%3A00%3A00Z&zone=NL": {
+   "file": "get__explain_9dd70209.json",
+   "status": 200
+  },
+  "GET /explain?ts=2026-11-07T21%3A00%3A00Z&zone=NO2": {
+   "file": "get__explain_d9a1bd46.json",
+   "status": 200
+  },
+  "GET /explain?ts=2026-11-07T22%3A00%3A00Z&zone=BE": {
+   "file": "get__explain_ef28aa84.json",
+   "status": 200
+  },
+  "GET /explain?ts=2026-11-07T22%3A00%3A00Z&zone=DE-LU": {
+   "file": "get__explain_769c6da5.json",
+   "status": 200
+  },
+  "GET /explain?ts=2026-11-07T22%3A00%3A00Z&zone=FR": {
+   "file": "get__explain_a7c73e01.json",
+   "status": 200
+  },
+  "GET /explain?ts=2026-11-07T22%3A00%3A00Z&zone=GB": {
+   "file": "get__explain_533b8904.json",
+   "status": 200
+  },
+  "GET /explain?ts=2026-11-07T22%3A00%3A00Z&zone=NL": {
+   "file": "get__explain_0ea42a2c.json",
+   "status": 200
+  },
+  "GET /explain?ts=2026-11-07T22%3A00%3A00Z&zone=NO2": {
+   "file": "get__explain_2e3f71f1.json",
+   "status": 200
+  },
+  "GET /explain?ts=2026-11-07T23%3A00%3A00Z&zone=BE": {
+   "file": "get__explain_57c371bf.json",
+   "status": 200
+  },
+  "GET /explain?ts=2026-11-07T23%3A00%3A00Z&zone=DE-LU": {
+   "file": "get__explain_fa84b684.json",
+   "status": 200
+  },
+  "GET /explain?ts=2026-11-07T23%3A00%3A00Z&zone=FR": {
+   "file": "get__explain_d099c64e.json",
+   "status": 200
+  },
+  "GET /explain?ts=2026-11-07T23%3A00%3A00Z&zone=GB": {
+   "file": "get__explain_04b285ca.json",
+   "status": 200
+  },
+  "GET /explain?ts=2026-11-07T23%3A00%3A00Z&zone=NL": {
+   "file": "get__explain_e2db6c57.json",
+   "status": 200
+  },
+  "GET /explain?ts=2026-11-07T23%3A00%3A00Z&zone=NO2": {
+   "file": "get__explain_b830b7f5.json",
+   "status": 200
+  },
+  "GET /explain?zone=BE": {
+   "file": "get__explain_42234ce1.json",
+   "status": 200
+  },
+  "GET /explain?zone=DE-LU": {
+   "file": "get__explain_0d56ebc2.json",
+   "status": 200
+  },
+  "GET /explain?zone=FR": {
+   "file": "get__explain_46c163e3.json",
+   "status": 200
+  },
+  "GET /explain?zone=GB": {
+   "file": "get__explain_aa73b3c2.json",
+   "status": 200
+  },
+  "GET /explain?zone=NL": {
+   "file": "get__explain_6967ec36.json",
+   "status": 200
+  },
+  "GET /explain?zone=NO2": {
+   "file": "get__explain_a6542f7f.json",
+   "status": 200
+  },
+  "GET /household?region=A": {
+   "file": "get__household_4451c064.json",
+   "status": 200
+  },
+  "GET /household?region=B": {
+   "file": "get__household_6f83d39a.json",
+   "status": 200
+  },
+  "GET /household?region=C": {
+   "file": "get__household_8c9176b4.json",
+   "status": 200
+  },
+  "GET /household?region=D": {
+   "file": "get__household_118ac0bb.json",
+   "status": 200
+  },
+  "GET /household?region=E": {
+   "file": "get__household_dde9c163.json",
+   "status": 200
+  },
+  "GET /household?region=F": {
+   "file": "get__household_cd05de0f.json",
+   "status": 200
+  },
+  "GET /household?region=G": {
+   "file": "get__household_43a7568b.json",
+   "status": 200
+  },
+  "GET /household?region=H": {
+   "file": "get__household_a2652596.json",
+   "status": 200
+  },
+  "GET /household?region=J": {
+   "file": "get__household_30357465.json",
+   "status": 200
+  },
+  "GET /household?region=K": {
+   "file": "get__household_e0779e50.json",
+   "status": 200
+  },
+  "GET /household?region=L": {
+   "file": "get__household_665582af.json",
+   "status": 200
+  },
+  "GET /household?region=M": {
+   "file": "get__household_099ac6cd.json",
+   "status": 200
+  },
+  "GET /household?region=N": {
+   "file": "get__household_ad479804.json",
+   "status": 200
+  },
+  "GET /household?region=P": {
+   "file": "get__household_ac650eb7.json",
+   "status": 200
+  },
+  "GET /replay?event=2026-10-26": {
+   "file": "get__replay_39f57db7.json",
+   "status": 200
+  },
+  "GET /reveal": {
+   "file": "get__reveal_865f2aeb.json",
+   "status": 404
+  },
+  "GET /scenarios": {
+   "file": "get__scenarios_0f4017fb.json",
+   "status": 200
+  },
+  "GET /scores": {
+   "file": "get__scores_aae474d1.json",
+   "status": 200
+  },
+  "GET /state?at=2026-11-06T17%3A00%3A00Z": {
+   "file": "get__state_b8ff5430.json",
+   "status": 200
+  },
+  "GET /state?at=2026-11-06T18%3A00%3A00Z": {
+   "file": "get__state_7ca46b7f.json",
+   "status": 200
+  },
+  "GET /state?at=2026-11-06T19%3A00%3A00Z": {
+   "file": "get__state_6a06edf4.json",
+   "status": 200
+  },
+  "GET /state?at=2026-11-06T20%3A00%3A00Z": {
+   "file": "get__state_ff609d2b.json",
+   "status": 200
+  },
+  "GET /state?at=2026-11-06T21%3A00%3A00Z": {
+   "file": "get__state_c2e0add9.json",
+   "status": 200
+  },
+  "GET /state?at=2026-11-06T22%3A00%3A00Z": {
+   "file": "get__state_7d8cfa48.json",
+   "status": 200
+  },
+  "GET /state?at=2026-11-06T23%3A00%3A00Z": {
+   "file": "get__state_ed0cf072.json",
+   "status": 200
+  },
+  "GET /state?at=2026-11-07T00%3A00%3A00Z": {
+   "file": "get__state_39fe89de.json",
+   "status": 200
+  },
+  "GET /state?at=2026-11-07T01%3A00%3A00Z": {
+   "file": "get__state_d3400be0.json",
+   "status": 200
+  },
+  "GET /state?at=2026-11-07T02%3A00%3A00Z": {
+   "file": "get__state_b745e68a.json",
+   "status": 200
+  },
+  "GET /state?at=2026-11-07T03%3A00%3A00Z": {
+   "file": "get__state_144c3df5.json",
+   "status": 200
+  },
+  "GET /state?at=2026-11-07T04%3A00%3A00Z": {
+   "file": "get__state_f035cfa1.json",
+   "status": 200
+  },
+  "GET /state?at=2026-11-07T05%3A00%3A00Z": {
+   "file": "get__state_43b0124a.json",
+   "status": 200
+  },
+  "GET /state?at=2026-11-07T06%3A00%3A00Z": {
+   "file": "get__state_1bda8643.json",
+   "status": 200
+  },
+  "GET /state?at=2026-11-07T07%3A00%3A00Z": {
+   "file": "get__state_4117453f.json",
+   "status": 200
+  },
+  "GET /state?at=2026-11-07T08%3A00%3A00Z": {
+   "file": "get__state_e6749c67.json",
+   "status": 200
+  },
+  "GET /state?at=2026-11-07T09%3A00%3A00Z": {
+   "file": "get__state_d2f99b57.json",
+   "status": 200
+  },
+  "GET /state?at=2026-11-07T10%3A00%3A00Z": {
+   "file": "get__state_7e59e1f1.json",
+   "status": 200
+  },
+  "GET /state?at=2026-11-07T11%3A00%3A00Z": {
+   "file": "get__state_3e53f17a.json",
+   "status": 200
+  },
+  "GET /state?at=2026-11-07T12%3A00%3A00Z": {
+   "file": "get__state_ef0653e7.json",
+   "status": 200
+  },
+  "GET /state?at=2026-11-07T13%3A00%3A00Z": {
+   "file": "get__state_1be56d3b.json",
+   "status": 200
+  },
+  "GET /state?at=2026-11-07T14%3A00%3A00Z": {
+   "file": "get__state_6628a165.json",
+   "status": 200
+  },
+  "GET /state?at=2026-11-07T15%3A00%3A00Z": {
+   "file": "get__state_814544b0.json",
+   "status": 200
+  },
+  "GET /state?at=2026-11-07T16%3A00%3A00Z": {
+   "file": "get__state_a2eca36b.json",
+   "status": 200
+  },
+  "GET /state?at=2026-11-07T17%3A00%3A00Z": {
+   "file": "get__state_356807ed.json",
+   "status": 200
+  },
+  "GET /state?at=2026-11-07T18%3A00%3A00Z": {
+   "file": "get__state_7e847d03.json",
+   "status": 200
+  },
+  "GET /state?at=2026-11-07T19%3A00%3A00Z": {
+   "file": "get__state_b07b4ba3.json",
+   "status": 200
+  },
+  "GET /state?at=2026-11-07T20%3A00%3A00Z": {
+   "file": "get__state_f851abbe.json",
+   "status": 200
+  },
+  "GET /state?at=2026-11-07T21%3A00%3A00Z": {
+   "file": "get__state_a71236c0.json",
+   "status": 200
+  },
+  "GET /state?at=2026-11-07T22%3A00%3A00Z": {
+   "file": "get__state_92ffc3c0.json",
+   "status": 200
+  },
+  "GET /state?at=2026-11-07T23%3A00%3A00Z": {
+   "file": "get__state_6cfd8d1a.json",
+   "status": 200
+  },
+  "GET /state?at=2026-11-08T00%3A00%3A00Z": {
+   "file": "get__state_e26018a9.json",
+   "status": 200
+  },
+  "GET /state?at=2026-11-08T01%3A00%3A00Z": {
+   "file": "get__state_a69fa4a6.json",
+   "status": 200
+  },
+  "GET /state?at=2026-11-08T02%3A00%3A00Z": {
+   "file": "get__state_e06c9e3b.json",
+   "status": 200
+  },
+  "GET /state?at=2026-11-08T03%3A00%3A00Z": {
+   "file": "get__state_c5b9efb7.json",
+   "status": 200
+  },
+  "GET /state?at=2026-11-08T04%3A00%3A00Z": {
+   "file": "get__state_3085319f.json",
+   "status": 200
+  },
+  "GET /state?at=2026-11-08T05%3A00%3A00Z": {
+   "file": "get__state_9e0f763a.json",
+   "status": 200
+  },
+  "GET /state?at=2026-11-08T06%3A00%3A00Z": {
+   "file": "get__state_98753bcd.json",
+   "status": 200
+  },
+  "GET /state?at=2026-11-08T07%3A00%3A00Z": {
+   "file": "get__state_51e42685.json",
+   "status": 200
+  },
+  "GET /state?at=2026-11-08T08%3A00%3A00Z": {
+   "file": "get__state_bc0416a4.json",
+   "status": 200
+  },
+  "GET /state?at=2026-11-08T09%3A00%3A00Z": {
+   "file": "get__state_fd3f8fc6.json",
+   "status": 200
+  },
+  "GET /state?at=2026-11-08T10%3A00%3A00Z": {
+   "file": "get__state_0ada531e.json",
+   "status": 200
+  },
+  "GET /state?at=2026-11-08T11%3A00%3A00Z": {
+   "file": "get__state_025951ec.json",
+   "status": 200
+  },
+  "GET /state?at=2026-11-08T12%3A00%3A00Z": {
+   "file": "get__state_70beb88e.json",
+   "status": 200
+  },
+  "GET /state?at=2026-11-08T13%3A00%3A00Z": {
+   "file": "get__state_e1d020e6.json",
+   "status": 200
+  },
+  "GET /state?at=2026-11-08T14%3A00%3A00Z": {
+   "file": "get__state_d764ca49.json",
+   "status": 200
+  },
+  "GET /state?at=2026-11-08T15%3A00%3A00Z": {
+   "file": "get__state_832f9b95.json",
+   "status": 200
+  },
+  "GET /state?at=2026-11-08T16%3A00%3A00Z": {
+   "file": "get__state_a9a7f560.json",
+   "status": 200
+  },
+  "GET /state?at=2026-11-08T17%3A00%3A00Z": {
+   "file": "get__state_60bc4476.json",
+   "status": 200
+  },
+  "GET /unseen/carbon?at=2026-11-06T17%3A00%3A00Z": {
+   "file": "get__unseen_carbon_61a1a55f.json",
+   "status": 200
+  },
+  "GET /unseen/carbon?at=2026-11-06T18%3A00%3A00Z": {
+   "file": "get__unseen_carbon_7eaa42de.json",
+   "status": 200
+  },
+  "GET /unseen/carbon?at=2026-11-06T19%3A00%3A00Z": {
+   "file": "get__unseen_carbon_e86d0632.json",
+   "status": 200
+  },
+  "GET /unseen/carbon?at=2026-11-06T20%3A00%3A00Z": {
+   "file": "get__unseen_carbon_f76576b9.json",
+   "status": 200
+  },
+  "GET /unseen/carbon?at=2026-11-06T21%3A00%3A00Z": {
+   "file": "get__unseen_carbon_abda400f.json",
+   "status": 200
+  },
+  "GET /unseen/carbon?at=2026-11-06T22%3A00%3A00Z": {
+   "file": "get__unseen_carbon_4bf22c97.json",
+   "status": 200
+  },
+  "GET /unseen/carbon?at=2026-11-06T23%3A00%3A00Z": {
+   "file": "get__unseen_carbon_bd7a8786.json",
+   "status": 200
+  },
+  "GET /unseen/carbon?at=2026-11-07T00%3A00%3A00Z": {
+   "file": "get__unseen_carbon_64484fe0.json",
+   "status": 200
+  },
+  "GET /unseen/carbon?at=2026-11-07T01%3A00%3A00Z": {
+   "file": "get__unseen_carbon_5cc056ea.json",
+   "status": 200
+  },
+  "GET /unseen/carbon?at=2026-11-07T02%3A00%3A00Z": {
+   "file": "get__unseen_carbon_01a7a44c.json",
+   "status": 200
+  },
+  "GET /unseen/carbon?at=2026-11-07T03%3A00%3A00Z": {
+   "file": "get__unseen_carbon_d78b206e.json",
+   "status": 200
+  },
+  "GET /unseen/carbon?at=2026-11-07T04%3A00%3A00Z": {
+   "file": "get__unseen_carbon_e5070fac.json",
+   "status": 200
+  },
+  "GET /unseen/carbon?at=2026-11-07T05%3A00%3A00Z": {
+   "file": "get__unseen_carbon_03838e60.json",
+   "status": 200
+  },
+  "GET /unseen/carbon?at=2026-11-07T06%3A00%3A00Z": {
+   "file": "get__unseen_carbon_948fbe42.json",
+   "status": 200
+  },
+  "GET /unseen/carbon?at=2026-11-07T07%3A00%3A00Z": {
+   "file": "get__unseen_carbon_87be274e.json",
+   "status": 200
+  },
+  "GET /unseen/carbon?at=2026-11-07T08%3A00%3A00Z": {
+   "file": "get__unseen_carbon_aeb83667.json",
+   "status": 200
+  },
+  "GET /unseen/carbon?at=2026-11-07T09%3A00%3A00Z": {
+   "file": "get__unseen_carbon_56dbda57.json",
+   "status": 200
+  },
+  "GET /unseen/carbon?at=2026-11-07T10%3A00%3A00Z": {
+   "file": "get__unseen_carbon_5466e82c.json",
+   "status": 200
+  },
+  "GET /unseen/carbon?at=2026-11-07T11%3A00%3A00Z": {
+   "file": "get__unseen_carbon_67c366a8.json",
+   "status": 200
+  },
+  "GET /unseen/carbon?at=2026-11-07T12%3A00%3A00Z": {
+   "file": "get__unseen_carbon_6a90bf30.json",
+   "status": 200
+  },
+  "GET /unseen/carbon?at=2026-11-07T13%3A00%3A00Z": {
+   "file": "get__unseen_carbon_85bbba35.json",
+   "status": 200
+  },
+  "GET /unseen/carbon?at=2026-11-07T14%3A00%3A00Z": {
+   "file": "get__unseen_carbon_bbd3b28a.json",
+   "status": 200
+  },
+  "GET /unseen/carbon?at=2026-11-07T15%3A00%3A00Z": {
+   "file": "get__unseen_carbon_7e479b0f.json",
+   "status": 200
+  },
+  "GET /unseen/carbon?at=2026-11-07T16%3A00%3A00Z": {
+   "file": "get__unseen_carbon_62e0f538.json",
+   "status": 200
+  },
+  "GET /unseen/carbon?at=2026-11-07T17%3A00%3A00Z": {
+   "file": "get__unseen_carbon_5d91bb64.json",
+   "status": 200
+  },
+  "GET /unseen/carbon?at=2026-11-07T18%3A00%3A00Z": {
+   "file": "get__unseen_carbon_887d99ed.json",
+   "status": 200
+  },
+  "GET /unseen/carbon?at=2026-11-07T19%3A00%3A00Z": {
+   "file": "get__unseen_carbon_48f21453.json",
+   "status": 200
+  },
+  "GET /unseen/carbon?at=2026-11-07T20%3A00%3A00Z": {
+   "file": "get__unseen_carbon_a891b140.json",
+   "status": 200
+  },
+  "GET /unseen/carbon?at=2026-11-07T21%3A00%3A00Z": {
+   "file": "get__unseen_carbon_02b73d4c.json",
+   "status": 200
+  },
+  "GET /unseen/carbon?at=2026-11-07T22%3A00%3A00Z": {
+   "file": "get__unseen_carbon_08a61efe.json",
+   "status": 200
+  },
+  "GET /unseen/carbon?at=2026-11-07T23%3A00%3A00Z": {
+   "file": "get__unseen_carbon_3d4b61da.json",
+   "status": 200
+  },
+  "GET /unseen/carbon?at=2026-11-08T00%3A00%3A00Z": {
+   "file": "get__unseen_carbon_ff8bac7e.json",
+   "status": 200
+  },
+  "GET /unseen/carbon?at=2026-11-08T01%3A00%3A00Z": {
+   "file": "get__unseen_carbon_0435ed54.json",
+   "status": 200
+  },
+  "GET /unseen/carbon?at=2026-11-08T02%3A00%3A00Z": {
+   "file": "get__unseen_carbon_c5fea20a.json",
+   "status": 200
+  },
+  "GET /unseen/carbon?at=2026-11-08T03%3A00%3A00Z": {
+   "file": "get__unseen_carbon_171adba3.json",
+   "status": 200
+  },
+  "GET /unseen/carbon?at=2026-11-08T04%3A00%3A00Z": {
+   "file": "get__unseen_carbon_a93d7ce2.json",
+   "status": 200
+  },
+  "GET /unseen/carbon?at=2026-11-08T05%3A00%3A00Z": {
+   "file": "get__unseen_carbon_e8de89cf.json",
+   "status": 200
+  },
+  "GET /unseen/carbon?at=2026-11-08T06%3A00%3A00Z": {
+   "file": "get__unseen_carbon_a76c8d47.json",
+   "status": 200
+  },
+  "GET /unseen/carbon?at=2026-11-08T07%3A00%3A00Z": {
+   "file": "get__unseen_carbon_37d1cbd5.json",
+   "status": 200
+  },
+  "GET /unseen/carbon?at=2026-11-08T08%3A00%3A00Z": {
+   "file": "get__unseen_carbon_b7a08c22.json",
+   "status": 200
+  },
+  "GET /unseen/carbon?at=2026-11-08T09%3A00%3A00Z": {
+   "file": "get__unseen_carbon_85aae055.json",
+   "status": 200
+  },
+  "GET /unseen/carbon?at=2026-11-08T10%3A00%3A00Z": {
+   "file": "get__unseen_carbon_75975e56.json",
+   "status": 200
+  },
+  "GET /unseen/carbon?at=2026-11-08T11%3A00%3A00Z": {
+   "file": "get__unseen_carbon_bfe01201.json",
+   "status": 200
+  },
+  "GET /unseen/carbon?at=2026-11-08T12%3A00%3A00Z": {
+   "file": "get__unseen_carbon_b8652372.json",
+   "status": 200
+  },
+  "GET /unseen/carbon?at=2026-11-08T13%3A00%3A00Z": {
+   "file": "get__unseen_carbon_c85e7ad4.json",
+   "status": 200
+  },
+  "GET /unseen/carbon?at=2026-11-08T14%3A00%3A00Z": {
+   "file": "get__unseen_carbon_c438db72.json",
+   "status": 200
+  },
+  "GET /unseen/carbon?at=2026-11-08T15%3A00%3A00Z": {
+   "file": "get__unseen_carbon_6f86b0c5.json",
+   "status": 200
+  },
+  "GET /unseen/carbon?at=2026-11-08T16%3A00%3A00Z": {
+   "file": "get__unseen_carbon_37fb15bc.json",
+   "status": 200
+  },
+  "GET /unseen/carbon?at=2026-11-08T17%3A00%3A00Z": {
+   "file": "get__unseen_carbon_f031da28.json",
+   "status": 200
+  },
+  "GET /unseen/ghost-wind": {
+   "file": "get__unseen_ghost_wind_4e7d7f44.json",
+   "status": 200
+  },
+  "GET /unseen/ghost-wind?from=2026-10-26T00%3A00%3A00Z&to=2026-10-27T00%3A00%3A00Z": {
+   "file": "get__unseen_ghost_wind_2ac59786.json",
+   "status": 200
+  },
+  "GET /zones": {
+   "file": "get__zones_0b516cf8.json",
+   "status": 200
+  },
+  "POST /intervene?type=hormuz": {
+   "file": "post__intervene_e6825c81.json",
+   "status": 200
+  },
+  "POST /intervene?type=interconnector_trip": {
+   "file": "post__intervene_5c8c4880.json",
+   "status": 200
+  },
+  "POST /intervene?type=nuclear_outage": {
+   "file": "post__intervene_7aae794d.json",
+   "status": 200
+  },
+  "POST /intervene?type=scottish_storm": {
+   "file": "post__intervene_fda788eb.json",
+   "status": 200
+  }
+ }
+}
