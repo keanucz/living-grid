@@ -2,5 +2,8 @@ import React from 'react'
 import { createRoot } from 'react-dom/client'
 import App from './App.jsx'
 import './styles/app.css'
+import { startLive } from './live/index.js'
+
+startLive()
 
 createRoot(document.getElementById('root')).render(<App />)

@@ -47,7 +47,7 @@ function MapApp() {
   const ui = useStore()
   const geo = useGeo()
   const zones = useApi(api.zones)
-  const state = useApi(() => api.state(ui.at), [ui.at])
+  const state = useApi(() => api.state(ui.at), [ui.at, ui.live?.version])
   const scenarios = useApi(api.scenarios)
   const assets = useApi(api.assets)
 

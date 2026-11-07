@@ -4,6 +4,7 @@ import stateFixture from '../fixtures/state.json'
 import scenariosFixture from '../fixtures/scenarios.json'
 import assetsFixture from '../fixtures/assets.json'
 import { normaliseScenarios, normaliseState, normaliseZones } from './normalise.js'
+import { withLive } from '../live/index.js'
 
 // Every GET in the CLAUDE.md HTTP contract, served by FastAPI behind the /api proxy (Vite in dev,
 // Caddy on htb.stefvuck.dev). Live responses are normalised to the UI's shapes; if the API is
@@ -54,6 +55,12 @@ function zones() {
 }
 
 async function state(at) {
+  const res = await stateFromApi(at)
+  // Prices, load, mix, carbon and forecasts come from SpacetimeDB when it is connected, else as the API gave them.
+  return { ...res, data: withLive(res.data, at ?? currentHour(), GBP_EUR) }
+}
+
+async function stateFromApi(at) {
   return liveOr(stateFixture, '/state', async () => {
     const [raw, z] = await Promise.all([fetchLive('/state', { at: at ?? currentHour() }), zones()])
     if (!raw) return null

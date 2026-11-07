@@ -16,7 +16,7 @@ const MIX_GROUPS = [
   [/biomass|biogas|waste/, 'biomass'],
 ]
 
-function groupMix(mixMw) {
+export function groupMix(mixMw) {
   const out = {}
   for (const [k, v] of Object.entries(mixMw ?? {})) {
     if (!(v > 0)) continue
