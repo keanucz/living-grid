@@ -8,8 +8,8 @@ only data known by then. The result is written to data/replay/<event>.json, whic
 file the route falls back to the committed contract sample for the headline event.
 
 Explanations are LightGBM attributions of the model's own number against a typical hour of that day, attached to the
-hours where the forecast moves most. The constraint cost is NESO's published daily total when cached; otherwise the
-project brief's figure is used and the summary says so.
+hours where the forecast moves most. The constraint cost is NESO's published daily total when cached, else the verified NESO figure for the
+event (engine/reference), else the project brief's figure; the summary says which.
 """
 
 import argparse
@@ -21,6 +21,7 @@ from datetime import date, datetime
 import pandas as pd
 
 from engine import data
+from engine.reference import loader
 from pipeline import cache, schemas
 from pipeline.features import build
 from pipeline.models import asof, train
@@ -44,16 +45,30 @@ def path(event: date):
     return cache.DATA / "replay" / f"{event.isoformat()}.json"
 
 
-def constraint_cost(event: date) -> tuple[float, bool]:
-    """(GBP, from_neso) for the event's GB day."""
+VERIFIED_COST_FACTS = {HEADLINE_EVENT: "con_2026_10_26_cost"}
+COST_SOURCES = {
+    "cache": "NESO daily total",
+    "verified": "NESO datastore, constraints category only",
+    "brief": "the project brief's figure, not NESO data",
+}
+
+
+def constraint_cost(event: date) -> tuple[float, str]:
+    """(GBP, source key): the cached NESO daily total, else the verified NESO figure for the event, else the brief's."""
     try:
         c = cache.read("neso/constraint_costs")
+        hit = c[c["date"].astype(str) == event.isoformat()]
+        if not hit.empty:
+            return float(hit["total_cost_gbp"].iloc[0]), "cache"
     except FileNotFoundError:
-        return BRIEF_CONSTRAINT_COST_GBP, False
-    hit = c[c["date"].astype(str) == event.isoformat()]
-    if hit.empty:
-        return BRIEF_CONSTRAINT_COST_GBP, False
-    return float(hit["total_cost_gbp"].iloc[0]), True
+        pass
+    fact = VERIFIED_COST_FACTS.get(event)
+    if fact:
+        try:
+            return loader.figure(fact, after="alone was"), "verified"
+        except (KeyError, ValueError, loader.UnverifiedFact):
+            log.warning("verified constraint cost %s unavailable; using the brief's figure", fact)
+    return BRIEF_CONSTRAINT_COST_GBP, "brief"
 
 
 def _point(ts, actual, q, explanation):
@@ -97,12 +112,12 @@ def compute(event: date, model=None, inputs: build.Inputs | None = None) -> dict
                        "points": [_point(rows.at[i, "ts"], actual[i], q.iloc[i], sentences.get(i)) for i in range(len(rows))]})
     if not series:
         raise ReplayUnavailable("the model covers none of the replay series")
-    cost, from_neso = constraint_cost(event)
+    cost, source = constraint_cost(event)
     return {"event": event, "title": TITLES.get(event, f"Replay of {event:%d %B %Y}"), "trained_before": event,
-            "series": series, "constraint_cost_gbp": cost, "summary": summary(series, event, cost, from_neso, model.version)}
+            "series": series, "constraint_cost_gbp": cost, "summary": summary(series, event, cost, source, model.version)}
 
 
-def summary(series: list[dict], event: date, cost: float, from_neso: bool, version: str) -> str:
+def summary(series: list[dict], event: date, cost: float, source: str, version: str) -> str:
     wins, total = 0, 0
     for s in series:
         pts = [p for p in s["points"] if p["actual"] is not None]
@@ -112,9 +127,9 @@ def summary(series: list[dict], event: date, cost: float, from_neso: bool, versi
         total += len(pts)
         wins += inside
     cov = f"{wins} of {total} hours landed inside the P10 to P90 band" if total else "no actuals were available to compare"
-    src = "NESO daily total" if from_neso else "the project brief's figure, not yet NESO data"
+    src = COST_SOURCES[source]
     return (f"Model {version} saw no data on or after {event:%d %B %Y}; forecasts are as made {LEAD_H} hours ahead. {cov}. "
-            f"GB constraint cost for the day: £{cost / 1e6:.0f}M ({src}).")
+            f"GB constraint cost for the day: £{cost / 1e6:.1f}M ({src}).")
 
 
 def run(event: date = HEADLINE_EVENT, **kw) -> str:

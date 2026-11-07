@@ -69,17 +69,27 @@ def test_model_for_another_date_is_refused(model):
         rp.compute(date(2026, 10, 30), model=model)
 
 
-def test_constraint_cost_prefers_neso_and_says_where_it_came_from(model, populated):  # noqa: F811
+def test_constraint_cost_prefers_cache_then_verified_neso_fact_then_the_brief(model, populated):  # noqa: F811
     r = rp.compute(EVENT, model=model)
-    assert r["constraint_cost_gbp"] == 36_000_000.0 and "not yet NESO data" in r["summary"]
+    assert r["constraint_cost_gbp"] == pytest.approx(36_530_868.70) and "NESO datastore" in r["summary"]
+    assert "£36.5M" in r["summary"] and "brief" not in r["summary"]
     cache.write("neso/constraint_costs", pd.DataFrame({"date": ["2026-10-25", "2026-10-26"], "total_cost_gbp": [1.0, 35_500_000.0]}))
     r = rp.compute(EVENT, model=model)
-    assert r["constraint_cost_gbp"] == 35_500_000.0 and "NESO daily total" in r["summary"] and "£36M" in r["summary"]
+    assert r["constraint_cost_gbp"] == 35_500_000.0 and "NESO daily total" in r["summary"]
+    assert rp.constraint_cost(date(2026, 10, 30)) == (36_000_000.0, "brief")
+
+
+def test_unverified_cost_fact_falls_back_to_the_brief(monkeypatch):
+    def refuse(*a, **k):
+        raise rp.loader.UnverifiedFact("no")
+
+    monkeypatch.setattr(rp.loader, "figure", refuse)
+    assert rp.constraint_cost(EVENT) == (36_000_000.0, "brief")
 
 
 def test_summary_counts_hours_inside_the_band():
     series = [{"points": [{"actual": 5, "p10": 1, "p90": 9}, {"actual": 20, "p10": 1, "p90": 9}, {"actual": None, "p10": 1, "p90": 9}]}]
-    s = rp.summary(series, EVENT, 36e6, False, "asof-20261026")
+    s = rp.summary(series, EVENT, 36e6, "brief", "asof-20261026")
     assert "1 of 2 hours landed inside" in s and "26 October 2026" in s and "12 hours ahead" in s
 
 
