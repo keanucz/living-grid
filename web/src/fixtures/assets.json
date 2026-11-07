@@ -1,0 +1,173 @@
+[
+ {
+  "name": "Viking",
+  "type": "wind",
+  "mw": 443,
+  "coord": [
+   -1.25,
+   60.3
+  ]
+ },
+ {
+  "name": "Moray East",
+  "type": "wind",
+  "mw": 950,
+  "coord": [
+   -2.75,
+   58.2
+  ]
+ },
+ {
+  "name": "Seagreen",
+  "type": "wind",
+  "mw": 1075,
+  "coord": [
+   -1.85,
+   56.6
+  ]
+ },
+ {
+  "name": "Hornsea",
+  "type": "wind",
+  "mw": 2500,
+  "coord": [
+   1.85,
+   53.9
+  ]
+ },
+ {
+  "name": "Dogger Bank",
+  "type": "wind",
+  "mw": 3600,
+  "coord": [
+   2.1,
+   54.8
+  ]
+ },
+ {
+  "name": "Gemini",
+  "type": "wind",
+  "mw": 600,
+  "coord": [
+   6,
+   54.05
+  ]
+ },
+ {
+  "name": "Borkum Riffgrund",
+  "type": "wind",
+  "mw": 1300,
+  "coord": [
+   6.6,
+   54
+  ]
+ },
+ {
+  "name": "Torness",
+  "type": "nuclear",
+  "mw": 1185,
+  "coord": [
+   -2.41,
+   55.97
+  ]
+ },
+ {
+  "name": "Heysham",
+  "type": "nuclear",
+  "mw": 2400,
+  "coord": [
+   -2.92,
+   54.03
+  ]
+ },
+ {
+  "name": "Sizewell B",
+  "type": "nuclear",
+  "mw": 1198,
+  "coord": [
+   1.62,
+   52.21
+  ]
+ },
+ {
+  "name": "Gravelines",
+  "type": "nuclear",
+  "mw": 5460,
+  "coord": [
+   2.11,
+   51.01
+  ]
+ },
+ {
+  "name": "Flamanville",
+  "type": "nuclear",
+  "mw": 4250,
+  "coord": [
+   -1.88,
+   49.54
+  ]
+ },
+ {
+  "name": "Paluel",
+  "type": "nuclear",
+  "mw": 5320,
+  "coord": [
+   0.63,
+   49.86
+  ]
+ },
+ {
+  "name": "Doel",
+  "type": "nuclear",
+  "mw": 1000,
+  "coord": [
+   4.26,
+   51.32
+  ]
+ },
+ {
+  "name": "Pembroke",
+  "type": "gas",
+  "mw": 2200,
+  "coord": [
+   -4.99,
+   51.68
+  ]
+ },
+ {
+  "name": "Grain",
+  "type": "gas",
+  "mw": 1275,
+  "coord": [
+   0.71,
+   51.45
+  ]
+ },
+ {
+  "name": "Eemshaven",
+  "type": "gas",
+  "mw": 2700,
+  "coord": [
+   6.83,
+   53.43
+  ]
+ },
+ {
+  "name": "Kvilldal",
+  "type": "hydro",
+  "mw": 1240,
+  "coord": [
+   6.65,
+   59.52
+  ]
+ },
+ {
+  "name": "Sima",
+  "type": "hydro",
+  "mw": 1120,
+  "coord": [
+   7.12,
+   60.47
+  ]
+ }
+]

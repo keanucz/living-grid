@@ -1,0 +1,280 @@
+{
+ "zones": [
+  {
+   "id": "GB",
+   "name": "Great Britain",
+   "currency": "GBP",
+   "centroid": [
+    -1.9,
+    53.4
+   ],
+   "label_at": [
+    -3.2,
+    54.6
+   ]
+  },
+  {
+   "id": "FR",
+   "name": "France",
+   "currency": "EUR",
+   "centroid": [
+    2.4,
+    46.8
+   ],
+   "label_at": [
+    2.4,
+    46.8
+   ]
+  },
+  {
+   "id": "DE-LU",
+   "name": "Germany–Luxembourg",
+   "currency": "EUR",
+   "centroid": [
+    10.2,
+    51.1
+   ],
+   "label_at": [
+    10.2,
+    51.1
+   ]
+  },
+  {
+   "id": "NL",
+   "name": "Netherlands",
+   "currency": "EUR",
+   "centroid": [
+    5.6,
+    52.3
+   ],
+   "label_at": [
+    5.6,
+    52.6
+   ]
+  },
+  {
+   "id": "BE",
+   "name": "Belgium",
+   "currency": "EUR",
+   "centroid": [
+    4.6,
+    50.6
+   ],
+   "label_at": [
+    4.4,
+    50.5
+   ]
+  },
+  {
+   "id": "NO2",
+   "name": "Southern Norway",
+   "currency": "EUR",
+   "centroid": [
+    7.6,
+    59.2
+   ],
+   "label_at": [
+    8.4,
+    60.4
+   ]
+  }
+ ],
+ "interconnectors": [
+  {
+   "id": "NSL",
+   "name": "North Sea Link",
+   "from": "NO2",
+   "to": "GB",
+   "capacity_mw": 1400,
+   "from_at": [
+    6.4,
+    59
+   ],
+   "to_at": [
+    -1.6,
+    55.1
+   ]
+  },
+  {
+   "id": "IFA",
+   "name": "IFA",
+   "from": "FR",
+   "to": "GB",
+   "capacity_mw": 2000,
+   "from_at": [
+    2.6,
+    48.9
+   ],
+   "to_at": [
+    -0.1,
+    51.5
+   ]
+  },
+  {
+   "id": "IFA2",
+   "name": "IFA2",
+   "from": "FR",
+   "to": "GB",
+   "capacity_mw": 1000,
+   "from_at": [
+    -0.4,
+    48.6
+   ],
+   "to_at": [
+    -1.3,
+    50.95
+   ]
+  },
+  {
+   "id": "ELEC",
+   "name": "ElecLink",
+   "from": "FR",
+   "to": "GB",
+   "capacity_mw": 1000,
+   "from_at": [
+    1.7,
+    50.2
+   ],
+   "to_at": [
+    0.5,
+    51.3
+   ]
+  },
+  {
+   "id": "BRITNED",
+   "name": "BritNed",
+   "from": "NL",
+   "to": "GB",
+   "capacity_mw": 1000,
+   "from_at": [
+    4.9,
+    52.2
+   ],
+   "to_at": [
+    0.6,
+    51.75
+   ]
+  },
+  {
+   "id": "NEMO",
+   "name": "Nemo Link",
+   "from": "BE",
+   "to": "GB",
+   "capacity_mw": 1000,
+   "from_at": [
+    4.2,
+    50.9
+   ],
+   "to_at": [
+    0.9,
+    51.45
+   ]
+  },
+  {
+   "id": "NORNED",
+   "name": "NorNed",
+   "from": "NO2",
+   "to": "NL",
+   "capacity_mw": 700,
+   "from_at": [
+    6.8,
+    58.4
+   ],
+   "to_at": [
+    5.8,
+    52.7
+   ]
+  },
+  {
+   "id": "NORDLINK",
+   "name": "NordLink",
+   "from": "NO2",
+   "to": "DE-LU",
+   "capacity_mw": 1400,
+   "from_at": [
+    8,
+    58.6
+   ],
+   "to_at": [
+    10,
+    53.6
+   ]
+  },
+  {
+   "id": "FR-BE",
+   "name": "France–Belgium",
+   "from": "FR",
+   "to": "BE",
+   "capacity_mw": 3000,
+   "from_at": [
+    2.9,
+    48.9
+   ],
+   "to_at": [
+    4.4,
+    50.6
+   ]
+  },
+  {
+   "id": "FR-DE",
+   "name": "France–Germany",
+   "from": "FR",
+   "to": "DE-LU",
+   "capacity_mw": 3000,
+   "from_at": [
+    3.6,
+    48.4
+   ],
+   "to_at": [
+    9,
+    49.4
+   ]
+  },
+  {
+   "id": "BE-NL",
+   "name": "Belgium–Netherlands",
+   "from": "BE",
+   "to": "NL",
+   "capacity_mw": 2400,
+   "from_at": [
+    4.7,
+    50.95
+   ],
+   "to_at": [
+    5.3,
+    52
+   ]
+  },
+  {
+   "id": "NL-DE",
+   "name": "Netherlands–Germany",
+   "from": "DE-LU",
+   "to": "NL",
+   "capacity_mw": 4000,
+   "from_at": [
+    9.4,
+    52.1
+   ],
+   "to_at": [
+    6,
+    52.25
+   ]
+  },
+  {
+   "id": "ALEGRO",
+   "name": "ALEGrO",
+   "from": "BE",
+   "to": "DE-LU",
+   "capacity_mw": 1000,
+   "from_at": [
+    5.1,
+    50.55
+   ],
+   "to_at": [
+    8,
+    50.8
+   ]
+  }
+ ],
+ "gb_regions": []
+}
