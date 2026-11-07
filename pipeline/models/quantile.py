@@ -97,9 +97,9 @@ class QuantileModel:
         return pd.concat(parts, ignore_index=True)[cols] if parts else pd.DataFrame(columns=cols)
 
     def explain(self, features: pd.DataFrame) -> pd.DataFrame:
-        from .explain import grouped_zero
+        from .explain import contributions
 
-        return grouped_zero(features)
+        return contributions(self, features)
 
 
 def incomplete(path: Path) -> list[str]:
