@@ -173,7 +173,7 @@ Every constant in the engine (interconnector capacities, plant efficiencies, emi
 ### Known limits
 
 - The P10 to P90 bands are too narrow (see above).
-- Energy-Charts gives load for all of Norway, not just NO2 (15.3 GW against roughly 5 GW), so NO2 demand is left blank.
+- Energy-Charts reports load and wind for all of Norway, not just price zone NO2 (load averages about 15 GW against roughly 5 GW for NO2). So the load and wind forecasts cover five zones (GB, FR, DE-LU, NL, BE) and leave NO2 out, rather than log Norway-wide numbers under an NO2 label. Day-ahead prices cover all six zones, and each hourly run logs 816 forecasts instead of 912.
 - Ghost wind (wind paid to switch off) is worked out two ways: from accepted balancing bids, and from the gap between weather-implied and metered output. Both are labelled as estimates.
 - Carbon in imported power uses standard emission factors per fuel, not plant-level data.
 
