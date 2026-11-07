@@ -39,6 +39,7 @@ import BatteryDecideReducer from "./battery_decide_reducer";
 import BatteryPoolPutReducer from "./battery_pool_put_reducer";
 import ClaimZoneReducer from "./claim_zone_reducer";
 import ClearInterventionReducer from "./clear_intervention_reducer";
+import ClueBuyReducer from "./clue_buy_reducer";
 import DecideReducer from "./decide_reducer";
 import DeleteKeysReducer from "./delete_keys_reducer";
 import JoinReducer from "./join_reducer";
@@ -50,11 +51,15 @@ import LobbyReadyReducer from "./lobby_ready_reducer";
 import LobbyRematchReducer from "./lobby_rematch_reducer";
 import LobbySettingsReducer from "./lobby_settings_reducer";
 import LobbyStartReducer from "./lobby_start_reducer";
+import LobbyVoteReducer from "./lobby_vote_reducer";
 import MarketBuyReducer from "./market_buy_reducer";
 import MarketSellReducer from "./market_sell_reducer";
 import PoolDeleteReducer from "./pool_delete_reducer";
 import PoolPutReducer from "./pool_put_reducer";
+import ProfileSetReducer from "./profile_set_reducer";
 import PruneBeforeReducer from "./prune_before_reducer";
+import QuickCancelReducer from "./quick_cancel_reducer";
+import QuickPlayReducer from "./quick_play_reducer";
 import RemoveAdminReducer from "./remove_admin_reducer";
 import ResetGameReducer from "./reset_game_reducer";
 import SetAgentReducer from "./set_agent_reducer";
@@ -88,6 +93,7 @@ import InterventionRow from "./intervention_table";
 import LatestForecastRow from "./latest_forecast_table";
 import LeaderboardRow from "./leaderboard_table";
 import LobbyRow from "./lobby_table";
+import LobbyBallotRow from "./lobby_ballot_table";
 import LobbyPlayerRow from "./lobby_player_table";
 import MarketAccountRow from "./market_account_table";
 import MarketBotRow from "./market_bot_table";
@@ -97,8 +103,13 @@ import MarketLeaderboardRow from "./market_leaderboard_table";
 import MarketPositionRow from "./market_position_table";
 import MarketQuestionRow from "./market_question_table";
 import MarketRoundRow from "./market_round_table";
+import MetaLeaderboardRow from "./meta_leaderboard_table";
+import MyClueOffersRow from "./my_clue_offers_table";
+import MyCluesRow from "./my_clues_table";
 import PlayerRow from "./player_table";
 import PlayerDecisionRow from "./player_decision_table";
+import ProfileRow from "./profile_table";
+import QuickQueueRow from "./quick_queue_table";
 import ScoreRow from "./score_table";
 import ZoneRow from "./zone_table";
 
@@ -298,6 +309,20 @@ const tablesSchema = __schema({
       { name: 'lobby_id_key', constraint: 'unique', columns: ['id'] },
     ],
   }, LobbyRow),
+  lobbyBallot: __table({
+    name: 'lobby_ballot',
+    indexes: [
+      { accessor: 'key', name: 'lobby_ballot_key_idx_btree', algorithm: 'btree', columns: [
+        'key',
+      ] },
+      { accessor: 'lobby_id', name: 'lobby_ballot_lobby_id_idx_btree', algorithm: 'btree', columns: [
+        'lobbyId',
+      ] },
+    ],
+    constraints: [
+      { name: 'lobby_ballot_key_key', constraint: 'unique', columns: ['key'] },
+    ],
+  }, LobbyBallotRow),
   lobbyPlayer: __table({
     name: 'lobby_player',
     indexes: [
@@ -450,6 +475,28 @@ const tablesSchema = __schema({
       { name: 'player_decision_key_key', constraint: 'unique', columns: ['key'] },
     ],
   }, PlayerDecisionRow),
+  profile: __table({
+    name: 'profile',
+    indexes: [
+      { accessor: 'identity', name: 'profile_identity_idx_btree', algorithm: 'btree', columns: [
+        'identity',
+      ] },
+    ],
+    constraints: [
+      { name: 'profile_identity_key', constraint: 'unique', columns: ['identity'] },
+    ],
+  }, ProfileRow),
+  quickQueue: __table({
+    name: 'quick_queue',
+    indexes: [
+      { accessor: 'identity', name: 'quick_queue_identity_idx_btree', algorithm: 'btree', columns: [
+        'identity',
+      ] },
+    ],
+    constraints: [
+      { name: 'quick_queue_identity_key', constraint: 'unique', columns: ['identity'] },
+    ],
+  }, QuickQueueRow),
   score: __table({
     name: 'score',
     indexes: [
@@ -500,6 +547,27 @@ const tablesSchema = __schema({
     constraints: [
     ],
   }, MarketLeaderboardRow),
+  metaLeaderboard: __table({
+    name: 'meta_leaderboard',
+    indexes: [
+    ],
+    constraints: [
+    ],
+  }, MetaLeaderboardRow),
+  myClueOffers: __table({
+    name: 'my_clue_offers',
+    indexes: [
+    ],
+    constraints: [
+    ],
+  }, MyClueOffersRow),
+  myClues: __table({
+    name: 'my_clues',
+    indexes: [
+    ],
+    constraints: [
+    ],
+  }, MyCluesRow),
 });
 
 /** The schema information for all reducers in this module. This is defined the same way as the reducers would have been defined in the server, except the body of the reducer is omitted in code generation. */
@@ -509,6 +577,7 @@ const reducersSchema = __reducers(
   __reducerSchema("battery_pool_put", BatteryPoolPutReducer),
   __reducerSchema("claim_zone", ClaimZoneReducer),
   __reducerSchema("clear_intervention", ClearInterventionReducer),
+  __reducerSchema("clue_buy", ClueBuyReducer),
   __reducerSchema("decide", DecideReducer),
   __reducerSchema("delete_keys", DeleteKeysReducer),
   __reducerSchema("join", JoinReducer),
@@ -520,11 +589,15 @@ const reducersSchema = __reducers(
   __reducerSchema("lobby_rematch", LobbyRematchReducer),
   __reducerSchema("lobby_settings", LobbySettingsReducer),
   __reducerSchema("lobby_start", LobbyStartReducer),
+  __reducerSchema("lobby_vote", LobbyVoteReducer),
   __reducerSchema("market_buy", MarketBuyReducer),
   __reducerSchema("market_sell", MarketSellReducer),
   __reducerSchema("pool_delete", PoolDeleteReducer),
   __reducerSchema("pool_put", PoolPutReducer),
+  __reducerSchema("profile_set", ProfileSetReducer),
   __reducerSchema("prune_before", PruneBeforeReducer),
+  __reducerSchema("quick_cancel", QuickCancelReducer),
+  __reducerSchema("quick_play", QuickPlayReducer),
   __reducerSchema("remove_admin", RemoveAdminReducer),
   __reducerSchema("reset_game", ResetGameReducer),
   __reducerSchema("set_agent", SetAgentReducer),
@@ -560,6 +633,8 @@ type __SchemaWithTableAccessorAliases = Omit<typeof tablesSchema.schemaType, "ta
     readonly "game_result": Omit<typeof tablesSchema.schemaType.tables["gameResult"], "accessorName"> & { readonly accessorName: "game_result" };
     /** @deprecated Use `ghostWind` instead. This alias will be removed in the next major version. */
     readonly "ghost_wind": Omit<typeof tablesSchema.schemaType.tables["ghostWind"], "accessorName"> & { readonly accessorName: "ghost_wind" };
+    /** @deprecated Use `lobbyBallot` instead. This alias will be removed in the next major version. */
+    readonly "lobby_ballot": Omit<typeof tablesSchema.schemaType.tables["lobbyBallot"], "accessorName"> & { readonly accessorName: "lobby_ballot" };
     /** @deprecated Use `lobbyPlayer` instead. This alias will be removed in the next major version. */
     readonly "lobby_player": Omit<typeof tablesSchema.schemaType.tables["lobbyPlayer"], "accessorName"> & { readonly accessorName: "lobby_player" };
     /** @deprecated Use `marketAccount` instead. This alias will be removed in the next major version. */
@@ -578,12 +653,20 @@ type __SchemaWithTableAccessorAliases = Omit<typeof tablesSchema.schemaType, "ta
     readonly "market_round": Omit<typeof tablesSchema.schemaType.tables["marketRound"], "accessorName"> & { readonly accessorName: "market_round" };
     /** @deprecated Use `playerDecision` instead. This alias will be removed in the next major version. */
     readonly "player_decision": Omit<typeof tablesSchema.schemaType.tables["playerDecision"], "accessorName"> & { readonly accessorName: "player_decision" };
+    /** @deprecated Use `quickQueue` instead. This alias will be removed in the next major version. */
+    readonly "quick_queue": Omit<typeof tablesSchema.schemaType.tables["quickQueue"], "accessorName"> & { readonly accessorName: "quick_queue" };
     /** @deprecated Use `batteryMyPending` instead. This alias will be removed in the next major version. */
     readonly "battery_my_pending": Omit<typeof tablesSchema.schemaType.tables["batteryMyPending"], "accessorName"> & { readonly accessorName: "battery_my_pending" };
     /** @deprecated Use `latestForecast` instead. This alias will be removed in the next major version. */
     readonly "latest_forecast": Omit<typeof tablesSchema.schemaType.tables["latestForecast"], "accessorName"> & { readonly accessorName: "latest_forecast" };
     /** @deprecated Use `marketLeaderboard` instead. This alias will be removed in the next major version. */
     readonly "market_leaderboard": Omit<typeof tablesSchema.schemaType.tables["marketLeaderboard"], "accessorName"> & { readonly accessorName: "market_leaderboard" };
+    /** @deprecated Use `metaLeaderboard` instead. This alias will be removed in the next major version. */
+    readonly "meta_leaderboard": Omit<typeof tablesSchema.schemaType.tables["metaLeaderboard"], "accessorName"> & { readonly accessorName: "meta_leaderboard" };
+    /** @deprecated Use `myClueOffers` instead. This alias will be removed in the next major version. */
+    readonly "my_clue_offers": Omit<typeof tablesSchema.schemaType.tables["myClueOffers"], "accessorName"> & { readonly accessorName: "my_clue_offers" };
+    /** @deprecated Use `myClues` instead. This alias will be removed in the next major version. */
+    readonly "my_clues": Omit<typeof tablesSchema.schemaType.tables["myClues"], "accessorName"> & { readonly accessorName: "my_clues" };
   };
 };
 
@@ -609,6 +692,7 @@ const tableAccessorAliases = {
   "battery_slot": "batterySlot",
   "game_result": "gameResult",
   "ghost_wind": "ghostWind",
+  "lobby_ballot": "lobbyBallot",
   "lobby_player": "lobbyPlayer",
   "market_account": "marketAccount",
   "market_bot": "marketBot",
@@ -618,9 +702,13 @@ const tableAccessorAliases = {
   "market_question": "marketQuestion",
   "market_round": "marketRound",
   "player_decision": "playerDecision",
+  "quick_queue": "quickQueue",
   "battery_my_pending": "batteryMyPending",
   "latest_forecast": "latestForecast",
   "market_leaderboard": "marketLeaderboard",
+  "meta_leaderboard": "metaLeaderboard",
+  "my_clue_offers": "myClueOffers",
+  "my_clues": "myClues",
 } as const;
 
 function __withTableAccessorAliases<T extends object>(target: T, freeze = false): T {
@@ -655,6 +743,8 @@ export type DbView = __DbViewBase & {
   readonly "game_result": __DbViewBase["gameResult"];
   /** @deprecated Use `ghostWind` instead. This alias will be removed in the next major version. */
   readonly "ghost_wind": __DbViewBase["ghostWind"];
+  /** @deprecated Use `lobbyBallot` instead. This alias will be removed in the next major version. */
+  readonly "lobby_ballot": __DbViewBase["lobbyBallot"];
   /** @deprecated Use `lobbyPlayer` instead. This alias will be removed in the next major version. */
   readonly "lobby_player": __DbViewBase["lobbyPlayer"];
   /** @deprecated Use `marketAccount` instead. This alias will be removed in the next major version. */
@@ -673,12 +763,20 @@ export type DbView = __DbViewBase & {
   readonly "market_round": __DbViewBase["marketRound"];
   /** @deprecated Use `playerDecision` instead. This alias will be removed in the next major version. */
   readonly "player_decision": __DbViewBase["playerDecision"];
+  /** @deprecated Use `quickQueue` instead. This alias will be removed in the next major version. */
+  readonly "quick_queue": __DbViewBase["quickQueue"];
   /** @deprecated Use `batteryMyPending` instead. This alias will be removed in the next major version. */
   readonly "battery_my_pending": __DbViewBase["batteryMyPending"];
   /** @deprecated Use `latestForecast` instead. This alias will be removed in the next major version. */
   readonly "latest_forecast": __DbViewBase["latestForecast"];
   /** @deprecated Use `marketLeaderboard` instead. This alias will be removed in the next major version. */
   readonly "market_leaderboard": __DbViewBase["marketLeaderboard"];
+  /** @deprecated Use `metaLeaderboard` instead. This alias will be removed in the next major version. */
+  readonly "meta_leaderboard": __DbViewBase["metaLeaderboard"];
+  /** @deprecated Use `myClueOffers` instead. This alias will be removed in the next major version. */
+  readonly "my_clue_offers": __DbViewBase["myClueOffers"];
+  /** @deprecated Use `myClues` instead. This alias will be removed in the next major version. */
+  readonly "my_clues": __DbViewBase["myClues"];
 };
 
 type __TablesBase = __QueryBuilder<typeof tablesSchema.schemaType>;
@@ -697,6 +795,8 @@ export type Tables = __TablesBase & {
   readonly "game_result": __TablesBase["gameResult"];
   /** @deprecated Use `ghostWind` instead. This alias will be removed in the next major version. */
   readonly "ghost_wind": __TablesBase["ghostWind"];
+  /** @deprecated Use `lobbyBallot` instead. This alias will be removed in the next major version. */
+  readonly "lobby_ballot": __TablesBase["lobbyBallot"];
   /** @deprecated Use `lobbyPlayer` instead. This alias will be removed in the next major version. */
   readonly "lobby_player": __TablesBase["lobbyPlayer"];
   /** @deprecated Use `marketAccount` instead. This alias will be removed in the next major version. */
@@ -715,12 +815,20 @@ export type Tables = __TablesBase & {
   readonly "market_round": __TablesBase["marketRound"];
   /** @deprecated Use `playerDecision` instead. This alias will be removed in the next major version. */
   readonly "player_decision": __TablesBase["playerDecision"];
+  /** @deprecated Use `quickQueue` instead. This alias will be removed in the next major version. */
+  readonly "quick_queue": __TablesBase["quickQueue"];
   /** @deprecated Use `batteryMyPending` instead. This alias will be removed in the next major version. */
   readonly "battery_my_pending": __TablesBase["batteryMyPending"];
   /** @deprecated Use `latestForecast` instead. This alias will be removed in the next major version. */
   readonly "latest_forecast": __TablesBase["latestForecast"];
   /** @deprecated Use `marketLeaderboard` instead. This alias will be removed in the next major version. */
   readonly "market_leaderboard": __TablesBase["marketLeaderboard"];
+  /** @deprecated Use `metaLeaderboard` instead. This alias will be removed in the next major version. */
+  readonly "meta_leaderboard": __TablesBase["metaLeaderboard"];
+  /** @deprecated Use `myClueOffers` instead. This alias will be removed in the next major version. */
+  readonly "my_clue_offers": __TablesBase["myClueOffers"];
+  /** @deprecated Use `myClues` instead. This alias will be removed in the next major version. */
+  readonly "my_clues": __TablesBase["myClues"];
 };
 
 /** The tables available in this remote SpacetimeDB module. Each table reference doubles as a query builder. */

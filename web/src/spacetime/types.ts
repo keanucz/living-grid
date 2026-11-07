@@ -179,6 +179,28 @@ export const CarbonIn = __t.object("CarbonIn", {
 });
 export type CarbonIn = __Infer<typeof CarbonIn>;
 
+export const ClueOffer = __t.object("ClueOffer", {
+  questionId: __t.string(),
+  clueId: __t.string(),
+  label: __t.string(),
+  cost: __t.f64(),
+  bought: __t.bool(),
+});
+export type ClueOffer = __Infer<typeof ClueOffer>;
+
+export const CluePurchase = __t.object("CluePurchase", {
+  key: __t.string(),
+  lobbyId: __t.u32(),
+  identity: __t.identity(),
+  questionId: __t.string(),
+  clueId: __t.string(),
+  label: __t.string(),
+  body: __t.string(),
+  cost: __t.f64(),
+  boughtHour: __t.u32(),
+});
+export type CluePurchase = __Infer<typeof CluePurchase>;
+
 export const Forecast = __t.object("Forecast", {
   key: __t.string(),
   madeAt: __t.timestamp(),
@@ -282,10 +304,20 @@ export const Lobby = __t.object("Lobby", {
   bots: __t.bool(),
   createdAt: __t.timestamp(),
   stateSince: __t.timestamp(),
+  kind: __t.string(),
+  countdownS: __t.u32(),
   roundNo: __t.u32(),
   countdownUntil: __t.timestamp(),
 });
 export type Lobby = __Infer<typeof Lobby>;
+
+export const LobbyBallot = __t.object("LobbyBallot", {
+  key: __t.string(),
+  lobbyId: __t.u32(),
+  identity: __t.identity(),
+  vote: __t.string(),
+});
+export type LobbyBallot = __Infer<typeof LobbyBallot>;
 
 export const LobbyDayPlayed = __t.object("LobbyDayPlayed", {
   key: __t.string(),
@@ -326,7 +358,7 @@ export type MarketAccount = __Infer<typeof MarketAccount>;
 export const MarketAnswer = __t.object("MarketAnswer", {
   questionId: __t.string(),
   lobbyId: __t.u32(),
-  outcome: __t.bool(),
+  outcome: __t.string(),
   actual: __t.f64(),
 });
 export type MarketAnswer = __Infer<typeof MarketAnswer>;
@@ -394,8 +426,8 @@ export const MarketPosition = __t.object("MarketPosition", {
   lobbyId: __t.u32(),
   identity: __t.identity(),
   questionId: __t.string(),
-  yes: __t.f64(),
-  no: __t.f64(),
+  side: __t.string(),
+  shares: __t.f64(),
   spent: __t.f64(),
 });
 export type MarketPosition = __Infer<typeof MarketPosition>;
@@ -411,6 +443,10 @@ export type MarketProfile = __Infer<typeof MarketProfile>;
 export const MarketQuestion = __t.object("MarketQuestion", {
   id: __t.string(),
   lobbyId: __t.u32(),
+  qtype: __t.string(),
+  choicesJson: __t.string(),
+  qJson: __t.string(),
+  pricesJson: __t.string(),
   groupId: __t.string(),
   optionLabel: __t.string(),
   text: __t.string(),
@@ -453,6 +489,28 @@ export const MarketSecret = __t.object("MarketSecret", {
 });
 export type MarketSecret = __Infer<typeof MarketSecret>;
 
+export const MetaLeaderboard = __t.object("MetaLeaderboard", {});
+export type MetaLeaderboard = __Infer<typeof MetaLeaderboard>;
+
+export const MetaLeaderboardRow = __t.object("MetaLeaderboardRow", {
+  rank: __t.u32(),
+  identity: __t.identity(),
+  name: __t.string(),
+  avatar: __t.string(),
+  isBot: __t.bool(),
+  rating: __t.f64(),
+  games: __t.u32(),
+  wins: __t.u32(),
+  pointsTotal: __t.f64(),
+});
+export type MetaLeaderboardRow = __Infer<typeof MetaLeaderboardRow>;
+
+export const MyClueOffers = __t.object("MyClueOffers", {});
+export type MyClueOffers = __Infer<typeof MyClueOffers>;
+
+export const MyClues = __t.object("MyClues", {});
+export type MyClues = __Infer<typeof MyClues>;
+
 export const Player = __t.object("Player", {
   identity: __t.identity(),
   name: __t.string(),
@@ -473,6 +531,30 @@ export const PlayerDecision = __t.object("PlayerDecision", {
   decidedAt: __t.timestamp(),
 });
 export type PlayerDecision = __Infer<typeof PlayerDecision>;
+
+export const Profile = __t.object("Profile", {
+  identity: __t.identity(),
+  name: __t.string(),
+  avatar: __t.string(),
+  isBot: __t.bool(),
+  games: __t.u32(),
+  wins: __t.u32(),
+  pointsTotal: __t.f64(),
+  rating: __t.f64(),
+  badgesJson: __t.string(),
+  botRecordJson: __t.string(),
+  updatedAt: __t.timestamp(),
+});
+export type Profile = __Infer<typeof Profile>;
+
+export const QuickQueue = __t.object("QuickQueue", {
+  identity: __t.identity(),
+  name: __t.string(),
+  avatar: __t.string(),
+  mode: __t.string(),
+  joinedAt: __t.timestamp(),
+});
+export type QuickQueue = __Infer<typeof QuickQueue>;
 
 export const Score = __t.object("Score", {
   key: __t.string(),

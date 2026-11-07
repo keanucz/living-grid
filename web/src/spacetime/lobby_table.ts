@@ -21,6 +21,8 @@ export default __t.row({
   bots: __t.bool(),
   createdAt: __t.timestamp().name("created_at"),
   stateSince: __t.timestamp().name("state_since"),
+  kind: __t.string(),
+  countdownS: __t.u32().name("countdown_s"),
   roundNo: __t.u32().name("round_no"),
   countdownUntil: __t.timestamp().name("countdown_until"),
 });

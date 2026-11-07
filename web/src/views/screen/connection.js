@@ -59,14 +59,12 @@ export function connectScreen({ code, onState, onEvent }) {
   }
   const accountName = (id) => conn.db.market_account.identity?.find?.(id)?.name ?? null
   const question = (qid) => conn.db.market_question.id?.find?.(qid) ?? null
+  // One market_position row per question and option (side = 'yes' / 'no' or an option id): the change in shares is the trade.
   const trade = (prev, row) => {
     if (!applied) return
-    const dy = row.yes - (prev?.yes ?? 0)
-    const dn = row.no - (prev?.no ?? 0)
-    if (Math.abs(dy) < 1e-9 && Math.abs(dn) < 1e-9) return
-    const side = Math.abs(dy) >= Math.abs(dn) ? 'yes' : 'no'
-    const shares = side === 'yes' ? dy : dn
-    onEvent?.({ kind: 'trade', who: accountName(row.identity) ?? 'Someone', side, shares, question: question(row.questionId)?.text ?? '' })
+    const shares = row.shares - (prev?.shares ?? 0)
+    if (Math.abs(shares) < 1e-9) return
+    onEvent?.({ kind: 'trade', who: accountName(row.identity) ?? 'Someone', side: row.side, shares, question: question(row.questionId)?.text ?? '' })
   }
   conn = DbConnection.builder()
     .withUri(uri())

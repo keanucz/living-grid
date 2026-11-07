@@ -106,21 +106,34 @@ function Profile({ profile, setProfile, autoFocus }) {
   )
 }
 
-function Landing({ onHost, onJoinCode, onQuick }) {
+const defaultName = () => `Player ${100 + Math.floor(Math.random() * 900)}`
+
+function Landing({ profile, setProfile, queue, onHost, onJoinCode, onQuick, onCancel }) {
   const [code, setCode] = useState('')
+  const [mode, setMode] = useState('market')
+  const waiting = queue?.waiting ?? { market: 0, battery: 0 }
   return (
     <>
-      {onQuick && (
-        <section className="lb-card">
-          <h2>Quick play</h2>
-          <p className="lb-muted">Jump into a game as soon as two or more people are waiting.</p>
-          <button className="lb-primary" onClick={onQuick}>Quick play</button>
-        </section>
-      )}
+      <section className="lb-card lb-quick">
+        <h2>Quick play</h2>
+        {queue?.mine ? (
+          <>
+            <p className="lb-muted"><b>Looking for another player…</b> {waiting[queue.mine]} waiting for {queue.mine === 'battery' ? 'a battery game' : 'a prediction market'}. The game starts a few seconds after a second person arrives. Ask a friend to scan the same QR code.</p>
+            <button className="lb-ghost" onClick={onCancel}>Cancel</button>
+          </>
+        ) : (
+          <>
+            <p className="lb-muted">No code, no host. You are matched as soon as two or more people are waiting.</p>
+            <Profile profile={profile} setProfile={setProfile} />
+            <Segmented label="Game" options={MODES} value={mode} onChange={setMode} />
+            <button className="lb-primary" onClick={() => onQuick(mode)}>Quick play{waiting[mode] ? ` · ${waiting[mode]} waiting` : ''}</button>
+          </>
+        )}
+      </section>
       <section className="lb-card">
         <h2>Host a game</h2>
         <p className="lb-muted">You get a 4-letter code, a QR for phones and a link for the big screen.</p>
-        <button className="lb-primary" onClick={onHost}>Host a game</button>
+        <button className="lb-ghost wide" onClick={onHost}>Host a game</button>
       </section>
       <section className="lb-card">
         <h2>Join with a code</h2>
@@ -129,7 +142,7 @@ function Landing({ onHost, onJoinCode, onQuick }) {
             <span>Code from the host</span>
             <input className="lb-code-in" value={code} maxLength={4} inputMode="text" autoCapitalize="characters" autoComplete="off" placeholder="ABCD" onChange={(e) => setCode(normaliseCode(e.target.value))} />
           </label>
-          <button className="lb-primary" disabled={code.length !== 4}>Continue</button>
+          <button className="lb-ghost wide" disabled={code.length !== 4}>Continue</button>
         </form>
       </section>
     </>
@@ -253,7 +266,7 @@ function Waiting({ s, lobby, busy, run, api }) {
   )
 }
 
-function Countdown({ lobby, onVote, vote }) {
+function Countdown({ lobby, onVote, vote, players = [], tally = null }) {
   const seen = useRef(Date.now())
   const [now, setNow] = useState(Date.now())
   useEffect(() => {
@@ -267,23 +280,31 @@ function Countdown({ lobby, onVote, vote }) {
       <div className="lb-muted">Game {lobby.code} starts in</div>
       <div className="lb-big num">{left > 0 ? left : 'Go'}</div>
       <div className="lb-muted">Get ready: a real day from the past, date hidden.</div>
+      {players.length > 0 && (
+        <ul className="lb-faces" aria-label="Players in this game">
+          {players.map((p) => <li key={p.id} title={p.name}><Avatar id={p.avatar} size={30} /><span>{p.name}</span></li>)}
+        </ul>
+      )}
       {onVote && (
         <div className="lb-row">
-          <button className={`lb-ghost ${vote === 'start' ? 'on' : ''}`} onClick={() => onVote('start')}>Start now</button>
-          <button className={`lb-ghost ${vote === 'wait' ? 'on' : ''}`} onClick={() => onVote('wait')}>Wait for more</button>
+          <button className={`lb-ghost ${vote === 'start' ? 'on' : ''}`} onClick={() => onVote('start')}>Start now{tally ? ` · ${tally.start}` : ''}</button>
+          <button className={`lb-ghost ${vote === 'wait' ? 'on' : ''}`} onClick={() => onVote('wait')}>Wait for more{tally ? ` · ${tally.wait}` : ''}</button>
         </div>
       )}
     </section>
   )
 }
 
-function RoundFooter({ s, lobby, busy, run, api }) {
+function RoundFooter({ s, lobby, busy, run, api, profile }) {
   const isHost = lobby.host === s.me
   const over = lobby.state === 'reveal'
+  const quick = lobby.kind === 'quick'
+  const again = () => run(() => api.current.lobbyLeave().then(() => api.current.quickPlay((profile?.name ?? '').trim() || defaultName(), profile?.avatar ?? avatarIds[0], lobby.mode)))
   return (
     <div className="lb-foot">
-      {over && isHost && <button className="lb-primary" disabled={busy} onClick={() => run(() => api.current.lobbyRematch())}>Rematch</button>}
-      {over && !isHost && <p className="lb-muted">Waiting for the host to start a rematch.</p>}
+      {over && quick && <button className="lb-primary" disabled={busy} onClick={again}>Play again</button>}
+      {over && !quick && isHost && <button className="lb-primary" disabled={busy} onClick={() => run(() => api.current.lobbyRematch())}>Rematch</button>}
+      {over && !quick && !isHost && <p className="lb-muted">Waiting for the host to start a rematch.</p>}
       <button className="lb-link" onClick={() => run(() => api.current.lobbyLeave().then(() => go('')))}>Leave game</button>
       <style>{CSS}</style>
     </div>
@@ -317,6 +338,11 @@ function Lobby() {
     setHosting(false)
     run(() => api.current.lobbyCreate({ ...set, name: profile.name.trim(), avatar: profile.avatar ?? avatarIds[0] }))
   }
+  const quickPlay = (mode) => {
+    const name = (profile.name ?? '').trim() || defaultName()
+    if (!profile.name) setProfile({ ...profile, name })
+    return run(() => api.current.quickPlay(name, profile.avatar ?? avatarIds[0], mode))
+  }
   const join = (code) => run(() => api.current.lobbyJoin(code, profile.name.trim(), profile.avatar ?? avatarIds[0]))
 
   let body
@@ -327,14 +353,20 @@ function Lobby() {
       ? <HostForm profile={profile} setProfile={setProfile} busy={busy} onCreate={create} onBack={() => setHosting(false)} />
       : routeCodeNow
         ? <JoinForm code={routeCodeNow} profile={profile} setProfile={setProfile} busy={busy} onJoin={join} onBack={() => go('')} />
-        : <Landing onHost={() => setHosting(true)} onJoinCode={go} onQuick={api.current?.can?.('quickPlay') ? () => run(() => api.current.quickPlay((profile.name ?? '').trim() || 'Player', profile.avatar ?? avatarIds[0])) : null} />
+        : <Landing profile={profile} setProfile={setProfile} queue={s.queue} onHost={() => setHosting(true)} onJoinCode={go}
+            onQuick={(mode) => quickPlay(mode)} onCancel={() => run(() => api.current.quickCancel())} />
   } else if (lobby.state === 'waiting') body = <Waiting s={s} lobby={lobby} busy={busy} run={run} api={api} />
-  else if (lobby.state === 'countdown') body = <Countdown lobby={lobby} onVote={lobby.kind === 'quick' && api.current?.can?.('lobbyVote') ? (c) => run(() => api.current.lobbyVote(c)) : null} />
+  else if (lobby.state === 'countdown') {
+    const ballots = (s.ballots ?? []).filter((b) => b.lobbyId === lobby.id)
+    const tally = { start: ballots.filter((b) => b.vote === 'start').length, wait: ballots.filter((b) => b.vote === 'wait').length }
+    body = <Countdown lobby={lobby} players={members(s, lobby)} tally={lobby.kind === 'quick' ? tally : null} vote={ballots.find((b) => b.id === s.me)?.vote}
+      onVote={lobby.kind === 'quick' ? (v) => run(() => api.current.lobbyVote(v)) : null} />
+  }
   else body = null
 
   if (lobby && (lobby.state === 'playing' || lobby.state === 'reveal')) {
     const Round = ROUNDS[lobby.mode]
-    const footer = <RoundFooter s={s} lobby={lobby} busy={busy} run={run} api={api} />
+    const footer = <RoundFooter s={s} lobby={lobby} busy={busy} run={run} api={api} profile={profile} />
     if (Round) return Round({ lobbyId: lobby.id, footer })
     body = <><p className="lb-muted">This game mode is not available on your device yet.</p>{footer}</>
   }
@@ -392,6 +424,12 @@ body { overflow: auto; }
 .lb-big { font-size: 140px; font-weight: 800; line-height: 1; color: var(--accent); margin: 12px 0; }
 .lb-foot { max-width: 520px; margin: 0 auto 40px; padding: 0 16px; }
 .av { display: block; }
+.lb-faces { list-style: none; display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; padding: 0; margin: 12px 0 4px; }
+.lb-faces li { display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 11px; color: var(--text-2); max-width: 64px; }
+.lb-faces li span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 64px; }
+.lb-ghost.on { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
+.lb-ghost.wide { width: 100%; }
+.lb-quick h2 { color: var(--accent); }
 `
 
 export { Countdown, HostForm, JoinForm, Landing, RoundFooter, Waiting }

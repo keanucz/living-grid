@@ -7,7 +7,7 @@ const DB = 'living-grid'
 const TOKEN_KEY = 'lg-game-token'
 const TABLES = ['player', 'market_round', 'market_question', 'market_account', 'market_position', 'market_feed', 'market_leaderboard', 'market_bot', 'market_bot_p']
 // Lobby tables exist once the lobby module (#165) is published and the bindings regenerated; skipped before that.
-const LOBBY_TABLES = ['lobby', 'lobby_player', 'reaction', ...BATTERY_TABLES]
+const LOBBY_TABLES = ['lobby', 'lobby_player', 'lobby_ballot', 'quick_queue', 'reaction', ...BATTERY_TABLES]
 
 const tokenStore = {
   get: () => {
@@ -50,7 +50,18 @@ function read(conn, me, lobbyId = null) {
   // With a lobby id, only that room's rows; without, everything (the original single-room /market view).
   const rows = (t) => (conn.db[t] ? [...conn.db[t].iter()] : []).filter((r) => lobbyId == null || r.lobbyId == null || r.lobbyId === lobbyId)
   const positions = {}
-  for (const p of rows('market_position')) if (p.identity.toHexString() === hex) positions[p.questionId] = p
+  // The module keeps one position row per question and option (side = 'yes' / 'no', or an option id for a choice
+  // question). `positions` folds a question's rows into { yes, no, spent } for the yes/no screens; `positionRows`
+  // keeps the raw rows per question for the choice screens.
+  const positionRows = {}
+  for (const p of rows('market_position')) {
+    if (p.identity.toHexString() !== hex) continue
+    ;(positionRows[p.questionId] ??= []).push(p)
+    const a = (positions[p.questionId] ??= { yes: 0, no: 0, spent: 0 })
+    if (p.side === 'yes') a.yes += p.shares
+    else if (p.side === 'no') a.no += p.shares
+    a.spent += p.spent
+  }
   const account = rows('market_account').find((a) => a.identity.toHexString() === hex) ?? null
   const player = rows('player').find((p) => p.identity.toHexString() === hex) ?? null
   const accounts = new Map(rows('market_account').map((a) => [a.identity.toHexString(), a.points]))
@@ -77,6 +88,15 @@ function read(conn, me, lobbyId = null) {
     battery: lobbyId != null && conn.db.battery_round ? readBattery(conn, lobbyId, me) : null,
     lobbies,
     lobbyPlayers,
+    // Quick play: who is waiting for a game (per mode), whether that includes me, and the votes in each countdown.
+    queue: (() => {
+      const q = conn.db.quick_queue ? [...conn.db.quick_queue.iter()] : []
+      return {
+        mine: q.find((x) => x.identity.toHexString() === hex)?.mode ?? null,
+        waiting: { market: q.filter((x) => x.mode === 'market').length, battery: q.filter((x) => x.mode === 'battery').length },
+      }
+    })(),
+    ballots: (conn.db.lobby_ballot ? [...conn.db.lobby_ballot.iter()] : []).map((b) => ({ lobbyId: b.lobbyId, id: b.identity.toHexString(), vote: b.vote })),
     identities,
     player,
     account,
@@ -86,6 +106,7 @@ function read(conn, me, lobbyId = null) {
     round: (conn.db.market_round ? [...conn.db.market_round.iter()] : []).find((r) => lobbyId == null || r.id === lobbyId) ?? null,
     questions: rows('market_question').sort((a, b) => a.targetHour - b.targetHour || a.id.localeCompare(b.id)),
     positions,
+    positionRows,
     feed: rows('market_feed').sort((a, b) => a.hour - b.hour),
     leaderboard: rows('market_leaderboard').sort((a, b) => a.rank - b.rank),
   }
@@ -147,11 +168,12 @@ export function connectMarket({ onState, withToken = true, lobbyId = null }) {
     lobbySettings: (o) => call('lobbySettings', { secondsPerHour: o.secondsPerHour, nQuestions: o.nQuestions, bots: o.botsOn, mode: o.mode ?? 'market' }),
     batteryDecide: (slot, action) => call('batteryDecide', { slot, action }),
     lobbyStart: () => call('lobbyStart', {}),
-    // Optional, present once the module has them (quick play, #176): the capability check hides the buttons until then.
+    // Reducers some modules lack (reactions): the capability check hides what depends on them.
     can: (reducer) => !!conn.reducers[reducer],
-    quickPlay: (name, avatar) => call('quickPlay', { name, avatar }),
+    quickPlay: (name, avatar, mode = 'market') => call('quickPlay', { name, avatar, mode }),
+    quickCancel: () => call('quickCancel', {}),
     react: (emoji) => call('react', { emoji }), // present once the module has reactions
-    lobbyVote: (choice) => call('lobbyVote', { choice }), // 'start' | 'wait'
+    lobbyVote: (vote) => call('lobbyVote', { vote }), // 'start' | 'wait'
     lobbyRematch: () => call('lobbyRematch', {}),
     join: (name) => conn.reducers.join({ name }),
     buy: (questionId, side, shares) => conn.reducers.marketBuy({ questionId, side, shares }),

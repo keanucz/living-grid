@@ -13,6 +13,10 @@ import {
 export default __t.row({
   id: __t.string().primaryKey(),
   lobbyId: __t.u32().name("lobby_id"),
+  qtype: __t.string(),
+  choicesJson: __t.string().name("choices_json"),
+  qJson: __t.string().name("q_json"),
+  pricesJson: __t.string().name("prices_json"),
   groupId: __t.string().name("group_id"),
   optionLabel: __t.string().name("option_label"),
   text: __t.string(),
