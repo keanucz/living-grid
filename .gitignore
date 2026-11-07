@@ -20,3 +20,4 @@ coord/__pycache__/
 # data cache: only data/static is tracked
 data/*
 !data/static/
+!data/events/
