@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { api } from '../../api/client.js'
 import { Icon } from '../../shell/icons.jsx'
+import Savings from './Savings.jsx'
 
 const TZ = 'Europe/London'
 const t = (iso) => new Date(iso).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', timeZone: TZ })
@@ -79,6 +80,8 @@ function Household() {
 
       {d === undefined && <p className="hh-muted">Working out the cheapest hours…</p>}
       {d === null && <p className="hh-muted">Couldn’t reach the forecast right now. Try again in a minute.</p>}
+
+      <Savings region={region} />
 
       {d?.windows?.map((w) => (
         <article key={w.task} className="hh-card">
