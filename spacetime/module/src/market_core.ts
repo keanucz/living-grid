@@ -28,15 +28,9 @@ export const BOT_SPECS = [
 
 export const lk = (lobby: number, s: string) => `${lobby}|${s}`;
 export const acctKey = (lobby: number, id: Identity) => lk(lobby, id.toHexString());
-const posKey = (id: Identity, qid: string) => `${id.toHexString()}|${qid}`;
+const posKey = (id: Identity, qid: string, side: string) => `${id.toHexString()}|${qid}|${side}`;
 const botHex = (i: number) => `${'0'.repeat(58)}6d0d${i.toString(16).padStart(2, '0')}`;
 const botId = (name: string): Identity => (name === OUR_MODEL ? MODEL : Identity.fromString(botHex(ORDER.indexOf(name))));
-
-function cost(y: number, n: number, b: number): number {
-  const m = Math.max(y, n);
-  return m + b * Math.log(Math.exp((y - m) / b) + Math.exp((n - m) / b));
-}
-const priceYes = (y: number, n: number, b: number) => 1 / (1 + Math.exp((n - y) / b));
 
 function runningRound(ctx: any, lobby: number) {
   const r = ctx.db.market_round.id.find(lobby);
@@ -57,24 +51,43 @@ function openQuestion(ctx: any, r: any, qid: string) {
   return q;
 }
 
-// Signed trade: shares > 0 buys, < 0 sells. Returns points paid (negative when selling).
+const softmaxPrices = (q: Record<string, number>, b: number): Record<string, number> => {
+  const ids = Object.keys(q);
+  const m = Math.max(...ids.map(i => q[i]));
+  const e = ids.map(i => Math.exp((q[i] - m) / b));
+  const z = e.reduce((x, y) => x + y, 0);
+  return Object.fromEntries(ids.map((i, k) => [i, e[k] / z]));
+};
+const costOf = (q: Record<string, number>, b: number): number => {
+  const ids = Object.keys(q);
+  const m = Math.max(...ids.map(i => q[i]));
+  return m + b * Math.log(ids.reduce((z, i) => z + Math.exp((q[i] - m) / b), 0));
+};
+export const optionIds = (q: any): string[] => (q.qtype === 'choice' ? JSON.parse(q.choices_json).map((c: any) => c.id) : ['yes', 'no']);
+
+// Signed trade on one option: shares > 0 buys, < 0 sells. Returns points paid (negative when selling). The market
+// maker is an LMSR over the question's options (two for yes/no), so the prices are the room's probabilities.
 function trade(ctx: any, r: any, who: Identity, qid: string, side: string, shares: number): number {
-  if (side !== 'yes' && side !== 'no') throw new SenderError('side must be yes or no');
   if (!Number.isFinite(shares) || shares === 0 || Math.abs(shares) > MAX_SHARES) {
     throw new SenderError(`shares must be between 0 and ${MAX_SHARES}`);
   }
   const q = openQuestion(ctx, r, qid);
+  if (!optionIds(q).includes(side)) throw new SenderError(`unknown option ${side}: use ${optionIds(q).join(' or ')}`);
   const a = account(ctx, r.id, who);
-  const key = posKey(who, qid);
-  const pos = ctx.db.market_position.key.find(key) ?? { key, lobby_id: r.id, identity: who, question_id: qid, yes: 0, no: 0, spent: 0 };
-  if (shares < 0 && -shares > pos[side] + 1e-9) throw new SenderError('cannot sell more than you hold');
-  const y = q.q_yes + (side === 'yes' ? shares : 0);
-  const n = q.q_no + (side === 'no' ? shares : 0);
-  const paid = cost(y, n, r.b) - cost(q.q_yes, q.q_no, r.b);
+  const key = posKey(who, qid, side);
+  const pos = ctx.db.market_position.key.find(key) ?? { key, lobby_id: r.id, identity: who, question_id: qid, side, shares: 0, spent: 0 };
+  if (shares < 0 && -shares > pos.shares + 1e-9) throw new SenderError('cannot sell more than you hold');
+  const before: Record<string, number> = JSON.parse(q.q_json);
+  const after = { ...before, [side]: before[side] + shares };
+  const paid = costOf(after, r.b) - costOf(before, r.b);
   if (paid > a.points + 1e-9) throw new SenderError('not enough points');
   ctx.db.market_account.key.update({ ...a, points: a.points - paid });
-  ctx.db.market_question.id.update({ ...q, q_yes: y, q_no: n, price_yes: priceYes(y, n, r.b) });
-  const next = { ...pos, [side]: pos[side] + shares, spent: pos.spent + paid };
+  const prices = softmaxPrices(after, r.b);
+  ctx.db.market_question.id.update({
+    ...q, q_json: JSON.stringify(after), prices_json: JSON.stringify(prices),
+    ...(q.qtype === 'binary' ? { q_yes: after.yes, q_no: after.no, price_yes: prices.yes } : {}),
+  });
+  const next = { ...pos, shares: pos.shares + shares, spent: pos.spent + paid };
   if (ctx.db.market_position.key.find(key)) ctx.db.market_position.key.update(next);
   else ctx.db.market_position.insert(next);
   return paid;
@@ -93,8 +106,9 @@ export type DayQuestion = {
   id: string; text: string; kind: string; target_hour: number; unit: string; threshold: number; model_p: number; model_note: string;
   bot_p: { bot: string; p: number; note: string }[]; series: string; profile_json: string;
   group_id?: string; option_label?: string; // options of one multi-outcome question share a group_id
+  choices?: { id: string; label: string }[]; // a choice question: several options, exactly one wins
 };
-export type Answer = { question_id: string; outcome: boolean; actual: number };
+export type Answer = { question_id: string; outcome: boolean | string; actual: number }; // a bool means yes or no
 export type FeedRow = { label: string; value: number; unit: string };
 
 // Delete everything a lobby's round created (not the lobby or its players).
@@ -116,7 +130,7 @@ function botTrade(ctx: any, r: any, name: string, qid: string) {
   const bot = ctx.db.market_bot.key.find(lk(r.id, name));
   const bp = ctx.db.market_bot_p.key.find(`${name}|${qid}`);
   const q = ctx.db.market_question.id.find(qid);
-  if (!bot || !bp || !q || q.status !== 'open' || r.clock_hour >= q.target_hour) return;
+  if (!bot || !bp || !q || q.qtype !== 'binary' || q.status !== 'open' || r.clock_hour >= q.target_hour) return;
   const acct = ctx.db.market_account.key.find(acctKey(r.id, botId(name)));
   if (!acct) return;
   const [side, shares] = kellyShares(bp.p, q.price_yes, acct.points, bot.kelly, Math.min(BOT_MAX_SHARES, MAX_SHARES), r.b, q.q_yes, q.q_no);
@@ -179,8 +193,14 @@ export function startRound(
     if (!a) throw new SenderError(`no answer for ${q.id}`);
     const qid = lk(lobby.id, q.id);
     ids.push(qid);
-    ctx.db.market_answer.insert({ question_id: qid, lobby_id: lobby.id, outcome: a.outcome, actual: a.actual });
+    const choice = !!q.choices && q.choices.length >= 2;
+    const outcome = typeof a.outcome === 'boolean' ? (a.outcome ? 'yes' : 'no') : a.outcome;
+    const opts = choice ? q.choices!.map(c => c.id) : ['yes', 'no'];
+    if (!opts.includes(outcome)) throw new SenderError(`answer for ${q.id} is not one of ${opts.join(', ')}`);
+    ctx.db.market_answer.insert({ question_id: qid, lobby_id: lobby.id, outcome, actual: a.actual });
     ctx.db.market_question.insert({
+      qtype: choice ? 'choice' : 'binary', choices_json: choice ? JSON.stringify(q.choices) : '',
+      q_json: JSON.stringify(Object.fromEntries(opts.map(i => [i, 0]))), prices_json: JSON.stringify(Object.fromEntries(opts.map(i => [i, 1 / opts.length]))),
       id: qid, lobby_id: lobby.id, group_id: q.group_id ? lk(lobby.id, q.group_id) : '', option_label: q.option_label ?? '', text: q.text, kind: q.kind, target_hour: q.target_hour, unit: q.unit, threshold: q.threshold,
       model_p: q.model_p, model_note: q.model_note, q_yes: 0, q_no: 0, price_yes: 0.5, status: 'open', outcome: '', actual: 0, room_p_close: -1,
     });
@@ -215,16 +235,18 @@ export function tickRound(ctx: any, lobby: number, hour: number, feed: FeedRow[]
     if (q.status !== 'open' || hour <= q.target_hour) continue;
     const ans = ctx.db.market_answer.question_id.find(q.id);
     if (!ans) continue;
-    const win = ans.outcome ? 'yes' : 'no';
+    const win = ans.outcome;
     for (const pos of [...ctx.db.market_position.question_id.filter(q.id)]) {
       const a = ctx.db.market_account.key.find(acctKey(lobby, pos.identity));
-      if (a && pos[win] > 0) ctx.db.market_account.key.update({ ...a, points: a.points + pos[win] });
+      if (a && pos.side === win && pos.shares > 0) ctx.db.market_account.key.update({ ...a, points: a.points + pos.shares });
     }
-    const y = ans.outcome ? 1 : 0;
-    room += (q.price_yes - y) ** 2;
-    model += (q.model_p - y) ** 2;
-    n += 1;
-    ctx.db.market_question.id.update({ ...q, status: 'settled', outcome: win, actual: ans.actual, room_p_close: q.price_yes });
+    const y = win === 'yes' ? 1 : 0;
+    if (q.qtype === 'binary') {
+      room += (q.price_yes - y) ** 2;
+      model += (q.model_p - y) ** 2;
+      n += 1;
+    }
+    ctx.db.market_question.id.update({ ...q, status: 'settled', outcome: win, actual: ans.actual, room_p_close: q.qtype === 'binary' ? q.price_yes : -1 });
     for (const bp of [...ctx.db.market_bot_p.question_id.filter(q.id)]) {
       const bot = ctx.db.market_bot.key.find(lk(lobby, bp.bot));
       if (bot) ctx.db.market_bot.key.update({ ...bot, brier: bot.n ? (bot.brier * bot.n + (bp.p - y) ** 2) / (bot.n + 1) : (bp.p - y) ** 2, n: bot.n + 1 });

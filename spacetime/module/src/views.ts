@@ -60,3 +60,29 @@ export const battery_my_pending = spacetimedb.view(
   t.array(battery_pending.rowType),
   ctx => [...ctx.db.battery_pending.identity.filter(ctx.sender)]
 );
+
+const MetaRow = t.row('MetaLeaderboardRow', {
+  rank: t.u32(),
+  identity: t.identity(),
+  name: t.string(),
+  avatar: t.string(),
+  is_bot: t.bool(),
+  rating: t.f64(),
+  games: t.u32(),
+  wins: t.u32(),
+  points_total: t.f64(),
+});
+
+// Everyone who has finished a game, people and bots together, by rating.
+export const meta_leaderboard = spacetimedb.anonymousView(
+  { name: 'meta_leaderboard', public: true },
+  t.array(MetaRow),
+  ctx =>
+    [...ctx.db.profile.iter()]
+      .filter(p => p.games > 0)
+      .sort((a, b) => b.rating - a.rating)
+      .map((p, i) => ({
+        rank: i + 1, identity: p.identity, name: p.name, avatar: p.avatar, is_bot: p.is_bot, rating: p.rating, games: p.games,
+        wins: p.wins, points_total: p.points_total,
+      }))
+);

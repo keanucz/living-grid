@@ -4,25 +4,20 @@ import spacetimedb from '../schema';
 import { requireAdmin } from '../auth';
 import { lobby_tick } from '../tables';
 import { clearRound, lk, startRound, tickRound, type Answer, type DayQuestion, type FeedRow } from '../market_core';
-import { cancelSchedule, micros, recordResults, schedule, setState, startCountdown } from '../lobby_core';
+import {
+  DEFAULTS, MAX_PLAYERS, MODES, afterLeave, cancelSchedule, cleanAvatar, cleanName, deleteLobby, ensureSweep, hex, leaveOthers, micros,
+  newCode, pkey, recordResults, removePlayer, schedule, setState, startCountdown,
+} from '../lobby_core';
 import { addBatteryPlayer, clearBattery, startBattery, tickBattery } from '../battery_core';
 
 // Lobbies: a room with a 4-letter code and a host. The host starts the game; after a 5 s countdown the module picks a
 // random mystery day from market_day_pool and runs the round itself, one game hour per seconds_per_hour, with a
 // scheduled reducer (lobby_tick). No engine process is involved once the pool is loaded.
 
-const CODE_LETTERS = 'ABCDEFGHJKLMNPQRSTUVWXYZ'; // no I or O: they read as 1 and 0
-const AVATARS = ['turbine', 'pylon', 'solar', 'flame', 'battery', 'wave'];
-const MODES = ['market', 'battery'];
-const SWEEP_EVERY_US = 600_000_000n;
 const STALE_US = 2n * 3_600_000_000n;
-const MAX_PLAYERS = 40;
-const DEFAULTS = { seconds_per_hour: 30, n_questions: 6, bots: true };
 const LIMITS = { seconds_per_hour: [5, 120], n_questions: [1, 12] };
 const TITLE = 'Mystery day';
 
-const hex = (id: Identity) => id.toHexString();
-const pkey = (lobby: number, id: Identity) => lk(lobby, hex(id));
 
 function findLobby(ctx: any, id: number) {
   const l = ctx.db.lobby.id.find(id);
@@ -41,67 +36,12 @@ function hostLobby(ctx: any) {
   return l;
 }
 
-function newCode(ctx: any): string {
-  for (let i = 0; i < 200; i++) {
-    let code = '';
-    for (let k = 0; k < 4; k++) code += CODE_LETTERS[ctx.random.integerInRange(0, CODE_LETTERS.length - 1)];
-    if (!ctx.db.lobby.code.find(code)) return code;
-  }
-  throw new SenderError('could not make a lobby code, try again');
-}
-
-function cleanName(name: string): string {
-  const clean = name.trim().slice(0, 24);
-  if (!clean) throw new SenderError('name required');
-  return clean;
-}
-
-function cleanAvatar(avatar: string): string {
-  return AVATARS.includes(avatar) ? avatar : AVATARS[0];
-}
-
-function removePlayer(ctx: any, lobby: number, id: Identity) {
-  ctx.db.lobby_player.key.delete(pkey(lobby, id));
-  ctx.db.market_account.key.delete(lk(lobby, hex(id)));
-}
-
-// A lobby with nobody in it is gone; if the host left, the longest-waiting player takes over.
-function afterLeave(ctx: any, l: any) {
-  const rest = [...ctx.db.lobby_player.lobby_id.filter(l.id)];
-  if (!rest.length) return deleteLobby(ctx, l.id);
-  if (l.host.isEqual(rest[0].identity) || rest.some((p: any) => p.identity.isEqual(l.host))) return;
-  ctx.db.lobby.id.update({ ...l, host: rest[0].identity });
-}
-
-function deleteLobby(ctx: any, id: number) {
-  cancelSchedule(ctx, id);
-  clearRound(ctx, id);
-  clearBattery(ctx, id);
-  for (const p of [...ctx.db.lobby_player.lobby_id.filter(id)]) ctx.db.lobby_player.key.delete(p.key);
-  for (const d of [...ctx.db.lobby_day_played.lobby_id.filter(id)]) ctx.db.lobby_day_played.key.delete(d.key);
-  ctx.db.lobby.id.delete(id);
-}
-
-function leaveOthers(ctx: any, except: number | null) {
-  for (const p of [...ctx.db.lobby_player.identity.filter(ctx.sender)]) {
-    if (p.lobby_id === except) continue;
-    const l = ctx.db.lobby.id.find(p.lobby_id);
-    removePlayer(ctx, p.lobby_id, ctx.sender);
-    if (l) afterLeave(ctx, l);
-  }
-}
-
-function ensureSweep(ctx: any) {
-  for (const s of ctx.db.lobby_tick.iter()) if (s.kind === 'sweep') return;
-  schedule(ctx, 'sweep', 0, SWEEP_EVERY_US, true);
-}
-
 export const lobby_create = spacetimedb.reducer({ name: t.string(), avatar: t.string(), mode: t.string() }, (ctx, { name, avatar, mode }) => {
   if (!MODES.includes(mode)) throw new SenderError('mode must be market or battery');
   const who = cleanName(name);
   leaveOthers(ctx, null);
   const l = ctx.db.lobby.insert({
-    id: 0, code: newCode(ctx), host: ctx.sender, mode, state: 'waiting', ...DEFAULTS, seconds_per_hour: mode === 'battery' ? 10 : DEFAULTS.seconds_per_hour,
+    id: 0, code: newCode(ctx), host: ctx.sender, mode, state: 'waiting', kind: 'private', countdown_s: 0, ...DEFAULTS, seconds_per_hour: mode === 'battery' ? 10 : DEFAULTS.seconds_per_hour,
     created_at: ctx.timestamp, state_since: ctx.timestamp, round_no: 0, countdown_until: ctx.timestamp,
   });
   ctx.db.lobby_player.insert({ key: pkey(l.id, ctx.sender), lobby_id: l.id, identity: ctx.sender, name: who, avatar: cleanAvatar(avatar), ready: false, points: 0 });
@@ -117,7 +57,7 @@ export const lobby_join = spacetimedb.reducer({ code: t.string(), name: t.string
     ctx.db.lobby_player.key.update({ ...existing, name: who, avatar: cleanAvatar(avatar) });
     return;
   }
-  if (l.state === 'countdown') throw new SenderError('the game is about to start');
+  if (l.state === 'countdown' && l.kind !== 'quick') throw new SenderError('the game is about to start');
   if ([...ctx.db.lobby_player.lobby_id.filter(l.id)].length >= MAX_PLAYERS) throw new SenderError('that lobby is full');
   leaveOthers(ctx, l.id);
   ctx.db.lobby_player.insert({ key: pkey(l.id, ctx.sender), lobby_id: l.id, identity: ctx.sender, name: who, avatar: cleanAvatar(avatar), ready: false, points: 0 });
@@ -274,6 +214,7 @@ export const pool_put = spacetimedb.reducer(
     const ans: Answer[] = JSON.parse(row.answers_json);
     JSON.parse(row.feed_json);
     if (!qs.length || qs.some(q => !ans.some(a => a.question_id === q.id))) throw new SenderError('every question needs an answer');
+    if (qs.some(q => q.target_hour <= row.start_hour || q.target_hour > row.end_hour)) throw new SenderError('every question hour must fall after start_hour and by end_hour, or it never settles');
     if (ctx.db.market_day_pool.day.find(row.day)) ctx.db.market_day_pool.day.update(row);
     else ctx.db.market_day_pool.insert(row);
   }

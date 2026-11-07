@@ -191,6 +191,10 @@ export const market_question = table(
   {
     id: t.string().primaryKey(), // '<lobby_id>|<question id>'
     lobby_id: t.u32().index('btree'),
+    qtype: t.string(), // binary | choice (several options, one wins)
+    choices_json: t.string(), // [{id, label}] for a choice question; '' for binary
+    q_json: t.string(), // LMSR shares per option, as {id: shares}
+    prices_json: t.string(), // current probability per option, as {id: p}
     group_id: t.string(), // '' for a plain yes/no; questions sharing a group are the options of one multi-outcome question
     option_label: t.string(), // the option's label inside its group (a price band, a zone, import or export)
     text: t.string(),
@@ -216,7 +220,7 @@ export const market_answer = table(
   {
     question_id: t.string().primaryKey(),
     lobby_id: t.u32().index('btree'),
-    outcome: t.bool(),
+    outcome: t.string(), // the winning option id: yes | no for a binary question
     actual: t.f64(),
   }
 );
@@ -244,12 +248,12 @@ export const market_account = table(
 export const market_position = table(
   { name: 'market_position', public: true },
   {
-    key: t.string().primaryKey(),
+    key: t.string().primaryKey(), // '<identity hex>|<question id>|<side>'
     lobby_id: t.u32().index('btree'),
     identity: t.identity().index('btree'),
     question_id: t.string().index('btree'),
-    yes: t.f64(),
-    no: t.f64(),
+    side: t.string(), // an option id (yes or no for a binary question)
+    shares: t.f64(),
     spent: t.f64(),
   }
 );
@@ -323,6 +327,8 @@ export const lobby = table(
     bots: t.bool(),
     created_at: t.timestamp(),
     state_since: t.timestamp(),
+    kind: t.string(), // private | quick
+    countdown_s: t.u32(), // length of the countdown that is (or was last) running
     round_no: t.u32(), // rounds begun in this lobby (rematches count up)
     countdown_until: t.timestamp(), // when the running countdown ends; equals state_since outside a countdown
   }
@@ -471,5 +477,47 @@ export const game_result = table(
     n_players: t.u32(),
     points: t.f64(), // market points or battery profit
     ended_at: t.timestamp(),
+  }
+);
+
+// ---------------------------------------------------------------------------------------------------------------
+// Quick play: players wait in the queue until a second one arrives, then a lobby is made and its countdown starts.
+export const quick_queue = table(
+  { name: 'quick_queue', public: true },
+  {
+    identity: t.identity().primaryKey(),
+    name: t.string(),
+    avatar: t.string(),
+    mode: t.string(),
+    joined_at: t.timestamp(),
+  }
+);
+
+// 'Start now' / 'Wait for more' votes during a quick lobby's countdown.
+export const lobby_ballot = table(
+  { name: 'lobby_ballot', public: true },
+  {
+    key: t.string().primaryKey(), // '<lobby_id>|<identity hex>'
+    lobby_id: t.u32().index('btree'),
+    identity: t.identity(),
+    vote: t.string(), // start | wait
+  }
+);
+
+// Persistent player profile and rating, across every game. Bots have rows too (their rating moves like anyone's).
+export const profile = table(
+  { name: 'profile', public: true },
+  {
+    identity: t.identity().primaryKey(),
+    name: t.string(),
+    avatar: t.string(),
+    is_bot: t.bool(),
+    games: t.u32(),
+    wins: t.u32(), // rounds finished first among the people in the room
+    points_total: t.f64(),
+    rating: t.f64(), // Elo, starts at 1000
+    badges_json: t.string(), // string[]
+    bot_record_json: t.string(), // {bot name: {w, l}}: games this player finished ahead of / behind that bot
+    updated_at: t.timestamp(),
   }
 );
