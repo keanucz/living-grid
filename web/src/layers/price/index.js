@@ -1,4 +1,4 @@
-import { ColumnLayer, GeoJsonLayer, PathLayer } from 'deck.gl'
+import { GeoJsonLayer, PathLayer } from 'deck.gl'
 import { priceColor, COLORS } from '../../styles/tokens.js'
 
 export const GLASS = { ambient: 0.72, diffuse: 0.32, shininess: 120, specularColor: [70, 70, 66] }
@@ -30,7 +30,10 @@ export function outlines(features, z) {
   return paths
 }
 
-export const towerHeight = (eur) => 20000 + Math.max(0, eur ?? 0) * 700
+// Simulate: the whole country rises with its price (150 m per €/MWh on a 6 km base).
+export const slabHeight = (eur) => 6000 + Math.max(0, eur ?? 0) * 150
+// Kept for the map callout, which anchors to the top of the focus zone.
+export const towerHeight = slabHeight
 
 export default {
   id: 'price',
@@ -51,7 +54,7 @@ export default {
         stroked: false,
         // Thin glossy slab: the scene's point light slides a specular highlight across it (epoxy look).
         extruded: true,
-        getElevation: sim ? 6000 : 2500,
+        getElevation: (f) => (sim ? slabHeight(priceOf(f.properties.zone)) : 2500),
         material: GLASS,
         getFillColor: (f) => {
           const p = priceOf(f.properties.zone)
@@ -64,17 +67,20 @@ export default {
         pickable: true,
         autoHighlight: true,
         highlightColor: [255, 255, 255, 28],
-        transitions: { getFillColor: 600 },
+        transitions: { getFillColor: 600, getElevation: { duration: 1200, easing: (t) => 1 - Math.pow(1 - t, 3) } },
         updateTriggers: {
           getFillColor: [ui.selectedZone, ui.scenario?.ranAt, sim],
-          getElevation: [sim],
+          getElevation: [sim, ui.scenario?.ranAt, data.state],
           getLineColor: [ui.selectedZone],
           getLineWidth: [ui.selectedZone],
         },
       }),
       new PathLayer({
         id: 'price-zone-borders',
-        data: outlines(zoneFeatures, (sim ? 6000 : 2500) + 60),
+        // Borders sit on each zone's own top face, so they ride up with it.
+        data: sim
+          ? zoneFeatures.flatMap((f) => outlines([f], Math.round(slabHeight(priceOf(f.properties.zone))) + 60))
+          : outlines(zoneFeatures, 2560),
         getPath: (d) => d.path,
         getColor: (d) => (d.zone === ui.selectedZone ? [...COLORS.accent, 255] : [250, 250, 250, 120]),
         getWidth: (d) => (d.zone === ui.selectedZone ? 2 : 1),
@@ -82,21 +88,6 @@ export default {
         jointRounded: true,
         updateTriggers: { getColor: [ui.selectedZone, ui.scenario?.ranAt, data.state], getWidth: [ui.selectedZone] },
       }),
-      sim &&
-        new ColumnLayer({
-          id: 'price-towers',
-          data: data.zones?.zones ?? [],
-          diskResolution: 6,
-          radius: 32000,
-          extruded: true,
-          getPosition: (z) => z.centroid,
-          getElevation: (z) => towerHeight(priceOf(z.id)),
-          getFillColor: (z) => priceColor(priceOf(z.id) ?? 0, 255),
-          material: { ambient: 0.55, diffuse: 0.5, shininess: 72, specularColor: [255, 245, 230] },
-          pickable: true,
-          transitions: { getElevation: { duration: 1200, easing: (t) => 1 - Math.pow(1 - t, 3) }, getFillColor: 900 },
-          updateTriggers: { getElevation: [ui.scenario?.ranAt], getFillColor: [ui.scenario?.ranAt] },
-        }),
     ].filter(Boolean)
   },
 }
