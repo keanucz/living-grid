@@ -11,23 +11,27 @@
       "path": [[-3.6, 54.95], [-2.6, 55.12], [-1.7, 55.2]],
       "capacity_mw": 6000,
       "flow_mw": 5400,
-      "cost_gbp_window": 4200000,
+      "util": 0.9,
+      "over_share": 0.2,
+      "overload_mwh": 120000,
+      "cost_gbp_window": null,
       "wind_curtailed_mwh_window": 38000,
       "source": { "name": "Sample figures (not NESO data)", "url": null, "date": "2026-11-08" },
       "counterfactual": [
-        { "add_mw": 0, "cost_gbp_window": 4200000, "wind_curtailed_mwh_window": 38000 },
-        { "add_mw": 2000, "cost_gbp_window": 2100000, "wind_curtailed_mwh_window": 19000 },
-        { "add_mw": 4000, "cost_gbp_window": 900000, "wind_curtailed_mwh_window": 8000 }
-      ]
+        { "add_mw": 0, "cost_saved_gbp": 0, "wind_saved_mwh": 0 },
+        { "add_mw": 2000, "cost_saved_gbp": 2100000, "wind_saved_mwh": 19000 },
+        { "add_mw": 4000, "cost_saved_gbp": 3300000, "wind_saved_mwh": 30000 }
+      ],
+      "cf": { "cost_total_gbp": 9000000, "cost_days": 7, "wind_total_mwh": 38000, "estimate": true }
     }
   ],
   "interconnectors": [
-    { "id": "ifa", "name": "IFA", "from": "GB", "to": "FR", "capacity_mw": 2000, "flow_mw": 1900, "source": { "name": "Sample figures (not Elexon data)", "url": null, "date": "2026-11-08" } },
-    { "id": "nsl", "name": "North Sea Link", "from": "GB", "to": "NO2", "capacity_mw": 1400, "flow_mw": -1300, "source": { "name": "Sample figures (not Elexon data)", "url": null, "date": "2026-11-08" } },
-    { "id": "britned", "name": "BritNed", "from": "GB", "to": "NL", "capacity_mw": 1000, "flow_mw": 350, "source": { "name": "Sample figures (not Elexon data)", "url": null, "date": "2026-11-08" } }
+    { "id": "FR", "zone": "FR", "name": "France", "from": "GB", "to": "FR", "capacity_mw": 4000, "flow_mw": 1900, "source": { "name": "Sample figures (not Elexon data)", "url": null, "date": "2026-11-08" } },
+    { "id": "NO2", "zone": "NO2", "name": "Norway", "from": "GB", "to": "NO2", "capacity_mw": 1400, "flow_mw": -1300, "source": { "name": "Sample figures (not Elexon data)", "url": null, "date": "2026-11-08" } },
+    { "id": "NL", "zone": "NL", "name": "Netherlands", "from": "GB", "to": "NL", "capacity_mw": 1000, "flow_mw": 350, "source": { "name": "Sample figures (not Elexon data)", "url": null, "date": "2026-11-08" } }
   ],
   "planned": [
-    { "id": "sample-link", "name": "Sample planned link", "kind": "boundary", "capacity_mw": 2000, "expected_year": 2030, "status": "sample", "source": { "name": "Sample figures", "url": null, "date": "2026-11-08" } }
+    { "id": "sample-link", "name": "Sample planned link", "capacity_mw": 2000, "expected_year": "2030", "status": "sample", "source": { "name": "Sample figures", "url": null, "date": "2026-11-08" } }
   ],
   "notes": ["These are sample figures so the screen can be built before the live endpoint lands."]
 }

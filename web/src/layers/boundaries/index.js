@@ -24,10 +24,18 @@ export default {
   build({ data }) {
     load()
     const { data: infra, source } = getInfra()
-    const ic = Object.fromEntries((data?.zones?.interconnectors ?? []).map((l) => [l.id, l]))
+    const zl = data?.zones?.interconnectors ?? []
+    const ic = Object.fromEntries(zl.map((l) => [l.id, l]))
+    // /infrastructure groups links by far-end country: draw that country's largest link.
+    const byZone = {}
+    for (const l of zl) if (l.from_at && l.to_at && l.capacity_mw > (byZone[l.to]?.capacity_mw ?? 0)) byZone[l.to] = l
+    const lineFor = (l) => {
+      const z = ic[l.id] ?? byZone[l.zone ?? l.id]
+      return z?.from_at && z?.to_at ? [z.from_at, z.to_at] : null
+    }
     const rows = [
       ...(infra.boundaries ?? []).map((b) => ({ ...b, kind: 'boundary', line: b.path })),
-      ...(infra.interconnectors ?? []).map((l) => ({ ...l, kind: 'link', line: l.path ?? (ic[l.id]?.from_at && ic[l.id]?.to_at ? [ic[l.id].from_at, ic[l.id].to_at] : null) })),
+      ...(infra.interconnectors ?? []).map((l) => ({ ...l, kind: 'link', line: l.path ?? lineFor(l) })),
     ].filter((r) => r.line?.length >= 2)
     const tag = source === 'sample' ? ' (sample)' : ''
     return [

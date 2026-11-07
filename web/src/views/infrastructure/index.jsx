@@ -45,10 +45,10 @@ function Story({ row, days }) {
     <section className="inf-panel">
       <div className="inf-h">{row.name}</div>
       <p>
-        {row.name} was {pct(u)} full: {mw(Math.abs(row.flow_mw ?? 0))} against a limit of {mw(row.capacity_mw)}.
-        {row.cost_gbp_window != null && ` Over the last ${days} days, managing the limit cost ${money(row.cost_gbp_window)}`}
-        {row.wind_curtailed_mwh_window != null && ` and ${gwh(row.wind_curtailed_mwh_window)} of wind was paid to switch off behind it`}
-        {row.cost_gbp_window != null || row.wind_curtailed_mwh_window != null ? '.' : ''}
+        {row.name} was {pct(u)} full on average{row.flow_mw != null && row.capacity_mw != null ? `: ${mw(Math.abs(row.flow_mw))} against ${row.kind === 'boundary' ? 'a limit' : 'a capacity'} of ${mw(row.capacity_mw)}` : ''}.
+        {row.over_share != null && ` NESO's day-ahead flow forecast was above the limit in ${pct(row.over_share)} of hours${row.overload_mwh ? `, ${gwh(row.overload_mwh)} more than it could carry` : ''}.`}
+        {row.cost_gbp_window != null && ` Over the last ${days} days, managing the limit cost ${money(row.cost_gbp_window)}.`}
+        {row.wind_curtailed_mwh_window != null && ` About ${gwh(row.wind_curtailed_mwh_window)} of wind was paid to switch off in Scotland over ${days} days (estimate from accepted bids, an upper bound).`}
       </p>
       <Source s={row.source} />
     </section>
@@ -68,10 +68,10 @@ function Build({ row, days }) {
         <input type="range" min={0} max={max} step={max >= 1000 ? 250 : 50} value={r.addMw} onChange={(e) => setAdd(Number(e.target.value))} aria-label="Added capacity in megawatts" />
       </label>
       <div className="inf-result">
-        <div><span>Cost avoided</span><b className="num yes">{money(r.costSaved)}</b><small>of {money(r.cost + r.costSaved)} in {days} days</small></div>
-        <div><span>Wind no longer wasted</span><b className="num yes">{gwh(r.windSaved)}</b><small>of {gwh(r.wind + r.windSaved)} in {days} days</small></div>
+        <div><span>Cost avoided</span><b className="num yes">{money(r.costSaved)}</b>{row.cf?.cost_total_gbp != null && <small>over {row.cf.cost_days} days with NESO cost data, out of {money(row.cf.cost_total_gbp)} of GB thermal constraint costs</small>}</div>
+        <div><span>Wind no longer wasted</span><b className="num yes">{gwh(r.windSaved)}</b>{row.cf?.wind_total_mwh != null && <small>out of {gwh(row.cf.wind_total_mwh)} switched off in Scotland in {days} days</small>}</div>
       </div>
-      <p className="inf-muted">A counterfactual on the same {days} days, not a forecast: it assumes the extra capacity had been in place and everything else unchanged. Values between the published points are interpolated; nothing beyond +{mw(max)} is shown.</p>
+      <p className="inf-muted">A counterfactual on the same {days} days, not a forecast: it assumes the extra capacity had been in place and everything else unchanged, so treat both figures as upper bounds (other Scottish boundaries would still bind). Values between the published points are interpolated; nothing beyond +{mw(max)} is shown.</p>
       <Source s={row.source} />
     </section>
   )
