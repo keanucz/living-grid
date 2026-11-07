@@ -133,3 +133,62 @@ def test_stub_predict_all_without_models(monkeypatch):
     feats = fixture_features(monkeypatch)
     out = quantile.QuantileModel().predict_all(feats)
     assert set(out.target) == {"price_da", "gb_system_price"}
+
+
+def test_version_dir_holds_only_text_and_json_with_per_model_metadata(trained):
+    assert {p.suffix for p in trained.iterdir()} == {".txt", ".json"}
+    info = json.loads((trained / "load_p90.json").read_text())
+    assert info["model_version"] == "lgbm-test" and info["target"] == "load" and info["quantile"] == 0.9
+    assert info["features"] == quantile.FEATURES
+    start, end = pd.Timestamp(info["train_window"]["start"]), pd.Timestamp(info["train_window"]["end"])
+    assert start < end < MADE_AT.floor("h")
+    meta = json.loads((trained / "meta.json").read_text())
+    assert set(meta["files"]) == {p.name for p in trained.iterdir() if p.name != "meta.json"}
+    assert not [p for p in trained.parent.iterdir() if p.name.startswith(".")]
+
+
+def test_failed_training_leaves_no_version_or_temp_dir(populated):  # noqa: F811
+    with pytest.raises(ValueError):
+        train.train(["price_da"], trained_before=pd.Timestamp("2026-10-11T00:00Z"), version="too-early", params=SMALL)
+    root = quantile.models_dir()
+    assert not root.exists() or not list(root.iterdir())
+
+
+def test_existing_version_is_never_overwritten(trained):
+    with pytest.raises(FileExistsError):
+        train.train(["price_da"], trained_before=MADE_AT, version="lgbm-test", params=SMALL)
+    assert quantile.QuantileModel.load(trained).version == "lgbm-test"
+
+
+def test_half_copied_or_temp_versions_are_skipped(populated):  # noqa: F811
+    train.train(["price_da"], trained_before=MADE_AT, version="lgbm-old", params=SMALL)
+    time.sleep(0.01)
+    newer = train.train(["price_da"], trained_before=MADE_AT, version="lgbm-new", params=SMALL)
+    assert quantile.active().version == "lgbm-new"
+
+    (newer / "price_da_p90.txt").write_bytes((newer / "price_da_p90.txt").read_bytes()[:50])
+    assert quantile.incomplete(newer) == ["price_da_p90.txt"]
+    assert quantile.active().version == "lgbm-old"
+    with pytest.raises(ValueError, match="not a complete"):
+        quantile.QuantileModel.load(newer)
+
+    (newer / "price_da_p90.txt").unlink()
+    assert quantile.active().version == "lgbm-old"
+
+    copying = quantile.models_dir() / ".tmp-lgbm-copying"
+    copying.mkdir()
+    (copying / "meta.json").write_text(json.dumps({"files": {}, "trained_at": "9999", "targets": []}))
+    assert quantile.active().version == "lgbm-old"
+
+    no_meta = quantile.models_dir() / "lgbm-no-meta"
+    no_meta.mkdir()
+    (no_meta / "price_da_p10.txt").write_text("x")
+    assert quantile.active().version == "lgbm-old"
+
+
+def test_models_dir_override_for_copied_in_models(populated, tmp_path, monkeypatch):  # noqa: F811
+    elsewhere = tmp_path / "mac-models"
+    train.train(["price_da"], trained_before=MADE_AT, version="from-mac", params=SMALL, out_dir=elsewhere)
+    assert quantile.current() is None
+    monkeypatch.setenv("LG_MODELS_DIR", str(elsewhere))
+    assert quantile.models_dir() == elsewhere and quantile.active().version == "from-mac"

@@ -6,6 +6,7 @@ with the zone as a categorical feature. Quantiles are sorted per row so p10 <= p
 
 import functools
 import json
+import os
 from pathlib import Path
 
 import lightgbm as lgb
@@ -22,7 +23,8 @@ STUB_TARGETS = ("price_da", "gb_system_price")
 
 
 def models_dir() -> Path:
-    return cache.DATA / "models"
+    """data/models, or LG_MODELS_DIR when set (for models trained elsewhere and copied in)."""
+    return Path(os.environ["LG_MODELS_DIR"]) if os.environ.get("LG_MODELS_DIR") else cache.DATA / "models"
 
 
 def zone_id(zones: pd.Series) -> np.ndarray:
@@ -51,10 +53,13 @@ class QuantileModel:
 
     @classmethod
     def load(cls, path: Path) -> "QuantileModel":
-        meta = json.loads((Path(path) / "meta.json").read_text())
+        path = Path(path)
+        missing = incomplete(path)
+        if missing:
+            raise ValueError(f"{path} is not a complete model version: {missing}")
+        meta = json.loads((path / "meta.json").read_text())
         boosters = {
-            t: {q: lgb.Booster(model_file=str(Path(path) / f"{t}_{q}.txt")) for q in QUANTILES}
-            for t in meta["targets"]
+            t: {q: lgb.Booster(model_file=str(path / f"{t}_{q}.txt")) for q in QUANTILES} for t in meta["targets"]
         }
         before = pd.Timestamp(meta["trained_before"]) if meta.get("trained_before") else None
         return cls(before, boosters, meta)
@@ -96,11 +101,31 @@ class QuantileModel:
         return grouped_zero(features)
 
 
+def incomplete(path: Path) -> list[str]:
+    """Why a version directory cannot be loaded; empty when meta.json and every listed file are present and full-size."""
+    meta_path = Path(path) / "meta.json"
+    if not meta_path.exists():
+        return ["meta.json"]
+    try:
+        files = json.loads(meta_path.read_text())["files"]
+    except (ValueError, KeyError):
+        return ["meta.json unreadable"]
+    return [
+        name
+        for name, size in files.items()
+        if not (Path(path) / name).exists() or (Path(path) / name).stat().st_size != size
+    ]
+
+
 def _versions(root: Path) -> list[Path]:
+    """Complete version directories, oldest first. Temp directories (dot prefix) and partial copies are skipped."""
     found = []
     for meta in root.glob("*/meta.json"):
-        found.append((json.loads(meta.read_text()).get("trained_at", ""), meta.parent))
-    return [p for _, p in sorted(found)]
+        d = meta.parent
+        if d.name.startswith(".") or incomplete(d):
+            continue
+        found.append((json.loads(meta.read_text()).get("trained_at", ""), d.name, d))
+    return [d for *_, d in sorted(found)]
 
 
 @functools.lru_cache(maxsize=4)
@@ -109,7 +134,7 @@ def _load_cached(path: str, mtime_ns: int) -> QuantileModel:
 
 
 def current() -> QuantileModel | None:
-    """The newest trained model under data/models/, or None when nothing has been trained."""
+    """The newest complete trained model under models_dir(), or None when there is none."""
     root = models_dir()
     versions = _versions(root) if root.exists() else []
     if not versions:

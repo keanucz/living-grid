@@ -4,13 +4,18 @@
     uv run python -m pipeline.models.train --trained-before 2026-10-26 --version lgbm-asof-20261026
     uv run python -m pipeline.models.train --targets price_da,load --since 2024-06-01
 
-Writes data/models/<version>/{target}_{p10,p50,p90}.txt and meta.json. Only rows with ts before --trained-before
+Writes data/models/<version>/ (or LG_MODELS_DIR, or --out-dir): per target and quantile a LightGBM text file
+{target}_{p10,p50,p90}.txt and a small JSON {target}_{q}.json, plus meta.json. No pickles, so a version can be trained
+on any machine and copied into the runner's data/models/. The version is built in a dot-prefixed temp directory
+and renamed when finished, so a half-written or half-copied version is never loaded. Only rows with ts before --trained-before
 are used (default: now), so a model can be rebuilt as of a past date for replay. Needs the ingest caches.
 """
 
 import argparse
 import json
 import logging
+import os
+import shutil
 import sys
 from pathlib import Path
 
@@ -32,7 +37,7 @@ PARAMS = {
     "subsample_freq": 1,
     "colsample_bytree": 0.8,
     "verbosity": -1,
-    "n_jobs": 4,
+    "n_jobs": os.cpu_count() or 1,
 }
 MIN_ROWS = 200
 
@@ -80,24 +85,40 @@ def train(targets=None, trained_before=None, version=None, since=None, params=No
     if unknown:
         raise ValueError(f"no cached actuals for target(s) {unknown}; have {list(wides)}")
 
-    out = (out_dir or quantile.models_dir()) / version
-    out.mkdir(parents=True, exist_ok=True)
-    meta = {"version": version, "trained_at": now.isoformat(), "trained_before": before.isoformat(),
-            "features": quantile.FEATURES, "targets": [], "zones": {}, "rows": {}, "params": params}
-    for t in chosen:
-        df = training_frame(hist, wides[t], before)
-        if len(df) < MIN_ROWS:
-            log.warning("skipping %s: only %d training rows (need %d)", t, len(df), MIN_ROWS)
-            continue
-        log.info("training %s on %d rows across %s", t, len(df), sorted(df["zone"].unique()))
-        for q, booster in fit_target(df, params).items():
-            booster.save_model(str(out / f"{t}_{q}.txt"))
-        meta["targets"].append(t)
-        meta["zones"][t] = sorted(df["zone"].unique())
-        meta["rows"][t] = len(df)
-    if not meta["targets"]:
-        raise ValueError("no target had enough training rows; has the backfill finished?")
-    (out / "meta.json").write_text(json.dumps(meta, indent=1))
+    root = out_dir or quantile.models_dir()
+    final, tmp = root / version, root / f".tmp-{version}-{os.getpid()}"
+    if final.exists():
+        raise FileExistsError(f"{final} already exists; pass a different --version")
+    tmp.mkdir(parents=True)
+    try:
+        meta = {"version": version, "trained_at": now.isoformat(), "trained_before": before.isoformat(),
+                "features": quantile.FEATURES, "targets": [], "zones": {}, "rows": {}, "window": {}, "params": params}
+        for t in chosen:
+            df = training_frame(hist, wides[t], before)
+            if len(df) < MIN_ROWS:
+                log.warning("skipping %s: only %d training rows (need %d)", t, len(df), MIN_ROWS)
+                continue
+            log.info("training %s on %d rows across %s", t, len(df), sorted(df["zone"].unique()))
+            window = {"start": df["ts"].min().isoformat(), "end": df["ts"].max().isoformat()}
+            for q, booster in fit_target(df, params).items():
+                booster.save_model(str(tmp / f"{t}_{q}.txt"))
+                info = {"model_version": version, "target": t, "quantile": quantile.QUANTILES[q], "name": q,
+                        "features": quantile.FEATURES, "train_window": window, "rows": len(df)}
+                (tmp / f"{t}_{q}.json").write_text(json.dumps(info, indent=1))
+            meta["targets"].append(t)
+            meta["zones"][t] = sorted(df["zone"].unique())
+            meta["rows"][t] = len(df)
+            meta["window"][t] = window
+        if not meta["targets"]:
+            raise ValueError("no target had enough training rows; has the backfill finished?")
+        files = {p.name: p.stat().st_size for p in sorted(tmp.iterdir())}
+        meta["files"] = files
+        (tmp / "meta.json").write_text(json.dumps(meta, indent=1))
+        tmp.rename(final)
+    except BaseException:
+        shutil.rmtree(tmp, ignore_errors=True)
+        raise
+    out = final
     log.info("saved %s", out)
     return out
 
@@ -108,13 +129,13 @@ def main(argv=None) -> int:
     ap.add_argument("--trained-before", default=None, help="only use data before this UTC time (default now)")
     ap.add_argument("--since", default=None, help="first UTC day of training rows")
     ap.add_argument("--version", default=None)
-    ap.add_argument("--out-dir", default=None, help="default data/models")
+    ap.add_argument("--out-dir", default=None, help="default data/models, or LG_MODELS_DIR")
     args = ap.parse_args(argv)
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
     try:
         path = train(args.targets.split(","), args.trained_before, args.version, args.since,
                      out_dir=Path(args.out_dir) if args.out_dir else None)
-    except (ValueError, FileNotFoundError) as e:
+    except (ValueError, FileNotFoundError, FileExistsError) as e:
         log.error("%s", e)
         return 1
     log.info("model ready at %s", path)
