@@ -7,16 +7,15 @@ import numpy as np
 import pandas as pd
 
 from engine.interventions.base import EUR_PER_GBP
+from engine.reference import loader as facts
 from pipeline import cache
 
-# TODO(#67): replace with verified figures from engine/reference/facts/gas_carbon.json
-CCGT_EFFICIENCY = 0.50  # MWh power per MWh gas, so gas pass-through is about 1 / 0.5 = 2
-# TODO(#67): replace with verified figures from engine/reference/facts/gas_carbon.json
-CCGT_CO2_T_PER_MWH = 0.37  # tonnes CO2 per MWh of power from a CCGT
-# TODO(#67): replace with verified figures from engine/reference/facts/gas_carbon.json
-TTF_2022_PEAK_EUR_MWH = 340.0  # upper bound for clamping gas shocks to history
-# TODO(#67): replace with verified figures from engine/reference/facts/gas_carbon.json
-GB_GAS_MARGINAL_SHARE = 0.60
+# Verified facts (engine/reference/facts/gas_carbon.json); see each fact's caveat.
+# Modern CCGT net efficiency, LHV (EU BAT range for new units, so older fleet plant pass through more).
+CCGT_EFFICIENCY = facts.figure("gas_ccgt_efficiency", after="representative large plant at about") / 100
+CCGT_CO2_T_PER_MWH = facts.figure("gas_ccgt_co2_intensity", after="(")  # t CO2 per MWh of power
+TTF_2022_PEAK_EUR_MWH = facts.figure("gas_ttf_2022_peak")  # upper bound for clamping gas shocks to history
+GB_GAS_MARGINAL_SHARE = facts.figure("gas_gb_marginal_share", after="around") / 100  # UK government, 2026
 
 # Standard-estimate prior for the share of hours gas sets the price, used when the pipeline's
 # per-zone estimate (#33, features/gas_marginal_share) is missing or not yet differentiated by zone.

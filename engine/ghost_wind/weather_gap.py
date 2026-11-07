@@ -13,16 +13,18 @@ import math
 import numpy as np
 import pandas as pd
 
+from engine.reference import loader as facts
 from pipeline import static
 
 METHOD = "weather_gap"
 COLUMNS = ["ts", "region", "region_name", "method", "implied_mwh", "metered_mwh", "mwh", "farms", "kind"]
 
-# TODO(#67): replace with the verified power curve, shear and hub height in engine/reference/facts/wind.json.
-CUT_IN_MS = 3.0
-RATED_MS = 12.0
-CUT_OUT_MS = 25.0
-SHEAR_ALPHA = 0.11  # power-law exponent; offshore-ish
+# Verified facts (engine/reference/facts/wind.json): a generic modern turbine, not any one model.
+CUT_IN_MS = facts.figure("wind_power_curve", after="cut-in")
+RATED_MS = facts.figure("wind_power_curve", after="rated")  # low end of the 12 to 13 m/s range
+CUT_OUT_MS = facts.figure("wind_power_curve", after="cut-out")
+SHEAR_ALPHA = facts.figure("wind_shear_exponent", after="over sea")  # most mapped capacity is offshore
+# Modelling assumptions with no verified source; stated on screen through kind="modelled".
 HUB_HEIGHT_M = 110.0
 AVAILABILITY = 0.92  # share of capacity not out for maintenance or faults
 

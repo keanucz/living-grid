@@ -6,8 +6,8 @@ data/static/wind_farms.csv count towards a region; the rest are reported as unma
 can say how much of the GB total the regional picture covers. Accepted bids include non-constraint
 actions, so these are upper bounds on constraint curtailment: label them as estimates.
 
-TODO(#67): check the wind_farms.csv BM unit stems against the verified IDs and capacities in
-engine/reference/facts/wind.json once it lands; no capacities or unit IDs are hard-coded here.
+The wind_farms.csv stems and capacities are checked against the verified wind facts in
+engine/reference/facts/wind.json by engine/tests/test_reference_loader.py.
 """
 
 import pandas as pd
