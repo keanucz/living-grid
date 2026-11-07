@@ -92,6 +92,7 @@ export function playerTrade(ctx: any, question_id: string, side: string, shares:
 export type DayQuestion = {
   id: string; text: string; kind: string; target_hour: number; unit: string; threshold: number; model_p: number; model_note: string;
   bot_p: { bot: string; p: number; note: string }[]; series: string; profile_json: string;
+  group_id?: string; option_label?: string; // options of one multi-outcome question share a group_id
 };
 export type Answer = { question_id: string; outcome: boolean; actual: number };
 export type FeedRow = { label: string; value: number; unit: string };
@@ -180,7 +181,7 @@ export function startRound(
     ids.push(qid);
     ctx.db.market_answer.insert({ question_id: qid, lobby_id: lobby.id, outcome: a.outcome, actual: a.actual });
     ctx.db.market_question.insert({
-      id: qid, lobby_id: lobby.id, text: q.text, kind: q.kind, target_hour: q.target_hour, unit: q.unit, threshold: q.threshold,
+      id: qid, lobby_id: lobby.id, group_id: q.group_id ? lk(lobby.id, q.group_id) : '', option_label: q.option_label ?? '', text: q.text, kind: q.kind, target_hour: q.target_hour, unit: q.unit, threshold: q.threshold,
       model_p: q.model_p, model_note: q.model_note, q_yes: 0, q_no: 0, price_yes: 0.5, status: 'open', outcome: '', actual: 0, room_p_close: -1,
     });
     for (const p of q.bot_p) {

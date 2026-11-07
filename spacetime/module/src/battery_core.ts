@@ -1,6 +1,6 @@
 import { SenderError } from 'spacetimedb/server';
 import { Identity } from 'spacetimedb';
-import { BATTERY, step, slotPnl } from './battery_math';
+import { BATTERY, parseAction, step, slotPnl } from './battery_math';
 import { lk } from './market_core';
 
 // Battery rounds inside a lobby (see reducers/lobby.ts for start and ticks, reducers/game.ts for decisions).
@@ -45,7 +45,7 @@ export function startBattery(ctx: any, lobby: { id: number; seconds_per_hour: nu
 export function decideBattery(ctx: any, lobby: number, who: Identity, slot: number, action: string) {
   const r = ctx.db.battery_round.lobby_id.find(lobby);
   if (!r || r.status !== 'running') throw new SenderError('no battery round is running in this lobby');
-  if (!['charge', 'hold', 'discharge'].includes(action)) throw new SenderError('action must be charge, hold or discharge');
+  if (!parseAction(action)) throw new SenderError('unknown action: use charge, hold, discharge (optionally :1-100) or offer:discharge:<price>');
   if (!Number.isInteger(slot) || slot < r.slot || slot >= r.n_slots) throw new SenderError('that half-hour is closed or outside the round');
   if (!ctx.db.battery_player.key.find(pk(lobby, who))) throw new SenderError('you are not playing in this lobby');
   const key = dk(lobby, who, slot);
@@ -67,8 +67,8 @@ export function tickBattery(ctx: any, lobby: number): boolean {
   for (const p of [...ctx.db.battery_player.lobby_id.filter(lobby)]) {
     const key = dk(lobby, p.identity, r.slot);
     const picked = p.is_agent ? plans[p.kind]?.[r.slot] : ctx.db.battery_pending.key.find(key)?.action;
-    const action = ['charge', 'hold', 'discharge'].includes(picked) ? picked : 'hold';
-    const [grid, soc] = step(p.soc_mwh, action);
+    const action = typeof picked === 'string' && parseAction(picked) ? picked : 'hold';
+    const [grid, soc] = step(p.soc_mwh, action, price);
     const pnl = slotPnl(price, grid);
     ctx.db.battery_decision.insert({ key, lobby_id: lobby, identity: p.identity, slot: r.slot, action, price, grid_mwh: grid, soc_mwh: soc, pnl });
     ctx.db.battery_player.key.update({ ...p, soc_mwh: soc, pnl: Math.round((p.pnl + pnl) * 100) / 100 });

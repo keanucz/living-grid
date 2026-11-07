@@ -191,6 +191,8 @@ export const market_question = table(
   {
     id: t.string().primaryKey(), // '<lobby_id>|<question id>'
     lobby_id: t.u32().index('btree'),
+    group_id: t.string(), // '' for a plain yes/no; questions sharing a group are the options of one multi-outcome question
+    option_label: t.string(), // the option's label inside its group (a price band, a zone, import or export)
     text: t.string(),
     kind: t.string(),
     target_hour: t.u32(),
@@ -321,6 +323,8 @@ export const lobby = table(
     bots: t.bool(),
     created_at: t.timestamp(),
     state_since: t.timestamp(),
+    round_no: t.u32(), // rounds begun in this lobby (rematches count up)
+    countdown_until: t.timestamp(), // when the running countdown ends; equals state_since outside a countdown
   }
 );
 
@@ -448,5 +452,24 @@ export const battery_slot = table(
     lobby_id: t.u32().index('btree'),
     slot: t.u32(),
     price: t.f64(),
+  }
+);
+
+// One row per participant (people and bots) when a round ends: the base for ratings and the meta leaderboard.
+export const game_result = table(
+  { name: 'game_result', public: true },
+  {
+    key: t.string().primaryKey(), // '<lobby_id>|<round_no>|<identity hex>'
+    lobby_id: t.u32().index('btree'),
+    round_no: t.u32(),
+    identity: t.identity().index('btree'),
+    name: t.string(),
+    is_bot: t.bool(),
+    mode: t.string(), // market | battery
+    day: t.string(),
+    rank: t.u32(),
+    n_players: t.u32(),
+    points: t.f64(), // market points or battery profit
+    ended_at: t.timestamp(),
   }
 );

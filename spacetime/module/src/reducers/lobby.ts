@@ -4,6 +4,7 @@ import spacetimedb from '../schema';
 import { requireAdmin } from '../auth';
 import { lobby_tick } from '../tables';
 import { clearRound, lk, startRound, tickRound, type Answer, type DayQuestion, type FeedRow } from '../market_core';
+import { cancelSchedule, micros, recordResults, schedule, setState, startCountdown } from '../lobby_core';
 import { addBatteryPlayer, clearBattery, startBattery, tickBattery } from '../battery_core';
 
 // Lobbies: a room with a 4-letter code and a host. The host starts the game; after a 5 s countdown the module picks a
@@ -13,7 +14,6 @@ import { addBatteryPlayer, clearBattery, startBattery, tickBattery } from '../ba
 const CODE_LETTERS = 'ABCDEFGHJKLMNPQRSTUVWXYZ'; // no I or O: they read as 1 and 0
 const AVATARS = ['turbine', 'pylon', 'solar', 'flame', 'battery', 'wave'];
 const MODES = ['market', 'battery'];
-const COUNTDOWN_US = 5_000_000n;
 const SWEEP_EVERY_US = 600_000_000n;
 const STALE_US = 2n * 3_600_000_000n;
 const MAX_PLAYERS = 40;
@@ -23,7 +23,6 @@ const TITLE = 'Mystery day';
 
 const hex = (id: Identity) => id.toHexString();
 const pkey = (lobby: number, id: Identity) => lk(lobby, hex(id));
-const micros = (ts: any): bigint => ts.microsSinceUnixEpoch;
 
 function findLobby(ctx: any, id: number) {
   const l = ctx.db.lobby.id.find(id);
@@ -40,25 +39,6 @@ function hostLobby(ctx: any) {
   const l = myLobby(ctx);
   if (!l.host.isEqual(ctx.sender)) throw new SenderError('only the host can do that');
   return l;
-}
-
-function setState(ctx: any, l: any, state: string) {
-  const next = { ...l, state, state_since: ctx.timestamp };
-  ctx.db.lobby.id.update(next);
-  return next;
-}
-
-function schedule(ctx: any, kind: string, lobby: number, afterUs: bigint, every = false) {
-  ctx.db.lobby_tick.insert({
-    scheduled_id: 0n,
-    scheduled_at: every ? ScheduleAt.interval(afterUs) : ScheduleAt.time(micros(ctx.timestamp) + afterUs),
-    kind,
-    lobby_id: lobby,
-  });
-}
-
-function cancelSchedule(ctx: any, lobby: number) {
-  for (const s of [...ctx.db.lobby_tick.iter()]) if (s.lobby_id === lobby && s.kind !== 'sweep') ctx.db.lobby_tick.scheduled_id.delete(s.scheduled_id);
 }
 
 function newCode(ctx: any): string {
@@ -122,7 +102,7 @@ export const lobby_create = spacetimedb.reducer({ name: t.string(), avatar: t.st
   leaveOthers(ctx, null);
   const l = ctx.db.lobby.insert({
     id: 0, code: newCode(ctx), host: ctx.sender, mode, state: 'waiting', ...DEFAULTS, seconds_per_hour: mode === 'battery' ? 10 : DEFAULTS.seconds_per_hour,
-    created_at: ctx.timestamp, state_since: ctx.timestamp,
+    created_at: ctx.timestamp, state_since: ctx.timestamp, round_no: 0, countdown_until: ctx.timestamp,
   });
   ctx.db.lobby_player.insert({ key: pkey(l.id, ctx.sender), lobby_id: l.id, identity: ctx.sender, name: who, avatar: cleanAvatar(avatar), ready: false, points: 0 });
   ensureSweep(ctx);
@@ -189,8 +169,7 @@ export const lobby_start = spacetimedb.reducer({}, ctx => {
   if (l.state !== 'waiting') throw new SenderError('the game has already started');
   const pool = l.mode === 'battery' ? ctx.db.battery_day : ctx.db.market_day_pool;
   if ([...pool.iter()].length === 0) throw new SenderError('no mystery days are loaded yet');
-  setState(ctx, l, 'countdown');
-  schedule(ctx, 'begin', l.id, COUNTDOWN_US);
+  startCountdown(ctx, l);
 });
 
 export const lobby_rematch = spacetimedb.reducer({}, ctx => {
@@ -220,7 +199,7 @@ function begin(ctx: any, lobbyId: number) {
   if (day && l.mode === 'battery') {
     startBattery(ctx, l, day);
     ctx.db.lobby_day_played.insert({ key: lk(lobbyId, day.day), lobby_id: lobbyId, day: day.day });
-    setState(ctx, l, 'playing');
+    setState(ctx, l, 'playing', { round_no: l.round_no + 1, countdown_until: ctx.timestamp });
     schedule(ctx, 'tick', lobbyId, BigInt(l.seconds_per_hour) * 1_000_000n);
     return;
   }
@@ -240,7 +219,7 @@ function begin(ctx: any, lobbyId: number) {
   }
   startRound(ctx, l, day, picked, answers, TITLE);
   ctx.db.lobby_day_played.insert({ key: lk(lobbyId, day.day), lobby_id: lobbyId, day: day.day });
-  setState(ctx, l, 'playing');
+  setState(ctx, l, 'playing', { round_no: l.round_no + 1, countdown_until: ctx.timestamp });
   schedule(ctx, 'tick', lobbyId, BigInt(l.seconds_per_hour) * 1_000_000n);
 }
 
@@ -248,7 +227,10 @@ function tick(ctx: any, lobbyId: number) {
   const l = ctx.db.lobby.id.find(lobbyId);
   if (l && l.mode === 'battery') {
     if (l.state !== 'playing') return;
-    if (tickBattery(ctx, lobbyId)) setState(ctx, l, 'reveal');
+    if (tickBattery(ctx, lobbyId)) {
+      const done = setState(ctx, l, 'reveal');
+      recordResults(ctx, done, 'battery', ctx.db.battery_secret.lobby_id.find(lobbyId)?.day ?? '');
+    }
     else schedule(ctx, 'tick', lobbyId, BigInt(l.seconds_per_hour) * 1_000_000n);
     return;
   }
@@ -259,8 +241,10 @@ function tick(ctx: any, lobbyId: number) {
   const pooled = day ? ctx.db.market_day_pool.day.find(day) : null;
   const feeds: Record<string, FeedRow[]> = pooled ? JSON.parse(pooled.feed_json || '{}') : {};
   const done = tickRound(ctx, lobbyId, hour, feeds[String(hour - 1)] ?? []);
-  if (done) setState(ctx, l, 'reveal');
-  else schedule(ctx, 'tick', lobbyId, BigInt(l.seconds_per_hour) * 1_000_000n);
+  if (done) {
+    const over = setState(ctx, l, 'reveal');
+    recordResults(ctx, over, 'market', day ?? '');
+  } else schedule(ctx, 'tick', lobbyId, BigInt(l.seconds_per_hour) * 1_000_000n);
 }
 
 function sweep(ctx: any) {

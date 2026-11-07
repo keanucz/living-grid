@@ -5,7 +5,7 @@ set -euo pipefail
 cd "$(dirname "$0")"
 PORT=${PORT:-3198}
 H=http://127.0.0.1:$PORT
-DB=lg-lobby-smoke
+DB=lg-lobby-smoke-$$-$RANDOM  # a fresh name: the CLI keeps old smoke databases between runs
 
 spacetime start --listen-addr "127.0.0.1:$PORT" --in-memory --non-interactive >/dev/null 2>&1 &
 SERVER=$!
@@ -83,6 +83,10 @@ sql "SELECT * FROM market_round" | grep -c '2026-10-26' | grep -qv '^0$' && { ec
 wait_count "SELECT state FROM lobby" reveal 2
 sql "SELECT * FROM market_round" | grep -c '2026-10-26' | grep -qv '^0$' || { echo "FAIL day not revealed" >&2; exit 1; }
 sql "SELECT outcome FROM market_question WHERE lobby_id = 1" | grep -c yes | grep -qv '^0$' || { echo "FAIL settled" >&2; exit 1; }
+# One result row per person and bot (3 people + 6 bots), ranked, on round 1.
+[ "$(sql 'SELECT rank FROM game_result WHERE lobby_id = 1 AND round_no = 1' | grep -c '^ [0-9]')" = 9 ] || { echo "FAIL game_result rows: $(sql 'SELECT * FROM game_result WHERE lobby_id = 1')" >&2; exit 1; }
+sql "SELECT round_no FROM lobby WHERE id = 1" | grep -c '^ 1 ' | grep -qv '^0$' || { echo "FAIL round_no" >&2; exit 1; }
+sql "SELECT mode, day FROM game_result WHERE lobby_id = 1" | grep -c 'market.*2026-10-26' | grep -qv '^0$' || { echo "FAIL result mode/day" >&2; exit 1; }
 call_as "${TOK[a_p1]}" lobby_rematch '[]' 530
 call_as "${TOK[a_host]}" lobby_rematch '[]' 200
 sql "SELECT id, state FROM lobby WHERE id = 1" | grep -c waiting | grep -qv '^0$' || { echo "FAIL rematch" >&2; exit 1; }
@@ -115,6 +119,10 @@ wait_count "SELECT state FROM lobby WHERE id = $LB" playing 1
 call_as "$BT" battery_decide '[0,"charge"]' 200
 call_as "$BT" battery_decide '[1,"discharge"]' 200
 call_as "$CT" battery_decide '[2,"hold"]' 200
+call_as "$CT" battery_decide '[2,"offer:discharge:999:50"]' 200
+call_as "$CT" battery_decide '[1,"charge:50"]' 200
+call_as "$CT" battery_decide '[1,"charge:500"]' 530
+call_as "$CT" battery_decide '[1,"offer:charge:5"]' 530
 call_as "$CT" battery_decide '[9,"hold"]' 530
 call_as "$CT" battery_decide '[0,"explode"]' 530
 call_as "$PUB" battery_decide '[0,"hold"]' 530

@@ -80,3 +80,30 @@ console.log(JSON.stringify(cases.map(([soc, a, p]) => {{ const [g, s] = step(soc
         grid, new = settle.step(soc, a, b)
         assert g == pytest.approx(grid, abs=1e-9) and s == pytest.approx(new, abs=1e-9), (soc, a)
         assert pnl == pytest.approx(round(-p * grid - b.degradation_per_mwh * abs(grid), 2), abs=0.011), (soc, a, p)
+
+
+def test_module_action_grammar_sizes_and_offers(tmp_path):
+    """charge:50 moves half the energy; an offer below its limit does not trade; bad actions are refused."""
+    esbuild = ROOT / "web" / "node_modules" / ".bin" / "esbuild"
+    node = shutil.which("node")
+    if not esbuild.exists() or not node:
+        pytest.skip("node or esbuild not installed")
+    out = tmp_path / "battery_math.mjs"
+    subprocess.run([str(esbuild), str(ROOT / "spacetime/module/src/battery_math.ts"), "--bundle", "--format=esm", f"--outfile={out}", "--log-level=error"], check=True)
+    script = tmp_path / "run.mjs"
+    script.write_text("""import { parseAction, step } from './battery_math.mjs';
+const bad = ['', 'explode', 'charge:0', 'charge:101', 'charge:5.5', 'hold:50', 'offer:charge:5', 'offer:discharge', 'offer:discharge:x', 'charge:50:1'];
+console.log(JSON.stringify({
+  full: step(1, 'charge'), half: step(1, 'charge:50'), quarter: step(1, 'discharge:25'),
+  belowLimit: step(1, 'offer:discharge:180', 100), atLimit: step(1, 'offer:discharge:180', 180), noPrice: step(1, 'offer:discharge:180'),
+  offerHalf: step(1, 'offer:discharge:100:50', 150), unknown: step(1, 'explode'),
+  bad: bad.map(a => parseAction(a)), ok: ['hold', 'charge', 'charge:100', 'offer:discharge:180:50'].map(a => parseAction(a)),
+}));
+""")
+    got = json.loads(subprocess.run([node, str(script)], capture_output=True, text=True, check=True).stdout)
+    assert got["half"][0] == pytest.approx(got["full"][0] / 2)
+    assert got["quarter"][0] == pytest.approx(settle.step(1, "discharge", settle.GameBattery())[0] / 4)
+    assert got["belowLimit"] == [0, 1] and got["unknown"] == [0, 1]
+    assert got["atLimit"][0] == pytest.approx(settle.step(1, "discharge", settle.GameBattery())[0])
+    assert got["offerHalf"][0] == pytest.approx(settle.step(1, "discharge", settle.GameBattery())[0] / 2)
+    assert all(x is None for x in got["bad"]) and all(x is not None for x in got["ok"])
