@@ -11,7 +11,7 @@ import { withLive } from '../live/index.js'
 // unreachable, slow, or returns something we cannot read, we fall back to bundled fixtures
 // (already in UI shape) so the page always renders.
 const OFFLINE = import.meta.env.VITE_LG_OFFLINE === '1'
-const TIMEOUT_MS = { '/state': 9000, default: 8000 }
+const TIMEOUT_MS = { '/state': 9000, '/scores': 30000, default: 8000 }
 
 async function fetchLive(path, params = {}) {
   if (OFFLINE) return null
@@ -94,6 +94,34 @@ async function raw(path, params) {
   return { data, source: 'live' }
 }
 
+// Keep the newest good response per path (in memory and in this browser) so a slow or failed refresh shows
+// the last real numbers, labelled 'cached', instead of a bundled sample.
+function lastGood(path) {
+  const key = `lg-last-good:${path}`
+  let memory = null
+  return async (params) => {
+    try {
+      const res = await raw(path, params)
+      memory = res.data
+      try {
+        localStorage.setItem(key, JSON.stringify({ at: Date.now(), data: res.data }))
+      } catch {
+        /* storage full or blocked: memory still holds it */
+      }
+      return res
+    } catch (err) {
+      if (memory) return { data: memory, source: 'cached' }
+      try {
+        const saved = JSON.parse(localStorage.getItem(key) ?? 'null')
+        if (saved?.data) return { data: saved.data, source: 'cached' }
+      } catch {
+        /* unreadable: fall through */
+      }
+      throw err
+    }
+  }
+}
+
 export async function post(path, body) {
   const res = await fetch(`/api${path}`, {
     method: 'POST',
@@ -111,7 +139,7 @@ export const api = {
   explain: (zone, ts) => raw('/explain', { zone, ts }),
   ghostWind: (from, to) => raw('/unseen/ghost-wind', { from, to }),
   carbon: (at) => raw('/unseen/carbon', { at }),
-  scores: () => raw('/scores'),
+  scores: lastGood('/scores'),
   household: (region) => raw('/household', { region }),
   replay: (event) => raw('/replay', { event }),
   reveal: () => raw('/reveal'),

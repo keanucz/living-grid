@@ -50,7 +50,7 @@ function Scoreboard() {
       <section className="panel score fade-in" onClick={() => setOpen(true)} role="button" tabIndex={0} onKeyDown={(e) => e.key === 'Enter' && setOpen(true)}>
         <div className="panel-head">
           <span>
-            How right are we? <span className="tag" style={{ marginLeft: 8 }}>{source === 'live' ? 'Live' : 'Fixture'}</span>
+            How right are we? <span className="tag" style={{ marginLeft: 8 }}>{source === 'live' ? 'Live' : source === 'cached' ? 'Last good' : 'Fixture'}</span>
           </span>
           <span className="muted score-hint">Tap for backtest by zone ›</span>
         </div>
