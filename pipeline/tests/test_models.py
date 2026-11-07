@@ -6,16 +6,17 @@ import pandas as pd
 import pytest
 
 from pipeline import cache, forecast_log, scheduler, schemas
-from pipeline.models import quantile, train
+from pipeline.models import promote, quantile, train
 from pipeline.tests.test_features import MADE_AT, populated  # noqa: F401  (fixture)
 
 REAL_FIXTURES = cache.FIXTURES
+T_LATER = MADE_AT + pd.Timedelta(hours=1)
 SMALL = {"n_estimators": 25, "num_leaves": 7, "min_child_samples": 10, "n_jobs": 1}
 
 
 @pytest.fixture
 def trained(populated, monkeypatch):  # noqa: F811
-    path = train.train(["all"], trained_before=MADE_AT.floor("h"), version="lgbm-test", params=SMALL)
+    path = train.train(["all"], trained_before=MADE_AT.floor("h"), trained_at=MADE_AT, version="lgbm-test", params=SMALL)
     return path
 
 
@@ -94,10 +95,9 @@ def test_trained_before_excludes_later_rows(populated):  # noqa: F811
 
 def test_current_is_stub_until_trained_then_newest(populated):  # noqa: F811
     assert quantile.current() is None and quantile.active().version == "stub-0"
-    train.train(["price_da"], trained_before=MADE_AT, version="lgbm-a", params=SMALL)
+    train.train(["price_da"], trained_before=MADE_AT, trained_at=MADE_AT, version="lgbm-a", params=SMALL)
     assert quantile.active().version == "lgbm-a"
-    time.sleep(0.01)
-    train.train(["price_da"], trained_before=MADE_AT, version="lgbm-b", params=SMALL)
+    train.train(["price_da"], trained_before=MADE_AT, trained_at=T_LATER, version="lgbm-b", params=SMALL)
     assert quantile.active().version == "lgbm-b"
 
 
@@ -107,7 +107,7 @@ def test_scheduler_uses_trained_model_else_stub(populated, monkeypatch):  # noqa
     made_at = pd.Timestamp("2026-11-07T14:00Z")
     scheduler.run_once(now=made_at, do_refresh=False)
     assert set(forecast_log.read().model_version) == {"stub-0"}
-    train.train(["all"], trained_before=MADE_AT.floor("h"), version="lgbm-test", params=SMALL)
+    train.train(["all"], trained_before=MADE_AT.floor("h"), trained_at=MADE_AT, version="lgbm-test", params=SMALL)
     scheduler.run_once(now=made_at + pd.Timedelta(hours=1), do_refresh=False)
     log = forecast_log.read()
     new = log[log.made_at > made_at]
@@ -156,14 +156,13 @@ def test_failed_training_leaves_no_version_or_temp_dir(populated):  # noqa: F811
 
 def test_existing_version_is_never_overwritten(trained):
     with pytest.raises(FileExistsError):
-        train.train(["price_da"], trained_before=MADE_AT, version="lgbm-test", params=SMALL)
+        train.train(["price_da"], trained_before=MADE_AT, trained_at=MADE_AT, version="lgbm-test", params=SMALL)
     assert quantile.QuantileModel.load(trained).version == "lgbm-test"
 
 
 def test_half_copied_or_temp_versions_are_skipped(populated):  # noqa: F811
-    train.train(["price_da"], trained_before=MADE_AT, version="lgbm-old", params=SMALL)
-    time.sleep(0.01)
-    newer = train.train(["price_da"], trained_before=MADE_AT, version="lgbm-new", params=SMALL)
+    train.train(["price_da"], trained_before=MADE_AT, trained_at=MADE_AT, version="lgbm-old", params=SMALL)
+    newer = train.train(["price_da"], trained_before=MADE_AT, trained_at=T_LATER, version="lgbm-new", params=SMALL)
     assert quantile.active().version == "lgbm-new"
 
     (newer / "price_da_p90.txt").write_bytes((newer / "price_da_p90.txt").read_bytes()[:50])
@@ -188,7 +187,53 @@ def test_half_copied_or_temp_versions_are_skipped(populated):  # noqa: F811
 
 def test_models_dir_override_for_copied_in_models(populated, tmp_path, monkeypatch):  # noqa: F811
     elsewhere = tmp_path / "mac-models"
-    train.train(["price_da"], trained_before=MADE_AT, version="from-mac", params=SMALL, out_dir=elsewhere)
+    train.train(["price_da"], trained_before=MADE_AT, trained_at=MADE_AT, version="from-mac", params=SMALL, out_dir=elsewhere)
     assert quantile.current() is None
     monkeypatch.setenv("LG_MODELS_DIR", str(elsewhere))
     assert quantile.models_dir() == elsewhere and quantile.active().version == "from-mac"
+
+
+def test_as_of_model_trained_later_never_becomes_current(populated):  # noqa: F811
+    live = train.train(["price_da"], trained_before=MADE_AT, trained_at=MADE_AT, version="live", params=SMALL)
+    replay = train.train(
+        ["price_da"], trained_before=pd.Timestamp("2026-10-26T00:00Z"), trained_at=T_LATER, version="asof-1026", params=SMALL
+    )
+    assert quantile.is_as_of(json.loads((replay / "meta.json").read_text()))
+    assert not quantile.is_as_of(json.loads((live / "meta.json").read_text()))
+    assert quantile.active().version == "live"
+
+
+def test_as_of_model_in_its_own_dir_is_loadable_but_not_scanned(populated, tmp_path):  # noqa: F811
+    asof = tmp_path / "models-asof"
+    path = train.train(["price_da"], trained_before=pd.Timestamp("2026-10-26T00:00Z"), trained_at=T_LATER,
+                       version="asof-1026", params=SMALL, out_dir=asof)
+    assert quantile.QuantileModel.load(path).trained_before == pd.Timestamp("2026-10-26T00:00Z")
+    assert quantile.current() is None
+
+
+def test_one_day_tolerance_boundary():
+    meta = {"trained_before": "2026-11-06T14:00:00+00:00", "trained_at": "2026-11-07T14:00:00+00:00"}
+    assert not quantile.is_as_of(meta)
+    assert quantile.is_as_of({**meta, "trained_at": "2026-11-07T14:00:01+00:00"})
+    assert not quantile.is_as_of({"trained_at": "2026-11-07T14:00:00+00:00"})
+
+
+def test_promote_moves_incoming_version_in_one_rename(populated):  # noqa: F811
+    incoming = promote.incoming_dir()
+    train.train(["price_da"], trained_before=MADE_AT, trained_at=MADE_AT, version="from-mac", params=SMALL, out_dir=incoming)
+    assert quantile.current() is None
+    assert promote.main(["from-mac"]) == 0
+    assert not (incoming / "from-mac").exists()
+    assert quantile.active().version == "from-mac"
+    assert promote.main(["from-mac"]) == 1
+
+
+def test_promote_refuses_incomplete_and_existing(populated):  # noqa: F811
+    incoming = promote.incoming_dir()
+    path = train.train(["price_da"], trained_before=MADE_AT, trained_at=MADE_AT, version="partial", params=SMALL, out_dir=incoming)
+    (path / "price_da_p10.txt").unlink()
+    with pytest.raises(ValueError, match="incomplete"):
+        promote.promote("partial")
+    assert path.exists() and quantile.current() is None
+    with pytest.raises(FileNotFoundError):
+        promote.promote("nothing-here")

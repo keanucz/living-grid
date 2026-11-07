@@ -20,6 +20,7 @@ QUANTILES = {"p10": 0.1, "p50": 0.5, "p90": 0.9}
 TARGET_ZONES = {"gb_system_price": ["GB"]}
 FEATURES = ["zone_id", *schemas.FEATURE_COLUMNS]
 STUB_TARGETS = ("price_da", "gb_system_price")
+AS_OF_TOLERANCE = pd.Timedelta(days=1)
 
 
 def models_dir() -> Path:
@@ -117,14 +118,24 @@ def incomplete(path: Path) -> list[str]:
     ]
 
 
+def is_as_of(meta: dict) -> bool:
+    """True for a replay model: trained on data from well before the day it was trained."""
+    if not meta.get("trained_before") or not meta.get("trained_at"):
+        return False
+    return pd.Timestamp(meta["trained_at"]) - pd.Timestamp(meta["trained_before"]) > AS_OF_TOLERANCE
+
+
 def _versions(root: Path) -> list[Path]:
-    """Complete version directories, oldest first. Temp directories (dot prefix) and partial copies are skipped."""
+    """Live version directories, oldest first. Skips temp dirs (dot prefix), partial copies and as-of replay models."""
     found = []
-    for meta in root.glob("*/meta.json"):
-        d = meta.parent
+    for meta_path in root.glob("*/meta.json"):
+        d = meta_path.parent
         if d.name.startswith(".") or incomplete(d):
             continue
-        found.append((json.loads(meta.read_text()).get("trained_at", ""), d.name, d))
+        meta = json.loads(meta_path.read_text())
+        if is_as_of(meta):
+            continue
+        found.append((meta.get("trained_at", ""), d.name, d))
     return [d for *_, d in sorted(found)]
 
 
@@ -134,7 +145,7 @@ def _load_cached(path: str, mtime_ns: int) -> QuantileModel:
 
 
 def current() -> QuantileModel | None:
-    """The newest complete trained model under models_dir(), or None when there is none."""
+    """The newest complete live model under models_dir(), or None. As-of replay models are never current."""
     root = models_dir()
     versions = _versions(root) if root.exists() else []
     if not versions:

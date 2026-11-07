@@ -4,7 +4,8 @@
     uv run python -m pipeline.models.train --trained-before 2026-10-26 --version lgbm-asof-20261026
     uv run python -m pipeline.models.train --targets price_da,load --since 2024-06-01
 
-Writes data/models/<version>/ (or LG_MODELS_DIR, or --out-dir): per target and quantile a LightGBM text file
+Writes data/models/<version>/ (or LG_MODELS_DIR, or --out-dir). As-of replay models (--trained-before well in the past) never become
+the live model; keep them in data/models-asof via --out-dir: per target and quantile a LightGBM text file
 {target}_{p10,p50,p90}.txt and a small JSON {target}_{q}.json, plus meta.json. No pickles, so a version can be trained
 on any machine and copied into the runner's data/models/. The version is built in a dot-prefixed temp directory
 and renamed when finished, so a half-written or half-copied version is never loaded. Only rows with ts before --trained-before
@@ -70,9 +71,10 @@ def fit_target(df: pd.DataFrame, params: dict) -> dict[str, lgb.Booster]:
     return boosters
 
 
-def train(targets=None, trained_before=None, version=None, since=None, params=None, out_dir=None, inputs=None):
+def train(targets=None, trained_before=None, version=None, since=None, params=None, out_dir=None, inputs=None,
+          trained_at=None):
     """Train and save a model; returns its directory."""
-    now = pd.Timestamp.now(tz="UTC")
+    now = pd.Timestamp.now(tz="UTC") if trained_at is None else pd.Timestamp(trained_at)
     before = now if trained_before is None else pd.Timestamp(trained_before)
     before = before.tz_localize("UTC") if before.tzinfo is None else before.tz_convert("UTC")
     version = version or f"lgbm-{now:%Y%m%dT%H%M}"
@@ -86,6 +88,9 @@ def train(targets=None, trained_before=None, version=None, since=None, params=No
         raise ValueError(f"no cached actuals for target(s) {unknown}; have {list(wides)}")
 
     root = out_dir or quantile.models_dir()
+    if before < now - quantile.AS_OF_TOLERANCE and out_dir is None:
+        log.warning("--trained-before is a day or more in the past: this is an as-of replay model and the live "
+                    "scheduler will ignore it. Keep replay models apart with --out-dir data/models-asof")
     final, tmp = root / version, root / f".tmp-{version}-{os.getpid()}"
     if final.exists():
         raise FileExistsError(f"{final} already exists; pass a different --version")
