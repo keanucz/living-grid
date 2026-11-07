@@ -49,7 +49,7 @@ Conventions:
 | `upsert_scores` | `rows: [{window_start_us, window_end_us, zone, target, metric, model, value, n (u32)}]` | zone, target, metric, model |
 | `upsert_ghost_wind` | `rows: [{ts_us, region, method, mwh, cost_gbp}]`; `method` is `boalf` or `weather_gap` | region, method, ts |
 | `upsert_carbon` | `rows: [{ts_us, zone, production_gco2_kwh, consumption_gco2_kwh, imports_share}]` | zone, ts |
-| `upsert_batteries` | `rows: [{zone, strategy, soc_mwh, profit, currency, share_of_perfect}]`; `strategy` is `median`, `risk_aware`, `naive` or `perfect` | zone, strategy |
+| `upsert_batteries` | `rows: [{zone, strategy, soc_mwh, profit, currency, share_of_perfect}]`; `strategy` is `median_only`, `risk_aware`, `naive` or `perfect_foresight` (the HTTP contract names) | zone, strategy |
 | `upsert_battery_actions` | `rows: [{ts_us, zone, strategy, action, mw, soc_mwh, price}]`; `action` is `charge`, `hold` or `discharge` | zone, strategy, ts |
 | `set_intervention` | `slot, type, target, magnitude, hours (u32), triggered_by, cost_total, currency, explanation, result_json` (10 positional args) | `slot` (use `main`) |
 | `clear_intervention` | `slot` | |

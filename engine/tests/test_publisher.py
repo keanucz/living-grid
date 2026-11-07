@@ -153,3 +153,26 @@ def test_rejected_publish_surfaces_the_auth_error():
     rec = Recorder(fail_with=530)
     with pytest.raises(P.ReducerError, match="530"):
         P.publish_intervention(client(rec), fixture("intervene"))
+
+
+def test_loop_publishes_battery_rows(monkeypatch):
+    from engine.battery import compare
+    from engine.publisher import __main__ as loop
+
+    ts = pd.date_range(NOW - pd.Timedelta(hours=72), periods=72, freq="h")
+    settled = pd.DataFrame({"ts": ts, "action": "hold", "grid_mwh": 0.0, "mw": 0.0, "soc_mwh": 1.0,
+                            "plan_price": 50.0, "planned_pnl": 0.0, "price": 50.0, "pnl": 0.0})
+    out = {
+        "results": [{"strategy": st, "zone": "GB", "profit": 10.0, "currency": "GBP", "share_of_perfect": 0.5,
+                     "worst_hour_loss": 0.0} for st in compare.STRATEGIES],
+        "settled": {"GB": {st: settled for st in compare.STRATEGIES}},
+        "share": 0.5,
+        "bad_hours": {},
+    }
+    monkeypatch.setattr(loop.battery_compare, "run", lambda: out)
+    rec = Recorder()
+    sent = run_once(P.Publisher(client(rec)), hours_back=48, now=NOW)
+    assert sent["batteries"] == 4
+    assert sent["battery_actions"] == 4 * 48, "only actions inside the publish window"
+    bats = next(body[0] for name, body in rec.calls if name == "upsert_batteries")
+    assert {b["strategy"] for b in bats} == set(compare.STRATEGIES)

@@ -12,6 +12,7 @@ import time
 import httpx
 import pandas as pd
 
+from engine.battery import compare as battery_compare
 from engine.ghost_wind import costs as ghost_wind_costs
 from engine.publisher import Publisher, ReducerError, from_env, prune_before, sources
 
@@ -33,6 +34,12 @@ def run_once(pub: Publisher, hours_back: float, now: pd.Timestamp | None = None)
     gw = ghost_wind_costs.publish_rows(cutoff, now)
     if len(gw):
         sent["ghost_wind"] = pub.publish("ghost_wind", gw)
+    bats, acts = battery_compare.battery_rows(battery_compare.run())
+    if len(bats):
+        sent["batteries"] = pub.publish("batteries", bats)
+        acts = acts[pd.to_datetime(acts["ts"], utc=True) >= cutoff]
+        if len(acts):
+            sent["battery_actions"] = pub.publish("battery_actions", acts)
     prune_before(pub.client, cutoff - pd.Timedelta(hours=24))
     return sent
 
