@@ -1,49 +1,41 @@
 [
   {
     "id": "bc_carbon_intensity_range",
-    "question": "What is the maximum date range per request of the GB Carbon Intensity API (api.carbonintensity.org.uk) regional endpoints?",
+    "question": "What is the maximum date range per request of the GB Carbon Intensity API (api.carbonintensity.org.uk) for the regional endpoints such as /regional/intensity/{from}/{to} and /regional/intensity/{from}/{to}/regionid/{id}, according to the API documentation? Quote the figure exactly as the source writes it and name the source; do not convert units or do your own arithmetic. If no source states it directly, say so.",
     "used_by": "#49",
-    "processor": "core",
-    "run_id": "srun_051cfaf41dc0453270eec389cc9c8522",
-    "retrieved_at": "2026-11-07T14:00:46+00:00",
-    "value": "14 days (two weeks) per request.",
-    "unit": "days",
-    "as_of": "",
-    "caveat": "The official regional-range endpoint description does not itself specify a maximum; the 14-day figure is supported by the API’s stated intensity-range limit and Energy Systems Catapult’s API-wide two-week limit in the context of regional-range calls.",
+    "processor": "pro",
+    "run_id": "srun_488394657d484cd3f16b5096e5e8770c",
+    "retrieved_at": "2026-11-07T14:33:25+00:00",
+    "value": "No maximum date range per request is directly stated for /regional/intensity/{from}/{to} or /regional/intensity/{from}/{to}/regionid/{regionid} in NESO’s official Carbon Intensity API Great Britain documentation: https://carbon-intensity.github.io/api-definitions.",
+    "unit": "n/a",
+    "as_of": "No applicable date or period is stated.",
+    "caveat": "The documentation states, “The maximum date range is limited to 14 days.” for the national /intensity/{from}/{to} endpoint, not the regional endpoints. It should not be presented as a documented regional limit.",
     "confidence": "medium",
     "sources": [
       {
-        "url": "https://es.catapult.org.uk/insight/demystifying-the-carbon-intensity-api-will-rowe/",
-        "quote": "#### Behind the scenes: CO2 API tips … 1. **Call limitations** : If you’re after all the historic intensity data you can get, be patient. The API has its limits. It’ll only serve you two weeks’ worth of data at a time. So, be patient, you’ll need to loop and make calls for subsequent two-week periods. This can take time (a few minutes for years of data), but good things come to those who wait… … 2. **Local data cache** : We found it really helpful to make a local cache of the data rather than requesting all the data on every run. By saving the data where our code can reach it faster, we’ve spe"
-      },
-      {
-        "url": "https://carbon-intensity.github.io/api-definitions/",
-        "quote": "_Get Carbon Intensity data between specified datetimes for GB regions_ … Get Regional Carbon Intensity data between specified datetimes. All times provided in UTC (+00:00). … ### Parameters … |Parameter |In |Type |Required |Description | … | --- | --- | --- | --- | --- | … |from |path |string |true |Start datetime in in ISO8601 format YYYY-MM-DDThh:mmZ e.g. 2017-08-25T12:35Z | … |to |path |string |true |End datetime in in ISO8601 format YYYY-MM-DDThh:mmZ e.g. 2017-08-25T12:35Z | … _Get Carbon Intensity data between from and to datetime_ … Get Carbon Intensity data between the {from} and {to} d"
+        "url": "https://carbon-intensity.github.io/api-definitions",
+        "quote": "**Introduction** This is the Official Carbon Intensity API for Great Britain developed by National Energy System Operator (NESO). … _Get Carbon Intensity data between specified datetimes for GB regions_ Get Regional Carbon Intensity data between specified datetimes. All times provided in UTC (+00:00). Parameters |Parameter |In |Type |Required |Description | |from |path |string |true |Start datetime in in ISO8601 format YYYY-MM-DDThh:mmZ e.g. 2017-08-25T12:35Z | … _Get Carbon Intensity data between specified datetimes for specified region_ Get Regional Carbon Intensity data between specified da"
       }
     ],
-    "verified": false,
-    "verification": "cross-check disagrees: The documented 14-day limit applies to the national /intensity/{from}/{to} endpoint, not explicitly to regional endpoints. A successful 31-day regional request contradicts a 14-day regional maximum. The exact regional maximum remains unconfirmed.",
     "crosscheck": {
-      "run_id": "srun_791b0c3367af4148da297334f56fce52",
-      "independent_value": "No maximum date range is explicitly stated for regional endpoints in the official documentation I found. A regional request covering 31 days (1 January–1 February 2024) successfully returned data across that period, establishing support for at least 31 days—not an exact maximum.",
-      "agrees": false,
-      "disagreement": "The documented 14-day limit applies to the national /intensity/{from}/{to} endpoint, not explicitly to regional endpoints. A successful 31-day regional request contradicts a 14-day regional maximum. The exact regional maximum remains unconfirmed.",
+      "run_id": "srun_9128b164a6774410717e19bd074bd3b2",
+      "independent_value": "No maximum date range per request is directly stated for /regional/intensity/{from}/{to} or /regional/intensity/{from}/{to}/regionid/{regionid} in NESO’s official “Carbon Intensity API Great Britain” documentation (https://carbon-intensity.github.io/api-definitions). There is therefore no regional maximum-range figure to quote from that source. This does not establish that the API has no operational limit.",
+      "agrees": true,
+      "disagreement": "none",
       "confidence": "medium",
       "sources": [
         {
-          "url": "https://carbon-intensity.github.io/api-definitions/",
-          "quote": "GET /regional/intensity/{from}/{to}/postcode/{postcode} … GET /regional/intensity/{from}/{to}/regionid/{regionid}"
-        },
-        {
-          "url": "https://api.carbonintensity.org.uk/regional/intensity/2024-01-01T00:00Z/2024-02-01T00:00Z/regionid/1",
-          "quote": "{\"data\":{\"regionid\":1,\"dnoregion\":\"Scottish Hydro Electric Power Distribution\",\"shortname\":\"North Scotland\",\"data\":[{\"from\":\"2023-12-31T23:30Z\",\"to\":\"2024-01-01T00:00Z\",\"intensity\":{\"forecast\":4,\"index\":\"very low\"},\"generationmix\":[{\"fuel\":\"biomass\",\"perc\":0.6},{\"fuel\":\"coal\",\"perc\":0},{\"fuel\":\"imports\",\"perc\":0},{\"fuel\":\"gas\",\"perc\":0.8},{\"fuel\":\"nuclear\",\"perc\":6.8},{\"fuel\":\"other\",\"perc\":0},{\"fuel\":\"hydro\",\"perc\":44.4},{\"fuel\":\"solar\",\"perc\":0},{\"fuel\":\"wind\",\"perc\":47.4}]},{\"from\":\"2024-01-01T00:00Z\",\"to\":\"2024-01-01T00:30Z\",\"intensity\":{\"forecast\":3,\"index\":\"very low\"},\"generationmix\":[{\""
+          "url": "https://carbon-intensity.github.io/api-definitions",
+          "quote": "**Introduction** This is the Official Carbon Intensity API for Great Britain developed by National Energy System Operator (NESO). … GET /regional/intensity/{from}/{to} … GET /regional/intensity/{from}/{to}/regionid/{regionid}"
         }
       ]
     },
-    "figures_found": [
-      "14"
-    ],
-    "figures_missing": []
+    "figures_found": [],
+    "figures_missing": [],
+    "verified": true,
+    "verification": "no figures to re-find; verified by an agreeing independent cross-check only",
+    "figures_route": {},
+    "corroborated_by_other_domain": false
   },
   {
     "id": "bc_elexon_system_price_lag",
@@ -89,7 +81,11 @@
     "figures_found": [
       "15"
     ],
-    "figures_missing": []
+    "figures_missing": [],
+    "figures_route": {
+      "15": "direct"
+    },
+    "corroborated_by_other_domain": false
   },
   {
     "id": "bc_energy_charts_rate_limit",
@@ -128,7 +124,12 @@
     ],
     "figures_missing": [],
     "verified": true,
-    "verification": "independent cross-check agrees and all figures ['2', '4'] were re-found in an independent fetch"
+    "verification": "independent cross-check agrees and all figures ['2', '4'] were re-found in an independent fetch",
+    "figures_route": {
+      "2": "parallel_extract",
+      "4": "parallel_extract"
+    },
+    "corroborated_by_other_domain": false
   },
   {
     "id": "bc_gb_dst",
@@ -149,7 +150,7 @@
       }
     ],
     "verified": true,
-    "verification": "independent cross-check agrees and all figures ['25'] were re-found in an independent fetch",
+    "verification": "independent cross-check agrees and all figures ['date:2026-10-25'] were re-found in an independent fetch",
     "crosscheck": {
       "run_id": "srun_791b0c3367af414880b90a8a24ec4bbf",
       "independent_value": "25 October 2026.",
@@ -168,9 +169,13 @@
       ]
     },
     "figures_found": [
-      "25"
+      "date:2026-10-25"
     ],
-    "figures_missing": []
+    "figures_missing": [],
+    "figures_route": {
+      "date:2026-10-25": "direct"
+    },
+    "corroborated_by_other_domain": true
   },
   {
     "id": "bc_n2ex_timing",
@@ -223,7 +228,14 @@
       "10",
       "00"
     ],
-    "figures_missing": []
+    "figures_missing": [],
+    "figures_route": {
+      "09": "direct",
+      "50": "direct",
+      "10": "direct",
+      "00": "direct"
+    },
+    "corroborated_by_other_domain": false
   },
   {
     "id": "bc_nordpool_history",
@@ -281,12 +293,19 @@
       ]
     },
     "figures_found": [
-      "10",
-      "01"
+      "date:2026-10-01",
+      "date:2021-01-01",
+      "3"
     ],
     "figures_missing": [],
     "verified": true,
-    "verification": "independent cross-check agrees and all figures ['10', '01'] were re-found in an independent fetch"
+    "verification": "independent cross-check agrees and all figures ['date:2026-10-01', 'date:2021-01-01', '3'] were re-found in an independent fetch",
+    "figures_route": {
+      "date:2026-10-01": "direct",
+      "3": "direct",
+      "date:2021-01-01": "parallel_extract"
+    },
+    "corroborated_by_other_domain": false
   },
   {
     "id": "bc_open_meteo_limit",
@@ -342,7 +361,13 @@
       "000",
       "14"
     ],
-    "figures_missing": []
+    "figures_missing": [],
+    "figures_route": {
+      "10": "direct",
+      "000": "direct",
+      "14": "direct"
+    },
+    "corroborated_by_other_domain": true
   },
   {
     "id": "bc_sdac_timing",
@@ -390,6 +415,12 @@
       "00",
       "55"
     ],
-    "figures_missing": []
+    "figures_missing": [],
+    "figures_route": {
+      "12": "parallel_extract",
+      "00": "parallel_extract",
+      "55": "parallel_extract"
+    },
+    "corroborated_by_other_domain": true
   }
 ]

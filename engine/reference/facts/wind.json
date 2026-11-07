@@ -47,7 +47,11 @@
     ],
     "figures_missing": [],
     "verified": true,
-    "verification": "independent cross-check agrees and all figures ['588'] were re-found in an independent fetch"
+    "verification": "independent cross-check agrees and all figures ['588'] were re-found in an independent fetch",
+    "figures_route": {
+      "588": "direct"
+    },
+    "corroborated_by_other_domain": true
   },
   {
     "id": "wind_clyde_capacity",
@@ -109,7 +113,11 @@
     "figures_found": [
       "522.4"
     ],
-    "figures_missing": []
+    "figures_missing": [],
+    "figures_route": {
+      "522.4": "direct"
+    },
+    "corroborated_by_other_domain": true
   },
   {
     "id": "wind_moray_east_capacity",
@@ -167,7 +175,11 @@
     "figures_found": [
       "950"
     ],
-    "figures_missing": []
+    "figures_missing": [],
+    "figures_route": {
+      "950": "direct"
+    },
+    "corroborated_by_other_domain": true
   },
   {
     "id": "wind_moray_west_capacity",
@@ -225,7 +237,11 @@
     "figures_found": [
       "882"
     ],
-    "figures_missing": []
+    "figures_missing": [],
+    "figures_route": {
+      "882": "direct"
+    },
+    "corroborated_by_other_domain": false
   },
   {
     "id": "wind_power_curve",
@@ -277,7 +293,13 @@
       "13",
       "25"
     ],
-    "figures_missing": []
+    "figures_missing": [],
+    "figures_route": {
+      "12": "direct",
+      "25": "direct",
+      "13": "parallel_extract"
+    },
+    "corroborated_by_other_domain": true
   },
   {
     "id": "wind_seagreen_capacity",
@@ -327,7 +349,11 @@
     "figures_found": [
       "1075"
     ],
-    "figures_missing": []
+    "figures_missing": [],
+    "figures_route": {
+      "1075": "direct"
+    },
+    "corroborated_by_other_domain": true
   },
   {
     "id": "wind_shear_exponent",
@@ -379,7 +405,13 @@
       "0.14",
       "0.11"
     ],
-    "figures_missing": []
+    "figures_missing": [],
+    "figures_route": {
+      "0.14": "direct",
+      "0.11": "direct",
+      "0.143": "parallel_extract"
+    },
+    "corroborated_by_other_domain": false
   },
   {
     "id": "wind_viking_capacity",
@@ -430,7 +462,12 @@
       "443",
       "103"
     ],
-    "figures_missing": []
+    "figures_missing": [],
+    "figures_route": {
+      "443": "direct",
+      "103": "direct"
+    },
+    "corroborated_by_other_domain": false
   },
   {
     "id": "wind_whitelee_capacity",
@@ -476,6 +513,10 @@
     "figures_found": [
       "539"
     ],
-    "figures_missing": []
+    "figures_missing": [],
+    "figures_route": {
+      "539": "parallel_extract"
+    },
+    "corroborated_by_other_domain": false
   }
 ]

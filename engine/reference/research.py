@@ -15,12 +15,14 @@ Human decisions in manual.json override both and survive re-runs. Needs PARALLEL
 from __future__ import annotations
 
 import argparse
+import html
 import json
 import os
 import re
 import sys
 import time
 import urllib.error
+import urllib.parse
 import urllib.request
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
@@ -99,39 +101,92 @@ def call(method: str, path: str, body: dict | None = None, retries: int = 5) -> 
     raise RuntimeError(f"{method} {path} failed after {retries} attempts")
 
 
+DECIMAL_COMMA = re.compile(r"(?<=\d),(?=\d{1,2}(?!\d))")
+
+
 def normalise(text: str) -> str:
-    return THOUSANDS.sub("", text)
+    """Drop thousands separators ('1,400' -> '1400') and read European decimal commas
+    ('58,5' -> '58.5'); a comma followed by exactly three digits is a thousands separator."""
+    return DECIMAL_COMMA.sub(".", THOUSANDS.sub("", text))
+
+
+MONTHS = {m: i for i, m in enumerate(["january", "february", "march", "april", "may", "june", "july", "august",
+                                      "september", "october", "november", "december"], 1)}
+MONTH_RE = r"(jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|june?|july?|aug(?:ust)?|sep(?:t(?:ember)?)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)"
+DATE_PATTERNS = [
+    (re.compile(r"\b(\d{4})-(\d{2})-(\d{2})\b"), lambda m: (int(m[3]), int(m[2]), int(m[1]))),
+    (re.compile(rf"\b(\d{{1,2}})(?:st|nd|rd|th)?\s+{MONTH_RE}\.?(?:\s+(\d{{4}}))?\b", re.I), lambda m: (int(m[1]), month(m[2]), m[3] and int(m[3]))),
+    (re.compile(rf"\b{MONTH_RE}\.?\s+(\d{{1,2}})(?:st|nd|rd|th)?(?:,?\s+(\d{{4}}))?\b", re.I), lambda m: (int(m[2]), month(m[1]), m[3] and int(m[3]))),
+]
+
+
+def month(name: str) -> int:
+    return next(v for k, v in MONTHS.items() if k.startswith(name.lower()[:3]))
+
+
+def dates(text: str) -> tuple[list[str], str]:
+    """Dates in the text as tokens 'date:YYYY-MM-DD' (or 'date:--MM-DD' when no year), plus the
+    text with those dates removed so their parts are not checked again as loose numbers."""
+    tokens, rest = [], text
+    for pattern, parse in DATE_PATTERNS:
+        for m in list(pattern.finditer(rest)):
+            day, mon, year = parse(m)
+            if 1 <= day <= 31 and 1 <= mon <= 12:
+                tokens.append(f"date:{year:04d}-{mon:02d}-{day:02d}" if year else f"date:--{mon:02d}-{day:02d}")
+        rest = pattern.sub(" ", rest)
+    return list(dict.fromkeys(tokens)), rest
 
 
 def figures(text: str) -> list[str]:
-    """Figures worth checking, normalised ('1,400 MW' -> '1400'). Single digits count only when
-    the answer has nothing longer, so '2 requests per minute' is still checked."""
-    found = list(dict.fromkeys(re.findall(r"\d+(?:\.\d+)?", normalise(text))))
+    """What to re-find in the sources: whole dates first, then numbers ('1,400 MW' -> '1400').
+    Loose years are dropped only when the answer has another value; single digits count only
+    when there is nothing longer, so '2 requests per minute' is still checked."""
+    date_tokens, rest = dates(text)
+    found = list(dict.fromkeys(re.findall(r"\d+(?:\.\d+)?", normalise(rest))))
     years = {n for n in found if re.fullmatch(r"(19[5-9]\d|20[0-4]\d)", n)}
-    values = [n for n in found if n not in years] or found
+    values = [n for n in found if n not in years]
+    if not values and not date_tokens:
+        values = found
     significant = [n for n in values if len(n.replace(".", "")) >= 2 or "." in n]
-    return (significant or values)[:MAX_FIGURES_CHECKED]
+    return (date_tokens + (significant or values))[:MAX_FIGURES_CHECKED]
+
+
+def sig_digits(fig: str) -> int:
+    return len(fig.replace(".", "").lstrip("0").rstrip("0")) or 1
 
 
 def equivalents(fig: str) -> set[str]:
     """The figure as a source might write it: as given, scaled by 1000 (MW <-> GW, kg <-> t), or
-    rounded to fewer decimals. Never produces a figure with fewer than two significant digits."""
+    rounded. A rounded form keeps at least min(3, the figure's own significant digits) and at
+    least two digits, so '10.241337' may match '10.2' but never a bare '10'."""
     out = {fig}
     try:
         x = float(fig)
     except ValueError:
         return out
+    floor = min(3, sig_digits(fig))
     for scaled in (x, x * 1000, x / 1000):
-        for nd in range(0, 4):
-            s = f"{round(scaled, nd):.{nd}f}"
-            if len(s.replace(".", "").lstrip("0")) >= 2:
-                out.add(s)
-        if float(scaled).is_integer() and abs(scaled) >= 10:
-            out.add(str(int(scaled)))
+        forms = {f"{round(scaled, nd):.{nd}f}" for nd in range(0, 4)}
+        if float(scaled).is_integer():
+            forms.add(str(int(scaled)))
+        out |= {s for s in forms if len(s.replace(".", "")) >= 2 and sig_digits(s) >= floor}
     return out
 
 
+def date_forms(token: str) -> list[str]:
+    _, iso = token.split(":", 1)
+    y, mon, d = (None if iso.startswith("--") else int(iso[:4])), int(iso[-5:-3]), int(iso[-2:])
+    name = [k for k, v in MONTHS.items() if v == mon][0]
+    short = name[:3]
+    if y is None:
+        return [rf"\b{d}(?:st|nd|rd|th)?\s+(?:{name}|{short})\b", rf"\b(?:{name}|{short})\.?\s+{d}\b"]
+    return [rf"\b{y}-{mon:02d}-{d:02d}\b", rf"\b{d}(?:st|nd|rd|th)?\s+(?:{name}|{short})\.?,?\s+{y}\b",
+            rf"\b(?:{name}|{short})\.?\s+{d}(?:st|nd|rd|th)?,?\s+{y}\b", rf"\b0?{d}/0?{mon}/{y}\b"]
+
+
 def present(fig: str, text: str) -> bool:
+    if fig.startswith("date:"):
+        return any(re.search(p, text, re.I) for p in date_forms(fig))
     if any(re.search(rf"(?<![\d.]){re.escape(c)}(?![\d])", text) for c in equivalents(fig)):
         return True
     try:
@@ -139,22 +194,72 @@ def present(fig: str, text: str) -> bool:
     except ValueError:
         return False
     if small.is_integer() and 0 < small < 10:
-        unit = r"\s?(?:GW|GWh|TW|TWh|bn|billion|kt|Mt|t)\b"
+        unit = r"\s?(?:GW|GWh|TW|TWh|bn|billion|kt|Mt)\b"
         return re.search(rf"(?<![\d.]){int(small)}{unit}", text) is not None
     return False
 
 
-def figure_check(question: str, figs: list[str], urls: list[str]) -> tuple[list[str], list[str]]:
-    """Fetch the cited pages independently; return (found, missing) figures."""
-    if not figs or not urls:
-        return [], figs
+def fetch_direct(url: str) -> str | None:
+    """Plain HTTP GET with no Parallel involvement; None for failures, PDFs and non-text pages."""
+    req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0 (living-grid fact check)"})
     try:
-        got = call("POST", "/v1/extract", {"urls": urls[:MAX_SOURCES_CHECKED], "objective": question, "search_queries": figs[:3]})
-    except RuntimeError:
-        return [], figs
-    text = normalise(" ".join(" ".join(r.get("excerpts") or []) for r in got.get("results", [])))
-    found = [f for f in figs if present(f, text)]
-    return found, [f for f in figs if f not in found]
+        with urllib.request.urlopen(req, timeout=20) as resp:
+            ctype = resp.headers.get("Content-Type", "")
+            if not any(t in ctype for t in ("text/", "json", "xml")):
+                return None
+            raw = resp.read(3_000_000).decode(resp.headers.get_content_charset() or "utf-8", errors="replace")
+    except Exception:
+        return None
+    raw = re.sub(r"(?is)<(script|style)\b.*?</\1>", " ", raw)
+    return normalise(html.unescape(re.sub(r"<[^>]+>", " ", raw)))
+
+
+def figure_check(question: str, figs: list[str], urls: list[str]) -> tuple[list[str], list[str], dict]:
+    """Re-find every figure in the cited pages: direct HTTP first (independent of Parallel), then
+    Parallel Extract only for figures still missing (JavaScript pages, PDFs). Returns found,
+    missing, and which route proved each found figure."""
+    route: dict[str, str] = {}
+    if not figs or not urls:
+        return [], figs, route
+    urls = urls[:MAX_SOURCES_CHECKED]
+    with ThreadPoolExecutor(max_workers=4) as pool:
+        direct = normalise(" ".join(t for t in pool.map(fetch_direct, urls) if t))
+    for f in figs:
+        if direct and present(f, direct):
+            route[f] = "direct"
+    missing = [f for f in figs if f not in route]
+    if missing:
+        try:
+            got = call("POST", "/v1/extract", {"urls": urls, "objective": question,
+                                                "search_queries": [m for m in missing if not m.startswith("date:")][:3] or [question[:60]]})
+            text = normalise(" ".join(" ".join(r.get("excerpts") or []) for r in got.get("results", [])))
+            for f in missing:
+                if present(f, text):
+                    route[f] = "parallel_extract"
+            still = [f for f in missing if f not in route]
+            if still:
+                full = call("POST", "/v1/extract", {"urls": urls, "objective": question, "advanced_settings": {"full_content": True}})
+                text = normalise(" ".join(r.get("full_content") or "" for r in full.get("results", [])))
+                for f in still:
+                    if present(f, text):
+                        route[f] = "parallel_extract_full"
+        except RuntimeError:
+            pass
+    found = [f for f in figs if f in route]
+    return found, [f for f in figs if f not in route], route
+
+
+def domain(url: str) -> str:
+    host = urllib.parse.urlparse(url).netloc.lower()
+    return host[4:] if host.startswith("www.") else host
+
+
+def corroborated(fact: dict, cross: dict | None) -> bool:
+    """True when the agreeing cross-check cites at least one website the research run did not."""
+    if not cross or not cross.get("agrees"):
+        return False
+    research_domains = {domain(s["url"]) for s in fact.get("sources", [])}
+    return any(domain(s["url"]) not in research_domains for s in cross.get("sources", []))
 
 
 def run_group(inputs: list[dict], schema: dict, label: str) -> list[str]:
@@ -253,9 +358,10 @@ def decide(fact: dict, cross: dict | None, found: list[str], missing: list[str],
 def verify(fact: dict, cross: dict | None) -> dict:
     figs = figures(fact.get("value", ""))
     urls = [s["url"] for s in fact.get("sources", [])] + [s["url"] for s in (cross or {}).get("sources", [])]
-    found, missing = figure_check(fact["question"], figs, list(dict.fromkeys(urls))) if "value" in fact else ([], figs)
+    found, missing, route = figure_check(fact["question"], figs, list(dict.fromkeys(urls))) if "value" in fact else ([], figs, {})
     ok, how = decide(fact, cross, found, missing, figs)
-    return {**fact, "crosscheck": cross, "figures_found": found, "figures_missing": missing, "verified": ok, "verification": how}
+    return {**fact, "crosscheck": cross, "figures_found": found, "figures_missing": missing, "figures_route": route,
+            "corroborated_by_other_domain": corroborated(fact, cross), "verified": ok, "verification": how}
 
 
 def apply_manual(fact: dict, manual: dict) -> dict:

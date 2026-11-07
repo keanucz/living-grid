@@ -41,7 +41,13 @@
       "63000",
       "57"
     ],
-    "figures_missing": []
+    "figures_missing": [],
+    "figures_route": {
+      "63": "direct",
+      "63000": "direct",
+      "57": "direct"
+    },
+    "corroborated_by_other_domain": false
   },
   {
     "id": "ev_fr_reactor_size",
@@ -103,7 +109,15 @@
       "1630",
       "1620"
     ],
-    "figures_missing": []
+    "figures_missing": [],
+    "figures_route": {
+      "1300": "direct",
+      "900": "parallel_extract",
+      "1450": "parallel_extract",
+      "1630": "parallel_extract",
+      "1620": "parallel_extract"
+    },
+    "corroborated_by_other_domain": false
   },
   {
     "id": "ev_fr_temp_sensitivity",
@@ -141,55 +155,57 @@
     "figures_found": [
       "2400"
     ],
-    "figures_missing": []
+    "figures_missing": [],
+    "figures_route": {
+      "2400": "parallel_extract"
+    },
+    "corroborated_by_other_domain": false
   },
   {
     "id": "ev_gb_temp_sensitivity",
-    "question": "By how many MW (or GW) does Great Britain's electricity demand rise for each 1 degree Celsius drop in temperature in winter? Give an absolute MW figure from NESO, National Grid ESO, Elexon or a peer-reviewed study, not a percentage; if only a percentage is published, give the percentage and the base demand it applies to.",
+    "question": "What figure does NESO, National Grid ESO or a peer-reviewed study state for the change in Great Britain's electricity demand per 1 degree Celsius change in winter temperature (in MW, GW or percent)? Quote the figure exactly as the source writes it and name the source; do not convert units or do your own arithmetic. If no source states it directly, say so.",
     "used_by": "#50",
     "processor": "pro",
-    "run_id": "srun_ca3dde3a03704793b0af5b64e63c47c4",
-    "retrieved_at": "2026-11-07T14:16:18+00:00",
-    "value": "Approximately 417–500 MW (0.417–0.500 GW) of additional daily-average demand per 1°C drop in winter temperature. The peer-reviewed study by Thornton, Hoskins and Scaife (2016), Environmental Research Letters, states that a 1°C decrease typically produces a “10 – 12 GWh increase in daily electricity demand”.",
-    "unit": "MW per °C of cooling; source figure expressed in GWh/day per °C",
-    "as_of": "Great Britain electricity-demand observations analysed over 1975–2013; study published in 2016.",
-    "caveat": "The MW figure is calculated, not quoted directly: 10–12 GWh divided by 24 hours equals approximately 417–500 MW. This is a historical daily-average response, not an instantaneous or winter peak-demand increment.",
-    "confidence": "medium",
+    "run_id": "srun_488394657d484cd394494a54c4382ff5",
+    "retrieved_at": "2026-11-07T14:33:25+00:00",
+    "value": "“∼1% increase” in Great Britain’s daily electricity demand for “a 1 °C decrease in daily temperature during winter months”. Source: H E Thornton, B J Hoskins and A A Scaife, “The role of temperature in the variability and extremes of electricity and gas demand in Great Britain” (2016).",
+    "unit": "%",
+    "as_of": "Electricity-demand data from 1975 to 2013; study published 8 November 2016.",
+    "caveat": "The source says this will “typically” occur and establishes the estimate using monthly linear fits. The figure concerns daily electricity demand, not peak power demand.",
+    "confidence": "high",
     "sources": [
       {
-        "url": "https://centaur.reading.ac.uk/68474/1/Thornton_2016_Environ._Res._Lett._11_114015.pdf",
-        "quote": "Over the data period, a 1 ° C decrease in daily temper- ature during winter months will typically give rise to a 10 – 12 GWh increase in daily electricity demand ( ∼ 1% increase, established using the monthly linear fi ts in fi gure 10 ) and a 105 – 115 GWh increase in daily gas demand ( 3% – 4% increase ) ."
+        "url": "https://iopscience.iop.org/article/10.1088/1748-9326/11/11/114015",
+        "quote": "Over the data period, a 1 °C decrease in daily temperature during winter months will typically give rise to a 10–12 GWh increase in daily electricity demand (∼1% increase, established using the monthly linear fits in figure 10 ) and a 105–115 GWh increase in daily gas demand (3%–4% increase). … The role of temperature in the variability and extremes of electricity and gas demand in Great Britain H E Thornton , B J Hoskins and A A Scaife"
       }
     ],
     "crosscheck": {
-      "run_id": "srun_34632112fcf8493ca798b8e477b874ef",
-      "independent_value": "Approximately 417–500 MW (0.417–0.500 GW) of additional daily-average electricity demand per 1°C drop in winter temperature. Thornton, Hoskins and Scaife (2016), Environmental Research Letters, explicitly state: “a 1 °C decrease in daily temperature during winter months will typically give rise to a 10–12 GWh increase in daily electricity demand”. Converting daily energy to average power gives 10–12 × 1,000 ÷ 24 = 416.666…–500 MW. This is a historical daily-average sensitivity, not a peak-demand sensitivity; the study analysed Great Britain electricity-demand observations over 1975–2013.",
+      "run_id": "srun_9128b164a6774410450c9c6cafa43296",
+      "independent_value": "H E Thornton, B J Hoskins and A A Scaife, “The role of temperature in the variability and extremes of electricity and gas demand in Great Britain” (published 8 November 2016), states in its University of Reading repository abstract: “Winter then has the strongest demand–temperature relationship, during which a 1 °C reduction in daily temperature typically gives a ~1% increase in daily electricity demand and a 3%–4% increase in gas demand.” The electricity-demand analysis covers 1975–2013.",
       "agrees": true,
       "disagreement": "none",
-      "confidence": "medium",
+      "confidence": "high",
       "sources": [
         {
-          "url": "https://iopscience.iop.org/article/10.1088/1748-9326/11/11/114015",
-          "quote": "Over the data period, a 1 °C decrease in daily temperature during winter months will typically give rise to a 10–12 GWh increase in daily electricity demand (∼1% increase, established using the monthly linear fits in figure 10 ) and a 105–115 GWh increase in daily gas demand (3%–4% increase)."
+          "url": "https://centaur.reading.ac.uk/68474",
+          "quote": "Winter then has the strongest demand–temperature relationship, during which a 1 °C reduction in daily temperature typically gives a ~1% increase in daily electricity demand and a 3%–4% increase in gas demand. … The daily relationship of electricity and gas demand with temperature in Great Britain is analysed from 1975 to 2013 and 1996 to 2013 respectively."
         },
         {
-          "url": "https://centaur.reading.ac.uk/68474",
-          "quote": "The daily relationship of electricity and gas demand with temperature in Great Britain is analysed from 1975 to 2013 and 1996 to 2013 respectively."
+          "url": "https://iopscience.iop.org/article/10.1088/1748-9326/11/11/114015",
+          "quote": "H E Thornton , B J Hoskins and A A Scaife … Published 8 November 2016"
         }
       ]
     },
     "figures_found": [
-      "10",
-      "12"
+      "1"
     ],
-    "figures_missing": [
-      "417",
-      "500",
-      "0.417",
-      "0.500"
-    ],
-    "verified": false,
-    "verification": "cross-check agrees, but figures ['417', '500', '0.417', '0.500'] were not found in an independent fetch of the cited sources"
+    "figures_missing": [],
+    "verified": true,
+    "verification": "independent cross-check agrees and all figures ['1'] were re-found in an independent fetch",
+    "figures_route": {
+      "1": "direct"
+    },
+    "corroborated_by_other_domain": true
   },
   {
     "id": "ev_gb_wind_capacity",
@@ -228,44 +244,49 @@
       "14.3",
       "16.0"
     ],
-    "figures_missing": []
+    "figures_missing": [],
+    "figures_route": {
+      "14.3": "parallel_extract",
+      "16.0": "parallel_extract"
+    },
+    "corroborated_by_other_domain": false
   },
   {
     "id": "ev_scotland_wind_capacity",
-    "question": "What is the total installed wind generation capacity (onshore plus offshore) in Scotland in GW, as of the latest Scottish Government energy statistics in 2026?",
+    "question": "What total installed wind capacity in Scotland (onshore plus offshore, or each separately) do the Scottish Government's Energy Statistics or the DESNZ renewable electricity statistics state for the latest quarter of 2026 or 2025? Quote the figure exactly as the source writes it and name the source; do not convert units or do your own arithmetic. If no source states it directly, say so.",
     "used_by": "#50 #47",
     "processor": "pro",
-    "run_id": "srun_ca3dde3a037047935bf0269d3d127eeb",
-    "retrieved_at": "2026-11-07T14:16:18+00:00",
-    "value": "15.2 GW total, calculated from “10.9 GW” onshore wind plus “4.3 GW” offshore wind.",
+    "run_id": "srun_488394657d484cd340834b96db89b928",
+    "retrieved_at": "2026-11-07T14:33:25+00:00",
+    "value": "Onshore wind: “10.9 GW”; offshore wind: “4.3 GW”. Source: Scottish Government, Energy Statistics for Scotland – Q2 2026, “Renewable Electricity Capacity”, Figure 3.",
     "unit": "GW",
-    "as_of": "Q2 2026; Scottish Government statistics published 29 September 2026.",
-    "caveat": "The total is calculated from Figure 3’s component figures, reported to one decimal place. The headline 18.4 GW figure covers all renewable electricity capacity, not wind alone.",
-    "confidence": "medium",
+    "as_of": "Q2 2026",
+    "caveat": "The capacities are quoted separately; no combined total has been calculated and no units have been converted.",
+    "confidence": "high",
     "sources": [
       {
         "url": "https://www.gov.scot/binaries/content/gallery/publications/statistics/2026/09/energy-statistics-for-scotland---q2-2026/pages/renewable-electricity-capacity/energy-stats-q2-fig-3-png",
         "quote": "Onshore wind remains the largest component throughout and reaches 10.9 GW by Q2 2026. … Offshore wind is the second-largest component at 4.3 GW, followed by large-scale hydro at 1.3 GW and solar photovoltaics at 0.9 GW."
-      },
-      {
-        "url": "https://www.gov.scot/publications/energy-statistics-for-scotland-q2-2026/pages/renewable-electricity-capacity",
-        "quote": "Energy Statistics for Scotland - Q2 2026 Published **29 September 2026**"
       }
     ],
     "crosscheck": {
-      "run_id": "srun_34632112fcf8493cebc73a45ae1e715d",
-      "independent_value": "15.2 GW total installed wind generation capacity in Scotland as of Q2 2026, calculated from “10.9 GW” onshore wind plus “4.3 GW” offshore wind in the Scottish Government’s Energy Statistics for Scotland – Q2 2026, published 29 September 2026.",
+      "run_id": "srun_9128b164a67744104df01be14e79bd62",
+      "independent_value": "For Q2 2026, the latest quarter listed in the Scottish Government’s quarterly bulletins, installed capacity is stated separately as onshore wind: “10.9 GW”; offshore wind: “4.3 GW”. Source: Scottish Government, Energy Statistics for Scotland – Q2 2026, “Renewable Electricity Capacity”, Figure 3, published 29 September 2026. The chart credits DESNZ. These are quoted figures, without conversion or addition.",
       "agrees": true,
       "disagreement": "none",
       "confidence": "medium",
       "sources": [
         {
           "url": "https://www.gov.scot/binaries/content/gallery/publications/statistics/2026/09/energy-statistics-for-scotland---q2-2026/pages/renewable-electricity-capacity/energy-stats-q2-fig-3-png",
-          "quote": "Onshore wind remains the largest component throughout and reaches 10.9 GW by Q2 2026. … Offshore wind is the second-largest component at 4.3 GW, followed by large-scale hydro at 1.3 GW and solar photovoltaics at 0.9 GW."
+          "quote": "Onshore wind — 10.9 GW Offshore wind — 4.3 GW … Onshore wind remains the largest component throughout and reaches 10.9 GW by Q2 2026. … Source: DESNZ"
         },
         {
-          "url": "https://www.gov.scot/publications/energy-statistics-for-scotland-q2-2026/pages/renewable-electricity-capacity",
-          "quote": "Energy Statistics for Scotland - Q2 2026 Published **29 September 2026**"
+          "url": "https://www.gov.scot/publications/energy-statistics-for-scotland-q2-2026/pages/renewable-electricity-capacity/",
+          "quote": "Figure 3: Chart showing installed renewable energy capacity in gigawatts per hour in Scotland between Q4 2010 and Q2 2026 … Energy Statistics for Scotland - Q2 2026 Published **29 September 2026**"
+        },
+        {
+          "url": "https://www.gov.scot/collections/quarterly-energy-statistics-scotland",
+          "quote": "[Energy Statistics for Scotland - Q2 2026](https://www.gov.scot/publications/energy-statistics-for-scotland-q2-2026/)"
         }
       ]
     },
@@ -273,10 +294,13 @@
       "10.9",
       "4.3"
     ],
-    "figures_missing": [
-      "15.2"
-    ],
-    "verified": false,
-    "verification": "cross-check agrees, but figures ['15.2'] were not found in an independent fetch of the cited sources"
+    "figures_missing": [],
+    "verified": true,
+    "verification": "independent cross-check agrees and all figures ['10.9', '4.3'] were re-found in an independent fetch",
+    "figures_route": {
+      "10.9": "parallel_extract",
+      "4.3": "parallel_extract"
+    },
+    "corroborated_by_other_domain": false
   }
 ]

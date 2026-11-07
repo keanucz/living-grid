@@ -5,7 +5,9 @@ Every real-world constant the engine uses (interconnector capacities, gas plant 
 A fact is `"verified": true` only when both hold:
 
 1. **Cross-check:** a second, independent Parallel Task run (`pro`), told the claim but asked to find its own sources, agrees.
-2. **Figures:** every figure in the answer (years ignored when other figures exist) re-appears in an independent Extract fetch of the cited sources, allowing only x1000 unit scaling and rounding.
+2. **Figures:** every figure in the answer re-appears in a re-fetch of the cited sources. Pages are fetched with plain HTTP first (no Parallel involved); Parallel Extract is only the fallback for JavaScript pages and PDFs. `figures_route` records which route proved each figure. Dates must match whole, year included; loose years are ignored only beside another value; unit scaling (x1000) and rounding are allowed, but a rounded match keeps at least 3 significant digits.
+
+`corroborated_by_other_domain` says whether the agreeing cross-check cited a different website from the original research. It is recorded, not required: many facts have one authoritative source (NESO, Octopus, RTE).
 
 Human decisions live in `manual.json`, override both checks, survive re-runs, and are marked `manual_override` on the fact.
 

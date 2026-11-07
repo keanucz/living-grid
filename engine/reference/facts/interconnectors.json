@@ -43,7 +43,11 @@
     "figures_found": [
       "1000"
     ],
-    "figures_missing": []
+    "figures_missing": [],
+    "figures_route": {
+      "1000": "parallel_extract"
+    },
+    "corroborated_by_other_domain": true
   },
   {
     "id": "ic_eleclink_capacity",
@@ -81,7 +85,11 @@
     "figures_found": [
       "1000"
     ],
-    "figures_missing": []
+    "figures_missing": [],
+    "figures_route": {
+      "1000": "direct"
+    },
+    "corroborated_by_other_domain": false
   },
   {
     "id": "ic_ifa2_capacity",
@@ -119,7 +127,11 @@
     "figures_found": [
       "1000"
     ],
-    "figures_missing": []
+    "figures_missing": [],
+    "figures_route": {
+      "1000": "parallel_extract"
+    },
+    "corroborated_by_other_domain": true
   },
   {
     "id": "ic_ifa_capacity",
@@ -157,7 +169,11 @@
     "figures_found": [
       "2000"
     ],
-    "figures_missing": []
+    "figures_missing": [],
+    "figures_route": {
+      "2000": "parallel_extract"
+    },
+    "corroborated_by_other_domain": false
   },
   {
     "id": "ic_nemo_capacity",
@@ -199,7 +215,11 @@
     "figures_found": [
       "1000"
     ],
-    "figures_missing": []
+    "figures_missing": [],
+    "figures_route": {
+      "1000": "direct"
+    },
+    "corroborated_by_other_domain": false
   },
   {
     "id": "ic_neuconnect_status",
@@ -246,7 +266,12 @@
       "1400",
       "1.4"
     ],
-    "figures_missing": []
+    "figures_missing": [],
+    "figures_route": {
+      "1400": "direct",
+      "1.4": "direct"
+    },
+    "corroborated_by_other_domain": false
   },
   {
     "id": "ic_nsl_capacity",
@@ -292,7 +317,11 @@
     "figures_found": [
       "1400"
     ],
-    "figures_missing": []
+    "figures_missing": [],
+    "figures_route": {
+      "1400": "direct"
+    },
+    "corroborated_by_other_domain": false
   },
   {
     "id": "ic_viking_capacity",
@@ -338,6 +367,10 @@
     "figures_found": [
       "1400"
     ],
-    "figures_missing": []
+    "figures_missing": [],
+    "figures_route": {
+      "1400": "direct"
+    },
+    "corroborated_by_other_domain": true
   }
 ]

@@ -36,7 +36,12 @@
       "334",
       "0.334"
     ],
-    "figures_missing": []
+    "figures_missing": [],
+    "figures_route": {
+      "334": "parallel_extract",
+      "0.334": "parallel_extract"
+    },
+    "corroborated_by_other_domain": false
   },
   {
     "id": "gas_ccgt_efficiency",
@@ -79,7 +84,16 @@
       "57",
       "60.5"
     ],
-    "figures_missing": []
+    "figures_missing": [],
+    "figures_route": {
+      "53": "parallel_extract",
+      "58.5": "parallel_extract",
+      "50": "parallel_extract",
+      "600": "parallel_extract",
+      "57": "parallel_extract",
+      "60.5": "parallel_extract"
+    },
+    "corroborated_by_other_domain": false
   },
   {
     "id": "gas_gb_marginal_share",
@@ -138,7 +152,12 @@
       "97",
       "60"
     ],
-    "figures_missing": []
+    "figures_missing": [],
+    "figures_route": {
+      "97": "direct",
+      "60": "direct"
+    },
+    "corroborated_by_other_domain": false
   },
   {
     "id": "gas_hormuz_lng_share",
@@ -180,51 +199,55 @@
     "figures_found": [
       "20"
     ],
-    "figures_missing": []
+    "figures_missing": [],
+    "figures_route": {
+      "20": "direct"
+    },
+    "corroborated_by_other_domain": false
   },
   {
     "id": "gas_natgas_emission_factor",
-    "question": "What is the standard CO2 emission factor of natural gas combustion in tonnes CO2 per MWh of thermal energy (IPCC default or UK government conversion factor)?",
+    "question": "What CO2 emission factor for natural gas combustion does the UK government (DESNZ greenhouse gas conversion factors) or the IPCC 2006 Guidelines publish, per kWh or per TJ of fuel (net or gross CV, say which)? Quote the figure exactly as the source writes it and name the source; do not convert units or do your own arithmetic. If no source states it directly, say so.",
     "used_by": "#36",
     "processor": "pro",
-    "run_id": "srun_ca3dde3a037047935a2dc4f6b906262e",
-    "retrieved_at": "2026-11-07T14:16:18+00:00",
-    "value": "0.20196 (converted from the IPCC default of “56 100” kg CO2/TJ)",
-    "unit": "tCO2/MWh of thermal energy, net calorific value (NCV) basis",
-    "as_of": "2006 IPCC Guidelines for National Greenhouse Gas Inventories, Volume 2, Table 1.4",
-    "caveat": "This is a combustion CO2 factor on a net, not gross, calorific-value basis and assumes 100% carbon oxidation. IPCC recommends this default when country-specific factors are unavailable. Conversion: 56 100 kg/TJ × 0.0036 TJ/MWh ÷ 1000 kg/t = 0.20196 tCO2/MWh.",
-    "confidence": "medium",
+    "run_id": "srun_488394657d484cd3e80f4916486e1f36",
+    "retrieved_at": "2026-11-07T14:33:25+00:00",
+    "value": "“56 100” — IPCC, 2006 IPCC Guidelines for National Greenhouse Gas Inventories, Volume 2: Energy, Chapter 2: Stationary Combustion, Table 2.3, Natural Gas row.",
+    "unit": "kg CO2/TJ of fuel, on a net calorific value basis.",
+    "as_of": "2006 IPCC Guidelines.",
+    "caveat": "Default emission factor; assumes a carbon oxidation factor of 1. The cited table covers stationary combustion in manufacturing industries and construction.",
+    "confidence": "high",
     "sources": [
       {
-        "url": "https://www.ipcc-nggip.iges.or.jp/public/2006gl/pdf/2_Volume2/V2_1_Ch1_Introduction.pdf",
-        "quote": "Natural Gas 15.3 1 56 100 54 300 58 300 … **Effective CO2 emission factor (kg/TJ)** **2** **Fuel type English description Default carbon content (kg/GJ)**"
+        "url": "https://www.ipcc-nggip.iges.or.jp/public/2006gl/pdf/2_Volume2/V2_2_Ch2_Stationary_Combustion.pdf",
+        "quote": "Natural Gas 56 100 54 300 58 300 **r** 1 0.3 3 0.1 0.03 0.3 … 2\\.18 2006 IPCC Guidelines for National Greenhouse Gas Inventories **TABLE 2.3 DEFAULT EMISSION FACTORS FOR STATIONARY COMBUSTION IN MANUFACTURING INDUSTRIES AND CONSTRUCTION (kg of greenhouse gas per TJ on a Net Calorific Basis)** **CO2 CH4 N2O** **Fuel Default Emission Factor Lower Upper Default Emission Factor Lower Upper Default Emission Factor Lower Upper**"
       }
     ],
     "crosscheck": {
-      "run_id": "srun_34632112fcf8493c1f3bb626909a09f3",
-      "independent_value": "0.20196 tCO2/MWh of thermal energy on a net calorific value (NCV) basis. The 2006 IPCC Guidelines, Volume 2, Table 1.4 give natural gas a default combustion emission factor of “56 100” kg CO2/TJ. Since 1 MWh = 0.0036 TJ, the conversion is 56,100 × 0.0036 ÷ 1,000 = 0.20196 tCO2/MWh.",
+      "run_id": "srun_9128b164a67744103c291cf7acf7b632",
+      "independent_value": "“56 100” kg CO₂/TJ of fuel, on a net calorific value basis. Source: IPCC, 2006 IPCC Guidelines for National Greenhouse Gas Inventories, Volume 2: Energy, Chapter 2: Stationary Combustion, Table 2.3, Natural Gas row, CO₂ default emission factor. The table covers stationary combustion in manufacturing industries and construction. This figure is published directly; no unit conversion or arithmetic was applied.",
       "agrees": true,
       "disagreement": "none",
       "confidence": "medium",
       "sources": [
         {
-          "url": "https://www.ipcc-nggip.iges.or.jp/public/2006gl/pdf/2_Volume2/V2_1_Ch1_Introduction.pdf",
-          "quote": "Natural Gas 15.3 1 56 100 54 300 58 300"
-        },
-        {
           "url": "https://www.ipcc-nggip.iges.or.jp/public/2006gl/pdf/2_Volume2/V2_2_Ch2_Stationary_Combustion.pdf",
-          "quote": "Emission factors for CO2 are in units of kg CO2/TJ on a net calorific value basis … The CO2 emission factors are the same ones as presented in Table 1.4 of the Introduction chapter."
+          "quote": "Natural Gas 56 100 54 300 58 300 **r** 1 0.3 3 0.1 0.03 0.3 … Emission factors for CO2 are in units of kg CO2/TJ on a net calorific value basis and reflect the carbon content of the fuel and the assumption that the carbon oxidation factor is 1. … Table 2.3 Default emission factors for stationary combustion in manufacturing industries and construction (kg of greenhouse gas per TJ on a net calorific basis) ...................................2.18"
         }
       ]
     },
     "figures_found": [
-      "56100"
+      "56100",
+      "2.3"
     ],
-    "figures_missing": [
-      "0.20196"
-    ],
-    "verified": false,
-    "verification": "cross-check agrees, but figures ['0.20196'] were not found in an independent fetch of the cited sources"
+    "figures_missing": [],
+    "verified": true,
+    "verification": "independent cross-check agrees and all figures ['56100', '2.3'] were re-found in an independent fetch",
+    "figures_route": {
+      "56100": "parallel_extract",
+      "2.3": "parallel_extract"
+    },
+    "corroborated_by_other_domain": false
   },
   {
     "id": "gas_qatar_eu_lng_share",
@@ -279,7 +302,12 @@
     ],
     "figures_missing": [],
     "verified": true,
-    "verification": "independent cross-check agrees and all figures ['8', '6'] were re-found in an independent fetch"
+    "verification": "independent cross-check agrees and all figures ['8', '6'] were re-found in an independent fetch",
+    "figures_route": {
+      "8": "direct",
+      "6": "direct"
+    },
+    "corroborated_by_other_domain": false
   },
   {
     "id": "gas_ttf_2022_peak",
@@ -308,7 +336,7 @@
       }
     ],
     "verified": true,
-    "verification": "independent cross-check agrees and all figures ['339.20', '26'] were re-found in an independent fetch",
+    "verification": "independent cross-check agrees and all figures ['date:--08-26', '339.20'] were re-found in an independent fetch",
     "crosscheck": {
       "run_id": "srun_791b0c3367af4148fbe548dacbe073cd",
       "independent_value": "€339.20/MWh on 26 August 2022. AleaSoft’s September 1, 2022 review reports this as the monthly maximum daily settlement price for ICE Dutch TTF front-month futures, rather than an intraday high.",
@@ -323,9 +351,14 @@
       ]
     },
     "figures_found": [
-      "339.20",
-      "26"
+      "date:--08-26",
+      "339.20"
     ],
-    "figures_missing": []
+    "figures_missing": [],
+    "figures_route": {
+      "date:--08-26": "direct",
+      "339.20": "direct"
+    },
+    "corroborated_by_other_domain": false
   }
 ]

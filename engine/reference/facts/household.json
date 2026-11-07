@@ -1,51 +1,55 @@
 [
   {
     "id": "hh_agile_formula",
-    "question": "What is the formula Octopus Energy uses to derive Agile Octopus unit rates from the wholesale day-ahead price (multiplier, peak adder for 4pm to 7pm, and regional factors)?",
+    "question": "What values of the multiplier D and the peak adder P (4pm to 7pm) does Octopus Energy publish for the Agile Octopus tariff formula min(D x W + P, cap), and what is the cap in pence per kWh? Quote the figure exactly as the source writes it and name the source; do not convert units or do your own arithmetic. If no source states it directly, say so.",
     "used_by": "#56",
-    "processor": "core",
-    "run_id": "srun_051cfaf41dc04532bb8bc99e7d8f7c59",
-    "retrieved_at": "2026-11-07T14:00:45+00:00",
-    "value": "Octopus’s published formula is min(D x W + P, 95): W is the wholesale price for the half-hour in p/kWh; D is the region-specific multiplier; and P is the region-specific peak premium, applied only between 4pm and 7pm. The 95p/kWh cap is before VAT and is intended to cap the final price at 100p/kWh including VAT. Regional D / P values: East England 2.10 / 13; East Midlands 2.00 / 14; London 2.00 / 12; Merseyside & Northern Wales 2.20 / 13; West Midlands 2.10 / 12; North East England 2.10 / 12; North West England 2.10 / 12; South England 2.10 / 12; South East England 2.20 / 12; South Wales 2.20 / 12; South West England 2.30 / 11; Yorkshire 2.00 / 13; South Scotland 2.10 / 13; North Scotland 2.40 / 12.",
-    "unit": "p/kWh for W, P, and the rate; D is a dimensionless multiplier",
-    "as_of": "The official explainer was published on 13 February 2019; it gives no separate effective date for the formula.",
-    "caveat": "The official article calls this an ‘example’ algorithm and is dated 2019, so its regional parameters are the figures in that published explainer, not a guarantee that no later tariff adjustment applies.",
+    "processor": "pro",
+    "run_id": "srun_488394657d484cd398f74e1600d3211a",
+    "retrieved_at": "2026-11-07T14:33:25+00:00",
+    "value": "Source: Octopus Energy, “Agile pricing explained” (https://octopus.energy/blog/agile-pricing-explained).\n\nIts illustrative example states: “The Agile price is 2.2 times the wholesale price of energy” with “an additional 12p / kWh” between 4.00pm and 7.00pm, “capped at 100p / kWh”.\n\nIts regional table publishes these D and P values, quoted without conversion:\nEast England: D “2.10”, P “13”;\nEast Midlands: D “2.00”, P “14”;\nLondon: D “2.00”, P “12”;\nMerseyside & Northern Wales: D “2.20”, P “13”;\nWest Midlands: D “2.10”, P “12”;\nNorth East England: D “2.10”, P “12”;\nNorth West England: D “2.10”, P “12”;\nSouth England: D “2.10”, P “12”;\nSouth East England: D “2.20”, P “12”;\nSouth Wales: D “2.20”, P “12”;\nSouth West England: D “2.30”, P “11”;\nYorkshire: D “2.00”, P “13”;\nSouth Scotland: D “2.10”, P “13”;\nNorth Scotland: D “2.40”, P “12”.\n\nThe displayed formula is “min(D x W + P, 95)”. The source explicitly explains: “95 is chosen to ensure the price is capped at 100p/kWh once VAT is added.”",
+    "unit": "D: n/a (multiplier); P and cap: pence per kilowatt-hour (p/kWh).",
+    "as_of": "Published 13th February 2019. P applies between 4pm and 7pm; no separate tariff-effective date is stated.",
+    "caveat": "There is no single nationwide D/P pair: the source says they vary by location and calls its formula an example. Its prose describes P as ranging from “roughly 12 - 24”, whereas its regional table includes P “11” for South West England and P “14” for East Midlands. The formula’s “95” and the stated “100p/kWh” cap are distinguished by the source’s VAT explanation, not by any calculation here.",
     "confidence": "medium",
     "sources": [
       {
         "url": "https://octopus.energy/blog/agile-pricing-explained",
-        "quote": "## ‘Agile’ pricing … We wanted to: … 1. Keep energy transparent by reflecting the complete cost-breakdown involved … 2. Make Agile simple for customer useability   …    Balancing these two key things, an example Agile price algorithm is: … ### _min(D x W + P, 95)_ … In this equation, … * **D** is a coefficient that includes our **distribution costs,** which varies based on where you are in Britain; … * **W** is the **wholesale cost of electricity** for that period in _pence per kilowatt-hour_ (p/kWh); … * **P** is the **peak-time premium** , which ranges from roughly 12 - 24 based on where you"
-      },
-      {
-        "url": "https://octopus.energy/blog/agile-pricing-explained/",
-        "quote": "Find out more or switch to Agile Octopus … Published on 13th February 2019 by: … Philip Steele"
+        "quote": "The Agile price is 2.2 times the wholesale price of energy and between 4.00pm and 7.00pm an additional 12p / kWh is included (but capped at 100p / kWh, come what may). … **East England** D 2.10 P 13 … **East Midlands** D 2.00 P 14 … **London** D 2.00 P 12 … **Merseyside & Northern Wales** D 2.20 P 13 … **West Midlands** D 2.10 P 12 **North East England** … P 12 **North East England** D 2.10 P 12 … **North West England** D 2.10 P 12 … **South England** D 2.10 P 12 … **South East England** D 2.20 P 12 … **South Wales** D 2.20 P 12 … **South West England** D 2.30 P 11 … **Yorkshire** D 2.00 P 13 "
       }
     ],
-    "verified": false,
-    "verification": "cross-check agrees, but figures ['2.10', '13', '2.00', '14'] were not found in an independent fetch of the cited sources",
     "crosscheck": {
-      "run_id": "srun_791b0c3367af4148f2cbe5d011e8bc18",
-      "independent_value": "Octopus Energy’s official “Agile pricing explained” article, published 13 February 2019, gives:\n\nRate before VAT (p/kWh) = min(D × W + P, 95).\n\nW is the wholesale electricity cost for the half-hour in p/kWh. D is a dimensionless regional coefficient incorporating distribution costs. P is the regional peak premium in p/kWh, applied only from 4pm to 7pm; otherwise P = 0. Octopus states that 95 is chosen to keep the price capped at 100p/kWh once VAT is added—an intended ceiling, not a statement that the VAT-inclusive result equals exactly 100p.\n\nRegional values (D / P):\nEast England: 2.10 / 13\nEast Midlands: 2.00 / 14\nLondon: 2.00 / 12\nMerseyside & Northern Wales: 2.20 / 13\nWest Midlands: 2.10 / 12\nNorth East England: 2.10 / 12\nNorth West England: 2.10 / 12\nSouth England: 2.10 / 12\nSouth East England: 2.20 / 12\nSouth Wales: 2.20 / 12\nSouth West England: 2.30 / 11\nYorkshire: 2.00 / 13\nSouth Scotland: 2.10 / 13\nNorth Scotland: 2.40 / 12\n\nThe article gives no separate effective date for this formula. It defines W as the wholesale cost for the period without identifying a particular day-ahead exchange or auction.\n\nSource: https://octopus.energy/blog/agile-pricing-explained",
+      "run_id": "srun_9128b164a67744105fb71acb29e22c32",
+      "independent_value": "Source: Octopus Energy, “Agile pricing explained” (https://octopus.energy/blog/agile-pricing-explained/), published 13th February 2019.\n\nThe source displays “min(D x W + P, 95)” and explicitly states: “95 is chosen to ensure the price is capped at 100p/kWh once VAT is added.” Thus, the displayed formula uses “95”; the stated VAT-inclusive cap is “100p/kWh”.\n\nIts regional D and P figures, quoted exactly without conversion, are:\n\n| Region | D | P |\n|---|---|---|\n| East England | “2.10” | “13” |\n| East Midlands | “2.00” | “14” |\n| London | “2.00” | “12” |\n| Merseyside & Northern Wales | “2.20” | “13” |\n| West Midlands | “2.10” | “12” |\n| North East England | “2.10” | “12” |\n| North West England | “2.10” | “12” |\n| South England | “2.10” | “12” |\n| South East England | “2.20” | “12” |\n| South Wales | “2.20” | “12” |\n| South West England | “2.30” | “11” |\n| Yorkshire | “2.00” | “13” |\n| South Scotland | “2.10” | “13” |\n| North Scotland | “2.40” | “12” |\n\nThe source says P “is only applied between 4pm and 7pm”. Its illustrative example states: “The Agile price is 2.2 times the wholesale price of energy and between 4.00pm and 7.00pm an additional 12p / kWh is included (but capped at 100p / kWh, come what may).”",
       "agrees": true,
       "disagreement": "none",
-      "confidence": "medium",
+      "confidence": "high",
       "sources": [
         {
-          "url": "https://octopus.energy/blog/agile-pricing-explained",
-          "quote": "_min(D x W + P, 95)_ … **D** is a coefficient that includes our **distribution costs,** which varies based on where you are in Britain; **W** is the **wholesale cost of electricity** for that period in _pence per kilowatt-hour_ (p/kWh); **P** is the **peak-time premium** , which ranges from roughly 12 - 24 based on where you are, and is only applied between 4pm and 7pm. … **95** is chosen to ensure the price is capped at 100p/kWh once VAT is added. … **East England** D 2.10 P 13 … **East Midlands** D 2.00 P 14 … **London** D 2.00 P 12 … **Merseyside & Northern Wales** D 2.20 P 13 … **West Midl"
+          "url": "https://octopus.energy/blog/agile-pricing-explained/",
+          "quote": "Agile pricing explained … Publishedon 13th February 2019by: … _min(D x W + P, 95)_ … **95** is chosen to ensure the price is capped at 100p/kWh once VAT is added. … **East England** D 2.10 P 13 … **East Midlands** D 2.00 P 14 … **London** D 2.00 P 12 … **Merseyside & Northern Wales** D 2.20 P 13 … **West Midlands** D 2.10 P 12 **North East England** … D 2.10 P 12 … **North West England** D 2.10 P 12 … **South England** D 2.10 P 12 … **South East England** D 2.20 P 12 … **South Wales** D 2.20 P 12 … **South West England** D 2.30 P 11 … **Yorkshire** D 2.00 P 13 … **South Scotland** D 2.10 P 13 "
         }
       ]
     },
     "figures_found": [
-      "95",
-      "100"
+      "2.2",
+      "12",
+      "4.00",
+      "7.00",
+      "100",
+      "2.10"
     ],
-    "figures_missing": [
-      "2.10",
-      "13",
-      "2.00",
-      "14"
-    ]
+    "figures_missing": [],
+    "verified": true,
+    "verification": "independent cross-check agrees and all figures ['2.2', '12', '4.00', '7.00', '100', '2.10'] were re-found in an independent fetch",
+    "figures_route": {
+      "2.2": "direct",
+      "12": "direct",
+      "4.00": "direct",
+      "7.00": "direct",
+      "100": "direct",
+      "2.10": "direct"
+    },
+    "corroborated_by_other_domain": false
   },
   {
     "id": "hh_agile_publish_time",
@@ -87,7 +91,11 @@
     "figures_found": [
       "100"
     ],
-    "figures_missing": []
+    "figures_missing": [],
+    "figures_route": {
+      "100": "direct"
+    },
+    "corroborated_by_other_domain": false
   },
   {
     "id": "hh_agile_regions",
@@ -123,7 +131,9 @@
     "figures_found": [],
     "figures_missing": [],
     "verified": true,
-    "verification": "no figures to re-find; verified by an agreeing independent cross-check only"
+    "verification": "no figures to re-find; verified by an agreeing independent cross-check only",
+    "figures_route": {},
+    "corroborated_by_other_domain": false
   },
   {
     "id": "hh_dishwasher_kwh",
@@ -166,64 +176,65 @@
       "0.9",
       "0.5"
     ],
-    "figures_missing": []
+    "figures_missing": [],
+    "figures_route": {
+      "0.9": "parallel_extract",
+      "0.5": "parallel_extract"
+    },
+    "corroborated_by_other_domain": false
   },
   {
     "id": "hh_ev_charge_kwh",
-    "question": "How many kWh does a typical UK electric car use for an average overnight home charge, based on average daily UK car mileage and typical EV efficiency (miles per kWh)?",
+    "question": "What average annual electricity consumption (kWh per year) or daily charging energy for a home-charged electric car in the UK do Ofgem, the Energy Saving Trust or Octopus Energy state? Quote the figure exactly as the source writes it and name the source; do not convert units or do your own arithmetic. If no source states it directly, say so.",
     "used_by": "#56",
     "processor": "pro",
-    "run_id": "srun_ca3dde3a03704793b4341ebe7137de96",
-    "retrieved_at": "2026-11-07T14:16:18+00:00",
-    "value": "Approximately 5.6 kWh delivered to the battery per night—roughly 6 kWh drawn from the electricity supply allowing for charging losses.",
-    "unit": "kWh per overnight charge",
-    "as_of": "2025 average mileage; typical EV efficiency from a source dated 19 September 2026.",
-    "caveat": "Calculated estimate, not a directly measured average charging session: “7,100 miles” annually ÷ 365 ÷ “3.5 miles per kWh” ≈ 5.6 kWh/day. The mileage figure covers England and is used as a UK proxy. Typical home charging losses are “10 to 15 percent”. This assumes each overnight charge replaces one average day’s driving, rather than filling an empty battery.",
+    "run_id": "srun_488394657d484cd345314f54bcf909c9",
+    "retrieved_at": "2026-11-07T14:33:25+00:00",
+    "value": "I did not find a directly stated figure for average annual electricity consumption or daily home-charging energy for a UK electric car in the Ofgem, Energy Saving Trust or Octopus Energy sources reviewed.",
+    "unit": "n/a",
+    "as_of": "n/a — no qualifying figure found.",
+    "caveat": "This is a finding from the sources reviewed, not proof that no such publication exists. Household electricity totals, battery capacities, charging hours and mileage/efficiency assumptions were not treated as EV-only annual or daily consumption. No arithmetic or unit conversions were used.",
     "confidence": "medium",
     "sources": [
       {
-        "url": "https://www.racfoundation.org/motoring-faqs/mobility",
-        "quote": "**A33)** The estimated average annual mileage per car in England has decreased as the number of cars per household has risen, falling from around 9,200 miles in 2002 to 7,100 miles in 2025."
+        "url": "https://www.ofgem.gov.uk/sites/default/files/docs/2018/11/annex_4_-_assessing_the_options.pdf",
+        "quote": "Electric vehicles 18 4,622 4,622"
       },
       {
-        "url": "https://www.carsa.co.uk/blog/how-much-cost-charge-electric-car-uk-2026",
-        "quote": "A typical modern EV covers around 3.5 miles per kWh in mixed real-world conditions."
+        "url": "https://octopus.energy/smart/ford-intelligent-octopus-go?affiliate=ford",
+        "quote": "0\\.306 kWh/mile (last checked March 2026) for a typical EV"
       },
       {
-        "url": "https://www.c-lecelectrical.co.uk/how-many-kwh-to-charge-an-electric-car",
-        "quote": "Typical UK home charging loss is 10 to 15 percent."
+        "url": "https://octopus.energy/smart/intelligent-octopus-go/",
+        "quote": "Savings for individual homes vary based on how much electricity you use for your house and EV, and how much you shift towards off-peak hours."
+      },
+      {
+        "url": "https://energysavingtrust.org.uk/electric-vehicles-debunking-myths",
+        "quote": "EVs now have a typical range of around 300 miles."
+      },
+      {
+        "url": "https://energysavingtrust.org.uk/advice/smart-charging-electric-vehicles",
+        "quote": "A full charge of a typical range of 300 miles and a 50kWh capacity battery approximately costs:"
       }
     ],
     "crosscheck": {
-      "run_id": "srun_34632112fcf8493c40afc12e6c5a2f63",
-      "independent_value": "Approximately 5.6 kWh delivered to the battery and roughly 6 kWh drawn from the supply per overnight top-up. The RAC Foundation reports average annual mileage of 7,100 miles per car in England in 2025; Carsa states that a typical modern EV achieves around 3.5 miles/kWh. Thus: 7,100 ÷ 365 = 19.452 miles/day; 19.452 ÷ 3.5 = 5.558 kWh/day. ADAC testing reported by The Next Web found losses of 5.1%–7% using an 11 kW wallbox, implying 5.86–5.98 kWh from the supply. This assumes replacing one average day’s driving each night—not charging an empty battery fully. England’s mileage is a proxy for the UK, and actual efficiency and charging losses vary.",
-      "agrees": true,
-      "disagreement": "none",
+      "run_id": "srun_9128b164a6774410689a9a400cb68bd6",
+      "independent_value": "Octopus Energy states: “Savings are based on rates as of 15/10/2022 and assume an annual mileage of 10,000 miles and an average electricity consumption of 2,900 kWh with 100% of charging taking place in off peak hours”. Source: “Octopus Energy and Vauxhall offer drivers almost £700 in savings to switch to electric” (https://octopus.energy/press/octopus-energy-and-vauxhall-offer-drivers-almost-700-in-savings-to-switch-to-electric/). This is an explicitly stated consumption assumption for its annual home-charging savings comparison—not a measured UK-wide average.",
+      "agrees": false,
+      "disagreement": "I found a directly stated Octopus Energy figure, “2,900 kWh”, tied to an annual mileage assumption of “10,000 miles”. This differs from the claimed absence of a qualifying figure, although it must be described as a comparison assumption rather than an observed national average.",
       "confidence": "medium",
       "sources": [
         {
-          "url": "https://www.racfoundation.org/motoring-faqs/mobility",
-          "quote": "**A33)** The estimated average annual mileage per car in England has decreased as the number of cars per household has risen, falling from around 9,200 miles in 2002 to 7,100 miles in 2025."
-        },
-        {
-          "url": "https://www.carsa.co.uk/blog/how-much-cost-charge-electric-car-uk-2026",
-          "quote": "A typical modern EV covers around 3.5 miles per kWh in mixed real-world conditions."
-        },
-        {
-          "url": "https://thenextweb.com/news/adac-ev-home-charging-losses-wallbox-socket",
-          "quote": "An 11 kW wallbox cut every car’s losses to between 5.1% and 7%."
-        },
-        {
-          "url": "https://oneevgroup.com/insights/electric-vs-petrol-vs-diesel-uk-2026/",
-          "quote": "Real efficiency depends on the vehicle, temperature, speed, traffic, terrain, tyres, load and driving style."
+          "url": "https://octopus.energy/press/octopus-energy-and-vauxhall-offer-drivers-almost-700-in-savings-to-switch-to-electric/",
+          "quote": "Savings are based on rates as of 15/10/2022 and assume an annual mileage of 10,000 miles and an average electricity consumption of 2,900 kWh with 100% of charging taking place in off peak hours … Customers on the tariff save up to £660 per year on charging costs compared to a standard variable rate\\* and help balance the energy grid at the same time. … Vauxhall’s ‘Plug and Go’ EV bundle is now available for new Vauxhall customers and includes the installation of a home charger and access to Octopus’ award-winning EV roaming service, [Electric Universe"
         }
       ]
     },
     "figures_found": [],
-    "figures_missing": [
-      "5.6"
-    ],
+    "figures_missing": [],
     "verified": false,
-    "verification": "cross-check agrees, but figures ['5.6'] were not found in an independent fetch of the cited sources"
+    "verification": "cross-check disagrees: I found a directly stated Octopus Energy figure, “2,900 kWh”, tied to an annual mileage assumption of “10,000 miles”. This differs from the claimed absence of a qualifying figure, although it must be described as a comparison assumption rather than an observed national average.",
+    "figures_route": {},
+    "corroborated_by_other_domain": false
   }
 ]

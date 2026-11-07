@@ -45,53 +45,69 @@
       "38650310.28",
       "36530868.70"
     ],
-    "manual_override": true
+    "manual_override": true,
+    "figures_route": {},
+    "corroborated_by_other_domain": false
   },
   {
     "id": "con_annual_cost",
-    "question": "What were Great Britain's total annual transmission constraint costs in GBP for the most recent full year (2025 or financial year 2025/26), according to NESO?",
+    "question": "What total annual constraint costs (in GBP) for Great Britain do NESO, Ofgem or the National Audit Office state for the financial year 2024/25 or calendar year 2025, and which period does each figure cover? Quote the figure exactly as the source writes it and name the source; do not convert units or do your own arithmetic. If no source states it directly, say so.",
     "used_by": "#48",
-    "processor": "core",
-    "run_id": "srun_051cfaf41dc045326c12d11d55823a26",
-    "retrieved_at": "2026-11-07T14:00:43+00:00",
-    "value": "£1.9 billion",
+    "processor": "pro",
+    "run_id": "srun_488394657d484cd3ecbd4cd044844eaf",
+    "retrieved_at": "2026-11-07T14:33:25+00:00",
+    "value": "NESO’s 2025 Annual Balancing Costs Report states “£1.7bn” for annual thermal constraint costs. NESO’s Electricity Markets Roadmap (March 2026) states “£1.82 bn” for annual thermal constraint costs.",
     "unit": "GBP",
-    "as_of": "2025-26 financial year",
-    "caveat": "Thermal constraint costs, stated in 2024 prices; not total balancing costs.",
-    "confidence": "medium",
+    "as_of": "“£1.7bn”: financial year 2024/25, described as “FY24/25”. “£1.82 bn”: “in 2025”, as stated in the Electricity Markets Roadmap.",
+    "caveat": "Both figures are explicitly thermal-constraint totals. No broader all-category annual constraint-cost total was found directly stated for either requested period in the sources reviewed. The Roadmap does not explicitly label “2025” as a calendar year. Ofgem’s “£2.7 billion” for 2024-25 is overall balancing expenditure, not constraint costs alone. The NAO’s “£1.9 billion” covers 2025-26, outside the requested periods.",
+    "confidence": "high",
     "sources": [
       {
-        "url": "https://www.nao.org.uk/wp-content/uploads/2026/09/Upgrading-the-electricity-transmission-network-summary.pdf",
-        "quote": "As a result, thermal constraint costs have risen from £0.6 billion in 2018-19 to £1.9 billion in 2025-26 (in 2024 prices). The majority goes to generators to increase output at short notice."
+        "url": "https://www.neso.energy/document/362561/download",
+        "quote": "Thermal constraint costs have increased by 64% in 2024/25, totalling £1.7bn. … **2025 Annual Balancing Costs Report**"
+      },
+      {
+        "url": "https://www.neso.energy/document/379406/download",
+        "quote": "In 2025, the volume of constraint actions increased, reaching 14.37 TWh compared to 11 TWh in 2024. When taking thermal actions, we instruct an asset to reduce its output on one side of the constraint whilst directing additional replacement electricity – often gas plants – to re-balance the system. The cost of thermal constraints rose in line with volumes and we saw a 23% increase in thermal constraints costs from £1.48 bn to £1.82 bn in 2025. … Electricity Markets Roadmap March 2026"
+      },
+      {
+        "url": "https://www.ofgem.gov.uk/sites/default/files/2025-11/Ofgem%E2%80%99s-response-to-balancing-costs-in-winter-2024-to-2025.pdf",
+        "quote": "This is a major component of the £2.7 billion spent by NESO in 2024-25 to balance Great Britain’s power system"
+      },
+      {
+        "url": "https://www.nao.org.uk/wp-content/uploads/2026/09/Upgrading-the-electricity-transmission-network.pdf",
+        "quote": "Constraint costs have risen from £0.6 billion in 2018-19 to £1.9 billion in 2025-26 (Figure 4 on pages 21 and 22) in 2024 prices."
       }
     ],
-    "verified": false,
-    "verification": "cross-check disagrees: The £1.9 billion figure is supported by the National Audit Office’s analysis of NESO data for FY2025/26, but specifically for thermal constraint costs expressed in 2024 prices. It therefore does not establish the unqualified total across thermal, voltage and stability constraints requested here.",
     "crosscheck": {
-      "run_id": "srun_791b0c3367af4148be4f29a056914820",
-      "independent_value": "£2.21 billion for FY2025/26 is the broader constraint-management total reported by Compounding Energy’s analysis of NESO data: £1.96 billion for thermal constraints, £212 million for voltage support and £41 million for inertia (rounded figures). I could not directly confirm that aggregate in a NESO annual publication, so it should be treated as a qualified, secondary-source result.",
-      "agrees": false,
-      "disagreement": "The £1.9 billion figure is supported by the National Audit Office’s analysis of NESO data for FY2025/26, but specifically for thermal constraint costs expressed in 2024 prices. It therefore does not establish the unqualified total across thermal, voltage and stability constraints requested here.",
-      "confidence": "medium",
+      "run_id": "srun_9128b164a677441056d39b5a73a5f536",
+      "independent_value": "NESO’s 2025 Annual Balancing Costs Report states “£1.7bn” for thermal constraint costs in financial year 2024/25, described in the report as “FY24/25”. NESO’s Electricity Markets Roadmap (March 2026) states “£1.82 bn” for thermal constraint costs in 2025, using the wording “in 2025”. Both figures are explicitly thermal-constraint costs, not totals for all balancing costs.",
+      "agrees": true,
+      "disagreement": "none",
+      "confidence": "high",
       "sources": [
         {
-          "url": "https://www.compoundingenergy.com/library/CE-NOTE-2026-04_Where_the_Balancing_Money_Goes.pdf",
-          "quote": "In 2025/26 they came to £2.43bn, of which £2.21bn was constraint manage- ment. … Within that, thermal constraints (lines running at their limit) cost £1.96bn, voltage sup- port £212m and keeping enough inertia on the system £41m … NESO daily balancing costs and constraint break- down (National Energy System Operator 2026c; National Energy System Operator 2026b)."
-        },
-        {
-          "url": "https://www.nao.org.uk/wp-content/uploads/2026/09/Upgrading-the-electricity-transmission-network.pdf",
-          "quote": "Constraint costs have risen from £0.6 billion in 2018-19 to £1.9 billion in 2025-26 (Figure 4 on pages 21 and 22) in 2024 prices. … **Figure 4** Annual thermal constraint costs, 2018-19 to 2024-25, and projected constraint costs in 2030 under four different scenarios of grid upgrades"
-        },
-        {
           "url": "https://www.neso.energy/document/362561/download",
-          "quote": "Thermal, voltage, and stability constraints all require NESO to take action to manage."
+          "quote": "This Annual Balancing Costs Report shares the costs incurred in FY24/25 and provides insights into how these costs breakdown into different components. … Thermal constraint costs have increased by 64% in 2024/25, totalling £1.7bn."
+        },
+        {
+          "url": "https://www.neso.energy/document/379406/download",
+          "quote": "Electricity Markets Roadmap March 2026 … The cost of thermal constraints rose in line with volumes and we saw a 23% increase in thermal constraints costs from £1.48 bn to £1.82 bn in 2025."
         }
       ]
     },
     "figures_found": [
-      "1.9"
+      "1.7",
+      "1.82"
     ],
-    "figures_missing": []
+    "figures_missing": [],
+    "verified": true,
+    "verification": "independent cross-check agrees and all figures ['1.7', '1.82'] were re-found in an independent fetch",
+    "figures_route": {
+      "1.7": "parallel_extract",
+      "1.82": "parallel_extract"
+    },
+    "corroborated_by_other_domain": false
   },
   {
     "id": "con_b4_capability",
@@ -129,7 +145,11 @@
     ],
     "figures_missing": [],
     "verified": true,
-    "verification": "independent cross-check agrees and all figures ['4000'] were re-found in an independent fetch"
+    "verification": "independent cross-check agrees and all figures ['4000'] were re-found in an independent fetch",
+    "figures_route": {
+      "4000": "direct"
+    },
+    "corroborated_by_other_domain": false
   },
   {
     "id": "con_b6_capability",
@@ -172,7 +192,12 @@
       "6.7",
       "6700"
     ],
-    "figures_missing": []
+    "figures_missing": [],
+    "figures_route": {
+      "6.7": "direct",
+      "6700": "direct"
+    },
+    "corroborated_by_other_domain": false
   },
   {
     "id": "con_wind_curtailment_2025",
@@ -218,12 +243,18 @@
       ]
     },
     "figures_found": [
-      "10.241337",
       "10241337",
       "382108509"
     ],
-    "figures_missing": [],
-    "verified": true,
-    "verification": "independent cross-check agrees and all figures ['10.241337', '10241337', '382108509'] were re-found in an independent fetch"
+    "figures_missing": [
+      "10.241337"
+    ],
+    "verified": false,
+    "verification": "cross-check agrees, but figures ['10.241337'] were not found in an independent fetch of the cited sources",
+    "figures_route": {
+      "10241337": "direct",
+      "382108509": "direct"
+    },
+    "corroborated_by_other_domain": false
   }
 ]

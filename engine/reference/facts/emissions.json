@@ -39,7 +39,11 @@
     "figures_found": [
       "937"
     ],
-    "figures_missing": []
+    "figures_missing": [],
+    "figures_route": {
+      "937": "direct"
+    },
+    "corroborated_by_other_domain": true
   },
   {
     "id": "em_gas_ccgt_ci_api",
@@ -90,7 +94,12 @@
       "394",
       "651"
     ],
-    "figures_missing": []
+    "figures_missing": [],
+    "figures_route": {
+      "394": "direct",
+      "651": "direct"
+    },
+    "corroborated_by_other_domain": true
   },
   {
     "id": "em_ipcc_lifecycle",
@@ -133,7 +142,16 @@
       "41",
       "48"
     ],
-    "figures_missing": []
+    "figures_missing": [],
+    "figures_route": {
+      "820": "parallel_extract",
+      "490": "parallel_extract",
+      "12": "parallel_extract",
+      "11": "parallel_extract",
+      "41": "parallel_extract",
+      "48": "parallel_extract"
+    },
+    "corroborated_by_other_domain": false
   },
   {
     "id": "em_lignite",
@@ -175,7 +193,11 @@
     "figures_found": [
       "1049"
     ],
-    "figures_missing": []
+    "figures_missing": [],
+    "figures_route": {
+      "1049": "direct"
+    },
+    "corroborated_by_other_domain": false
   },
   {
     "id": "em_oil_biomass",
@@ -214,6 +236,11 @@
       "120",
       "935"
     ],
-    "figures_missing": []
+    "figures_missing": [],
+    "figures_route": {
+      "120": "parallel_extract",
+      "935": "parallel_extract"
+    },
+    "corroborated_by_other_domain": false
   }
 ]

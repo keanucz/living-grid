@@ -13,6 +13,25 @@ def test_figures_normalises_thousands_and_keeps_decimals():
     assert r.figures("1 000 MW") == ["1000"]
 
 
+def test_normalise_reads_european_decimal_commas_but_not_thousands():
+    assert r.normalise("CCGT 53–58,5 and 57–60,5") == "CCGT 53–58.5 and 57–60.5"
+    assert r.normalise("1,400 MW and 2,5 GW") == "1400 MW and 2.5 GW"
+    assert r.present("58.5", r.normalise("BAT-AEEL 53–58,5 %"))
+
+
+def test_figure_check_retries_full_content_when_excerpts_miss(monkeypatch):
+    monkeypatch.setattr(r, "fetch_direct", lambda url: None)
+    calls = []
+    def fake_call(method, path, body=None, retries=5):
+        calls.append(body)
+        if body.get("advanced_settings", {}).get("full_content"):
+            return {"results": [{"full_content": "CCGT, >= 600 MWth 57–60,5"}]}
+        return {"results": [{"excerpts": ["nothing useful"]}]}
+    monkeypatch.setattr(r, "call", fake_call)
+    found, missing, route = r.figure_check("q", ["60.5"], ["https://eur-lex.example/pdf"])
+    assert found == ["60.5"] and route == {"60.5": "parallel_extract_full"} and len(calls) == 2
+
+
 def test_figures_handles_unit_glued_to_number():
     assert r.figures("1,000MW") == ["1000"]
     assert r.figures("1,075MW") == ["1075"]
@@ -33,7 +52,6 @@ def test_present_does_not_match_inside_longer_numbers():
 
 def test_figures_ignores_years_when_the_answer_has_a_value():
     assert r.figures("8% of EU LNG imports in 2025 (report 2026)") == ["8"]
-    assert r.figures("25 October 2026") == ["25"]
     assert r.figures("since 2021") == ["2021"]
 
 
@@ -46,20 +64,58 @@ def test_figures_deduplicates_and_caps():
     assert r.figures("10 10 11 12 13 14 15 16") == ["10", "11", "12", "13", "14", "15"]
 
 
-def test_figure_check_reports_found_and_missing(monkeypatch):
+def test_figure_check_prefers_direct_fetch_and_falls_back_to_extract(monkeypatch):
+    monkeypatch.setattr(r, "fetch_direct", lambda url: "Capacity of 1,400 MW since 2021")
     def fake_call(method, path, body=None, retries=5):
         assert path == "/v1/extract"
-        return {"results": [{"excerpts": ["Capacity of 1,400 MW since 2021"]}]}
+        if body.get("advanced_settings", {}).get("full_content"):
+            return {"results": [{"full_content": "no match here"}]}
+        assert body["search_queries"] == ["720", "99"]
+        return {"results": [{"excerpts": ["about 720 MW at peak"]}]}
     monkeypatch.setattr(r, "call", fake_call)
-    found, missing = r.figure_check("q", ["1400", "720"], ["https://example.org"])
-    assert found == ["1400"] and missing == ["720"]
+    found, missing, route = r.figure_check("q", ["1400", "720", "99"], ["https://example.org"])
+    assert found == ["1400", "720"] and missing == ["99"]
+    assert route == {"1400": "direct", "720": "parallel_extract"}
 
 
-def test_figure_check_treats_fetch_failure_as_missing(monkeypatch):
+def test_figure_check_skips_extract_when_direct_finds_everything(monkeypatch):
+    monkeypatch.setattr(r, "fetch_direct", lambda url: "1,400 MW")
+    monkeypatch.setattr(r, "call", lambda *a, **k: pytest.fail("Extract should not be called"))
+    assert r.figure_check("q", ["1400"], ["https://example.org"]) == (["1400"], [], {"1400": "direct"})
+
+
+def test_figure_check_treats_all_failures_as_missing(monkeypatch):
+    monkeypatch.setattr(r, "fetch_direct", lambda url: None)
     def boom(*a, **k):
         raise RuntimeError("down")
     monkeypatch.setattr(r, "call", boom)
-    assert r.figure_check("q", ["1400"], ["https://example.org"]) == ([], ["1400"])
+    assert r.figure_check("q", ["1400"], ["https://example.org"]) == ([], ["1400"], {})
+
+
+def test_dates_are_checked_whole_including_the_year():
+    assert r.figures("25 October 2026") == ["date:2026-10-25"]
+    assert r.figures("EUR 339.20/MWh, reached on August 26.") == ["date:--08-26", "339.20"]
+    assert r.present("date:2026-10-25", "clocks went back on Sunday 25 October 2026")
+    assert r.present("date:2026-10-25", "on 2026-10-25 at 02:00")
+    assert not r.present("date:2026-10-25", "clocks went back on 25 October 2025")
+    assert r.present("date:--08-26", "peaked on 26 Aug at 339")
+
+
+def test_rounding_keeps_three_significant_digits():
+    assert r.present("10.241337", "about 10.2 TWh curtailed")
+    assert not r.present("10.241337", "over 10 TWh curtailed")
+    assert r.present("6700", "a transfer capability of 6.7 GW")
+    assert not r.present("1630", "1.6 GW")
+
+
+def test_corroboration_needs_an_agreeing_crosscheck_from_another_site():
+    fact = {"sources": [{"url": "https://www.neso.energy/a"}]}
+    same = {"agrees": True, "sources": [{"url": "https://neso.energy/b"}]}
+    other = {"agrees": True, "sources": [{"url": "https://www.ofgem.gov.uk/x"}]}
+    assert not r.corroborated(fact, same)
+    assert r.corroborated(fact, other)
+    assert not r.corroborated(fact, {**other, "agrees": False})
+    assert not r.corroborated(fact, None)
 
 
 AGREE = {"agrees": True, "disagreement": "none"}

@@ -74,7 +74,7 @@
   "topic": "gas_carbon",
   "used_by": "#36",
   "processor": "pro",
-  "question": "What is the standard CO2 emission factor of natural gas combustion in tonnes CO2 per MWh of thermal energy (IPCC default or UK government conversion factor)?"
+  "question": "What CO2 emission factor for natural gas combustion does the UK government (DESNZ greenhouse gas conversion factors) or the IPCC 2006 Guidelines publish, per kWh or per TJ of fuel (net or gross CV, say which)? Quote the figure exactly as the source writes it and name the source; do not convert units or do your own arithmetic. If no source states it directly, say so."
  },
  {
   "id": "gas_hormuz_lng_share",
@@ -130,14 +130,14 @@
   "topic": "events",
   "used_by": "#50",
   "processor": "pro",
-  "question": "By how many MW (or GW) does Great Britain's electricity demand rise for each 1 degree Celsius drop in temperature in winter? Give an absolute MW figure from NESO, National Grid ESO, Elexon or a peer-reviewed study, not a percentage; if only a percentage is published, give the percentage and the base demand it applies to."
+  "question": "What figure does NESO, National Grid ESO or a peer-reviewed study state for the change in Great Britain's electricity demand per 1 degree Celsius change in winter temperature (in MW, GW or percent)? Quote the figure exactly as the source writes it and name the source; do not convert units or do your own arithmetic. If no source states it directly, say so."
  },
  {
   "id": "ev_scotland_wind_capacity",
   "topic": "events",
   "used_by": "#50 #47",
   "processor": "pro",
-  "question": "What is the total installed wind generation capacity (onshore plus offshore) in Scotland in GW, as of the latest Scottish Government energy statistics in 2026?"
+  "question": "What total installed wind capacity in Scotland (onshore plus offshore, or each separately) do the Scottish Government's Energy Statistics or the DESNZ renewable electricity statistics state for the latest quarter of 2026 or 2025? Quote the figure exactly as the source writes it and name the source; do not convert units or do your own arithmetic. If no source states it directly, say so."
  },
  {
   "id": "ev_gb_wind_capacity",
@@ -220,8 +220,8 @@
   "id": "con_annual_cost",
   "topic": "constraints",
   "used_by": "#48",
-  "processor": "core",
-  "question": "What were Great Britain's total annual transmission constraint costs in GBP for the most recent full year (2025 or financial year 2025/26), according to NESO?"
+  "processor": "pro",
+  "question": "What total annual constraint costs (in GBP) for Great Britain do NESO, Ofgem or the National Audit Office state for the financial year 2024/25 or calendar year 2025, and which period does each figure cover? Quote the figure exactly as the source writes it and name the source; do not convert units or do your own arithmetic. If no source states it directly, say so."
  },
  {
   "id": "con_b6_capability",
@@ -297,15 +297,15 @@
   "id": "hh_agile_formula",
   "topic": "household",
   "used_by": "#56",
-  "processor": "core",
-  "question": "What is the formula Octopus Energy uses to derive Agile Octopus unit rates from the wholesale day-ahead price (multiplier, peak adder for 4pm to 7pm, and regional factors)?"
+  "processor": "pro",
+  "question": "What values of the multiplier D and the peak adder P (4pm to 7pm) does Octopus Energy publish for the Agile Octopus tariff formula min(D x W + P, cap), and what is the cap in pence per kWh? Quote the figure exactly as the source writes it and name the source; do not convert units or do your own arithmetic. If no source states it directly, say so."
  },
  {
   "id": "hh_ev_charge_kwh",
   "topic": "household",
   "used_by": "#56",
   "processor": "pro",
-  "question": "How many kWh does a typical UK electric car use for an average overnight home charge, based on average daily UK car mileage and typical EV efficiency (miles per kWh)?"
+  "question": "What average annual electricity consumption (kWh per year) or daily charging energy for a home-charged electric car in the UK do Ofgem, the Energy Saving Trust or Octopus Energy state? Quote the figure exactly as the source writes it and name the source; do not convert units or do your own arithmetic. If no source states it directly, say so."
  },
  {
   "id": "hh_dishwasher_kwh",
@@ -360,8 +360,8 @@
   "id": "bc_carbon_intensity_range",
   "topic": "brief_checks",
   "used_by": "#49",
-  "processor": "core",
-  "question": "What is the maximum date range per request of the GB Carbon Intensity API (api.carbonintensity.org.uk) regional endpoints?"
+  "processor": "pro",
+  "question": "What is the maximum date range per request of the GB Carbon Intensity API (api.carbonintensity.org.uk) for the regional endpoints such as /regional/intensity/{from}/{to} and /regional/intensity/{from}/{to}/regionid/{id}, according to the API documentation? Quote the figure exactly as the source writes it and name the source; do not convert units or do your own arithmetic. If no source states it directly, say so."
  },
  {
   "id": "bc_gb_dst",
