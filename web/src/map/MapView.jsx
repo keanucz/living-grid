@@ -24,7 +24,6 @@ if (typeof matchMedia !== 'undefined' && matchMedia('(max-width: 700px)').matche
   VIEWS.simulate = { longitude: 3.8, latitude: 52.6, zoom: 3.35, pitch: 50, bearing: -12 }
 }
 
-const ZONE_ONLY = (features) => features.filter((f) => f.properties.zone)
 const PHONE = typeof matchMedia !== 'undefined' && matchMedia('(max-width: 700px)').matches
 // Keep the camera on our six zones: bounded zoom, and the centre can't drift far from north-west Europe.
 const LIMITS = { minZoom: PHONE ? 2.8 : 3.4, maxZoom: 7.5, lon: [-12, 20], lat: [43, 64] }
@@ -89,8 +88,8 @@ export default function MapView({ ctx }) {
       ctx.data.geo && [
       new GeoJsonLayer({
         id: 'base-land',
-        // Only the zones we have data for; other countries are not drawn at all.
-        data: ctx.data.geo.features.filter((f) => f.properties.zone),
+        // The whole world in grey for context; only our zones get price colour (price layer).
+        data: ctx.data.geo,
         filled: true,
         stroked: true,
         getFillColor: COLORS.land,
@@ -103,9 +102,9 @@ export default function MapView({ ctx }) {
       }),
       new PathLayer({
         id: 'base-borders',
-        data: outlines(ZONE_ONLY(ctx.data.geo.features), 860),
+        data: outlines(ctx.data.geo.features, 860),
         getPath: (d) => d.path,
-        getColor: [96, 96, 91, 255],
+        getColor: [64, 64, 62, 255],
         getWidth: 1,
         widthUnits: 'pixels',
       }),
