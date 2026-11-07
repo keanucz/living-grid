@@ -12,7 +12,7 @@ import time
 
 import pandas as pd
 
-from pipeline import cache, features, forecast_log
+from pipeline import cache, commit_chain, features, forecast_log
 from pipeline.ingest import elexon, energy_charts, markets, nordpool, open_meteo
 from pipeline.models import quantile
 
@@ -67,6 +67,7 @@ def run_once(now=None, do_refresh: bool = True) -> int:
         return 0
     n = forecast_log.append(rows)
     log.info("logged %d forecasts made at %s", n, made_at)
+    commit_chain.safely(commit_chain.commit_run, rows, made_at)
     return n
 
 

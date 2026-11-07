@@ -87,6 +87,14 @@ flowchart TD
 
 Monday's forecast freezes at 09:15 UTC on Sunday, before the GB auction (09:50 UTC) and the continental one (11:00 UTC) close. It meets the real result in the 12:30 demo.
 
+### On-chain proof that forecasts were not changed
+
+Each frozen forecast, and each hourly run, is hashed with SHA-256 and the hash is posted to Solana (**devnet**, so a network reset can erase it) as a Memo-program transaction from one published wallet:
+
+`H82mxBj3HeSsgUpz1xSgxeteQquSvk4HvFyiUE8sc8Gv` ([every transaction](https://explorer.solana.com/address/H82mxBj3HeSsgUpz1xSgxeteQquSvk4HvFyiUE8sc8Gv?cluster=devnet))
+
+The memo reads `lg1|<freeze or run>|<UTC time>|<sha256>`. The hashed bytes are the canonical CSV in `data/commitments/` (header, rows sorted by every column, UTC times ending in Z, floats as Python prints them). A hash proves a forecast existed unchanged at that time; it cannot prove we did not post others, so the wallet's full history is the check. `python -m pipeline.commit_chain verify` recomputes the hashes and reads the memos back. Code: `pipeline/commit_chain.py`.
+
 ### Results
 
 Walk-forward backtest, six folds of seven days with a 48-hour purge, run on 7 November 2026 at 16:35 UTC:

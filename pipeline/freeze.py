@@ -26,7 +26,7 @@ from dataclasses import dataclass, field
 
 import pandas as pd
 
-from pipeline import cache, schemas
+from pipeline import cache, commit_chain, schemas
 
 log = logging.getLogger("pipeline.freeze")
 
@@ -122,6 +122,7 @@ def freeze(now=None, delivery: str | None = None) -> FreezeResult:
             raise ValueError(f"a freeze at {frozen_at} already exists; earlier freezes are never replaced")
         rows = cache.concat([old, rows], ignore_index=True)
     cache.write(NAME, rows.sort_values(KEY).reset_index(drop=True))
+    commit_chain.safely(commit_chain.commit_frozen, frozen_at)
     if not result.complete:
         log.warning("partial freeze at %s: missing zones %s, short zones %s", frozen_at, result.missing_zones, result.short_zones)
     return result
