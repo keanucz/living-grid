@@ -54,8 +54,60 @@ function zones() {
   return zonesPromise
 }
 
+// /state per hour: in-flight requests are shared, live answers are kept (past hours 10 min, current and future
+// hours 1 min, since forecasts refresh hourly), a fast scrub only fetches the hour it settles on, and the hours
+// either side are fetched ahead so the next step is instant.
+const STATE_TTL_MS = { past: 600_000, now: 60_000 }
+const STATE_MAX = 72
+const SCRUB_SETTLE_MS = 150
+const stateCache = new Map()
+let wantedAt = null
+
+const hourKey = (at) => at ?? currentHour()
+const shiftHour = (at, h) => new Date(Date.parse(at) + h * 3_600_000).toISOString().replace('.000Z', 'Z')
+
+function cachedState(key) {
+  const hit = stateCache.get(key)
+  if (!hit) return null
+  const ttl = Date.parse(key) < Date.parse(currentHour()) ? STATE_TTL_MS.past : STATE_TTL_MS.now
+  if (Date.now() - hit.t > ttl) return (stateCache.delete(key), null)
+  return hit.p
+}
+
+function loadState(key) {
+  const p = stateFromApi(key)
+  stateCache.set(key, { t: Date.now(), p })
+  while (stateCache.size > STATE_MAX) stateCache.delete(stateCache.keys().next().value)
+  p.then((r) => r.source !== 'live' && stateCache.get(key)?.p === p && stateCache.delete(key))
+  return p
+}
+
+function prefetchAround(key) {
+  for (const h of [1, -1]) {
+    const k = shiftHour(key, h)
+    if (!cachedState(k)) loadState(k)
+  }
+}
+
+async function cachedStateFromApi(at) {
+  const key = hourKey(at)
+  const hit = cachedState(key)
+  if (hit) return hit
+  if (at != null) {
+    wantedAt = key
+    await new Promise((r) => setTimeout(r, SCRUB_SETTLE_MS))
+    if (wantedAt !== key) return { data: null, source: 'superseded' }
+    const raced = cachedState(key)
+    if (raced) return raced
+  }
+  const p = loadState(key)
+  if (at != null) p.then((r) => r.source === 'live' && prefetchAround(key))
+  return p
+}
+
 async function state(at) {
-  const res = await stateFromApi(at)
+  const res = await cachedStateFromApi(at)
+  if (res.source === 'superseded') return res
   // Prices, load, mix, carbon and forecasts come from SpacetimeDB when it is connected, else as the API gave them.
   return { ...res, data: withLive(res.data, at ?? currentHour(), GBP_EUR) }
 }

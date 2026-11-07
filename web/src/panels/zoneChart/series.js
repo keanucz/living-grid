@@ -1,5 +1,6 @@
 // Hourly history and forecasts straight from SpacetimeDB's SQL endpoint (same origin, /v1).
-// Shared by the zone chart and the forecast ghost/scrubber.
+// Shared by the zone chart and the forecast ghost/scrubber (layers/ghost/series.js re-exports this module, so
+// both use one cache).
 const DB = '/v1/database/living-grid/sql'
 const cache = new Map()
 
@@ -22,9 +23,17 @@ async function sql(q) {
 const iso = (us) => new Date(us / 1000).toISOString().replace('.000Z', 'Z')
 
 // { actual: [{ts, value, unit}], forecast: [{ts, p10, p50, p90, made_at, horizon_h}] } sorted by ts, or null.
-export async function zoneSeries(zone, maxAgeMs = 60_000) {
+// Concurrent callers (the chart and the ghost layer) share one request per zone.
+const inflight = new Map()
+
+export function zoneSeries(zone, maxAgeMs = 60_000) {
   const hit = cache.get(zone)
-  if (hit && Date.now() - hit.at < maxAgeMs) return hit.data
+  if (hit && Date.now() - hit.at < maxAgeMs) return Promise.resolve(hit.data)
+  if (!inflight.has(zone)) inflight.set(zone, fetchSeries(zone).finally(() => inflight.delete(zone)))
+  return inflight.get(zone)
+}
+
+async function fetchSeries(zone) {
   const [a, f] = await Promise.all([
     sql(`SELECT ts, value, unit FROM actual WHERE zone = '${zone}' AND series = 'price_da'`),
     sql(`SELECT ts, made_at, horizon_h, p10, p50, p90 FROM latest_forecast WHERE zone = '${zone}' AND target = 'price_da'`),
