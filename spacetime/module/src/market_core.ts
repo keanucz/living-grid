@@ -30,7 +30,7 @@ export const lk = (lobby: number, s: string) => `${lobby}|${s}`;
 export const acctKey = (lobby: number, id: Identity) => lk(lobby, id.toHexString());
 const posKey = (id: Identity, qid: string, side: string) => `${id.toHexString()}|${qid}|${side}`;
 const botHex = (i: number) => `${'0'.repeat(58)}6d0d${i.toString(16).padStart(2, '0')}`;
-const botId = (name: string): Identity => (name === OUR_MODEL ? MODEL : Identity.fromString(botHex(ORDER.indexOf(name))));
+export const botId = (name: string): Identity => (name === OUR_MODEL ? MODEL : Identity.fromString(botHex(ORDER.indexOf(name))));
 
 function runningRound(ctx: any, lobby: number) {
   const r = ctx.db.market_round.id.find(lobby);

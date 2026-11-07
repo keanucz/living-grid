@@ -7,3 +7,4 @@ export * from './reducers/market';
 export * from './reducers/lobby';
 export * from './reducers/clues';
 export * from './reducers/matchmaking';
+export * from './reducers/beat';

@@ -538,3 +538,97 @@ export const profile = table(
     updated_at: t.timestamp(),
   }
 );
+
+// ---------------------------------------------------------------------------------------------------------------
+// Beat the model: five concrete calls on a mystery day, scored with a proper scoring rule (beat_math.ts).
+// Everything that would give an answer away stays private until its call is revealed.
+export const beat_day = table(
+  { name: 'beat_day' },
+  {
+    day: t.string().primaryKey(),
+    regime: t.string(), // calm | windy
+    calls_json: t.string(), // Call[]: text, options, answer, the model's call and reason, each bot's call (engine/beat/build.py)
+  }
+);
+
+export const beat_game = table(
+  { name: 'beat_game', public: true },
+  {
+    id: t.u32().primaryKey().autoInc(),
+    lobby_id: t.u32().index('btree'), // 0 for a solo game
+    state: t.string(), // answering | revealing | done
+    call_no: t.u32(), // the open (or just revealed) call, 0 based
+    n_calls: t.u32(),
+    answer_s: t.u32(),
+    reveal_s: t.u32(),
+    opened_at: t.timestamp(), // when the open call started: count answer_s down from here
+    day_revealed: t.string(), // empty until the last reveal
+    started_at: t.timestamp(),
+  }
+);
+
+export const beat_secret = table({ name: 'beat_secret' }, { game_id: t.u32().primaryKey(), day: t.string() });
+
+export const beat_call = table(
+  { name: 'beat_call', public: true },
+  {
+    key: t.string().primaryKey(), // '<game_id>|<idx>'
+    game_id: t.u32().index('btree'),
+    idx: t.u32(),
+    kind: t.string(), // price_band | battery | import_export | which_zone | wind_over
+    text: t.string(),
+    hour: t.u32(),
+    unit: t.string(),
+    options_json: t.string(), // [{id, label}]
+    revealed: t.bool(),
+    answer: t.string(), // the winning option id; empty until revealed
+    actual_text: t.string(), // what happened, in words; empty until revealed
+    model_choice: t.string(),
+    model_confidence: t.f64(),
+    model_reason: t.string(), // the model's top reason, from its explanation
+    bots_json: t.string(), // {bot name: {choice, confidence}}, empty until revealed
+  }
+);
+
+export const beat_pick = table(
+  { name: 'beat_pick' },
+  {
+    key: t.string().primaryKey(), // '<game_id>|<identity hex>|<idx>'
+    game_id: t.u32().index('btree'),
+    identity: t.identity(),
+    idx: t.u32(),
+    choice: t.string(),
+    confidence: t.u32(), // 50 to 100
+  }
+);
+
+export const beat_result = table(
+  { name: 'beat_result', public: true },
+  {
+    key: t.string().primaryKey(), // '<game_id>|<identity hex>|<idx>'
+    game_id: t.u32().index('btree'),
+    identity: t.identity().index('btree'),
+    idx: t.u32(),
+    choice: t.string(), // empty when nobody answered
+    confidence: t.u32(),
+    correct: t.bool(),
+    score: t.f64(),
+  }
+);
+
+export const beat_player = table(
+  { name: 'beat_player', public: true },
+  {
+    key: t.string().primaryKey(), // '<game_id>|<identity hex>'
+    game_id: t.u32().index('btree'),
+    identity: t.identity().index('btree'),
+    name: t.string(),
+    score: t.f64(),
+    is_bot: t.bool(),
+  }
+);
+
+export const beat_tick = table(
+  { name: 'beat_tick' },
+  { scheduled_id: t.u64().primaryKey().autoInc(), scheduled_at: t.scheduleAt(), kind: t.string(), game_id: t.u32() }
+);

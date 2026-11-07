@@ -8,6 +8,7 @@ import {
   DEFAULTS, MAX_PLAYERS, MODES, afterLeave, cancelSchedule, cleanAvatar, cleanName, deleteLobby, ensureSweep, hex, leaveOthers, micros,
   newCode, pkey, recordResults, removePlayer, schedule, setState, startCountdown,
 } from '../lobby_core';
+import { clearBeatForLobby, startBeat } from '../beat_core';
 import { addBatteryPlayer, clearBattery, startBattery, tickBattery } from '../battery_core';
 
 // Lobbies: a room with a 4-letter code and a host. The host starts the game; after a 5 s countdown the module picks a
@@ -107,7 +108,7 @@ export const lobby_settings = spacetimedb.reducer(
 export const lobby_start = spacetimedb.reducer({}, ctx => {
   const l = hostLobby(ctx);
   if (l.state !== 'waiting') throw new SenderError('the game has already started');
-  const pool = l.mode === 'battery' ? ctx.db.battery_day : ctx.db.market_day_pool;
+  const pool = l.mode === 'battery' ? ctx.db.battery_day : l.mode === 'beat' ? ctx.db.beat_day : ctx.db.market_day_pool;
   if ([...pool.iter()].length === 0) throw new SenderError('no mystery days are loaded yet');
   startCountdown(ctx, l);
 });
@@ -118,6 +119,7 @@ export const lobby_rematch = spacetimedb.reducer({}, ctx => {
   cancelSchedule(ctx, l.id);
   clearRound(ctx, l.id);
   clearBattery(ctx, l.id);
+  clearBeatForLobby(ctx, l.id);
   for (const p of [...ctx.db.lobby_player.lobby_id.filter(l.id)]) ctx.db.lobby_player.key.update({ ...p, ready: false, points: 0 });
   setState(ctx, l, 'waiting');
 });
@@ -135,7 +137,13 @@ function pickDay(ctx: any, lobby: number, table: any) {
 function begin(ctx: any, lobbyId: number) {
   const l = ctx.db.lobby.id.find(lobbyId);
   if (!l || l.state !== 'countdown') return;
-  const day = pickDay(ctx, lobbyId, l.mode === 'battery' ? ctx.db.battery_day : ctx.db.market_day_pool);
+  const day = pickDay(ctx, lobbyId, l.mode === 'battery' ? ctx.db.battery_day : l.mode === 'beat' ? ctx.db.beat_day : ctx.db.market_day_pool);
+  if (day && l.mode === 'beat') {
+    startBeat(ctx, lobbyId, [...ctx.db.lobby_player.lobby_id.filter(lobbyId)].map((p: any) => ({ identity: p.identity, name: p.name })), day, l.bots);
+    ctx.db.lobby_day_played.insert({ key: lk(lobbyId, day.day), lobby_id: lobbyId, day: day.day });
+    setState(ctx, l, 'playing', { round_no: l.round_no + 1, countdown_until: ctx.timestamp });
+    return;
+  }
   if (day && l.mode === 'battery') {
     startBattery(ctx, l, day);
     ctx.db.lobby_day_played.insert({ key: lk(lobbyId, day.day), lobby_id: lobbyId, day: day.day });
