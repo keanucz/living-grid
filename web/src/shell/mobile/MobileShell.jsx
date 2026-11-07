@@ -4,6 +4,7 @@ import { PANELS } from '../../panels/registry.js'
 import { VIEWS } from '../../views/index.js'
 import { actions } from '../../store/store.js'
 import { Icon } from '../icons.jsx'
+import PlayHub from './PlayHub.jsx'
 import LayerSwitch from './LayerSwitch.jsx'
 import '../../styles/mobile.css'
 
@@ -14,7 +15,7 @@ const TABS = [
   { id: 'events', label: 'Events', icon: 'sim', mode: 'simulate', panels: ['simDock', 'statTiles'] },
   { id: 'scores', label: 'Scores', icon: 'chart', mode: 'overview', panels: ['kpis', 'scoreboard', 'botLeague', 'battery', 'compute', 'leaderboard'] },
   { id: 'tonight', label: 'Tonight', icon: 'phone', mode: 'overview', view: '/household' },
-  { id: 'play', label: 'Play', icon: 'play', mode: 'overview', view: '/market' },
+  { id: 'play', label: 'Play', icon: 'play', mode: 'overview', hub: true },
 ]
 
 const byId = Object.fromEntries(PANELS.map((p) => [p.id, p]))
@@ -26,7 +27,7 @@ export default function MobileShell({ ctx, at, source }) {
     if (ctx.ui.mode !== t.mode) actions.setMode(t.mode)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tab])
-  const View = t.view && VIEWS.find((v) => v.path === t.view)?.Component
+  const View = t.hub ? PlayHub : t.view && VIEWS.find((v) => v.path === t.view)?.Component
   const when = at ? new Date(at).toLocaleString('en-GB', { weekday: 'short', hour: '2-digit', minute: '2-digit', timeZone: 'UTC' }) : '…'
   const sel = ctx.zoneById[ctx.ui.selectedZone]
   const st = ctx.stateByZone[ctx.ui.selectedZone]
