@@ -1,4 +1,5 @@
 import os
+from functools import lru_cache
 
 import numpy as np
 import pandas as pd
@@ -25,6 +26,24 @@ def _read(name: str) -> pd.DataFrame:
         return cache.read(name)
     except FileNotFoundError:
         return pd.DataFrame()
+
+
+def _battery_inputs_key() -> tuple:
+    """Paths and mtimes of everything compare.run() reads; it only needs re-running when one changes."""
+    bases = (cache.DATA, cache.FIXTURES) if cache.offline() else (cache.DATA,)
+    files = [b / f"{compare.FORECAST_LOG}.parquet" for b in bases]
+    files += [f for b in bases for f in sorted((b / "actuals").glob("*.parquet"))]
+    return tuple((str(f), f.stat().st_mtime_ns) for f in files if f.exists())
+
+
+@lru_cache(maxsize=2)
+def _battery_run(key: tuple) -> dict:
+    return compare.run()
+
+
+def battery_comparison() -> dict:
+    """compare.run(), memoised on its input files. The result is shared: read it, never mutate it."""
+    return _battery_run(_battery_inputs_key())
 
 
 def _none(x):
@@ -130,7 +149,7 @@ def build_scores() -> dict:
         battery = sample_body["battery"]
         summary = {"share": sample_body["headline"]["battery_share_of_perfect"], "n_hours": None, "note": "Sample data"}
     else:
-        out = compare.run()
+        out = battery_comparison()
         battery, summary = out["results"], out
     as_of = pd.to_datetime(scores["window_end"]).max() if len(scores) else pd.Timestamp.now(tz="UTC")
     return {
