@@ -1,15 +1,15 @@
 :root {
-  --bg: #121212;
-  --bg-2: #171717;
-  --panel: rgba(28, 28, 27, 0.86);
-  --panel-solid: #1c1c1b;
-  --card: #232322;
-  --card-2: #2a2a29;
-  --line: rgba(255, 255, 255, 0.07);
-  --line-2: rgba(255, 255, 255, 0.12);
-  --text: #f2f2ef;
-  --text-2: #a3a39e;
-  --text-3: #6d6d68;
+  --bg: #0a0a0a;
+  --bg-2: #0f0f0f;
+  --panel: rgba(23, 23, 23, 0.9);
+  --panel-solid: #171717;
+  --card: #1f1f1f;
+  --card-2: #262626;
+  --line: rgba(255, 255, 255, 0.1);
+  --line-2: rgba(255, 255, 255, 0.16);
+  --text: #fafafa;
+  --text-2: #a1a1a1;
+  --text-3: #737373;
   --accent: #c5f06b;
   --accent-dim: rgba(197, 240, 107, 0.14);
   --accent-ink: #18200a;
@@ -22,10 +22,11 @@
   --nuclear: #a78bfa;
   --gas: #ff8a1f;
   --hydro: #60a5fa;
-  --radius: 20px;
-  --radius-sm: 12px;
-  --shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
-  --font: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --radius: 8px;
+  --radius-sm: 6px;
+  --shadow: 0 1px 0 rgba(255, 255, 255, 0.04) inset, 0 12px 32px rgba(0, 0, 0, 0.5);
+  --font: 'Geist', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --mono: 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
   color-scheme: dark;
 }
 
@@ -167,3 +168,33 @@ input { font: inherit; color: inherit; }
 
 .fade-in { animation: fadeIn .35s ease both; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+/* ---------- editorial / intelligence-desk language (pollar.news-like), our colours kept ---------- */
+body { font-size: 13px; letter-spacing: -0.005em; }
+h1, .headline h1, .kval, .sim-name, .tile b { letter-spacing: -0.012em; }
+.headline h1 { font-weight: 500; font-size: 30px; }
+.num, .kval, .zprice, .tile b { font-feature-settings: 'tnum' 1; }
+/* metadata in mono: tags, labels, timestamps, scales, notes */
+.tag, .chip, .klabel, .knote, .faint, .muted, .map-label, .ztick, .rp-tick, .segs-scale, .legend, .zlegend, .gwnote,
+.scrub-scale, .scrub-note, .hh-kicker, .rp-kicker, .rv-kicker, .hh-meta, .rp-legend, .rv-legend, .batt-s, .hh-note, .rp-sum,
+.zname .faint, .mixlegend, .rp-stat span, .rv-sum span, .hh-axis {
+  font-family: var(--mono); letter-spacing: 0; font-size: 11px;
+}
+.tag { border-radius: 2px; padding: 2px 6px; font-weight: 500; text-transform: uppercase; letter-spacing: .04em; font-size: 10px; }
+.chip { border-radius: 6px; }
+.tabs, .tabs button { border-radius: 7px; }
+.klabel, .rp-stat span, .rv-sum span { text-transform: uppercase; letter-spacing: .05em; font-size: 10px; color: var(--text-3); }
+/* tighter corners everywhere: cards 8px, controls 6px */
+.panel, .sim-card, .tile, .hh-card, .hh-chart, .rp-chart, .rp-side, .rv-card, .rv-sum, .rv-wait, .qrcard, .gwbill, .batt,
+.zrow, .zfacts > div, .sim-tiles > div, .ev, .rp-back, .rv-back, .hh-logo { border-radius: var(--radius) !important; }
+.square-btn, .search, .segs button, .btn, .sim-round, .sim-icon, .ev-ic, .round-btn, .rp-play, .rp-tabs button, .gwtabs, .gwtabs button,
+.batt-zones, .batt-zones button, .hh-region select, .map-label, .callout, .pin { border-radius: var(--radius-sm) !important; }
+.zav { border-radius: 6px; font-family: var(--mono); font-weight: 500; }
+.pin { border-width: 2px; }
+.rail .logo, .rail button { border-radius: 7px; }
+.panel, .sim-card, .tile { backdrop-filter: blur(10px); box-shadow: var(--shadow); }
+.panel-head { padding: 14px 16px 10px; font-weight: 500; letter-spacing: -0.01em; }
+.map-label { background: rgba(10, 10, 10, 0.9); border-color: var(--line-2); font-size: 11px; padding: 5px 8px; }
+.map-label b { font-family: var(--font); font-size: 12px; }
+.pill-delta { font-family: var(--mono); font-weight: 500; font-size: 11px; }
+.btn.primary { box-shadow: none; }
