@@ -107,3 +107,23 @@ def test_offline_with_empty_cache_returns_empty(monkeypatch):
     monkeypatch.setenv("LG_OFFLINE", "1")
     df = ec.fetch(pd.Timestamp("2026-11-01T00:00Z"), pd.Timestamp("2026-11-02T00:00Z"))
     assert df.empty and list(df.columns) == ["ts", "zone", "series", "value", "unit"]
+
+
+def test_interval_defaults_to_30_seconds_and_env_overrides(monkeypatch):
+    monkeypatch.delenv("LG_EC_MIN_INTERVAL", raising=False)
+    assert ec._interval_from_env() == 30.0
+    monkeypatch.setenv("LG_EC_MIN_INTERVAL", "5")
+    assert ec._interval_from_env() == 5.0
+
+
+def test_throttle_is_per_endpoint(monkeypatch):
+    waits = []
+    monkeypatch.setattr(ec, "_sleep", waits.append)
+    monkeypatch.setattr(ec, "MIN_INTERVAL_S", 30.0)
+    monkeypatch.setattr(ec, "_last_call", {})
+    client = httpx.Client(transport=httpx.MockTransport(lambda r: httpx.Response(200, json={})))
+    ec._get(client, "price", {})
+    ec._get(client, "cbpf", {})
+    assert waits == []
+    ec._get(client, "price", {})
+    assert len(waits) == 1 and 29 < waits[0] <= 30

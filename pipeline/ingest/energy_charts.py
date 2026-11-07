@@ -17,7 +17,15 @@ from pipeline import cache, schemas
 BASE = "https://api.energy-charts.info"
 SOURCE = "energy_charts"
 CHUNK_DAYS = 31
-MIN_INTERVAL_S = float(os.environ.get("LG_EC_MIN_INTERVAL", "1.0"))
+DEFAULT_MIN_INTERVAL_S = 30.0
+
+
+def _interval_from_env() -> float:
+    return float(os.environ.get("LG_EC_MIN_INTERVAL", DEFAULT_MIN_INTERVAL_S))
+
+
+# Seconds between calls to the same endpoint. The limit is not formally agreed, so stay conservative.
+MIN_INTERVAL_S = _interval_from_env()
 MAX_RETRIES = 4
 
 # zone -> (price bidding zone, country code for public_power and cbpf)
@@ -52,7 +60,7 @@ PARTNERS = {
 SKIP_PRODUCTION = {"Load", "Cross border electricity trading"}
 SKIP_PATTERNS = re.compile(r"^(Residual load|Renewable share)", re.IGNORECASE)
 
-_last_call = 0.0
+_last_call: dict[str, float] = {}
 
 
 def _sleep(seconds: float) -> None:
@@ -60,12 +68,11 @@ def _sleep(seconds: float) -> None:
 
 
 def _get(client: httpx.Client, endpoint: str, params: dict) -> dict:
-    global _last_call
     for attempt in range(MAX_RETRIES + 1):
-        wait = MIN_INTERVAL_S - (time.monotonic() - _last_call)
+        wait = MIN_INTERVAL_S - (time.monotonic() - _last_call.get(endpoint, float("-inf")))
         if wait > 0:
             _sleep(wait)
-        _last_call = time.monotonic()
+        _last_call[endpoint] = time.monotonic()
         r = client.get(f"{BASE}/{endpoint}", params=params)
         if r.status_code == 429 and attempt < MAX_RETRIES:
             _sleep(float(r.headers.get("Retry-After", 30)))
