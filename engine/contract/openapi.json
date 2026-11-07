@@ -1,0 +1,2667 @@
+{
+ "components": {
+  "schemas": {
+   "BacktestRow": {
+    "additionalProperties": false,
+    "properties": {
+     "coverage_p10_p90": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Coverage P10 P90"
+     },
+     "fold": {
+      "title": "Fold",
+      "type": "integer"
+     },
+     "mae": {
+      "title": "Mae",
+      "type": "number"
+     },
+     "model": {
+      "title": "Model",
+      "type": "string"
+     },
+     "n": {
+      "title": "N",
+      "type": "integer"
+     },
+     "target": {
+      "title": "Target",
+      "type": "string"
+     },
+     "zone": {
+      "enum": [
+       "GB",
+       "FR",
+       "DE-LU",
+       "NL",
+       "BE",
+       "NO2"
+      ],
+      "title": "Zone",
+      "type": "string"
+     }
+    },
+    "required": [
+     "fold",
+     "zone",
+     "target",
+     "model",
+     "mae",
+     "coverage_p10_p90",
+     "n"
+    ],
+    "title": "BacktestRow",
+    "type": "object"
+   },
+   "BatteryResponse": {
+    "additionalProperties": false,
+    "properties": {
+     "currency": {
+      "enum": [
+       "GBP",
+       "EUR"
+      ],
+      "title": "Currency",
+      "type": "string"
+     },
+     "note": {
+      "title": "Note",
+      "type": "string"
+     },
+     "profit_after": {
+      "title": "Profit After",
+      "type": "number"
+     },
+     "profit_before": {
+      "title": "Profit Before",
+      "type": "number"
+     },
+     "zone": {
+      "enum": [
+       "GB",
+       "FR",
+       "DE-LU",
+       "NL",
+       "BE",
+       "NO2"
+      ],
+      "title": "Zone",
+      "type": "string"
+     }
+    },
+    "required": [
+     "zone",
+     "profit_before",
+     "profit_after",
+     "currency",
+     "note"
+    ],
+    "title": "BatteryResponse",
+    "type": "object"
+   },
+   "BatteryResult": {
+    "additionalProperties": false,
+    "properties": {
+     "currency": {
+      "enum": [
+       "GBP",
+       "EUR"
+      ],
+      "title": "Currency",
+      "type": "string"
+     },
+     "profit": {
+      "title": "Profit",
+      "type": "number"
+     },
+     "share_of_perfect": {
+      "title": "Share Of Perfect",
+      "type": "number"
+     },
+     "strategy": {
+      "enum": [
+       "median_only",
+       "risk_aware",
+       "naive",
+       "perfect_foresight"
+      ],
+      "title": "Strategy",
+      "type": "string"
+     },
+     "worst_hour_loss": {
+      "title": "Worst Hour Loss",
+      "type": "number"
+     },
+     "zone": {
+      "enum": [
+       "GB",
+       "FR",
+       "DE-LU",
+       "NL",
+       "BE",
+       "NO2"
+      ],
+      "title": "Zone",
+      "type": "string"
+     }
+    },
+    "required": [
+     "strategy",
+     "zone",
+     "profit",
+     "currency",
+     "share_of_perfect",
+     "worst_hour_loss"
+    ],
+    "title": "BatteryResult",
+    "type": "object"
+   },
+   "BoundaryFlow": {
+    "additionalProperties": false,
+    "properties": {
+     "boundary": {
+      "title": "Boundary",
+      "type": "string"
+     },
+     "flow_mw": {
+      "title": "Flow Mw",
+      "type": "number"
+     },
+     "kind": {
+      "default": "forecast",
+      "enum": [
+       "actual",
+       "forecast",
+       "modelled",
+       "estimated",
+       "scenario"
+      ],
+      "title": "Kind",
+      "type": "string"
+     },
+     "limit_mw": {
+      "title": "Limit Mw",
+      "type": "number"
+     },
+     "ts": {
+      "format": "date-time",
+      "title": "Ts",
+      "type": "string"
+     }
+    },
+    "required": [
+     "boundary",
+     "ts",
+     "flow_mw",
+     "limit_mw"
+    ],
+    "title": "BoundaryFlow",
+    "type": "object"
+   },
+   "CarbonNow": {
+    "additionalProperties": false,
+    "properties": {
+     "consumption_gco2_kwh": {
+      "title": "Consumption Gco2 Kwh",
+      "type": "number"
+     },
+     "imports_share": {
+      "title": "Imports Share",
+      "type": "number"
+     },
+     "kind": {
+      "default": "modelled",
+      "enum": [
+       "actual",
+       "forecast",
+       "modelled",
+       "estimated",
+       "scenario"
+      ],
+      "title": "Kind",
+      "type": "string"
+     },
+     "production_gco2_kwh": {
+      "title": "Production Gco2 Kwh",
+      "type": "number"
+     }
+    },
+    "required": [
+     "production_gco2_kwh",
+     "consumption_gco2_kwh",
+     "imports_share"
+    ],
+    "title": "CarbonNow",
+    "type": "object"
+   },
+   "CarbonResponse": {
+    "additionalProperties": false,
+    "properties": {
+     "at": {
+      "format": "date-time",
+      "title": "At",
+      "type": "string"
+     },
+     "note": {
+      "default": "Emission factors are standard estimates; consumption intensity is modelled.",
+      "title": "Note",
+      "type": "string"
+     },
+     "zones": {
+      "items": {
+       "$ref": "#/components/schemas/ZoneCarbon"
+      },
+      "title": "Zones",
+      "type": "array"
+     }
+    },
+    "required": [
+     "at",
+     "zones"
+    ],
+    "title": "CarbonResponse",
+    "type": "object"
+   },
+   "ConstraintCost": {
+    "additionalProperties": false,
+    "properties": {
+     "date": {
+      "format": "date",
+      "title": "Date",
+      "type": "string"
+     },
+     "gbp": {
+      "title": "Gbp",
+      "type": "number"
+     },
+     "kind": {
+      "default": "actual",
+      "enum": [
+       "actual",
+       "forecast",
+       "modelled",
+       "estimated",
+       "scenario"
+      ],
+      "title": "Kind",
+      "type": "string"
+     }
+    },
+    "required": [
+     "date",
+     "gbp"
+    ],
+    "title": "ConstraintCost",
+    "type": "object"
+   },
+   "Contribution": {
+    "additionalProperties": false,
+    "properties": {
+     "group": {
+      "enum": [
+       "wind",
+       "solar",
+       "demand",
+       "gas",
+       "carbon",
+       "imports",
+       "time_of_day"
+      ],
+      "title": "Group",
+      "type": "string"
+     },
+     "value": {
+      "description": "Contribution to the price in the zone's currency per MWh",
+      "title": "Value",
+      "type": "number"
+     }
+    },
+    "required": [
+     "group",
+     "value"
+    ],
+    "title": "Contribution",
+    "type": "object"
+   },
+   "ExplainResponse": {
+    "additionalProperties": false,
+    "properties": {
+     "base": {
+      "description": "Model baseline (expected value) for this target",
+      "title": "Base",
+      "type": "number"
+     },
+     "contributions": {
+      "items": {
+       "$ref": "#/components/schemas/Contribution"
+      },
+      "title": "Contributions",
+      "type": "array"
+     },
+     "delta": {
+      "description": "prediction minus a reference (e.g. same hour yesterday)",
+      "title": "Delta",
+      "type": "number"
+     },
+     "kind": {
+      "default": "forecast",
+      "enum": [
+       "actual",
+       "forecast",
+       "modelled",
+       "estimated",
+       "scenario"
+      ],
+      "title": "Kind",
+      "type": "string"
+     },
+     "prediction": {
+      "title": "Prediction",
+      "type": "number"
+     },
+     "sentence": {
+      "description": "e.g. \"GB price up £18: wind down 40% (+£12), less from Norway (+£5)\"",
+      "title": "Sentence",
+      "type": "string"
+     },
+     "target": {
+      "title": "Target",
+      "type": "string"
+     },
+     "ts": {
+      "format": "date-time",
+      "title": "Ts",
+      "type": "string"
+     },
+     "unit": {
+      "title": "Unit",
+      "type": "string"
+     },
+     "zone": {
+      "enum": [
+       "GB",
+       "FR",
+       "DE-LU",
+       "NL",
+       "BE",
+       "NO2"
+      ],
+      "title": "Zone",
+      "type": "string"
+     }
+    },
+    "required": [
+     "sentence",
+     "contributions",
+     "zone",
+     "ts",
+     "target",
+     "base",
+     "prediction",
+     "delta",
+     "unit"
+    ],
+    "title": "ExplainResponse",
+    "type": "object"
+   },
+   "Explanation": {
+    "additionalProperties": false,
+    "properties": {
+     "contributions": {
+      "items": {
+       "$ref": "#/components/schemas/Contribution"
+      },
+      "title": "Contributions",
+      "type": "array"
+     },
+     "kind": {
+      "default": "forecast",
+      "enum": [
+       "actual",
+       "forecast",
+       "modelled",
+       "estimated",
+       "scenario"
+      ],
+      "title": "Kind",
+      "type": "string"
+     },
+     "sentence": {
+      "description": "e.g. \"GB price up £18: wind down 40% (+£12), less from Norway (+£5)\"",
+      "title": "Sentence",
+      "type": "string"
+     }
+    },
+    "required": [
+     "sentence",
+     "contributions"
+    ],
+    "title": "Explanation",
+    "type": "object"
+   },
+   "Flow": {
+    "additionalProperties": false,
+    "properties": {
+     "capacity_mw": {
+      "title": "Capacity Mw",
+      "type": "number"
+     },
+     "from_zone": {
+      "title": "From Zone",
+      "type": "string"
+     },
+     "interconnector_id": {
+      "title": "Interconnector Id",
+      "type": "string"
+     },
+     "kind": {
+      "default": "actual",
+      "enum": [
+       "actual",
+       "forecast",
+       "modelled",
+       "estimated",
+       "scenario"
+      ],
+      "title": "Kind",
+      "type": "string"
+     },
+     "mw": {
+      "description": "Positive means from_zone to to_zone",
+      "title": "Mw",
+      "type": "number"
+     },
+     "to_zone": {
+      "title": "To Zone",
+      "type": "string"
+     }
+    },
+    "required": [
+     "interconnector_id",
+     "from_zone",
+     "to_zone",
+     "mw",
+     "capacity_mw"
+    ],
+    "title": "Flow",
+    "type": "object"
+   },
+   "ForecastNow": {
+    "additionalProperties": false,
+    "properties": {
+     "horizon_h": {
+      "title": "Horizon H",
+      "type": "integer"
+     },
+     "kind": {
+      "default": "forecast",
+      "enum": [
+       "actual",
+       "forecast",
+       "modelled",
+       "estimated",
+       "scenario"
+      ],
+      "title": "Kind",
+      "type": "string"
+     },
+     "made_at": {
+      "format": "date-time",
+      "title": "Made At",
+      "type": "string"
+     },
+     "p10": {
+      "title": "P10",
+      "type": "number"
+     },
+     "p50": {
+      "title": "P50",
+      "type": "number"
+     },
+     "p90": {
+      "title": "P90",
+      "type": "number"
+     },
+     "target": {
+      "title": "Target",
+      "type": "string"
+     }
+    },
+    "required": [
+     "p10",
+     "p50",
+     "p90",
+     "made_at",
+     "horizon_h",
+     "target"
+    ],
+    "title": "ForecastNow",
+    "type": "object"
+   },
+   "GbRegion": {
+    "additionalProperties": false,
+    "properties": {
+     "carbon_intensity_region_id": {
+      "title": "Carbon Intensity Region Id",
+      "type": "integer"
+     },
+     "dno": {
+      "title": "Dno",
+      "type": "string"
+     },
+     "name": {
+      "title": "Name",
+      "type": "string"
+     },
+     "region": {
+      "description": "Agile region letter A to P",
+      "title": "Region",
+      "type": "string"
+     }
+    },
+    "required": [
+     "region",
+     "name",
+     "dno",
+     "carbon_intensity_region_id"
+    ],
+    "title": "GbRegion",
+    "type": "object"
+   },
+   "GhostWindChange": {
+    "additionalProperties": false,
+    "properties": {
+     "delta_constraint_cost_gbp": {
+      "title": "Delta Constraint Cost Gbp",
+      "type": "number"
+     },
+     "delta_mwh": {
+      "title": "Delta Mwh",
+      "type": "number"
+     },
+     "kind": {
+      "default": "estimated",
+      "enum": [
+       "actual",
+       "forecast",
+       "modelled",
+       "estimated",
+       "scenario"
+      ],
+      "title": "Kind",
+      "type": "string"
+     }
+    },
+    "required": [
+     "delta_mwh",
+     "delta_constraint_cost_gbp"
+    ],
+    "title": "GhostWindChange",
+    "type": "object"
+   },
+   "GhostWindPoint": {
+    "additionalProperties": false,
+    "properties": {
+     "boalf_mw": {
+      "description": "Accepted bids to switch off, mapped wind units",
+      "title": "Boalf Mw",
+      "type": "number"
+     },
+     "ts": {
+      "format": "date-time",
+      "title": "Ts",
+      "type": "string"
+     },
+     "weather_gap_mw": {
+      "description": "Weather-implied output minus metered output",
+      "title": "Weather Gap Mw",
+      "type": "number"
+     }
+    },
+    "required": [
+     "ts",
+     "boalf_mw",
+     "weather_gap_mw"
+    ],
+    "title": "GhostWindPoint",
+    "type": "object"
+   },
+   "GhostWindRegion": {
+    "additionalProperties": false,
+    "properties": {
+     "boalf_mwh": {
+      "title": "Boalf Mwh",
+      "type": "number"
+     },
+     "centroid": {
+      "description": "[lon, lat]",
+      "maxItems": 2,
+      "minItems": 2,
+      "prefixItems": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "number"
+       }
+      ],
+      "title": "Centroid",
+      "type": "array"
+     },
+     "kind": {
+      "default": "estimated",
+      "enum": [
+       "actual",
+       "forecast",
+       "modelled",
+       "estimated",
+       "scenario"
+      ],
+      "title": "Kind",
+      "type": "string"
+     },
+     "name": {
+      "title": "Name",
+      "type": "string"
+     },
+     "region": {
+      "title": "Region",
+      "type": "string"
+     },
+     "series": {
+      "items": {
+       "$ref": "#/components/schemas/GhostWindPoint"
+      },
+      "title": "Series",
+      "type": "array"
+     },
+     "weather_gap_mwh": {
+      "title": "Weather Gap Mwh",
+      "type": "number"
+     }
+    },
+    "required": [
+     "region",
+     "name",
+     "centroid",
+     "boalf_mwh",
+     "weather_gap_mwh",
+     "series"
+    ],
+    "title": "GhostWindRegion",
+    "type": "object"
+   },
+   "GhostWindResponse": {
+    "additionalProperties": false,
+    "properties": {
+     "boundary_flows": {
+      "items": {
+       "$ref": "#/components/schemas/BoundaryFlow"
+      },
+      "title": "Boundary Flows",
+      "type": "array"
+     },
+     "constraint_cost_total_gbp": {
+      "title": "Constraint Cost Total Gbp",
+      "type": "number"
+     },
+     "constraint_costs": {
+      "items": {
+       "$ref": "#/components/schemas/ConstraintCost"
+      },
+      "title": "Constraint Costs",
+      "type": "array"
+     },
+     "from": {
+      "format": "date-time",
+      "title": "From",
+      "type": "string"
+     },
+     "note": {
+      "title": "Note",
+      "type": "string"
+     },
+     "regions": {
+      "items": {
+       "$ref": "#/components/schemas/GhostWindRegion"
+      },
+      "title": "Regions",
+      "type": "array"
+     },
+     "to": {
+      "format": "date-time",
+      "title": "To",
+      "type": "string"
+     },
+     "total_boalf_mwh": {
+      "title": "Total Boalf Mwh",
+      "type": "number"
+     },
+     "total_weather_gap_mwh": {
+      "title": "Total Weather Gap Mwh",
+      "type": "number"
+     }
+    },
+    "required": [
+     "from",
+     "to",
+     "regions",
+     "total_boalf_mwh",
+     "total_weather_gap_mwh",
+     "constraint_costs",
+     "constraint_cost_total_gbp",
+     "boundary_flows",
+     "note"
+    ],
+    "title": "GhostWindResponse",
+    "type": "object"
+   },
+   "HTTPValidationError": {
+    "properties": {
+     "detail": {
+      "items": {
+       "$ref": "#/components/schemas/ValidationError"
+      },
+      "title": "Detail",
+      "type": "array"
+     }
+    },
+    "title": "HTTPValidationError",
+    "type": "object"
+   },
+   "Headline": {
+    "additionalProperties": false,
+    "properties": {
+     "battery_share_of_perfect": {
+      "title": "Battery Share Of Perfect",
+      "type": "number"
+     },
+     "coverage_p10_p90": {
+      "title": "Coverage P10 P90",
+      "type": "number"
+     },
+     "forecasts_scored": {
+      "title": "Forecasts Scored",
+      "type": "integer"
+     },
+     "mae_model": {
+      "title": "Mae Model",
+      "type": "number"
+     },
+     "mae_persistence": {
+      "title": "Mae Persistence",
+      "type": "number"
+     },
+     "sentence": {
+      "title": "Sentence",
+      "type": "string"
+     },
+     "since": {
+      "format": "date-time",
+      "title": "Since",
+      "type": "string"
+     }
+    },
+    "required": [
+     "mae_model",
+     "mae_persistence",
+     "coverage_p10_p90",
+     "forecasts_scored",
+     "since",
+     "battery_share_of_perfect",
+     "sentence"
+    ],
+    "title": "Headline",
+    "type": "object"
+   },
+   "HourDelta": {
+    "additionalProperties": false,
+    "properties": {
+     "delta_p10": {
+      "title": "Delta P10",
+      "type": "number"
+     },
+     "delta_p50": {
+      "title": "Delta P50",
+      "type": "number"
+     },
+     "delta_p90": {
+      "title": "Delta P90",
+      "type": "number"
+     },
+     "ts": {
+      "format": "date-time",
+      "title": "Ts",
+      "type": "string"
+     }
+    },
+    "required": [
+     "ts",
+     "delta_p10",
+     "delta_p50",
+     "delta_p90"
+    ],
+    "title": "HourDelta",
+    "type": "object"
+   },
+   "HouseholdPrice": {
+    "additionalProperties": false,
+    "properties": {
+     "kind": {
+      "description": "actual for published Agile, forecast beyond it",
+      "enum": [
+       "actual",
+       "forecast",
+       "modelled",
+       "estimated",
+       "scenario"
+      ],
+      "title": "Kind",
+      "type": "string"
+     },
+     "p10": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "P10"
+     },
+     "p90": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "P90"
+     },
+     "p_kwh": {
+      "description": "Pence per kWh incl. VAT",
+      "title": "P Kwh",
+      "type": "number"
+     },
+     "ts": {
+      "format": "date-time",
+      "title": "Ts",
+      "type": "string"
+     }
+    },
+    "required": [
+     "ts",
+     "p_kwh",
+     "kind"
+    ],
+    "title": "HouseholdPrice",
+    "type": "object"
+   },
+   "HouseholdResponse": {
+    "additionalProperties": false,
+    "properties": {
+     "generated_at": {
+      "format": "date-time",
+      "title": "Generated At",
+      "type": "string"
+     },
+     "name": {
+      "title": "Name",
+      "type": "string"
+     },
+     "note": {
+      "title": "Note",
+      "type": "string"
+     },
+     "prices": {
+      "items": {
+       "$ref": "#/components/schemas/HouseholdPrice"
+      },
+      "title": "Prices",
+      "type": "array"
+     },
+     "region": {
+      "title": "Region",
+      "type": "string"
+     },
+     "windows": {
+      "items": {
+       "$ref": "#/components/schemas/HouseholdWindow"
+      },
+      "title": "Windows",
+      "type": "array"
+     }
+    },
+    "required": [
+     "region",
+     "name",
+     "generated_at",
+     "windows",
+     "prices",
+     "note"
+    ],
+    "title": "HouseholdResponse",
+    "type": "object"
+   },
+   "HouseholdWindow": {
+    "additionalProperties": false,
+    "properties": {
+     "avg_p_kwh": {
+      "title": "Avg P Kwh",
+      "type": "number"
+     },
+     "end": {
+      "format": "date-time",
+      "title": "End",
+      "type": "string"
+     },
+     "kind": {
+      "enum": [
+       "actual",
+       "forecast",
+       "modelled",
+       "estimated",
+       "scenario"
+      ],
+      "title": "Kind",
+      "type": "string"
+     },
+     "label": {
+      "title": "Label",
+      "type": "string"
+     },
+     "saving_gbp": {
+      "$ref": "#/components/schemas/Quantiles",
+      "description": "Saving against running it now (or at 17:00 to 19:00)"
+     },
+     "start": {
+      "format": "date-time",
+      "title": "Start",
+      "type": "string"
+     },
+     "task": {
+      "enum": [
+       "ev",
+       "dishwasher",
+       "washing_machine"
+      ],
+      "title": "Task",
+      "type": "string"
+     }
+    },
+    "required": [
+     "task",
+     "label",
+     "start",
+     "end",
+     "avg_p_kwh",
+     "saving_gbp",
+     "kind"
+    ],
+    "title": "HouseholdWindow",
+    "type": "object"
+   },
+   "ImportContribution": {
+    "additionalProperties": false,
+    "properties": {
+     "contribution_gco2_kwh": {
+      "description": "Share of the importer's consumption intensity",
+      "title": "Contribution Gco2 Kwh",
+      "type": "number"
+     },
+     "exporter_gco2_kwh": {
+      "title": "Exporter Gco2 Kwh",
+      "type": "number"
+     },
+     "from_zone": {
+      "title": "From Zone",
+      "type": "string"
+     },
+     "mw": {
+      "title": "Mw",
+      "type": "number"
+     }
+    },
+    "required": [
+     "from_zone",
+     "mw",
+     "exporter_gco2_kwh",
+     "contribution_gco2_kwh"
+    ],
+    "title": "ImportContribution",
+    "type": "object"
+   },
+   "Interconnector": {
+    "additionalProperties": false,
+    "properties": {
+     "capacity_mw": {
+      "title": "Capacity Mw",
+      "type": "number"
+     },
+     "from_coord": {
+      "description": "[lon, lat] landing in from_zone",
+      "maxItems": 2,
+      "minItems": 2,
+      "prefixItems": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "number"
+       }
+      ],
+      "title": "From Coord",
+      "type": "array"
+     },
+     "from_zone": {
+      "title": "From Zone",
+      "type": "string"
+     },
+     "id": {
+      "title": "Id",
+      "type": "string"
+     },
+     "in_v1": {
+      "title": "In V1",
+      "type": "boolean"
+     },
+     "name": {
+      "title": "Name",
+      "type": "string"
+     },
+     "to_coord": {
+      "description": "[lon, lat] landing in to_zone",
+      "maxItems": 2,
+      "minItems": 2,
+      "prefixItems": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "number"
+       }
+      ],
+      "title": "To Coord",
+      "type": "array"
+     },
+     "to_zone": {
+      "title": "To Zone",
+      "type": "string"
+     }
+    },
+    "required": [
+     "id",
+     "name",
+     "from_zone",
+     "to_zone",
+     "capacity_mw",
+     "from_coord",
+     "to_coord",
+     "in_v1"
+    ],
+    "title": "Interconnector",
+    "type": "object"
+   },
+   "InterventionRequest": {
+    "additionalProperties": false,
+    "properties": {
+     "hours": {
+      "anyOf": [
+       {
+        "maximum": 672.0,
+        "minimum": 1.0,
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "description": "Duration; defaults per type",
+      "title": "Hours"
+     },
+     "magnitude": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "description": "Percent, MW or EUR/t depending on type; defaults per type",
+      "title": "Magnitude"
+     },
+     "target": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "description": "Zone or interconnector id; defaults per type",
+      "title": "Target"
+     },
+     "type": {
+      "enum": [
+       "hormuz",
+       "interconnector_trip",
+       "nuclear_outage",
+       "wind",
+       "cold_snap",
+       "carbon_price",
+       "scottish_storm"
+      ],
+      "title": "Type",
+      "type": "string"
+     }
+    },
+    "required": [
+     "type"
+    ],
+    "title": "InterventionRequest",
+    "type": "object"
+   },
+   "InterventionResult": {
+    "additionalProperties": false,
+    "properties": {
+     "applied_hours": {
+      "title": "Applied Hours",
+      "type": "integer"
+     },
+     "applied_magnitude": {
+      "title": "Applied Magnitude",
+      "type": "number"
+     },
+     "battery": {
+      "items": {
+       "$ref": "#/components/schemas/BatteryResponse"
+      },
+      "title": "Battery",
+      "type": "array"
+     },
+     "clamped": {
+      "description": "Magnitude clamped to the range seen in training data",
+      "title": "Clamped",
+      "type": "boolean"
+     },
+     "cost_total_gbp": {
+      "$ref": "#/components/schemas/Quantiles"
+     },
+     "explanation": {
+      "$ref": "#/components/schemas/Explanation"
+     },
+     "ghost_wind": {
+      "anyOf": [
+       {
+        "$ref": "#/components/schemas/GhostWindChange"
+       },
+       {
+        "type": "null"
+       }
+      ]
+     },
+     "id": {
+      "title": "Id",
+      "type": "string"
+     },
+     "kind": {
+      "default": "scenario",
+      "enum": [
+       "actual",
+       "forecast",
+       "modelled",
+       "estimated",
+       "scenario"
+      ],
+      "title": "Kind",
+      "type": "string"
+     },
+     "losers": {
+      "items": {
+       "$ref": "#/components/schemas/Party"
+      },
+      "title": "Losers",
+      "type": "array"
+     },
+     "method_note": {
+      "title": "Method Note",
+      "type": "string"
+     },
+     "request": {
+      "$ref": "#/components/schemas/InterventionRequest"
+     },
+     "target": {
+      "title": "Target",
+      "type": "string"
+     },
+     "title": {
+      "title": "Title",
+      "type": "string"
+     },
+     "triggered_at": {
+      "format": "date-time",
+      "title": "Triggered At",
+      "type": "string"
+     },
+     "winners": {
+      "items": {
+       "$ref": "#/components/schemas/Party"
+      },
+      "title": "Winners",
+      "type": "array"
+     },
+     "zones": {
+      "items": {
+       "$ref": "#/components/schemas/ZoneImpact"
+      },
+      "title": "Zones",
+      "type": "array"
+     }
+    },
+    "required": [
+     "id",
+     "triggered_at",
+     "request",
+     "applied_magnitude",
+     "applied_hours",
+     "target",
+     "clamped",
+     "title",
+     "zones",
+     "cost_total_gbp",
+     "winners",
+     "losers",
+     "explanation",
+     "battery",
+     "method_note"
+    ],
+    "title": "InterventionResult",
+    "type": "object"
+   },
+   "Party": {
+    "additionalProperties": false,
+    "properties": {
+     "gbp": {
+      "title": "Gbp",
+      "type": "number"
+     },
+     "who": {
+      "title": "Who",
+      "type": "string"
+     }
+    },
+    "required": [
+     "who",
+     "gbp"
+    ],
+    "title": "Party",
+    "type": "object"
+   },
+   "PriceNow": {
+    "additionalProperties": false,
+    "properties": {
+     "kind": {
+      "default": "actual",
+      "enum": [
+       "actual",
+       "forecast",
+       "modelled",
+       "estimated",
+       "scenario"
+      ],
+      "title": "Kind",
+      "type": "string"
+     },
+     "source": {
+      "title": "Source",
+      "type": "string"
+     },
+     "unit": {
+      "description": "e.g. GBP/MWh or EUR/MWh",
+      "title": "Unit",
+      "type": "string"
+     },
+     "value": {
+      "title": "Value",
+      "type": "number"
+     }
+    },
+    "required": [
+     "value",
+     "unit",
+     "source"
+    ],
+    "title": "PriceNow",
+    "type": "object"
+   },
+   "Quantiles": {
+    "additionalProperties": false,
+    "properties": {
+     "p10": {
+      "title": "P10",
+      "type": "number"
+     },
+     "p50": {
+      "title": "P50",
+      "type": "number"
+     },
+     "p90": {
+      "title": "P90",
+      "type": "number"
+     }
+    },
+    "required": [
+     "p10",
+     "p50",
+     "p90"
+    ],
+    "title": "Quantiles",
+    "type": "object"
+   },
+   "ReplayPoint": {
+    "additionalProperties": false,
+    "properties": {
+     "actual": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Actual"
+     },
+     "explanation": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Explanation"
+     },
+     "made_at": {
+      "format": "date-time",
+      "title": "Made At",
+      "type": "string"
+     },
+     "p10": {
+      "title": "P10",
+      "type": "number"
+     },
+     "p50": {
+      "title": "P50",
+      "type": "number"
+     },
+     "p90": {
+      "title": "P90",
+      "type": "number"
+     },
+     "ts": {
+      "format": "date-time",
+      "title": "Ts",
+      "type": "string"
+     }
+    },
+    "required": [
+     "ts",
+     "actual",
+     "p10",
+     "p50",
+     "p90",
+     "made_at"
+    ],
+    "title": "ReplayPoint",
+    "type": "object"
+   },
+   "ReplayResponse": {
+    "additionalProperties": false,
+    "properties": {
+     "constraint_cost_gbp": {
+      "title": "Constraint Cost Gbp",
+      "type": "number"
+     },
+     "event": {
+      "format": "date",
+      "title": "Event",
+      "type": "string"
+     },
+     "series": {
+      "items": {
+       "$ref": "#/components/schemas/ReplaySeries"
+      },
+      "title": "Series",
+      "type": "array"
+     },
+     "summary": {
+      "title": "Summary",
+      "type": "string"
+     },
+     "title": {
+      "title": "Title",
+      "type": "string"
+     },
+     "trained_before": {
+      "description": "As-of models saw no data on or after this date",
+      "format": "date",
+      "title": "Trained Before",
+      "type": "string"
+     }
+    },
+    "required": [
+     "event",
+     "title",
+     "trained_before",
+     "series",
+     "constraint_cost_gbp",
+     "summary"
+    ],
+    "title": "ReplayResponse",
+    "type": "object"
+   },
+   "ReplaySeries": {
+    "additionalProperties": false,
+    "properties": {
+     "points": {
+      "items": {
+       "$ref": "#/components/schemas/ReplayPoint"
+      },
+      "title": "Points",
+      "type": "array"
+     },
+     "target": {
+      "title": "Target",
+      "type": "string"
+     },
+     "unit": {
+      "title": "Unit",
+      "type": "string"
+     },
+     "zone": {
+      "enum": [
+       "GB",
+       "FR",
+       "DE-LU",
+       "NL",
+       "BE",
+       "NO2"
+      ],
+      "title": "Zone",
+      "type": "string"
+     }
+    },
+    "required": [
+     "zone",
+     "target",
+     "unit",
+     "points"
+    ],
+    "title": "ReplaySeries",
+    "type": "object"
+   },
+   "RevealHour": {
+    "additionalProperties": false,
+    "properties": {
+     "actual": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Actual"
+     },
+     "p10": {
+      "title": "P10",
+      "type": "number"
+     },
+     "p50": {
+      "title": "P50",
+      "type": "number"
+     },
+     "p90": {
+      "title": "P90",
+      "type": "number"
+     },
+     "ts": {
+      "format": "date-time",
+      "title": "Ts",
+      "type": "string"
+     }
+    },
+    "required": [
+     "p10",
+     "p50",
+     "p90",
+     "ts",
+     "actual"
+    ],
+    "title": "RevealHour",
+    "type": "object"
+   },
+   "RevealResponse": {
+    "additionalProperties": false,
+    "properties": {
+     "delivery_date": {
+      "format": "date",
+      "title": "Delivery Date",
+      "type": "string"
+     },
+     "frozen_at": {
+      "format": "date-time",
+      "title": "Frozen At",
+      "type": "string"
+     },
+     "mean_abs_error": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Mean Abs Error"
+     },
+     "zones": {
+      "items": {
+       "$ref": "#/components/schemas/RevealZone"
+      },
+      "title": "Zones",
+      "type": "array"
+     },
+     "zones_inside_band": {
+      "anyOf": [
+       {
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Zones Inside Band"
+     },
+     "zones_published": {
+      "title": "Zones Published",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "delivery_date",
+     "frozen_at",
+     "zones",
+     "zones_published",
+     "mean_abs_error",
+     "zones_inside_band"
+    ],
+    "title": "RevealResponse",
+    "type": "object"
+   },
+   "RevealZone": {
+    "additionalProperties": false,
+    "properties": {
+     "currency": {
+      "enum": [
+       "GBP",
+       "EUR"
+      ],
+      "title": "Currency",
+      "type": "string"
+     },
+     "hours": {
+      "items": {
+       "$ref": "#/components/schemas/RevealHour"
+      },
+      "title": "Hours",
+      "type": "array"
+     },
+     "inside_band_share": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Inside Band Share"
+     },
+     "mae": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Mae"
+     },
+     "published": {
+      "title": "Published",
+      "type": "boolean"
+     },
+     "zone": {
+      "enum": [
+       "GB",
+       "FR",
+       "DE-LU",
+       "NL",
+       "BE",
+       "NO2"
+      ],
+      "title": "Zone",
+      "type": "string"
+     }
+    },
+    "required": [
+     "zone",
+     "currency",
+     "published",
+     "hours",
+     "mae",
+     "inside_band_share"
+    ],
+    "title": "RevealZone",
+    "type": "object"
+   },
+   "Scenario": {
+    "additionalProperties": false,
+    "properties": {
+     "blurb": {
+      "title": "Blurb",
+      "type": "string"
+     },
+     "key": {
+      "title": "Key",
+      "type": "string"
+     },
+     "result": {
+      "$ref": "#/components/schemas/InterventionResult"
+     },
+     "title": {
+      "title": "Title",
+      "type": "string"
+     }
+    },
+    "required": [
+     "key",
+     "title",
+     "blurb",
+     "result"
+    ],
+    "title": "Scenario",
+    "type": "object"
+   },
+   "ScenariosResponse": {
+    "additionalProperties": false,
+    "properties": {
+     "scenarios": {
+      "items": {
+       "$ref": "#/components/schemas/Scenario"
+      },
+      "title": "Scenarios",
+      "type": "array"
+     }
+    },
+    "required": [
+     "scenarios"
+    ],
+    "title": "ScenariosResponse",
+    "type": "object"
+   },
+   "ScoresResponse": {
+    "additionalProperties": false,
+    "properties": {
+     "as_of": {
+      "format": "date-time",
+      "title": "As Of",
+      "type": "string"
+     },
+     "backtest": {
+      "items": {
+       "$ref": "#/components/schemas/BacktestRow"
+      },
+      "title": "Backtest",
+      "type": "array"
+     },
+     "battery": {
+      "items": {
+       "$ref": "#/components/schemas/BatteryResult"
+      },
+      "title": "Battery",
+      "type": "array"
+     },
+     "headline": {
+      "$ref": "#/components/schemas/Headline"
+     },
+     "live": {
+      "items": {
+       "$ref": "#/components/schemas/ZoneScore"
+      },
+      "title": "Live",
+      "type": "array"
+     }
+    },
+    "required": [
+     "as_of",
+     "headline",
+     "live",
+     "backtest",
+     "battery"
+    ],
+    "title": "ScoresResponse",
+    "type": "object"
+   },
+   "StateResponse": {
+    "additionalProperties": false,
+    "properties": {
+     "at": {
+      "format": "date-time",
+      "title": "At",
+      "type": "string"
+     },
+     "flows": {
+      "items": {
+       "$ref": "#/components/schemas/Flow"
+      },
+      "title": "Flows",
+      "type": "array"
+     },
+     "zones": {
+      "items": {
+       "$ref": "#/components/schemas/ZoneState"
+      },
+      "title": "Zones",
+      "type": "array"
+     }
+    },
+    "required": [
+     "at",
+     "zones",
+     "flows"
+    ],
+    "title": "StateResponse",
+    "type": "object"
+   },
+   "ValidationError": {
+    "properties": {
+     "ctx": {
+      "title": "Context",
+      "type": "object"
+     },
+     "input": {
+      "title": "Input"
+     },
+     "loc": {
+      "items": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "integer"
+        }
+       ]
+      },
+      "title": "Location",
+      "type": "array"
+     },
+     "msg": {
+      "title": "Message",
+      "type": "string"
+     },
+     "type": {
+      "title": "Error Type",
+      "type": "string"
+     }
+    },
+    "required": [
+     "loc",
+     "msg",
+     "type"
+    ],
+    "title": "ValidationError",
+    "type": "object"
+   },
+   "ZoneCarbon": {
+    "additionalProperties": false,
+    "properties": {
+     "consumption_gco2_kwh": {
+      "title": "Consumption Gco2 Kwh",
+      "type": "number"
+     },
+     "imports": {
+      "items": {
+       "$ref": "#/components/schemas/ImportContribution"
+      },
+      "title": "Imports",
+      "type": "array"
+     },
+     "imports_share": {
+      "title": "Imports Share",
+      "type": "number"
+     },
+     "kind": {
+      "default": "modelled",
+      "enum": [
+       "actual",
+       "forecast",
+       "modelled",
+       "estimated",
+       "scenario"
+      ],
+      "title": "Kind",
+      "type": "string"
+     },
+     "production_gco2_kwh": {
+      "title": "Production Gco2 Kwh",
+      "type": "number"
+     },
+     "zone": {
+      "enum": [
+       "GB",
+       "FR",
+       "DE-LU",
+       "NL",
+       "BE",
+       "NO2"
+      ],
+      "title": "Zone",
+      "type": "string"
+     }
+    },
+    "required": [
+     "zone",
+     "production_gco2_kwh",
+     "consumption_gco2_kwh",
+     "imports_share",
+     "imports"
+    ],
+    "title": "ZoneCarbon",
+    "type": "object"
+   },
+   "ZoneImpact": {
+    "additionalProperties": false,
+    "properties": {
+     "avg_delta": {
+      "description": "Mean price change per MWh over the event",
+      "title": "Avg Delta",
+      "type": "number"
+     },
+     "cost": {
+      "description": "Price change x demand x hours, in the zone's currency",
+      "title": "Cost",
+      "type": "number"
+     },
+     "cost_gbp": {
+      "title": "Cost Gbp",
+      "type": "number"
+     },
+     "currency": {
+      "enum": [
+       "GBP",
+       "EUR"
+      ],
+      "title": "Currency",
+      "type": "string"
+     },
+     "hourly": {
+      "items": {
+       "$ref": "#/components/schemas/HourDelta"
+      },
+      "title": "Hourly",
+      "type": "array"
+     },
+     "zone": {
+      "enum": [
+       "GB",
+       "FR",
+       "DE-LU",
+       "NL",
+       "BE",
+       "NO2"
+      ],
+      "title": "Zone",
+      "type": "string"
+     }
+    },
+    "required": [
+     "zone",
+     "currency",
+     "avg_delta",
+     "cost",
+     "cost_gbp",
+     "hourly"
+    ],
+    "title": "ZoneImpact",
+    "type": "object"
+   },
+   "ZoneInfo": {
+    "additionalProperties": false,
+    "properties": {
+     "approximate_border": {
+      "title": "Approximate Border",
+      "type": "boolean"
+     },
+     "centroid": {
+      "description": "[lon, lat]",
+      "maxItems": 2,
+      "minItems": 2,
+      "prefixItems": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "number"
+       }
+      ],
+      "title": "Centroid",
+      "type": "array"
+     },
+     "currency": {
+      "enum": [
+       "GBP",
+       "EUR"
+      ],
+      "title": "Currency",
+      "type": "string"
+     },
+     "name": {
+      "title": "Name",
+      "type": "string"
+     },
+     "zone": {
+      "enum": [
+       "GB",
+       "FR",
+       "DE-LU",
+       "NL",
+       "BE",
+       "NO2"
+      ],
+      "title": "Zone",
+      "type": "string"
+     }
+    },
+    "required": [
+     "zone",
+     "name",
+     "currency",
+     "centroid",
+     "approximate_border"
+    ],
+    "title": "ZoneInfo",
+    "type": "object"
+   },
+   "ZoneScore": {
+    "additionalProperties": false,
+    "properties": {
+     "coverage_p10_p90": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Coverage P10 P90"
+     },
+     "mae": {
+      "title": "Mae",
+      "type": "number"
+     },
+     "model": {
+      "title": "Model",
+      "type": "string"
+     },
+     "n": {
+      "title": "N",
+      "type": "integer"
+     },
+     "target": {
+      "title": "Target",
+      "type": "string"
+     },
+     "zone": {
+      "enum": [
+       "GB",
+       "FR",
+       "DE-LU",
+       "NL",
+       "BE",
+       "NO2"
+      ],
+      "title": "Zone",
+      "type": "string"
+     }
+    },
+    "required": [
+     "zone",
+     "target",
+     "model",
+     "mae",
+     "coverage_p10_p90",
+     "n"
+    ],
+    "title": "ZoneScore",
+    "type": "object"
+   },
+   "ZoneState": {
+    "additionalProperties": false,
+    "properties": {
+     "carbon": {
+      "anyOf": [
+       {
+        "$ref": "#/components/schemas/CarbonNow"
+       },
+       {
+        "type": "null"
+       }
+      ]
+     },
+     "forecast": {
+      "anyOf": [
+       {
+        "$ref": "#/components/schemas/ForecastNow"
+       },
+       {
+        "type": "null"
+       }
+      ]
+     },
+     "load_mw": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Load Mw"
+     },
+     "mix_mw": {
+      "additionalProperties": {
+       "type": "number"
+      },
+      "description": "Generation by fuel in MW, e.g. wind, gas, nuclear",
+      "title": "Mix Mw",
+      "type": "object"
+     },
+     "price": {
+      "anyOf": [
+       {
+        "$ref": "#/components/schemas/PriceNow"
+       },
+       {
+        "type": "null"
+       }
+      ]
+     },
+     "zone": {
+      "enum": [
+       "GB",
+       "FR",
+       "DE-LU",
+       "NL",
+       "BE",
+       "NO2"
+      ],
+      "title": "Zone",
+      "type": "string"
+     }
+    },
+    "required": [
+     "zone",
+     "price",
+     "forecast",
+     "carbon",
+     "load_mw",
+     "mix_mw"
+    ],
+    "title": "ZoneState",
+    "type": "object"
+   },
+   "ZonesResponse": {
+    "additionalProperties": false,
+    "properties": {
+     "gb_regions": {
+      "items": {
+       "$ref": "#/components/schemas/GbRegion"
+      },
+      "title": "Gb Regions",
+      "type": "array"
+     },
+     "gb_regions_geojson": {
+      "additionalProperties": true,
+      "description": "FeatureCollection, properties.region",
+      "title": "Gb Regions Geojson",
+      "type": "object"
+     },
+     "interconnectors": {
+      "items": {
+       "$ref": "#/components/schemas/Interconnector"
+      },
+      "title": "Interconnectors",
+      "type": "array"
+     },
+     "zones": {
+      "items": {
+       "$ref": "#/components/schemas/ZoneInfo"
+      },
+      "title": "Zones",
+      "type": "array"
+     },
+     "zones_geojson": {
+      "additionalProperties": true,
+      "description": "FeatureCollection, properties.zone",
+      "title": "Zones Geojson",
+      "type": "object"
+     }
+    },
+    "required": [
+     "zones",
+     "interconnectors",
+     "gb_regions",
+     "zones_geojson",
+     "gb_regions_geojson"
+    ],
+    "title": "ZonesResponse",
+    "type": "object"
+   }
+  }
+ },
+ "info": {
+  "title": "The Living Grid",
+  "version": "0.1.0"
+ },
+ "openapi": "3.1.0",
+ "paths": {
+  "/explain": {
+   "get": {
+    "operationId": "explain_explain_get",
+    "parameters": [
+     {
+      "in": "query",
+      "name": "zone",
+      "required": false,
+      "schema": {
+       "default": "GB",
+       "enum": [
+        "GB",
+        "FR",
+        "DE-LU",
+        "NL",
+        "BE",
+        "NO2"
+       ],
+       "title": "Zone",
+       "type": "string"
+      }
+     },
+     {
+      "in": "query",
+      "name": "ts",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "format": "date-time",
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Ts"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ExplainResponse"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Explain",
+    "tags": [
+     "forecast"
+    ]
+   }
+  },
+  "/health": {
+   "get": {
+    "operationId": "health_health_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "additionalProperties": true,
+         "title": "Response Health Health Get",
+         "type": "object"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Health"
+   }
+  },
+  "/household": {
+   "get": {
+    "operationId": "household_household_get",
+    "parameters": [
+     {
+      "in": "query",
+      "name": "region",
+      "required": false,
+      "schema": {
+       "default": "N",
+       "title": "Region",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HouseholdResponse"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Household",
+    "tags": [
+     "household"
+    ]
+   }
+  },
+  "/intervene": {
+   "post": {
+    "operationId": "intervene_intervene_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/InterventionRequest"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/InterventionResult"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Intervene",
+    "tags": [
+     "interventions"
+    ]
+   }
+  },
+  "/replay": {
+   "get": {
+    "operationId": "replay_replay_get",
+    "parameters": [
+     {
+      "in": "query",
+      "name": "event",
+      "required": false,
+      "schema": {
+       "default": "2026-10-26",
+       "format": "date",
+       "title": "Event",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ReplayResponse"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Replay",
+    "tags": [
+     "proof"
+    ]
+   }
+  },
+  "/reveal": {
+   "get": {
+    "operationId": "reveal_reveal_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RevealResponse"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Reveal",
+    "tags": [
+     "proof"
+    ]
+   }
+  },
+  "/scenarios": {
+   "get": {
+    "operationId": "scenarios_scenarios_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ScenariosResponse"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Scenarios",
+    "tags": [
+     "interventions"
+    ]
+   }
+  },
+  "/scores": {
+   "get": {
+    "operationId": "scores_scores_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ScoresResponse"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Scores",
+    "tags": [
+     "proof"
+    ]
+   }
+  },
+  "/state": {
+   "get": {
+    "operationId": "state_state_get",
+    "parameters": [
+     {
+      "in": "query",
+      "name": "at",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "format": "date-time",
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "At"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/StateResponse"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "State",
+    "tags": [
+     "map"
+    ]
+   }
+  },
+  "/unseen/carbon": {
+   "get": {
+    "operationId": "carbon_unseen_carbon_get",
+    "parameters": [
+     {
+      "in": "query",
+      "name": "at",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "format": "date-time",
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "At"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/CarbonResponse"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Carbon",
+    "tags": [
+     "unseen"
+    ]
+   }
+  },
+  "/unseen/ghost-wind": {
+   "get": {
+    "operationId": "ghost_wind_unseen_ghost_wind_get",
+    "parameters": [
+     {
+      "in": "query",
+      "name": "from",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "format": "date-time",
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "From"
+      }
+     },
+     {
+      "in": "query",
+      "name": "to",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "format": "date-time",
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "To"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GhostWindResponse"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Ghost Wind",
+    "tags": [
+     "unseen"
+    ]
+   }
+  },
+  "/zones": {
+   "get": {
+    "operationId": "zones_zones_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ZonesResponse"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Zones",
+    "tags": [
+     "map"
+    ]
+   }
+  }
+ }
+}
