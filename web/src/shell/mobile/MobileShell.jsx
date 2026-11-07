@@ -11,7 +11,7 @@ import '../../styles/mobile.css'
 // Phone layout (< 700 px): map on top, a bottom sheet with tabs that reuse the desktop panels.
 // Tap a zone (or its label) to select it; the Map tab then shows its chart and the "why" card.
 const TABS = [
-  { id: 'map', label: 'Map', icon: 'globe', mode: 'overview', panels: ['zoneList', 'explain', 'zoneChart', 'constraintBill'] },
+  { id: 'map', label: 'Map', icon: 'globe', mode: 'overview', panels: ['zoneList', 'explain', 'zoneChart', 'constraintBill', 'renewables'] },
   { id: 'events', label: 'Events', icon: 'sim', mode: 'simulate', panels: ['simDock', 'statTiles'] },
   { id: 'scores', label: 'Scores', icon: 'chart', mode: 'overview', panels: ['kpis', 'scoreboard', 'botLeague', 'battery', 'compute', 'leaderboard'] },
   { id: 'tonight', label: 'Tonight', icon: 'phone', mode: 'overview', view: '/household' },

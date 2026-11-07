@@ -11,7 +11,7 @@ export const SECTIONS = [
     panels: ['zoneChart', 'explain', 'scrubber'], layers: { ghost: true, ghostWind: false, carbon: false } },
   { id: 'unseen', label: 'Unseen', icon: 'wind', mode: 'overview', at: 'now',
     title: 'What normally stays hidden', blurb: 'Wind paid to switch off over Scotland, and carbon carried in through the interconnectors',
-    panels: ['constraintBill', 'carbonLegend'], layers: { ghost: false, ghostWind: true, carbon: true } },
+    panels: ['constraintBill', 'carbonLegend', 'renewables'], layers: { ghost: false, ghostWind: true, carbon: true } },
   { id: 'simulate', label: 'Simulate', icon: 'sim', mode: 'simulate', at: 'now',
     panels: ['simDock', 'statTiles', 'battery'], layers: {} },
   { id: 'scores', label: 'Scores', icon: 'battery', mode: 'overview', at: 'now',
