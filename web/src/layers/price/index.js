@@ -30,9 +30,24 @@ export function outlines(features, z) {
   return paths
 }
 
-// Simulate: each country is a 3D bar with its own outline as the footprint; height ∝ price
-// (650 m per €/MWh on a 10 km base, so €300 stands ~205 km tall).
-export const slabHeight = (eur) => 10000 + Math.max(0, eur ?? 0) * 650
+// Simulate: each country is a 3D bar with its own outline as the footprint. Heights span today's price range
+// (cheapest zone ~25 km, dearest ~300 km) so small differences show; the range comes from pre-scenario prices,
+// so a scenario visibly lifts or lowers bars against it. Set each build from the current state.
+let range = { lo: 0, hi: 400 }
+export function setRange(prices) {
+  const v = prices.filter((p) => Number.isFinite(p))
+  if (!v.length) return
+  const lo = Math.min(...v)
+  const hi = Math.max(...v)
+  const pad = Math.max(10, (hi - lo) * 0.15)
+  range = { lo: lo - pad, hi: hi + pad }
+}
+export const slabHeight = (eur) => {
+  if (eur == null || !Number.isFinite(eur)) return 15000
+  const t = (eur - range.lo) / Math.max(1, range.hi - range.lo)
+  return 15000 + Math.max(0, Math.min(1.25, t)) * 300000
+}
+export const priceRange = () => range
 // Walls need real diffuse light to read as solid bars; the glass look stays on the flat overview.
 const BAR = { ambient: 0.42, diffuse: 0.78, shininess: 40, specularColor: [90, 90, 84] }
 // Kept for the map callout, which anchors to the top of the focus zone.
@@ -49,6 +64,7 @@ export default {
     if (!data.geo) return []
     const sim = ui.mode === 'simulate'
     const zoneFeatures = data.geo.features.filter((f) => f.properties.zone)
+    if (sim) setRange((data.state?.zones ?? []).map((z) => z.price_eur))
     return [
       new GeoJsonLayer({
         id: 'price-zones',
