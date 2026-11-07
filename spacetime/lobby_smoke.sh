@@ -92,4 +92,37 @@ call_as "${TOK[a_p2]}" lobby_leave '[]' 200
 call_as "${TOK[a_host]}" lobby_kick "[\"${ID[a_p1]}\"]" 200
 call_as "${TOK[a_host]}" lobby_leave '[]' 200
 sql "SELECT id FROM lobby" | grep -c '^ 1 ' | grep -qv '^0$' && { echo "FAIL empty lobby kept" >&2; exit 1; }
+
+# Battery mode: a lobby with two phones and both agents, 3 half-hours, priced low, high, high.
+BP=$(python3 - <<'PY'
+import json
+print(json.dumps(["2026-10-26", "windy", 24, 3, json.dumps([40.0, 200.0, 200.0]),
+                  json.dumps({"risk_aware": ["charge", "discharge", "discharge"], "median_only": ["hold", "hold", "hold"]})]))
+PY
+)
+call_as "$PUB" battery_pool_put "$BP" 200
+call_as "$PUB" battery_pool_put '["2026-10-27","windy",47,3,"[1,2,3]","{}"]' 530
+read -r BT BID < <(new_user); read -r CT CID < <(new_user)
+call_as "$BT" lobby_create '["Bea","wave","battery"]' 200
+LB=$(sql "SELECT id FROM lobby WHERE mode = 'battery'" | tail -1 | tr -d ' ')
+CODE_C=$(sql "SELECT code FROM lobby WHERE id = $LB" | tail -1 | tr -d ' "')
+sql "SELECT seconds_per_hour FROM lobby WHERE id = $LB" | grep -c '^ 10 ' | grep -qv '^0$' || { echo "FAIL battery default speed" >&2; exit 1; }
+call_as "$CT" lobby_join "[\"$CODE_C\",\"Cy\",\"pylon\"]" 200
+call_as "$BT" lobby_settings '[5,2,true,"battery"]' 200
+call_as "$BT" lobby_start '[]' 200
+wait_count "SELECT state FROM lobby WHERE id = $LB" playing 1
+[ "$(sql "SELECT key FROM battery_player WHERE lobby_id = $LB" | grep -c "^ \"$LB|")" = 4 ] || { echo "FAIL battery players + agents" >&2; exit 1; }
+call_as "$BT" battery_decide '[0,"charge"]' 200
+call_as "$BT" battery_decide '[1,"discharge"]' 200
+call_as "$CT" battery_decide '[2,"hold"]' 200
+call_as "$CT" battery_decide '[9,"hold"]' 530
+call_as "$CT" battery_decide '[0,"explode"]' 530
+call_as "$PUB" battery_decide '[0,"hold"]' 530
+wait_count "SELECT state FROM lobby WHERE id = $LB" reveal 1
+sql "SELECT * FROM battery_round WHERE lobby_id = $LB" | grep -c '2026-10-26' | grep -qv '^0$' || { echo "FAIL battery day not revealed" >&2; exit 1; }
+[ "$(sql "SELECT slot FROM battery_slot WHERE lobby_id = $LB" | grep -c '^ [0-2] ')" = 3 ] || { echo "FAIL battery slots" >&2; exit 1; }
+# Bea bought 0.5 MWh at 40 (-21) and sold 0.5 MWh at 200 (+99): 78. The median-only agent held all round: zero.
+sql "SELECT name, pnl FROM battery_player WHERE lobby_id = $LB" | grep -E 'Bea|Median' | tr -s ' ' | tr '\n' ';' | grep -q 'Median-only agent" | 0' || { echo "FAIL median agent pnl: $(sql "SELECT name, pnl FROM battery_player WHERE lobby_id = $LB")" >&2; exit 1; }
+BEA=$(sql "SELECT pnl FROM battery_player WHERE name = 'Bea'" | tail -1 | tr -d ' ')
+python3 -c "import sys; sys.exit(0 if abs(float(sys.argv[1]) - 78.0) < 0.01 else 1)" "$BEA" || { echo "FAIL Bea pnl $BEA" >&2; exit 1; }
 echo "lobby smoke: PASS"

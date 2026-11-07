@@ -1,6 +1,6 @@
 import { t } from 'spacetimedb/server';
 import spacetimedb from './schema';
-import { forecast } from './tables';
+import { forecast, battery_pending } from './tables';
 
 // Newest forecast per (zone, target, ts).
 export const latest_forecast = spacetimedb.anonymousView(
@@ -52,4 +52,11 @@ export const market_leaderboard = spacetimedb.anonymousView(
       rows.sort((a, b) => b.points - a.points).map((a, i) => ({ lobby_id, rank: i + 1, name: a.name, points: a.points, is_model: a.is_model }))
     );
   }
+);
+
+// A player's own undecided battery slots. The table itself is private so rivals cannot copy a choice.
+export const battery_my_pending = spacetimedb.view(
+  { name: 'battery_my_pending', public: true },
+  t.array(battery_pending.rowType),
+  ctx => [...ctx.db.battery_pending.identity.filter(ctx.sender)]
 );

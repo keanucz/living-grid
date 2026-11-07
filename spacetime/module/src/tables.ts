@@ -369,3 +369,84 @@ export const lobby_tick = table(
     lobby_id: t.u32(),
   }
 );
+
+// ---------------------------------------------------------------------------------------------------------------
+// Battery mode: one half-hour per tick on a mystery day's GB prices. Decisions stay private until their slot settles,
+// so nobody can copy a rival; the day's prices and the agents' plans are private until each slot passes.
+export const battery_day = table(
+  { name: 'battery_day' },
+  {
+    day: t.string().primaryKey(),
+    regime: t.string(), // calm | windy
+    start_slot: t.u32(), // half-hour of the day the window starts at (0 to 47)
+    n_slots: t.u32(),
+    prices_json: t.string(), // number[n_slots], GBP/MWh actual
+    plans_json: t.string(), // {"risk_aware": action[n_slots], "median_only": action[n_slots]} from as-of forecasts
+  }
+);
+
+export const battery_round = table(
+  { name: 'battery_round', public: true },
+  {
+    lobby_id: t.u32().primaryKey(),
+    status: t.string(), // running | done
+    slot: t.u32(), // the open slot: decisions for it are taken until the next tick
+    n_slots: t.u32(),
+    start_slot: t.u32(),
+    seconds_per_slot: t.u32(),
+    day_revealed: t.string(), // empty until the round is over
+    started_at: t.timestamp(),
+  }
+);
+
+export const battery_secret = table({ name: 'battery_secret' }, { lobby_id: t.u32().primaryKey(), day: t.string() });
+
+export const battery_player = table(
+  { name: 'battery_player', public: true },
+  {
+    key: t.string().primaryKey(), // '<lobby_id>|<identity hex>'
+    lobby_id: t.u32().index('btree'),
+    identity: t.identity().index('btree'),
+    name: t.string(),
+    soc_mwh: t.f64(),
+    pnl: t.f64(), // GBP, settled slots only
+    is_agent: t.bool(),
+    kind: t.string(), // '' | risk_aware | median_only
+  }
+);
+
+export const battery_pending = table(
+  { name: 'battery_pending' },
+  {
+    key: t.string().primaryKey(), // '<lobby_id>|<identity hex>|<slot>'
+    lobby_id: t.u32().index('btree'),
+    identity: t.identity().index('btree'),
+    slot: t.u32(),
+    action: t.string(),
+  }
+);
+
+export const battery_decision = table(
+  { name: 'battery_decision', public: true },
+  {
+    key: t.string().primaryKey(), // '<lobby_id>|<identity hex>|<slot>'
+    lobby_id: t.u32().index('btree'),
+    identity: t.identity().index('btree'),
+    slot: t.u32(),
+    action: t.string(),
+    price: t.f64(),
+    grid_mwh: t.f64(),
+    soc_mwh: t.f64(),
+    pnl: t.f64(),
+  }
+);
+
+export const battery_slot = table(
+  { name: 'battery_slot', public: true },
+  {
+    key: t.string().primaryKey(), // '<lobby_id>|<slot>'
+    lobby_id: t.u32().index('btree'),
+    slot: t.u32(),
+    price: t.f64(),
+  }
+);

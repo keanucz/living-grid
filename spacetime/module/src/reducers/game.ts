@@ -2,6 +2,7 @@ import { t, SenderError } from 'spacetimedb/server';
 import { Identity, Timestamp } from 'spacetimedb';
 import spacetimedb from '../schema';
 import { requireAdmin } from '../auth';
+import { decideBattery } from '../battery_core';
 
 // Room game. Players join, claim a zone battery (1 MW / 2 MWh) and choose charge, hold or discharge for
 // upcoming half-hours. engine/game settles every decision on the GB system price (market index price as a
@@ -99,3 +100,29 @@ export const reset_game = spacetimedb.reducer({}, ctx => {
   for (const d of [...ctx.db.player_decision.iter()]) ctx.db.player_decision.key.delete(d.key);
   for (const p of [...ctx.db.player.iter()]) ctx.db.player.identity.delete(p.identity);
 });
+
+// Battery mode inside a lobby: choose charge, hold or discharge for an open half-hour of the round. Undecided is hold.
+export const battery_decide = spacetimedb.reducer({ slot: t.u32(), action: t.string() }, (ctx, { slot, action }) => {
+  for (const p of ctx.db.lobby_player.identity.filter(ctx.sender)) return decideBattery(ctx, p.lobby_id, ctx.sender, slot, action);
+  throw new SenderError('you are not in a lobby');
+});
+
+// Admin: load or replace one mystery day for battery rounds (see engine/game/battery_pool.py).
+export const battery_pool_put = spacetimedb.reducer(
+  { day: t.string(), regime: t.string(), start_slot: t.u32(), n_slots: t.u32(), prices_json: t.string(), plans_json: t.string() },
+  (ctx, row) => {
+    requireAdmin(ctx);
+    if (row.regime !== 'calm' && row.regime !== 'windy') throw new SenderError('regime must be calm or windy');
+    if (row.n_slots < 2 || row.start_slot + row.n_slots > 48) throw new SenderError('the window must fit inside one day (48 half-hours)');
+    const prices = JSON.parse(row.prices_json);
+    const plans = JSON.parse(row.plans_json);
+    if (!Array.isArray(prices) || prices.length !== row.n_slots || prices.some((x: unknown) => typeof x !== 'number' || !Number.isFinite(x))) {
+      throw new SenderError('prices_json needs one finite price per slot');
+    }
+    for (const kind of ['risk_aware', 'median_only']) {
+      if (!Array.isArray(plans[kind]) || plans[kind].length !== row.n_slots) throw new SenderError(`plans_json needs a ${kind} action per slot`);
+    }
+    if (ctx.db.battery_day.day.find(row.day)) ctx.db.battery_day.day.update(row);
+    else ctx.db.battery_day.insert(row);
+  }
+);
