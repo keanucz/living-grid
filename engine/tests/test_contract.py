@@ -14,6 +14,7 @@ GETS = {
     "/explain?zone=GB&ts=2026-11-08T08:00:00Z": ("explain", s.ExplainResponse),
     "/unseen/ghost-wind?from=2026-11-06T12:00:00Z&to=2026-11-07T12:00:00Z": ("ghost_wind", s.GhostWindResponse),
     "/unseen/carbon?at=2026-11-07T12:00:00Z": ("carbon", s.CarbonResponse),
+    "/regions?at=2026-11-07T13:00:00Z": ("regions", s.RegionsResponse),
     "/scenarios": ("scenarios", s.ScenariosResponse),
     "/scores": ("scores", s.ScoresResponse),
     "/household?region=N": ("household", s.HouseholdResponse),

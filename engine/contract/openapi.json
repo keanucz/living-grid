@@ -1624,6 +1624,220 @@
     "title": "Quantiles",
     "type": "object"
    },
+   "RegionMix": {
+    "additionalProperties": false,
+    "properties": {
+     "fuel": {
+      "title": "Fuel",
+      "type": "string"
+     },
+     "perc": {
+      "description": "Percent of the region's modelled generation",
+      "title": "Perc",
+      "type": "number"
+     }
+    },
+    "required": [
+     "fuel",
+     "perc"
+    ],
+    "title": "RegionMix",
+    "type": "object"
+   },
+   "RegionNow": {
+    "additionalProperties": false,
+    "properties": {
+     "agile_kind": {
+      "anyOf": [
+       {
+        "enum": [
+         "actual",
+         "forecast",
+         "modelled",
+         "estimated",
+         "scenario"
+        ],
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "description": "actual when tonight is published, else forecast from our model",
+      "title": "Agile Kind"
+     },
+     "agile_now_p_kwh": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "description": "Agile unit rate now, pence per kWh incl. VAT",
+      "title": "Agile Now P Kwh"
+     },
+     "agile_tonight_avg_p_kwh": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Agile Tonight Avg P Kwh"
+     },
+     "agile_tonight_min_at": {
+      "anyOf": [
+       {
+        "format": "date-time",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Agile Tonight Min At"
+     },
+     "agile_tonight_min_p_kwh": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "description": "Cheapest half-hour tonight",
+      "title": "Agile Tonight Min P Kwh"
+     },
+     "carbon_gco2_kwh": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "description": "Carbon Intensity API regional model (modelled)",
+      "title": "Carbon Gco2 Kwh"
+     },
+     "carbon_index": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "description": "very low, low, moderate, high or very high",
+      "title": "Carbon Index"
+     },
+     "carbon_kind": {
+      "default": "modelled",
+      "enum": [
+       "actual",
+       "forecast",
+       "modelled",
+       "estimated",
+       "scenario"
+      ],
+      "title": "Carbon Kind",
+      "type": "string"
+     },
+     "centroid": {
+      "description": "[lon, lat]",
+      "maxItems": 2,
+      "minItems": 2,
+      "prefixItems": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "number"
+       }
+      ],
+      "title": "Centroid",
+      "type": "array"
+     },
+     "ghost_wind_mwh_24h": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "description": "Wind paid to switch off in the last 24 h; Scottish regions only",
+      "title": "Ghost Wind Mwh 24H"
+     },
+     "mix": {
+      "items": {
+       "$ref": "#/components/schemas/RegionMix"
+      },
+      "title": "Mix",
+      "type": "array"
+     },
+     "name": {
+      "title": "Name",
+      "type": "string"
+     },
+     "region": {
+      "description": "Agile / DNO region letter, A to P",
+      "title": "Region",
+      "type": "string"
+     }
+    },
+    "required": [
+     "region",
+     "name",
+     "centroid",
+     "carbon_gco2_kwh",
+     "carbon_index",
+     "mix",
+     "agile_now_p_kwh",
+     "agile_tonight_min_p_kwh",
+     "agile_tonight_min_at",
+     "agile_tonight_avg_p_kwh",
+     "agile_kind",
+     "ghost_wind_mwh_24h"
+    ],
+    "title": "RegionNow",
+    "type": "object"
+   },
+   "RegionsResponse": {
+    "additionalProperties": false,
+    "properties": {
+     "at": {
+      "format": "date-time",
+      "title": "At",
+      "type": "string"
+     },
+     "note": {
+      "title": "Note",
+      "type": "string"
+     },
+     "regions": {
+      "items": {
+       "$ref": "#/components/schemas/RegionNow"
+      },
+      "title": "Regions",
+      "type": "array"
+     }
+    },
+    "required": [
+     "at",
+     "regions",
+     "note"
+    ],
+    "title": "RegionsResponse",
+    "type": "object"
+   },
    "ReplayPoint": {
     "additionalProperties": false,
     "properties": {
@@ -2723,6 +2937,56 @@
     "summary": "Intervene",
     "tags": [
      "interventions"
+    ]
+   }
+  },
+  "/regions": {
+   "get": {
+    "operationId": "regions_regions_get",
+    "parameters": [
+     {
+      "in": "query",
+      "name": "at",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "format": "date-time",
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "At"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RegionsResponse"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Regions",
+    "tags": [
+     "unseen"
     ]
    }
   },

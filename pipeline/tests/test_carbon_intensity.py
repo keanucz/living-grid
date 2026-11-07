@@ -85,3 +85,43 @@ def test_run_writes_and_merges(tmp_path, monkeypatch, no_offline):
 
 def test_autodiscovered():
     assert "carbon_intensity" in ingest.sources()
+
+
+MIX_START, MIX_END = "2026-11-07 12:00", "2026-11-07 13:30"
+
+
+def mix_client(calls=None):
+    def handler(req: httpx.Request):
+        if calls is not None:
+            calls.append(req)
+        return httpx.Response(200, json=load("regional_mix.json" if "/regional/" in req.url.path else "national.json"))
+
+    return httpx.Client(transport=httpx.MockTransport(handler))
+
+
+def test_regional_mix_hourly_per_region_and_fuel(no_offline):
+    df = ci.fetch_regional_mix(MIX_START, MIX_END, mix_client())
+    assert list(df.columns) == ci.MIX_COLUMNS
+    assert set(df["region"]) == set(static.gb_region_keys()["region"])
+    assert set(df["ts"]) == {pd.Timestamp("2026-11-07 12:00", tz="UTC"), pd.Timestamp("2026-11-07 13:00", tz="UTC")}
+    assert not df.duplicated(["ts", "region", "fuel"]).any()
+    totals = df.groupby(["ts", "region"])["perc"].sum()
+    assert totals.between(95, 105).all(), "each region's mix is percentages of its generation"
+    north = df[(df["region"] == "P") & (df["ts"] == pd.Timestamp("2026-11-07 12:00", tz="UTC"))].set_index("fuel")["perc"]
+    raw = [r for s in load("regional_mix.json")["data"] if s["from"] in ("2026-11-07T12:00Z", "2026-11-07T12:30Z")
+           for r in s["regions"] if r["regionid"] == 1]
+    wind = sum(m["perc"] for r in raw for m in r["generationmix"] if m["fuel"] == "wind") / len(raw)
+    assert north["wind"] == pytest.approx(wind)
+
+
+def test_run_fetches_regional_once_and_writes_mix(tmp_path, monkeypatch, no_offline):
+    monkeypatch.setattr(cache, "DATA", tmp_path)
+    calls = []
+    written = ci.run(MIX_START, MIX_END, client=mix_client(calls))
+    assert ci.REGIONAL_MIX in written and ci.REGIONAL in written
+    assert len([c for c in calls if "/regional/" in c.url.path]) == 1
+    assert set(cache.read(ci.REGIONAL_MIX)["region"]) == set(static.gb_region_keys()["region"])
+
+
+def test_old_recordings_without_mix_write_no_mix(no_offline):
+    assert ci.fetch_regional_mix(START, END, client()).empty

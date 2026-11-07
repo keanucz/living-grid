@@ -474,3 +474,33 @@ class RevealResponse(Model):
     zones_published: int
     mean_abs_error: float | None
     zones_inside_band: int | None
+
+
+# ---------- GET /regions?at= ----------
+
+
+class RegionMix(Model):
+    fuel: str
+    perc: float = Field(description="Percent of the region's modelled generation")
+
+
+class RegionNow(Model):
+    region: str = Field(description="Agile / DNO region letter, A to P")
+    name: str
+    centroid: tuple[float, float] = Field(description="[lon, lat]")
+    carbon_gco2_kwh: float | None = Field(description="Carbon Intensity API regional model (modelled)")
+    carbon_index: str | None = Field(description="very low, low, moderate, high or very high")
+    mix: list[RegionMix]
+    carbon_kind: Kind = "modelled"
+    agile_now_p_kwh: float | None = Field(description="Agile unit rate now, pence per kWh incl. VAT")
+    agile_tonight_min_p_kwh: float | None = Field(description="Cheapest half-hour tonight")
+    agile_tonight_min_at: datetime | None
+    agile_tonight_avg_p_kwh: float | None
+    agile_kind: Kind | None = Field(description="actual when tonight is published, else forecast from our model")
+    ghost_wind_mwh_24h: float | None = Field(description="Wind paid to switch off in the last 24 h; Scottish regions only")
+
+
+class RegionsResponse(Model):
+    at: datetime
+    regions: list[RegionNow]
+    note: str

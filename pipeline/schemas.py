@@ -81,6 +81,13 @@ GAS_MARGINAL_SHARE = pa.schema(
     [("zone", pa.string()), ("hour_of_day", pa.int32()), ("month", pa.int32()), ("share", pa.float64())]
 )
 
+# Carbon Intensity API regional model (modelled), per GB region letter A to P.
+REGIONAL_CARBON = pa.schema(
+    [("ts", TS), ("region", pa.string()), ("region_id", pa.int64()), ("intensity_gco2_kwh", pa.float64()),
+     ("index", pa.string())]
+)
+REGIONAL_MIX = pa.schema([("ts", TS), ("region", pa.string()), ("fuel", pa.string()), ("perc", pa.float64())])
+
 # Feature column -> plain-English group used for explanations.
 FEATURE_GROUPS = {
     "wind_speed_100m": "wind",
@@ -136,6 +143,8 @@ SCHEMAS = {
     "features/gas_marginal_share": GAS_MARGINAL_SHARE,
     "carbon/consumption_intensity": CARBON,
     "weather": WEATHER,
+    "carbon_intensity/regional": REGIONAL_CARBON,
+    "carbon_intensity/regional_mix": REGIONAL_MIX,
     "scores/scores": SCORES,
     "backtest/walk_forward": WALK_FORWARD,
 }
