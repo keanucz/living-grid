@@ -120,8 +120,10 @@ def send(text: str, to: str, kind: str, ping: bool = False, priority: int = 0) -
 
 
 def clean(value: object, limit: int) -> str:
-    """Strip control characters (terminal escapes, fake line breaks) and cap the length."""
+    """Strip control characters and escape markup so a message cannot close or forge tags in
+    the agent's context (e.g. a fake </channel> or <system-reminder>), then cap the length."""
     text = re.sub(r"[\x00-\x1f\x7f-\x9f]", " ", str(value))
+    text = text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
     return text if len(text) <= limit else text[:limit] + "..."
 
 
@@ -152,7 +154,7 @@ def parse(event: dict, me: str, base: str):
     if event.get("event") != "message":
         return None
     sender = sender_of(event, base)
-    if sender == me:
+    if sender == me or sender.startswith("unverified:"):
         return None
     env = envelope(event)
     return {
