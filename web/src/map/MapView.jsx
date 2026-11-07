@@ -24,6 +24,22 @@ if (typeof matchMedia !== 'undefined' && matchMedia('(max-width: 700px)').matche
   VIEWS.simulate = { longitude: 3.8, latitude: 52.6, zoom: 3.35, pitch: 50, bearing: -12 }
 }
 
+const ZONE_ONLY = (features) => features.filter((f) => f.properties.zone)
+const PHONE = typeof matchMedia !== 'undefined' && matchMedia('(max-width: 700px)').matches
+// Keep the camera on our six zones: bounded zoom, and the centre can't drift far from north-west Europe.
+const LIMITS = { minZoom: PHONE ? 2.8 : 3.4, maxZoom: 7.5, lon: [-12, 20], lat: [43, 64] }
+const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v))
+function clampView(v) {
+  return {
+    ...v,
+    minZoom: LIMITS.minZoom,
+    maxZoom: LIMITS.maxZoom,
+    zoom: clamp(v.zoom, LIMITS.minZoom, LIMITS.maxZoom),
+    longitude: clamp(v.longitude, ...LIMITS.lon),
+    latitude: clamp(v.latitude, ...LIMITS.lat),
+  }
+}
+
 // ?still freezes animation (screenshots, slow software GL).
 const STILL = new URLSearchParams(location.search).has('still')
 
@@ -46,7 +62,7 @@ function useClock() {
 export default function MapView({ ctx }) {
   const ui = ctx.ui
   const time = useClock()
-  const [viewState, setViewState] = useState(VIEWS.overview)
+  const [viewState, setViewState] = useState(() => clampView(VIEWS.overview))
   const first = useRef(true)
 
   useEffect(() => {
@@ -64,7 +80,7 @@ export default function MapView({ ctx }) {
   }, [ui.mode, ctx.scenario?.focus])
 
   const zoom = (d) =>
-    setViewState((v) => ({ ...v, zoom: v.zoom + d, transitionDuration: 300, transitionInterpolator: new FlyToInterpolator() }))
+    setViewState((v) => clampView({ ...v, zoom: v.zoom + d, transitionDuration: 300, transitionInterpolator: new FlyToInterpolator() }))
   const north = () =>
     setViewState((v) => ({ ...v, bearing: 0, pitch: ui.mode === 'simulate' ? 52 : 0, transitionDuration: 500, transitionInterpolator: new FlyToInterpolator() }))
 
@@ -73,7 +89,8 @@ export default function MapView({ ctx }) {
       ctx.data.geo && [
       new GeoJsonLayer({
         id: 'base-land',
-        data: ctx.data.geo,
+        // Only the zones we have data for; other countries are not drawn at all.
+        data: ctx.data.geo.features.filter((f) => f.properties.zone),
         filled: true,
         stroked: true,
         getFillColor: COLORS.land,
@@ -86,7 +103,7 @@ export default function MapView({ ctx }) {
       }),
       new PathLayer({
         id: 'base-borders',
-        data: outlines(ctx.data.geo.features, 860),
+        data: outlines(ZONE_ONLY(ctx.data.geo.features), 860),
         getPath: (d) => d.path,
         getColor: [96, 96, 91, 255],
         getWidth: 1,
@@ -105,7 +122,7 @@ export default function MapView({ ctx }) {
   return (
     <DeckGL
       viewState={viewState}
-      onViewStateChange={({ viewState: v }) => setViewState(v)}
+      onViewStateChange={({ viewState: v }) => setViewState(clampView(v))}
       controller={{ dragRotate: ui.mode === 'simulate', touchRotate: ui.mode === 'simulate' }}
       layers={layers}
       effects={[LIGHTING]}
