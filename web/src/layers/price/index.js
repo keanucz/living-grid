@@ -70,7 +70,7 @@ export default {
         pickable: true,
         autoHighlight: true,
         highlightColor: [255, 255, 255, 28],
-        transitions: { getFillColor: 600, getElevation: { duration: 1200, easing: (t) => 1 - Math.pow(1 - t, 3) } },
+        // No attribute transitions here: on some GPUs an extruded polygon layer with transitions does not draw at all.
         updateTriggers: {
           getFillColor: [ui.selectedZone, ui.scenario?.ranAt, sim],
           getElevation: [sim, ui.scenario?.ranAt, data.state],
