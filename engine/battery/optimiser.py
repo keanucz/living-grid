@@ -2,8 +2,11 @@
 
 Modes:
 - median: optimise against the p50 path.
-- risk_aware: per hour, the probability-weighted reward across p10/p50/p90 minus `risk_aversion`
-  times its shortfall to the worst of the three, so wide bands discourage trading.
+- risk_aware: p10, p50 and p90 are read as three whole price paths, because forecast errors move
+  together across neighbouring hours: a day that comes in high is high at the charge hour and the
+  discharge hour alike. The plan maximises its probability-weighted profit minus `risk_aversion`
+  times its shortfall on the worst path, so uncertainty that differs between hours discourages
+  trading, while uncertainty shared by every hour (which a charge-discharge spread cancels) does not.
 - perfect: optimise against known prices (the perfect-foresight benchmark).
 
 Grid energy is positive when bought (charging) and negative when sold. Profit is always settled
@@ -47,14 +50,60 @@ def _grid_energy(battery: Battery) -> tuple[np.ndarray, np.ndarray]:
     return g, ok
 
 
-def _hour_reward(g: np.ndarray, prices: np.ndarray, battery: Battery, mode: str, risk_aversion: float) -> np.ndarray:
-    """Reward matrix for one hour. prices: shape (3,) for p10/p50/p90 or (1,) for a known price."""
+def _plan(price: np.ndarray, battery: Battery, soc0_mwh: float) -> tuple[np.ndarray, np.ndarray]:
+    """(grid MWh, end-of-hour state of charge) per hour maximising sum(-price * g) minus degradation."""
+    g, ok = _grid_energy(battery)
+    levels = battery.levels
     deg = battery.degradation_per_mwh * np.abs(g)
-    if mode != "risk_aware":
-        return -prices[0] * g - deg
-    r = -prices[:, None, None] * g[None] - deg[None]
-    mean = np.tensordot(WEIGHTS, r, axes=1)
-    return mean - risk_aversion * (mean - r.min(axis=0))
+    n_t, n_s = len(price), len(levels)
+    value = np.zeros(n_s)
+    policy = np.zeros((n_t, n_s), dtype=np.int64)
+    for t in range(n_t - 1, -1, -1):
+        q = np.where(ok, -price[t] * g - deg + value[None, :], -np.inf)
+        policy[t] = q.argmax(axis=1)
+        value = q[np.arange(n_s), policy[t]]
+    i = int(np.abs(levels - soc0_mwh).argmin())
+    grid, soc = np.zeros(n_t), np.zeros(n_t)
+    for t in range(n_t):
+        j = policy[t, i]
+        grid[t], soc[t] = g[i, j], levels[j]
+        i = j
+    return grid, soc
+
+
+def path_objective(grid: np.ndarray, paths: np.ndarray, battery: Battery, risk_aversion: float) -> float:
+    """Weighted profit across the three price paths minus risk_aversion times the shortfall to the worst."""
+    profit = -(paths @ grid) - battery.degradation_per_mwh * np.abs(grid).sum()
+    mean = float(WEIGHTS @ profit)
+    return mean - risk_aversion * (mean - float(profit.min()))
+
+
+BLENDS = np.linspace(0.0, 1.0, 21)
+
+
+def _blend(paths: np.ndarray, theta: float) -> np.ndarray:
+    """A price path sliding from p10 (theta 0) through p50 (0.5) to p90 (1)."""
+    if theta <= 0.5:
+        a = theta / 0.5
+        return (1 - a) * paths[0] + a * paths[1]
+    a = (theta - 0.5) / 0.5
+    return (1 - a) * paths[1] + a * paths[2]
+
+
+def _risk_aware(paths: np.ndarray, battery: Battery, soc0_mwh: float, risk_aversion: float):
+    """paths: (3, n_t) for p10, p50, p90. The objective is a minimum over paths of
+    (1 - r) * mean + r * profit_k, which is not additive over hours; any weighting of the paths is.
+    So solve the plain DP on the family (1 - r) * pbar + r * blend(theta) and keep the plan whose true
+    objective is best. The weighted-mean plan is always a candidate, so risk-aware never scores below it."""
+    pbar = WEIGHTS @ paths
+    candidates = [pbar] + [(1 - risk_aversion) * pbar + risk_aversion * _blend(paths, th) for th in BLENDS]
+    best = None
+    for price in candidates:
+        grid, soc = _plan(price, battery, soc0_mwh)
+        score = path_objective(grid, paths, battery, risk_aversion)
+        if best is None or score > best[0] + 1e-9:
+            best = (score, grid, soc)
+    return best[1], best[2]
 
 
 def optimise(
@@ -82,32 +131,24 @@ def optimise(
     if not np.isfinite(p).all():
         raise ValueError("prices must be finite")
 
-    g, ok = _grid_energy(battery)
-    levels = battery.levels
-    n_t, n_s = len(df), len(levels)
-    value = np.zeros(n_s)
-    policy = np.zeros((n_t, n_s), dtype=np.int64)
-    for t in range(n_t - 1, -1, -1):
-        q = np.where(ok, _hour_reward(g, p[t], battery, mode, risk_aversion) + value[None, :], -np.inf)
-        policy[t] = q.argmax(axis=1)
-        value = q[np.arange(n_s), policy[t]]
-
-    i = int(np.abs(levels - soc0_mwh).argmin())
+    if mode == "risk_aware":
+        grid, soc = _risk_aware(p.T, battery, soc0_mwh, risk_aversion)
+        plan_price = p[:, 1]
+    else:
+        grid, soc = _plan(p[:, 0], battery, soc0_mwh)
+        plan_price = p[:, 0]
     rows = []
-    for t in range(n_t):
-        j = policy[t, i]
-        e = g[i, j]
-        plan_price = p[t, 1] if mode == "risk_aware" else p[t, 0]
+    for t in range(len(df)):
+        e = float(grid[t])
         rows.append({
             "ts": df["ts"].iloc[t],
             "action": "charge" if e > 1e-9 else "discharge" if e < -1e-9 else "hold",
             "grid_mwh": e,
             "mw": -e,
-            "soc_mwh": levels[j],
-            "plan_price": plan_price,
-            "planned_pnl": -plan_price * e - battery.degradation_per_mwh * abs(e),
+            "soc_mwh": float(soc[t]),
+            "plan_price": float(plan_price[t]),
+            "planned_pnl": -plan_price[t] * e - battery.degradation_per_mwh * abs(e),
         })
-        i = j
     return pd.DataFrame(rows)
 
 
