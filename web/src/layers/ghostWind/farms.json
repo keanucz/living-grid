@@ -1,0 +1,112 @@
+[
+ {
+  "unit": "VKNGW",
+  "name": "Viking Wind Farm (Shetland)",
+  "region": "P",
+  "mw": 443.0,
+  "coord": [
+   -1.25,
+   60.38
+  ]
+ },
+ {
+  "unit": "SGRWO",
+  "name": "Seagreen",
+  "region": "P",
+  "mw": 1075.0,
+  "coord": [
+   -1.75,
+   56.58
+  ]
+ },
+ {
+  "unit": "MOWWO",
+  "name": "Moray West",
+  "region": "P",
+  "mw": 882.0,
+  "coord": [
+   -3.0,
+   58.12
+  ]
+ },
+ {
+  "unit": "MOWEO",
+  "name": "Moray East",
+  "region": "P",
+  "mw": 950.0,
+  "coord": [
+   -2.75,
+   58.15
+  ]
+ },
+ {
+  "unit": "BEATO",
+  "name": "Beatrice",
+  "region": "P",
+  "mw": 588.0,
+  "coord": [
+   -2.9,
+   58.25
+  ]
+ },
+ {
+  "unit": "NNGAO",
+  "name": "Neart na Gaoithe",
+  "region": "N",
+  "mw": 448.0,
+  "coord": [
+   -2.35,
+   56.27
+  ]
+ },
+ {
+  "unit": "WHILW",
+  "name": "Whitelee",
+  "region": "N",
+  "mw": 539.0,
+  "coord": [
+   -4.27,
+   55.68
+  ]
+ },
+ {
+  "unit": "CLDCW",
+  "name": "Clyde",
+  "region": "N",
+  "mw": 522.0,
+  "coord": [
+   -3.65,
+   55.5
+  ]
+ },
+ {
+  "unit": "KLGLW",
+  "name": "Kilgallioch",
+  "region": "N",
+  "mw": 239.0,
+  "coord": [
+   -4.7,
+   55.05
+  ]
+ },
+ {
+  "unit": "STRNW",
+  "name": "Stronelairg",
+  "region": "P",
+  "mw": 228.0,
+  "coord": [
+   -4.45,
+   57.12
+  ]
+ },
+ {
+  "unit": "DUNGW",
+  "name": "Dunmaglass",
+  "region": "P",
+  "mw": 94.0,
+  "coord": [
+   -4.32,
+   57.28
+  ]
+ }
+]
