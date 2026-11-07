@@ -247,3 +247,10 @@ h1, .headline h1, .kval, .sim-name, .tile b { letter-spacing: -0.012em; }
 .map-label.on b { color: #0a0a0a; }
 .zrow.on { background: rgba(255,255,255,.05); border-color: var(--line-2); }
 .zspark { color: var(--text-2) !important; }
+/* inverted sidebar: black rail, white accent */
+.rail { background: #000; border-right: 1px solid rgba(255, 255, 255, 0.1); }
+.rail .logo { background: #fafafa; color: #0a0a0a; }
+.rail button { color: #737373; }
+.rail button:hover { color: #fafafa; background: rgba(255, 255, 255, 0.08); }
+.rail button.on { color: #0a0a0a; background: #fafafa; }
+.rail-sep { background: rgba(255, 255, 255, 0.12); }
