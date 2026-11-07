@@ -18,10 +18,7 @@ COST_DAYS = 14
 
 
 def _read(name: str) -> pd.DataFrame | None:
-    try:
-        return cache.read(name)
-    except FileNotFoundError:
-        return None
+    return boalf.read_live(name)
 
 
 def _utc(t) -> pd.Timestamp:

@@ -11,6 +11,7 @@ import pandas as pd
 
 from engine.battery import baselines
 from engine.battery.optimiser import Battery, optimise, settle
+from engine.ghost_wind.boalf import read_live
 from pipeline import cache
 
 TARGET = "price_da"
@@ -88,15 +89,13 @@ def summarise(zone: str, settled: dict[str, pd.DataFrame]) -> list[dict]:
 
 
 def load_inputs() -> tuple[pd.DataFrame | None, pd.DataFrame | None]:
-    """(forecast log rows for the day-ahead price, actual day-ahead prices) from the cache."""
-    try:
-        log = cache.read(FORECAST_LOG)
-    except FileNotFoundError:
-        log = None
-    names = sorted({p.stem for base in (cache.DATA, cache.FIXTURES) for p in (base / "actuals").glob("*.parquet")})
+    """(forecast log rows for the day-ahead price, actual day-ahead prices); fixtures only offline."""
+    bases = (cache.DATA, cache.FIXTURES) if cache.offline() else (cache.DATA,)
+    log = read_live(FORECAST_LOG)
+    names = sorted({p.stem for base in bases for p in (base / "actuals").glob("*.parquet")})
     frames = []
     for name in names:
-        df = cache.read(f"actuals/{name}")
+        df = read_live(f"actuals/{name}")
         if (df["series"] == TARGET).any():
             frames.append(df[df["series"] == TARGET])
     actual = pd.concat(frames, ignore_index=True) if frames else None

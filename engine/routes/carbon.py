@@ -23,10 +23,14 @@ HIDDEN_MIN_G, HIDDEN_MIN_SHARE = 10.0, 0.10
 
 
 def _read(name: str) -> pd.DataFrame | None:
-    try:
-        return cache.read(name)
-    except FileNotFoundError:
-        return None
+    """Committed fixtures only under LG_OFFLINE=1; online a missing file means no data."""
+    if cache.offline():
+        try:
+            return cache.read(name)
+        except FileNotFoundError:
+            return None
+    p = cache.path(name)
+    return cache.read_file(p) if p.exists() else None
 
 
 def _hour(df: pd.DataFrame, at) -> pd.Timestamp:

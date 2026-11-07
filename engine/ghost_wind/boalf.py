@@ -20,11 +20,19 @@ SCOTLAND = ("N", "P")
 COLUMNS = ["ts", "region", "region_name", "method", "mwh", "units", "kind"]
 
 
+def read_live(name: str) -> pd.DataFrame | None:
+    """A cached frame, or None. Committed fixtures are read only under LG_OFFLINE=1, never served as live data."""
+    if cache.offline():
+        try:
+            return cache.read(name)
+        except FileNotFoundError:
+            return None
+    p = cache.path(name)
+    return cache.read_file(p) if p.exists() else None
+
+
 def load_bids() -> pd.DataFrame | None:
-    try:
-        return cache.read(BIDS)
-    except FileNotFoundError:
-        return None
+    return read_live(BIDS)
 
 
 def _region_names() -> dict[str, str]:
