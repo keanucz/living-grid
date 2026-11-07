@@ -26,9 +26,10 @@ export default function TopBar({ at, source }) {
         ))}
       </div>
       <div className="top-right">
-        <span className="chip" title={source === 'live' ? 'Live data from the API' : 'API unreachable: showing bundled fixture data'}>
-          <span className={`dot ${source === 'live' ? '' : 'fixture'}`} />
-          {source === 'live' ? 'Live' : 'Fixture data'}
+        <span className="chip" title={source === 'live' ? 'Live data from the API' : source ? 'API unreachable: showing bundled fixture data' : 'Waiting for the live API'}>
+          <span className={`dot ${source === 'live' ? '' : source ? 'fixture' : 'loading'}`} />
+          {source === 'live' ? 'Live' : source ? 'Fixture data' : 'Loading live data…'}
+          <style>{`.dot.loading { background: var(--text-3); box-shadow: none; animation: lgpulse 1s ease-in-out infinite; } @keyframes lgpulse { 50% { opacity: .3; } }`}</style>
         </span>
         <span className="chip num"><Icon name="calendar" size={15} /> {when} UTC</span>
         <button className="chip icon" title="Search"><Icon name="search" size={16} /></button>
