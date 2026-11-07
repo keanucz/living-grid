@@ -117,6 +117,7 @@ export default {
         lineHeight: 1.25,
         getTextAnchor: 'middle',
         getAlignmentBaseline: 'center',
+        getPixelOffset: [0, 30], // sits under the price label instead of on top of it
         parameters: { depthTest: false },
         updateTriggers: { getText: [live.zones, data.state], getSize: [live.zones, data.state], getColor: [live.zones, data.state], getBackgroundColor: [live.zones, data.state] },
       }),

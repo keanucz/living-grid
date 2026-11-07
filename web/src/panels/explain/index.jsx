@@ -27,6 +27,8 @@ function Explain({ ctx }) {
   const rows = [...body.contributions].sort((a, b) => Math.abs(b.value) - Math.abs(a.value))
   const max = Math.max(1e-9, ...rows.map((r) => Math.abs(r.value)))
   const name = ctx.zoneById[body.zone]?.name ?? body.zone
+  const shown = ctx.stateByZone[body.zone]
+  const differs = shown?.price != null && Math.abs(shown.price - body.prediction) >= 1
   const when = new Date(body.ts).toISOString().slice(5, 16).replace('T', ' ')
 
   return (
@@ -48,7 +50,7 @@ function Explain({ ctx }) {
         ))}
       </div>
       <div className="faint xnote">
-        {when} UTC · forecast {s}{body.prediction.toFixed(1)}/MWh, {signed(body.delta, s)} against the reference.
+        {when} UTC · forecast {s}{body.prediction.toFixed(1)}/MWh, {signed(body.delta, s)} against the reference.{differs ? ` The map shows ${s}${Math.round(shown.price)} for this hour (published result); the bars explain the forecast.` : ''}
         {res.sample ? ' Sample figures shown because the API could not be reached.' : ' Attribution of the model’s own number, not a proven cause.'}
       </div>
       <style>{`

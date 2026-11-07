@@ -116,7 +116,7 @@ function Reveal() {
             <div><span>Frozen</span><b className="num">{frozen} UTC</b></div>
             <div><span>Zones in</span><b className="num">{data.zones_published} of {data.zones.length}</b></div>
             <div><span>Mean error</span><b className="num">{data.mean_abs_error != null ? data.mean_abs_error.toFixed(1) : '—'}</b></div>
-            <div><span>Inside band</span><b className="num">{data.zones_inside_band ?? 0}</b></div>
+            <div><span>Inside band</span><b className="num">{data.zones_published > 0 ? (data.zones_inside_band ?? 0) : '—'}</b></div>
           </div>
         )}
       </header>

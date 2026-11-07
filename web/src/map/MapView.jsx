@@ -173,6 +173,16 @@ function tooltip({ object, layer }, ctx) {
   return null
 }
 
+// Labels that would sit under the layer chips or the top bar are skipped rather than hidden behind them.
+function underControls(x, y) {
+  if (typeof document === 'undefined') return false
+  const main = document.querySelector('.main')?.getBoundingClientRect()
+  return [...document.querySelectorAll('.actions, .topbar')].some((el) => {
+    const r = el.getBoundingClientRect()
+    return x + (main?.left ?? 0) > r.left - 24 && x + (main?.left ?? 0) < r.right + 24 && y + (main?.top ?? 0) > r.top - 14 && y + (main?.top ?? 0) < r.bottom + 14
+  })
+}
+
 function Overlay({ viewport, ctx }) {
   const { ui, data, zoneById, priceOf, scenario } = ctx
   if (!viewport || !data.zones) return null
@@ -186,6 +196,7 @@ function Overlay({ viewport, ctx }) {
           const [x, y] = project(z.label_at)
           const st = ctx.stateByZone[z.id]
           if (!st) return null
+          if (underControls(x, y)) return null
           return (
             <div key={z.id} className={`map-label ${ui.selectedZone === z.id ? 'on' : ''}`} style={{ left: x, top: y }}
               onClick={() => actions.selectZone(z.id)}>
