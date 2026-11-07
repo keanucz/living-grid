@@ -41,7 +41,9 @@ for (const [world, near] of [[detail, true], [coarse, false]]) {
     const g = f.geometry
     if (!g) continue
     const name = f.properties.name
-    const polys = (g.type === 'Polygon' ? [g.coordinates] : g.coordinates).filter((p) => !spansDateline(p))
+    if (name === 'Antarctica' || name === 'Fr. S. Antarctic Lands') continue
+    // Rings that wrap the antimeridian (Russia, Fiji) are unwrapped east of 180° so they draw as one shape.
+    const polys = (g.type === 'Polygon' ? [g.coordinates] : g.coordinates).map((p) => (spansDateline(p) ? p.map((ring) => ring.map(([x, y]) => [x < 0 ? x + 360 : x, y])) : p))
     const kept = polys.filter((p) => p[0].some(inBox) === near).map((p) => p.map(round))
     if (!kept.length) continue
     const key = `${name}|${near}`

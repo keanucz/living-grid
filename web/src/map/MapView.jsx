@@ -25,8 +25,9 @@ if (typeof matchMedia !== 'undefined' && matchMedia('(max-width: 700px)').matche
 }
 
 const PHONE = typeof matchMedia !== 'undefined' && matchMedia('(max-width: 700px)').matches
-// Keep the camera on our six zones: bounded zoom, and the centre can't drift far from north-west Europe.
-const LIMITS = { minZoom: PHONE ? 2.8 : 3.4, maxZoom: 7.5, lon: [-12, 20], lat: [43, 64] }
+// Bounded zoom and pan; the default views below still frame our six zones in Europe.
+// The whole world is drawn (grey context); zoom out far enough to see it, but no further than one world.
+const LIMITS = { minZoom: PHONE ? 0.3 : 1.1, maxZoom: 7.5, lon: [-180, 180], lat: [-58, 78] }
 const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v))
 function clampView(v) {
   return {
@@ -180,7 +181,7 @@ function Overlay({ viewport, ctx }) {
 
   return (
     <div className="overlay">
-      {!sim && ui.section !== 'unseen' &&
+      {!sim && ui.section !== 'unseen' && viewport.zoom >= 3 &&
         data.zones.zones.map((z) => {
           const [x, y] = project(z.label_at)
           const st = ctx.stateByZone[z.id]
