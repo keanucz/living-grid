@@ -8,6 +8,7 @@ import { PANELS } from './panels/registry.js'
 import { api, useApi } from './api/client.js'
 import { actions, setState, useStore } from './store/store.js'
 import { PRICE_LEGEND } from './styles/tokens.js'
+import { matchView } from './views/index.js'
 
 const ASSET_FOR = { hormuz: 'gas', nuclear_outage: 'nuclear', scottish_storm: 'wind', interconnector_trip: 'hydro' }
 const SLOTS = ['left', 'bottomRight', 'bottom']
@@ -22,7 +23,26 @@ function useGeo() {
   return geo
 }
 
+function useHashView() {
+  const [view, setView] = useState(() => matchView(location.hash))
+  useEffect(() => {
+    const on = () => setView(matchView(location.hash))
+    addEventListener('hashchange', on)
+    return () => removeEventListener('hashchange', on)
+  }, [])
+  return view
+}
+
 export default function App() {
+  const view = useHashView()
+  if (view) {
+    document.title = `${view.title} · The Living Grid`
+    return <view.Component />
+  }
+  return <MapApp />
+}
+
+function MapApp() {
   const ui = useStore()
   const geo = useGeo()
   const zones = useApi(api.zones)
