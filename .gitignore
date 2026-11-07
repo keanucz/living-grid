@@ -16,3 +16,7 @@ coord/.phones
 coord/.bus_last_*
 coord/.bus_polled_*
 coord/__pycache__/
+
+# data cache: only data/static is tracked
+data/*
+!data/static/

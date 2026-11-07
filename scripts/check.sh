@@ -1,17 +1,17 @@
 #!/usr/bin/env bash
-# The gate every task must pass before landing on main. Replace with your project's build and tests.
+# The gate every task must pass before landing on main: Python tests, then the web build.
 set -euo pipefail
+cd "$(dirname "$0")/.."
+export LG_OFFLINE=1
 
-if [ -f package.json ]; then
-  npm ci --silent && npm test --silent
-elif [ -f pyproject.toml ] || [ -f requirements.txt ]; then
-  python3 -m pytest -q
-elif [ -f Cargo.toml ]; then
-  cargo test --quiet
-elif [ -f go.mod ]; then
-  go test ./...
-elif [ -f CMakeLists.txt ]; then
-  cmake -S . -B build -G Ninja >/dev/null && cmake --build build && ctest --test-dir build --output-on-failure
-else
-  echo "no project detected yet, passing"
+need() { command -v "$1" >/dev/null || { echo "check: '$1' is not installed on this machine" >&2; exit 1; }; }
+
+need uv
+uv sync --quiet
+uv run --quiet pytest -q
+
+if [ -f web/package.json ]; then
+  need npm
+  (cd web && npm install --no-audit --no-fund --silent)
+  (cd web && npm run --silent build)
 fi

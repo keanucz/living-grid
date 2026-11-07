@@ -51,7 +51,7 @@ The demo is built around these. Everything else is optional and is cut first if 
 
 ### Rules for every session
 
-- Plan briefly before each task, then build. Keep the app runnable at all times; commit small and often to `main`, pull before you push.
+- Plan briefly before each task, then build. Keep the app runnable at all times; land small tasks often through `bin/hub ready` (only the merge queue writes to `main`), and run `bin/hub sync` to pick up others' work.
 - Only touch your own area (see Ownership). Changes to a shared contract need a heads-up to the team first.
 - Public data only. Write all project code during the event; `checks/` and `READINESS.md` are reference only, never import from them.
 - Cache every fetch to `data/` as parquet. `LG_OFFLINE=1` must make the whole app run from cache and fixtures with no network.
@@ -67,6 +67,17 @@ The demo is built around these. Everything else is optional and is cut first if 
 - Python 3.11+ with uv: pandas, pyarrow, lightgbm, scikit-learn, fastapi, uvicorn, httpx, yfinance, shapely.
 - Front end: React (Vite), deck.gl 9.4.1, maplibre-gl 5.24.0 (do not use MapLibre 6 interleaved; it throws every frame). Basemap `https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json`.
 - SpacetimeDB 2.14 (TypeScript module, `react-ts` template) is the live shared state: Python publishes actuals, forecasts, scores and intervention results, and every screen subscribes. Python calls reducers over HTTP (`POST /v1/identity` for a token, then `POST /v1/database/{db}/call/{reducer}`). FastAPI handles request-response work such as interventions and explanations.
+
+### Running it
+
+```
+uv sync                                            # Python deps (Python 3.12 is fetched by uv)
+uv run uvicorn engine.app:app --port 8000          # API
+cd web && npm install && npm run dev               # front end on :5173
+./scripts/check.sh                                 # the merge gate: pytest, then the web build
+```
+
+Tests live next to the code they cover (`pipeline/tests/`, `engine/tests/`) and must run offline. Add Python dependencies with `uv add` and front-end ones with `npm install` in `web/`; both lockfiles are shared files, so keep those changes in their own small task.
 
 ### Repo layout
 
@@ -188,13 +199,15 @@ pipeline.models.as_of(date) -> Model                                  # trained 
 
 ### Ownership
 
-#### A: Data and models (`pipeline/`)
+Your lane comes from your agent's name: `stefan-*` agents work lane A, `keanu-*` lane B, `manu-*` lane C. Claim tasks in your own lane first; take another lane's task only when yours has nothing open, and say so on the hivemind bus.
+
+#### A: Data and models (`pipeline/`): Stefan
 Ingest and caching for every source with offline fixtures; history backfill from the VPS (gas and carbon from 2021); feature pipeline; LightGBM quantile models (alpha 0.1, 0.5, 0.9) for GB system price, load, wind and next-day day-ahead prices; purged walk-forward backtest against persistence; forecast scheduler and scorer; explanations; as-of models for replay; carbon tracing; gas marginal-share estimates for pass-through. Freeze Monday's forecast by 23:59 Saturday and the final version by 11:50 Sunday.
 
-#### B: Engine and the unseen (`engine/`)
+#### B: Engine and the unseen (`engine/`, `spacetime/`): Keanu
 FastAPI app implementing the contract; battery optimiser in median-only and risk-aware modes with baselines and unit tests; interventions and world events including gas and carbon pass-through; pre-computed scenarios; ghost wind estimation (BOALF mapping plus weather-implied gap) with constraint costs; household advice; replay and reveal endpoints; SpacetimeDB module and the publisher from parquet and engine results into it; room game backend.
 
-#### C: Front end and demo (`web/`, `demo/`)
+#### C: Front end and demo (`web/`, `demo/`): Manu
 Main map with price, carbon and ghost wind layers; forecast ghost and scrubber; zone chart; explanation cards; intervention and world events menu with animated pound figure; scoreboard; household phone view; replay view; reveal view. Demo script with a G-Research-first and an HRT-first version, fallback video, write-up with backtest and live numbers, animated GIF thumbnail. Smooth at 60 fps on a projector at 1080p.
 
 ### Build order
