@@ -23,10 +23,20 @@ PRIOR_GAS_MARGINAL_SHARE = {
     "GB": GB_GAS_MARGINAL_SHARE,
     "NL": 0.65,
     "BE": 0.45,
-    "DE-LU": 0.35,
+    "DE-LU": 0.40,
     "FR": 0.15,
     "NO2": 0.03,
 }
+# The pipeline estimate measures co-movement of power with gas, which coupled hydro (NO2) shares and which
+# a short history (GB) understates, so it is clipped to documented bounds: GB at least the UK government's
+# 2026 figure, Norway at most 10% (hydro sets its price), NL and DE-LU at least 40% (gas-heavy merit orders).
+SHARE_BOUNDS = {
+    "GB": (GB_GAS_MARGINAL_SHARE, 1.0),
+    "NL": (0.40, 1.0),
+    "DE-LU": (0.40, 1.0),
+    "NO2": (0.0, 0.10),
+}
+BOUNDS_NOTE = "bounded by standard estimates: GB at least {gb:.0%} (UK government, 2026), Norway at most 10%, NL and DE-LU at least 40%"
 DEFAULT_TTF_EUR_MWH = 35.0
 DEFAULT_EUA_EUR_T = 70.0
 
@@ -41,14 +51,25 @@ def marginal_share(feats: pd.DataFrame) -> tuple[np.ndarray, str]:
         s = cache.read("features/gas_marginal_share")
     except FileNotFoundError:
         s = None
+    zones = feats["zone"]
     if s is not None and len(s) and s.groupby("zone")["share"].mean().nunique() > 1:
         key = pd.DataFrame(
-            {"zone": feats["zone"].to_numpy(), "hour_of_day": feats["ts"].dt.hour.to_numpy(), "month": feats["ts"].dt.month.to_numpy()}
+            {"zone": zones.to_numpy(), "hour_of_day": feats["ts"].dt.hour.to_numpy(), "month": feats["ts"].dt.month.to_numpy()}
         )
         merged = key.merge(s, on=["zone", "hour_of_day", "month"], how="left")
         prior = merged["zone"].map(PRIOR_GAS_MARGINAL_SHARE)
-        return merged["share"].fillna(prior).fillna(0.0).to_numpy(float), "estimated from generation mix and 2021 to 2026 prices"
-    return feats["zone"].map(PRIOR_GAS_MARGINAL_SHARE).fillna(0.0).to_numpy(float), "standard estimates"
+        share = merged["share"].fillna(prior).fillna(0.0).to_numpy(float)
+        source = "estimated from generation mix and 2021 to 2026 prices, " + BOUNDS_NOTE.format(gb=GB_GAS_MARGINAL_SHARE)
+    else:
+        share = zones.map(PRIOR_GAS_MARGINAL_SHARE).fillna(0.0).to_numpy(float)
+        source = "standard estimates"
+    return bounded(share, zones), source
+
+
+def bounded(share: np.ndarray, zones: pd.Series) -> np.ndarray:
+    lo = zones.map(lambda z: SHARE_BOUNDS.get(z, (0.0, 1.0))[0]).to_numpy(float)
+    hi = zones.map(lambda z: SHARE_BOUNDS.get(z, (0.0, 1.0))[1]).to_numpy(float)
+    return np.clip(share, lo, hi)
 
 
 def to_zone_currency(eur: np.ndarray, zones: pd.Series) -> np.ndarray:

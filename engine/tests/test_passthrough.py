@@ -88,4 +88,5 @@ def test_differentiated_pipeline_share_wins(tmp_path):
     (tmp_path / "features").mkdir()
     share.to_parquet(tmp_path / "features" / "gas_marginal_share.parquet")
     d = deltas(post(type="hormuz", magnitude=50))
-    assert d["NL"] == 0 and d["GB"] > 0
+    assert d["NL"] == pytest.approx(17.5 * pt.gas_pass_through() * pt.SHARE_BOUNDS["NL"][0], rel=0.01), "estimate 0 is lifted to the NL floor"
+    assert d["GB"] == pytest.approx(17.5 * pt.gas_pass_through() / 1.15, rel=0.01)
