@@ -383,5 +383,33 @@
   "used_by": "#178",
   "processor": "manual",
   "question": "kWh per tumble dryer load, Energy Saving Trust"
+ },
+ {
+  "id": "dc_dgx_h100_kw",
+  "topic": "datacentre",
+  "used_by": "#180",
+  "processor": "manual",
+  "question": "NVIDIA DGX H100 maximum system power (8 H100 GPUs)"
+ },
+ {
+  "id": "dc_dgx_b200_kw",
+  "topic": "datacentre",
+  "used_by": "#180",
+  "processor": "manual",
+  "question": "NVIDIA DGX B200 maximum system power (8 B200 GPUs)"
+ },
+ {
+  "id": "dc_rtx4090_tgp_w",
+  "topic": "datacentre",
+  "used_by": "#180",
+  "processor": "manual",
+  "question": "NVIDIA GeForce RTX 4090 total graphics power"
+ },
+ {
+  "id": "dc_pue",
+  "topic": "datacentre",
+  "used_by": "#180",
+  "processor": "manual",
+  "question": "Average data centre power usage effectiveness (PUE)"
  }
 ]

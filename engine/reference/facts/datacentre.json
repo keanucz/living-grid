@@ -1,0 +1,90 @@
+[
+  {
+    "id": "dc_dgx_h100_kw",
+    "question": "NVIDIA DGX H100 maximum system power (8 H100 GPUs)",
+    "used_by": "#180",
+    "retrieved_at": "2026-11-07T00:00:00+00:00",
+    "value": "10.2 kW max (8 x H100 per system)",
+    "unit": "kW per 8-GPU system",
+    "as_of": "NVIDIA DGX H100/H200 User Guide, read 7 Nov 2026",
+    "caveat": "Maximum, not typical draw; includes CPUs, memory, networking and fans. Per GPU: 1.275 kW.",
+    "confidence": "high",
+    "sources": [
+      {
+        "url": "https://docs.nvidia.com/dgx/dgxh100-user-guide/dgxh100-user-guide.pdf",
+        "quote": "200-240 volts AC 10.2 kW max. 3300 W @ 200-240 V, 16 A, 50-60 Hz"
+      }
+    ],
+    "verified": true,
+    "verification": "stefan-5 read the figure in NVIDIA's user guide; QuantaCloud's page quotes the same 10.2 kW",
+    "manual_override": true
+  },
+  {
+    "id": "dc_dgx_b200_kw",
+    "question": "NVIDIA DGX B200 maximum system power (8 B200 GPUs)",
+    "used_by": "#180",
+    "retrieved_at": "2026-11-07T00:00:00+00:00",
+    "value": "14.3 kW max (8 x B200 per system)",
+    "unit": "kW per 8-GPU system",
+    "as_of": "NVIDIA DGX B200 datasheet and user guide, read 7 Nov 2026",
+    "caveat": "Maximum, not typical draw. Per GPU: 1.7875 kW.",
+    "confidence": "high",
+    "sources": [
+      {
+        "url": "https://resources.nvidia.com/en-us-dgx-systems/dgx-b200-datasheet",
+        "quote": "System Power Usage ~14.3 kW max"
+      },
+      {
+        "url": "https://docs.nvidia.com/dgx/dgxb200-user-guide/introduction-to-dgxb200.html",
+        "quote": "200-240 volts AC 14.3 kW max."
+      }
+    ],
+    "verified": true,
+    "verification": "stefan-5 found the figure in both NVIDIA's datasheet and user guide",
+    "manual_override": true
+  },
+  {
+    "id": "dc_rtx4090_tgp_w",
+    "question": "NVIDIA GeForce RTX 4090 total graphics power",
+    "used_by": "#180",
+    "retrieved_at": "2026-11-07T00:00:00+00:00",
+    "value": "450 W total graphics power",
+    "unit": "W per card",
+    "as_of": "nvidia.com RTX 4090 page, read 7 Nov 2026",
+    "caveat": "Graphics card only; the host PC, networking and cooling are not included.",
+    "confidence": "high",
+    "sources": [
+      {
+        "url": "https://www.nvidia.com/en-us/geforce/graphics-cards/40-series/rtx-4090",
+        "quote": "Total Graphics Power (W) 450"
+      }
+    ],
+    "verified": true,
+    "verification": "stefan-5 read the figure on NVIDIA's product page",
+    "manual_override": true
+  },
+  {
+    "id": "dc_pue",
+    "question": "Average data centre power usage effectiveness (PUE)",
+    "used_by": "#180",
+    "retrieved_at": "2026-11-07T00:00:00+00:00",
+    "value": "Global average 1.54 (2025); Europe 1.50 (2025); Google fleet-wide 1.09 (2025)",
+    "unit": "ratio",
+    "as_of": "Uptime Institute Global Data Center Survey 2025; Google 2026 Environmental Report",
+    "caveat": "Uptime figures are operator self-reports (n=681 global, n=134 Europe); Google's is its own large-scale sites.",
+    "confidence": "high",
+    "sources": [
+      {
+        "url": "https://intelligence.uptimeinstitute.com/sites/default/files/2025-08/UI%20Field%20report%20183_Annual%20survey%20-%20regional%20view%202025.pdf",
+        "quote": "1.54 Global average (n=681) ... 1.50 Europe (n=134)"
+      },
+      {
+        "url": "https://sustainability.google/files/google-2026-environmental-report.pdf",
+        "quote": "a 2025 fleet-wide average power usage effectiveness (PUE) of 1.09"
+      }
+    ],
+    "verified": true,
+    "verification": "stefan-5 read both in the sources; Google's page also quotes Uptime's 1.54",
+    "manual_override": true
+  }
+]

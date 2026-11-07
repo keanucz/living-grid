@@ -449,6 +449,81 @@ class HouseholdSavingsResponse(Model):
     note: str
 
 
+class DataCentreRequest(Model):
+    locations: list[str] = Field(min_length=1, max_length=3, description="Zone codes or GB region letters, up to 3")
+    gpus: int = Field(1000, ge=1, le=1_000_000)
+    gpu_type: Literal["h100", "b200", "consumer"] = "h100"
+    pue: float | None = Field(None, ge=1.0, le=3.0, description="Default is Uptime Institute's 2025 European average")
+    utilisation: float = Field(0.6, gt=0, le=1)
+    flexible_share: float = Field(0.2, ge=0, le=1, description="Share of energy that can move within the day")
+
+
+class DataCentreEnergy(Model):
+    mean_price_local_mwh: float
+    cost_local: float = Field(description="Annual wholesale energy cost with a flat load, in the zone's currency")
+    cost_eur: float
+    cost_flex_local: float = Field(description="Same, with the flexible share moved to each day's cheapest hours")
+    cost_flex_eur: float
+    saving_flex_local: float
+    saving_flex_eur: float
+    saving_flex_pct: float
+
+
+class DataCentreCarbon(Model):
+    intensity_g_kwh: float = Field(description="Mean modelled consumption-based intensity")
+    tonnes: float = Field(description="Annual tonnes CO2 with a flat load")
+    tonnes_flex: float = Field(description="Annual tonnes with the flexible share moved to cheap hours")
+    eua_eur_t: float | None
+    cost_eur: float | None = Field(description="tonnes priced at the EU ETS allowance price; a shadow cost already inside the power price")
+    basis: str
+
+
+class DataCentreNextJob(Model):
+    start: datetime
+    end: datetime
+    hours: int
+    kw: float
+    saving_eur: Quantiles = Field(description="Against starting at the next hour")
+    kind: Kind
+
+
+class DataCentreNote(Model):
+    topic: str
+    text: str
+    source: str
+
+
+class DataCentreSite(Model):
+    location: str
+    zone: Zone
+    name: str
+    currency: Currency
+    peak_it_kw: float
+    facility_kw_avg: float
+    annual_mwh: float
+    price_basis: str
+    price_days: int = Field(description="Days of prices the annual figures are scaled from")
+    energy: DataCentreEnergy | None
+    carbon: DataCentreCarbon | None
+    next_job: DataCentreNextJob | None = Field(description="Best start for the flexible load over the next 24 hours, from /compute")
+    grid_notes: list[DataCentreNote]
+    kind: Kind
+
+
+class DataCentreResponse(Model):
+    generated_at: datetime
+    gpus: int
+    gpu_type: str
+    kw_per_gpu: float
+    pue: float
+    utilisation: float
+    flexible_share: float
+    eur_per_gbp: float
+    sites: list[DataCentreSite]
+    cheapest_site: str | None = Field(description="Location with the lowest annual energy cost once flexible load is moved")
+    note: str
+
+
 # ---------- GET /compute?kw=&hours=&zones=&deadline= ----------
 
 

@@ -426,6 +426,33 @@ def scores() -> dict:
     }
 
 
+def datacentre() -> dict:
+    def site(loc, zone, name, cur, fx, cost, flex_cost, ci, tonnes):
+        return {
+            "location": loc, "zone": zone, "name": name, "currency": cur, "peak_it_kw": 1275.0, "facility_kw_avg": 1147.5, "annual_mwh": 10052.1,
+            "price_basis": "day-ahead price", "price_days": 365,
+            "energy": {"mean_price_local_mwh": round(cost / 10052.1, 2), "cost_local": cost, "cost_eur": round(cost * fx), "cost_flex_local": flex_cost,
+                       "cost_flex_eur": round(flex_cost * fx), "saving_flex_local": cost - flex_cost, "saving_flex_eur": round((cost - flex_cost) * fx),
+                       "saving_flex_pct": round(100 * (cost - flex_cost) / cost, 2)},
+            "carbon": {"intensity_g_kwh": ci, "tonnes": tonnes, "tonnes_flex": round(tonnes * 1.01), "eua_eur_t": 72.0, "cost_eur": round(tonnes * 72.0),
+                       "basis": "modelled consumption-based intensity"},
+            "next_job": {"start": iso(NOW.replace(hour=2)), "end": iso(NOW.replace(hour=8)), "hours": 6, "kw": 229.5,
+                         "saving_eur": {"p10": 4.0, "p50": 9.0, "p90": 15.0}, "kind": "forecast"},
+            "grid_notes": [{"topic": "Interconnector access", "text": "Illustrative fixture note.", "source": "data/static/interconnectors.csv"},
+                           {"topic": "Connection queue and boundary limits", "text": "Not in our data yet.", "source": "none"}],
+            "kind": "estimated",
+        }
+
+    return {
+        "generated_at": iso(NOW), "gpus": 1000, "gpu_type": "h100", "kw_per_gpu": 1.275, "pue": 1.5, "utilisation": 0.6, "flexible_share": 0.2,
+        "eur_per_gbp": 1.15,
+        "sites": [site("FR", "FR", "FR", "EUR", 1.0, 640_000.0, 600_000.0, 55.0, 553),
+                  site("N", "GB", "South and Central Scotland (GB region N)", "GBP", 1.15, 790_000.0, 745_000.0, 180.0, 1809)],
+        "cheapest_site": "FR",
+        "note": "Illustrative fixture values; see the live endpoint for the real method and caveats.",
+    }
+
+
 def household() -> dict:
     start = NOW.replace(hour=16)
     prices = []
@@ -570,6 +597,7 @@ def build() -> dict[str, tuple[type, dict]]:
         "scenarios": (s.ScenariosResponse, sc),
         "scores": (s.ScoresResponse, scores()),
         "household": (s.HouseholdResponse, household()),
+        "datacentre": (s.DataCentreResponse, datacentre()),
         "household_savings": (s.HouseholdSavingsResponse, household_savings()),
         "replay": (s.ReplayResponse, replay()),
         "reveal": (s.RevealResponse, reveal()),

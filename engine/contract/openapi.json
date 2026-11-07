@@ -552,6 +552,449 @@
     "title": "Contribution",
     "type": "object"
    },
+   "DataCentreCarbon": {
+    "additionalProperties": false,
+    "properties": {
+     "basis": {
+      "title": "Basis",
+      "type": "string"
+     },
+     "cost_eur": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "description": "tonnes priced at the EU ETS allowance price; a shadow cost already inside the power price",
+      "title": "Cost Eur"
+     },
+     "eua_eur_t": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Eua Eur T"
+     },
+     "intensity_g_kwh": {
+      "description": "Mean modelled consumption-based intensity",
+      "title": "Intensity G Kwh",
+      "type": "number"
+     },
+     "tonnes": {
+      "description": "Annual tonnes CO2 with a flat load",
+      "title": "Tonnes",
+      "type": "number"
+     },
+     "tonnes_flex": {
+      "description": "Annual tonnes with the flexible share moved to cheap hours",
+      "title": "Tonnes Flex",
+      "type": "number"
+     }
+    },
+    "required": [
+     "intensity_g_kwh",
+     "tonnes",
+     "tonnes_flex",
+     "eua_eur_t",
+     "cost_eur",
+     "basis"
+    ],
+    "title": "DataCentreCarbon",
+    "type": "object"
+   },
+   "DataCentreEnergy": {
+    "additionalProperties": false,
+    "properties": {
+     "cost_eur": {
+      "title": "Cost Eur",
+      "type": "number"
+     },
+     "cost_flex_eur": {
+      "title": "Cost Flex Eur",
+      "type": "number"
+     },
+     "cost_flex_local": {
+      "description": "Same, with the flexible share moved to each day's cheapest hours",
+      "title": "Cost Flex Local",
+      "type": "number"
+     },
+     "cost_local": {
+      "description": "Annual wholesale energy cost with a flat load, in the zone's currency",
+      "title": "Cost Local",
+      "type": "number"
+     },
+     "mean_price_local_mwh": {
+      "title": "Mean Price Local Mwh",
+      "type": "number"
+     },
+     "saving_flex_eur": {
+      "title": "Saving Flex Eur",
+      "type": "number"
+     },
+     "saving_flex_local": {
+      "title": "Saving Flex Local",
+      "type": "number"
+     },
+     "saving_flex_pct": {
+      "title": "Saving Flex Pct",
+      "type": "number"
+     }
+    },
+    "required": [
+     "mean_price_local_mwh",
+     "cost_local",
+     "cost_eur",
+     "cost_flex_local",
+     "cost_flex_eur",
+     "saving_flex_local",
+     "saving_flex_eur",
+     "saving_flex_pct"
+    ],
+    "title": "DataCentreEnergy",
+    "type": "object"
+   },
+   "DataCentreNextJob": {
+    "additionalProperties": false,
+    "properties": {
+     "end": {
+      "format": "date-time",
+      "title": "End",
+      "type": "string"
+     },
+     "hours": {
+      "title": "Hours",
+      "type": "integer"
+     },
+     "kind": {
+      "enum": [
+       "actual",
+       "forecast",
+       "modelled",
+       "estimated",
+       "scenario"
+      ],
+      "title": "Kind",
+      "type": "string"
+     },
+     "kw": {
+      "title": "Kw",
+      "type": "number"
+     },
+     "saving_eur": {
+      "$ref": "#/components/schemas/Quantiles",
+      "description": "Against starting at the next hour"
+     },
+     "start": {
+      "format": "date-time",
+      "title": "Start",
+      "type": "string"
+     }
+    },
+    "required": [
+     "start",
+     "end",
+     "hours",
+     "kw",
+     "saving_eur",
+     "kind"
+    ],
+    "title": "DataCentreNextJob",
+    "type": "object"
+   },
+   "DataCentreNote": {
+    "additionalProperties": false,
+    "properties": {
+     "source": {
+      "title": "Source",
+      "type": "string"
+     },
+     "text": {
+      "title": "Text",
+      "type": "string"
+     },
+     "topic": {
+      "title": "Topic",
+      "type": "string"
+     }
+    },
+    "required": [
+     "topic",
+     "text",
+     "source"
+    ],
+    "title": "DataCentreNote",
+    "type": "object"
+   },
+   "DataCentreRequest": {
+    "additionalProperties": false,
+    "properties": {
+     "flexible_share": {
+      "default": 0.2,
+      "description": "Share of energy that can move within the day",
+      "maximum": 1.0,
+      "minimum": 0.0,
+      "title": "Flexible Share",
+      "type": "number"
+     },
+     "gpu_type": {
+      "default": "h100",
+      "enum": [
+       "h100",
+       "b200",
+       "consumer"
+      ],
+      "title": "Gpu Type",
+      "type": "string"
+     },
+     "gpus": {
+      "default": 1000,
+      "maximum": 1000000.0,
+      "minimum": 1.0,
+      "title": "Gpus",
+      "type": "integer"
+     },
+     "locations": {
+      "description": "Zone codes or GB region letters, up to 3",
+      "items": {
+       "type": "string"
+      },
+      "maxItems": 3,
+      "minItems": 1,
+      "title": "Locations",
+      "type": "array"
+     },
+     "pue": {
+      "anyOf": [
+       {
+        "maximum": 3.0,
+        "minimum": 1.0,
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "description": "Default is Uptime Institute's 2025 European average",
+      "title": "Pue"
+     },
+     "utilisation": {
+      "default": 0.6,
+      "exclusiveMinimum": 0.0,
+      "maximum": 1.0,
+      "title": "Utilisation",
+      "type": "number"
+     }
+    },
+    "required": [
+     "locations"
+    ],
+    "title": "DataCentreRequest",
+    "type": "object"
+   },
+   "DataCentreResponse": {
+    "additionalProperties": false,
+    "properties": {
+     "cheapest_site": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "description": "Location with the lowest annual energy cost once flexible load is moved",
+      "title": "Cheapest Site"
+     },
+     "eur_per_gbp": {
+      "title": "Eur Per Gbp",
+      "type": "number"
+     },
+     "flexible_share": {
+      "title": "Flexible Share",
+      "type": "number"
+     },
+     "generated_at": {
+      "format": "date-time",
+      "title": "Generated At",
+      "type": "string"
+     },
+     "gpu_type": {
+      "title": "Gpu Type",
+      "type": "string"
+     },
+     "gpus": {
+      "title": "Gpus",
+      "type": "integer"
+     },
+     "kw_per_gpu": {
+      "title": "Kw Per Gpu",
+      "type": "number"
+     },
+     "note": {
+      "title": "Note",
+      "type": "string"
+     },
+     "pue": {
+      "title": "Pue",
+      "type": "number"
+     },
+     "sites": {
+      "items": {
+       "$ref": "#/components/schemas/DataCentreSite"
+      },
+      "title": "Sites",
+      "type": "array"
+     },
+     "utilisation": {
+      "title": "Utilisation",
+      "type": "number"
+     }
+    },
+    "required": [
+     "generated_at",
+     "gpus",
+     "gpu_type",
+     "kw_per_gpu",
+     "pue",
+     "utilisation",
+     "flexible_share",
+     "eur_per_gbp",
+     "sites",
+     "cheapest_site",
+     "note"
+    ],
+    "title": "DataCentreResponse",
+    "type": "object"
+   },
+   "DataCentreSite": {
+    "additionalProperties": false,
+    "properties": {
+     "annual_mwh": {
+      "title": "Annual Mwh",
+      "type": "number"
+     },
+     "carbon": {
+      "anyOf": [
+       {
+        "$ref": "#/components/schemas/DataCentreCarbon"
+       },
+       {
+        "type": "null"
+       }
+      ]
+     },
+     "currency": {
+      "enum": [
+       "GBP",
+       "EUR"
+      ],
+      "title": "Currency",
+      "type": "string"
+     },
+     "energy": {
+      "anyOf": [
+       {
+        "$ref": "#/components/schemas/DataCentreEnergy"
+       },
+       {
+        "type": "null"
+       }
+      ]
+     },
+     "facility_kw_avg": {
+      "title": "Facility Kw Avg",
+      "type": "number"
+     },
+     "grid_notes": {
+      "items": {
+       "$ref": "#/components/schemas/DataCentreNote"
+      },
+      "title": "Grid Notes",
+      "type": "array"
+     },
+     "kind": {
+      "enum": [
+       "actual",
+       "forecast",
+       "modelled",
+       "estimated",
+       "scenario"
+      ],
+      "title": "Kind",
+      "type": "string"
+     },
+     "location": {
+      "title": "Location",
+      "type": "string"
+     },
+     "name": {
+      "title": "Name",
+      "type": "string"
+     },
+     "next_job": {
+      "anyOf": [
+       {
+        "$ref": "#/components/schemas/DataCentreNextJob"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "description": "Best start for the flexible load over the next 24 hours, from /compute"
+     },
+     "peak_it_kw": {
+      "title": "Peak It Kw",
+      "type": "number"
+     },
+     "price_basis": {
+      "title": "Price Basis",
+      "type": "string"
+     },
+     "price_days": {
+      "description": "Days of prices the annual figures are scaled from",
+      "title": "Price Days",
+      "type": "integer"
+     },
+     "zone": {
+      "enum": [
+       "GB",
+       "FR",
+       "DE-LU",
+       "NL",
+       "BE",
+       "NO2"
+      ],
+      "title": "Zone",
+      "type": "string"
+     }
+    },
+    "required": [
+     "location",
+     "zone",
+     "name",
+     "currency",
+     "peak_it_kw",
+     "facility_kw_avg",
+     "annual_mwh",
+     "price_basis",
+     "price_days",
+     "energy",
+     "carbon",
+     "next_job",
+     "grid_notes",
+     "kind"
+    ],
+    "title": "DataCentreSite",
+    "type": "object"
+   },
    "ExplainResponse": {
     "additionalProperties": false,
     "properties": {
@@ -3112,6 +3555,145 @@
     "summary": "Compute",
     "tags": [
      "household"
+    ]
+   }
+  },
+  "/datacentre": {
+   "get": {
+    "description": "Cost, carbon and grid notes for a GPU site; `locations` is a comma-separated list of up to 3 zones or GB region letters.",
+    "operationId": "datacentre_datacentre_get",
+    "parameters": [
+     {
+      "in": "query",
+      "name": "locations",
+      "required": false,
+      "schema": {
+       "default": "GB",
+       "title": "Locations",
+       "type": "string"
+      }
+     },
+     {
+      "in": "query",
+      "name": "gpus",
+      "required": false,
+      "schema": {
+       "default": 1000,
+       "title": "Gpus",
+       "type": "integer"
+      }
+     },
+     {
+      "in": "query",
+      "name": "gpu_type",
+      "required": false,
+      "schema": {
+       "default": "h100",
+       "title": "Gpu Type",
+       "type": "string"
+      }
+     },
+     {
+      "in": "query",
+      "name": "pue",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "number"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Pue"
+      }
+     },
+     {
+      "in": "query",
+      "name": "utilisation",
+      "required": false,
+      "schema": {
+       "default": 0.6,
+       "title": "Utilisation",
+       "type": "number"
+      }
+     },
+     {
+      "in": "query",
+      "name": "flexible_share",
+      "required": false,
+      "schema": {
+       "default": 0.2,
+       "title": "Flexible Share",
+       "type": "number"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/DataCentreResponse"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Datacentre",
+    "tags": [
+     "datacentre"
+    ]
+   },
+   "post": {
+    "operationId": "datacentre_post_datacentre_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/DataCentreRequest"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/DataCentreResponse"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Datacentre Post",
+    "tags": [
+     "datacentre"
     ]
    }
   },
