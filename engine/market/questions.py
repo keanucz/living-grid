@@ -6,10 +6,12 @@ wind Britain paid to switch off up to the end of play; the model's view there is
 previous 30 days that went above the line), and the question says so.
 """
 
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, field
 
 import numpy as np
 import pandas as pd
+
+from engine.market import bots
 
 TITLE = "A real day from the past few weeks. The date stays hidden until the end."
 ZONE_NAMES = {"GB": "Britain", "FR": "France", "DE-LU": "Germany", "NL": "the Netherlands", "BE": "Belgium", "NO2": "southern Norway"}
@@ -32,6 +34,14 @@ class MarketQuestion:
     model_note: str
     outcome: bool
     actual: float
+    # League fields (empty without bot quantiles for the day): each bot's P(yes) and one line on how it got there;
+    # series is the feed label the Nowcaster watches and profile Our model's as-of quantiles by hour.
+    bot_p: dict[str, float] = field(default_factory=dict)
+    bot_notes: dict[str, str] = field(default_factory=dict)
+    series: str = ""
+    profile: list[dict] = field(default_factory=list)
+
+LEGACY_FIELDS = ("id", "text", "kind", "target_hour", "unit", "threshold", "model_p", "model_note")
 
 
 def prob_above(x: float, p10: float, p50: float, p90: float) -> float:
@@ -61,7 +71,23 @@ def fit_hour(hour: int, start: int, end: int) -> int:
     return start + 1 + (hour - start - 1) % (end - start)
 
 
-def price_questions(replay: dict, asks=PRICE_QUESTIONS, start: int = 12, end: int = 18) -> list[MarketQuestion]:
+def bot_probabilities(league: dict | None, zone: str, target: str, ts: str, x: float, sym: str) -> tuple[dict, dict]:
+    """(bot_p, notes) at threshold x from each bot's as-of quantiles for this zone, target and hour (see engine.market.botdata)."""
+    if not league:
+        return {}, {}
+    for s in league.get("series", []):
+        if s["zone"] == zone and s["target"] == target:
+            for pt in s["points"]:
+                if pd.Timestamp(pt["ts"]) == pd.Timestamp(ts):
+                    p, notes = {}, {}
+                    for name, q in pt["bots"].items():
+                        p[name] = round(bots.band_probability(x, q["p10"], q["p50"], q["p90"]), 3)
+                        notes[name] = f"median {sym}{q['p50']:.0f}, 80% range {sym}{q['p10']:.0f} to {sym}{q['p90']:.0f}"
+                    return p, notes
+    return {}, {}
+
+
+def price_questions(replay: dict, asks=PRICE_QUESTIONS, start: int = 12, end: int = 18, league: dict | None = None) -> list[MarketQuestion]:
     by = {(s["zone"], s["target"]): s for s in replay["series"]}
     out = []
     for zone, target, asked in asks:
@@ -73,6 +99,10 @@ def price_questions(replay: dict, asks=PRICE_QUESTIONS, start: int = 12, end: in
         x = nice(p["p50"])
         sym = SYMBOL.get(s["unit"], "")
         made = pd.Timestamp(p["made_at"])
+        bot_p, bot_notes = bot_probabilities(league, zone, target, p["ts"], x, sym)
+        if bot_p:
+            bot_p[bots.OUR_MODEL] = round(prob_above(x, p["p10"], p["p50"], p["p90"]), 3)  # Our model is the replay's own band
+            bot_notes[bots.OUR_MODEL] = f"median {sym}{p['p50']:.0f}, 80% range {sym}{p['p10']:.0f} to {sym}{p['p90']:.0f}"
         out.append(MarketQuestion(
             id=f"{zone}-{target}-{hour:02d}", kind="price", target_hour=hour, unit=s["unit"], threshold=x,
             text=f"Will {ZONE_NAMES.get(zone, zone)}'s {TARGET_NAMES.get(target, target)} be above {sym}{x:.0f}/MWh at {hour:02d}:00?",
@@ -80,6 +110,8 @@ def price_questions(replay: dict, asks=PRICE_QUESTIONS, start: int = 12, end: in
             model_note=f"Our forecast made {(pd.Timestamp(p['ts']) - made).total_seconds() / 3600:.0f} h ahead: "
                        f"median {sym}{p['p50']:.0f}, 80% range {sym}{p['p10']:.0f} to {sym}{p['p90']:.0f}",
             outcome=bool(p["actual"] > x), actual=float(p["actual"]),
+            bot_p=bot_p, bot_notes=bot_notes, series=f"{zone} {TARGET_NAMES.get(target, target)}" if bot_p else "",
+            profile=[{"hour": pd.Timestamp(q["ts"]).hour, "p10": q["p10"], "p50": q["p50"], "p90": q["p90"]} for q in s["points"]] if bot_p else [],
         ))
     return out
 
@@ -106,15 +138,22 @@ def wind_question(day: pd.Timestamp, boalf: pd.DataFrame, end_hour: int, history
     )
 
 
-def build(replay: dict, boalf: pd.DataFrame | None = None, end_hour: int = 18, start_hour: int = 12) -> list[MarketQuestion]:
+def build(replay: dict, boalf: pd.DataFrame | None = None, end_hour: int = 18, start_hour: int = 12,
+          league: dict | None = None) -> list[MarketQuestion]:
     day = pd.Timestamp(replay["event"], tz="UTC")
-    qs = price_questions(replay, start=start_hour, end=end_hour)
+    qs = price_questions(replay, start=start_hour, end=end_hour, league=league)
     w = wind_question(day, boalf, end_hour) if boalf is not None else None
     return sorted(qs + ([w] if w else []), key=lambda q: (q.target_hour, q.id))
 
 
 def public(q: MarketQuestion) -> dict:
-    """What the module may show players before settlement (no outcome, no actual)."""
+    """What the module may show players before settlement (no outcome, no actual): the fields market_start accepts today."""
+    d = asdict(q)
+    return {k: d[k] for k in LEGACY_FIELDS}
+
+
+def league_public(q: MarketQuestion) -> dict:
+    """public() plus the bot league's probabilities, notes, feed label and profile, for a module that trades every bot."""
     d = asdict(q)
     d.pop("outcome")
     d.pop("actual")
