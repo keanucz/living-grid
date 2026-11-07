@@ -213,6 +213,135 @@
     "title": "BoundaryFlow",
     "type": "object"
    },
+   "CarbonAppraisal": {
+    "additionalProperties": false,
+    "properties": {
+     "gbp_per_t": {
+      "title": "Gbp Per T",
+      "type": "number"
+     },
+     "price_base": {
+      "title": "Price Base",
+      "type": "string"
+     },
+     "source": {
+      "title": "Source",
+      "type": "string"
+     }
+    },
+    "required": [
+     "gbp_per_t",
+     "price_base",
+     "source"
+    ],
+    "title": "CarbonAppraisal",
+    "type": "object"
+   },
+   "CarbonCostsDataCentre": {
+    "additionalProperties": false,
+    "properties": {
+     "hours_per_year": {
+      "title": "Hours Per Year",
+      "type": "number"
+     },
+     "mw": {
+      "title": "Mw",
+      "type": "number"
+     },
+     "note": {
+      "title": "Note",
+      "type": "string"
+     }
+    },
+    "required": [
+     "mw",
+     "hours_per_year",
+     "note"
+    ],
+    "title": "CarbonCostsDataCentre",
+    "type": "object"
+   },
+   "CarbonCostsHousehold": {
+    "additionalProperties": false,
+    "properties": {
+     "kwh_per_year": {
+      "title": "Kwh Per Year",
+      "type": "number"
+     },
+     "source": {
+      "title": "Source",
+      "type": "string"
+     }
+    },
+    "required": [
+     "kwh_per_year",
+     "source"
+    ],
+    "title": "CarbonCostsHousehold",
+    "type": "object"
+   },
+   "CarbonCostsResponse": {
+    "additionalProperties": false,
+    "properties": {
+     "appraisal": {
+      "$ref": "#/components/schemas/CarbonAppraisal"
+     },
+     "at": {
+      "format": "date-time",
+      "title": "At",
+      "type": "string"
+     },
+     "data_centre": {
+      "$ref": "#/components/schemas/CarbonCostsDataCentre"
+     },
+     "eur_per_gbp": {
+      "title": "Eur Per Gbp",
+      "type": "number"
+     },
+     "household": {
+      "$ref": "#/components/schemas/CarbonCostsHousehold"
+     },
+     "kind": {
+      "default": "estimated",
+      "enum": [
+       "actual",
+       "forecast",
+       "modelled",
+       "estimated",
+       "scenario"
+      ],
+      "title": "Kind",
+      "type": "string"
+     },
+     "note": {
+      "title": "Note",
+      "type": "string"
+     },
+     "sample": {
+      "default": false,
+      "title": "Sample",
+      "type": "boolean"
+     },
+     "zones": {
+      "items": {
+       "$ref": "#/components/schemas/ZoneCarbonCost"
+      },
+      "title": "Zones",
+      "type": "array"
+     }
+    },
+    "required": [
+     "at",
+     "zones",
+     "household",
+     "data_centre",
+     "appraisal",
+     "eur_per_gbp",
+     "note"
+    ],
+    "title": "CarbonCostsResponse",
+    "type": "object"
+   },
    "CarbonNow": {
     "additionalProperties": false,
     "properties": {
@@ -247,6 +376,54 @@
      "imports_share"
     ],
     "title": "CarbonNow",
+    "type": "object"
+   },
+   "CarbonPrice": {
+    "additionalProperties": false,
+    "properties": {
+     "as_of": {
+      "format": "date-time",
+      "title": "As Of",
+      "type": "string"
+     },
+     "basis": {
+      "title": "Basis",
+      "type": "string"
+     },
+     "currency": {
+      "enum": [
+       "GBP",
+       "EUR"
+      ],
+      "title": "Currency",
+      "type": "string"
+     },
+     "scheme": {
+      "enum": [
+       "UK ETS",
+       "EU ETS"
+      ],
+      "title": "Scheme",
+      "type": "string"
+     },
+     "source": {
+      "title": "Source",
+      "type": "string"
+     },
+     "value": {
+      "title": "Value",
+      "type": "number"
+     }
+    },
+    "required": [
+     "value",
+     "currency",
+     "scheme",
+     "as_of",
+     "basis",
+     "source"
+    ],
+    "title": "CarbonPrice",
     "type": "object"
    },
    "CarbonResponse": {
@@ -489,6 +666,46 @@
      "prices"
     ],
     "title": "ComputeZone",
+    "type": "object"
+   },
+   "ConnectionsQueue": {
+    "additionalProperties": false,
+    "properties": {
+     "aligned_with_clean_power_2030_gw": {
+      "title": "Aligned With Clean Power 2030 Gw",
+      "type": "number"
+     },
+     "as_of": {
+      "format": "date",
+      "title": "As Of",
+      "type": "string"
+     },
+     "before_reform_gw": {
+      "title": "Before Reform Gw",
+      "type": "string"
+     },
+     "new_pipeline_demand_gw": {
+      "title": "New Pipeline Demand Gw",
+      "type": "number"
+     },
+     "new_pipeline_generation_storage_gw": {
+      "title": "New Pipeline Generation Storage Gw",
+      "type": "number"
+     },
+     "source": {
+      "title": "Source",
+      "type": "string"
+     }
+    },
+    "required": [
+     "before_reform_gw",
+     "new_pipeline_generation_storage_gw",
+     "new_pipeline_demand_gw",
+     "aligned_with_clean_power_2030_gw",
+     "as_of",
+     "source"
+    ],
+    "title": "ConnectionsQueue",
     "type": "object"
    },
    "ConstraintCost": {
@@ -993,6 +1210,30 @@
      "kind"
     ],
     "title": "DataCentreSite",
+    "type": "object"
+   },
+   "EtysCapability": {
+    "additionalProperties": false,
+    "properties": {
+     "label": {
+      "title": "Label",
+      "type": "string"
+     },
+     "mw": {
+      "title": "Mw",
+      "type": "number"
+     },
+     "source": {
+      "title": "Source",
+      "type": "string"
+     }
+    },
+    "required": [
+     "mw",
+     "source",
+     "label"
+    ],
+    "title": "EtysCapability",
     "type": "object"
    },
    "ExplainResponse": {
@@ -1815,6 +2056,314 @@
     "title": "HouseholdWindow",
     "type": "object"
    },
+   "ImpactFit": {
+    "additionalProperties": false,
+    "properties": {
+     "n_hours": {
+      "title": "N Hours",
+      "type": "integer"
+     },
+     "r2": {
+      "title": "R2",
+      "type": "number"
+     },
+     "wind_se": {
+      "title": "Wind Se",
+      "type": "number"
+     },
+     "wind_slope_clear": {
+      "description": "Slope negative and more than two standard errors from zero",
+      "title": "Wind Slope Clear",
+      "type": "boolean"
+     },
+     "window_from": {
+      "format": "date-time",
+      "title": "Window From",
+      "type": "string"
+     },
+     "window_to": {
+      "format": "date-time",
+      "title": "Window To",
+      "type": "string"
+     }
+    },
+    "required": [
+     "n_hours",
+     "r2",
+     "window_from",
+     "window_to",
+     "wind_se",
+     "wind_slope_clear"
+    ],
+    "title": "ImpactFit",
+    "type": "object"
+   },
+   "ImpactHour": {
+    "additionalProperties": false,
+    "properties": {
+     "price": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Price"
+     },
+     "solar_effect_money": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Solar Effect Money"
+     },
+     "solar_effect_per_mwh": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Solar Effect Per Mwh"
+     },
+     "solar_mw": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Solar Mw"
+     },
+     "ts": {
+      "format": "date-time",
+      "title": "Ts",
+      "type": "string"
+     },
+     "wind_effect_money": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "description": "wind_effect_per_mwh times load, in the zone's currency",
+      "title": "Wind Effect Money"
+     },
+     "wind_effect_per_mwh": {
+      "description": "Estimated change in price from this hour's wind, per MWh (negative = cheaper)",
+      "title": "Wind Effect Per Mwh",
+      "type": "number"
+     },
+     "wind_mw": {
+      "title": "Wind Mw",
+      "type": "number"
+     }
+    },
+    "required": [
+     "ts",
+     "price",
+     "wind_mw",
+     "solar_mw",
+     "wind_effect_per_mwh",
+     "solar_effect_per_mwh",
+     "wind_effect_money",
+     "solar_effect_money"
+    ],
+    "title": "ImpactHour",
+    "type": "object"
+   },
+   "ImpactModelCheck": {
+    "additionalProperties": false,
+    "properties": {
+     "hours": {
+      "title": "Hours",
+      "type": "integer"
+     },
+     "note": {
+      "title": "Note",
+      "type": "string"
+     },
+     "solar_mean": {
+      "title": "Solar Mean",
+      "type": "number"
+     },
+     "wind_mean": {
+      "title": "Wind Mean",
+      "type": "number"
+     }
+    },
+    "required": [
+     "hours",
+     "wind_mean",
+     "solar_mean",
+     "note"
+    ],
+    "title": "ImpactModelCheck",
+    "type": "object"
+   },
+   "ImpactResponse": {
+    "additionalProperties": false,
+    "properties": {
+     "currency": {
+      "enum": [
+       "GBP",
+       "EUR"
+      ],
+      "title": "Currency",
+      "type": "string"
+     },
+     "fit": {
+      "$ref": "#/components/schemas/ImpactFit"
+     },
+     "from": {
+      "format": "date-time",
+      "title": "From",
+      "type": "string"
+     },
+     "hours": {
+      "items": {
+       "$ref": "#/components/schemas/ImpactHour"
+      },
+      "title": "Hours",
+      "type": "array"
+     },
+     "kind": {
+      "default": "estimated",
+      "enum": [
+       "actual",
+       "forecast",
+       "modelled",
+       "estimated",
+       "scenario"
+      ],
+      "title": "Kind",
+      "type": "string"
+     },
+     "model_check": {
+      "anyOf": [
+       {
+        "$ref": "#/components/schemas/ImpactModelCheck"
+       },
+       {
+        "type": "null"
+       }
+      ]
+     },
+     "note": {
+      "title": "Note",
+      "type": "string"
+     },
+     "sample": {
+      "default": false,
+      "title": "Sample",
+      "type": "boolean"
+     },
+     "sentence": {
+      "title": "Sentence",
+      "type": "string"
+     },
+     "solar_mean_effect_per_mwh": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Solar Mean Effect Per Mwh"
+     },
+     "solar_per_gw": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Solar Per Gw"
+     },
+     "solar_total_money": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Solar Total Money"
+     },
+     "source": {
+      "title": "Source",
+      "type": "string"
+     },
+     "to": {
+      "format": "date-time",
+      "title": "To",
+      "type": "string"
+     },
+     "wind_mean_effect_per_mwh": {
+      "title": "Wind Mean Effect Per Mwh",
+      "type": "number"
+     },
+     "wind_per_gw": {
+      "description": "Regression slope: price change per GW of wind",
+      "title": "Wind Per Gw",
+      "type": "number"
+     },
+     "wind_total_money": {
+      "title": "Wind Total Money",
+      "type": "number"
+     },
+     "zone": {
+      "enum": [
+       "GB",
+       "FR",
+       "DE-LU",
+       "NL",
+       "BE",
+       "NO2"
+      ],
+      "title": "Zone",
+      "type": "string"
+     }
+    },
+    "required": [
+     "zone",
+     "from",
+     "to",
+     "currency",
+     "wind_per_gw",
+     "solar_per_gw",
+     "wind_mean_effect_per_mwh",
+     "wind_total_money",
+     "solar_mean_effect_per_mwh",
+     "solar_total_money",
+     "sentence",
+     "hours",
+     "fit",
+     "model_check",
+     "note",
+     "source"
+    ],
+    "title": "ImpactResponse",
+    "type": "object"
+   },
    "ImportContribution": {
     "additionalProperties": false,
     "properties": {
@@ -1843,6 +2392,456 @@
      "contribution_gco2_kwh"
     ],
     "title": "ImportContribution",
+    "type": "object"
+   },
+   "InfraBoundary": {
+    "additionalProperties": false,
+    "properties": {
+     "boundary": {
+      "description": "NESO boundary code, e.g. SCOTEX (B6)",
+      "title": "Boundary",
+      "type": "string"
+     },
+     "hours": {
+      "title": "Hours",
+      "type": "integer"
+     },
+     "hours_over_limit_share": {
+      "title": "Hours Over Limit Share",
+      "type": "number"
+     },
+     "max_capacity_mw": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Max Capacity Mw"
+     },
+     "max_capacity_source": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Max Capacity Source"
+     },
+     "mean_flow_mw": {
+      "title": "Mean Flow Mw",
+      "type": "number"
+     },
+     "mean_utilisation": {
+      "title": "Mean Utilisation",
+      "type": "number"
+     },
+     "median_limit_mw": {
+      "title": "Median Limit Mw",
+      "type": "number"
+     },
+     "name": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Name"
+     },
+     "overload_mwh": {
+      "description": "Forecast flow above the limit, summed over the window",
+      "title": "Overload Mwh",
+      "type": "number"
+     },
+     "peak_overload_mw": {
+      "title": "Peak Overload Mw",
+      "type": "number"
+     }
+    },
+    "required": [
+     "boundary",
+     "hours",
+     "median_limit_mw",
+     "mean_flow_mw",
+     "hours_over_limit_share",
+     "overload_mwh",
+     "peak_overload_mw",
+     "mean_utilisation"
+    ],
+    "title": "InfraBoundary",
+    "type": "object"
+   },
+   "InfraConstraintCosts": {
+    "additionalProperties": false,
+    "properties": {
+     "days": {
+      "title": "Days",
+      "type": "integer"
+     },
+     "from": {
+      "format": "date-time",
+      "title": "From",
+      "type": "string"
+     },
+     "source": {
+      "title": "Source",
+      "type": "string"
+     },
+     "thermal_cost_gbp": {
+      "title": "Thermal Cost Gbp",
+      "type": "number"
+     },
+     "thermal_gbp_per_mwh": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Thermal Gbp Per Mwh"
+     },
+     "thermal_volume_mwh": {
+      "title": "Thermal Volume Mwh",
+      "type": "number"
+     },
+     "to": {
+      "format": "date-time",
+      "title": "To",
+      "type": "string"
+     },
+     "total_cost_gbp": {
+      "title": "Total Cost Gbp",
+      "type": "number"
+     }
+    },
+    "required": [
+     "days",
+     "from",
+     "to",
+     "total_cost_gbp",
+     "thermal_cost_gbp",
+     "thermal_volume_mwh",
+     "thermal_gbp_per_mwh",
+     "source"
+    ],
+    "title": "InfraConstraintCosts",
+    "type": "object"
+   },
+   "InfraCounterfactual": {
+    "additionalProperties": false,
+    "properties": {
+     "boundary": {
+      "title": "Boundary",
+      "type": "string"
+     },
+     "ghost_wind_source": {
+      "title": "Ghost Wind Source",
+      "type": "string"
+     },
+     "scenarios": {
+      "items": {
+       "$ref": "#/components/schemas/InfraScenario"
+      },
+      "title": "Scenarios",
+      "type": "array"
+     }
+    },
+    "required": [
+     "boundary",
+     "scenarios",
+     "ghost_wind_source"
+    ],
+    "title": "InfraCounterfactual",
+    "type": "object"
+   },
+   "InfraInterconnector": {
+    "additionalProperties": false,
+    "properties": {
+     "capacity_mw": {
+      "title": "Capacity Mw",
+      "type": "number"
+     },
+     "hours": {
+      "title": "Hours",
+      "type": "integer"
+     },
+     "hours_full_export_share": {
+      "title": "Hours Full Export Share",
+      "type": "number"
+     },
+     "hours_full_import_share": {
+      "title": "Hours Full Import Share",
+      "type": "number"
+     },
+     "import_utilisation": {
+      "title": "Import Utilisation",
+      "type": "number"
+     },
+     "mean_import_mw": {
+      "description": "Positive: GB imports",
+      "title": "Mean Import Mw",
+      "type": "number"
+     },
+     "name": {
+      "title": "Name",
+      "type": "string"
+     },
+     "zone": {
+      "title": "Zone",
+      "type": "string"
+     }
+    },
+    "required": [
+     "zone",
+     "name",
+     "capacity_mw",
+     "hours",
+     "mean_import_mw",
+     "import_utilisation",
+     "hours_full_import_share",
+     "hours_full_export_share"
+    ],
+    "title": "InfraInterconnector",
+    "type": "object"
+   },
+   "InfraScenario": {
+    "additionalProperties": false,
+    "properties": {
+     "avoided_cost_days": {
+      "title": "Avoided Cost Days",
+      "type": "integer"
+     },
+     "avoided_cost_gbp": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Avoided Cost Gbp"
+     },
+     "avoided_cost_window_overload_mwh": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Avoided Cost Window Overload Mwh"
+     },
+     "avoided_overload_mwh": {
+      "title": "Avoided Overload Mwh",
+      "type": "number"
+     },
+     "avoided_wind_mwh": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "description": "Upper bound: Scottish wind switched off that the extra capacity could have carried",
+      "title": "Avoided Wind Mwh"
+     },
+     "extra_mw": {
+      "title": "Extra Mw",
+      "type": "number"
+     },
+     "hours": {
+      "title": "Hours",
+      "type": "integer"
+     },
+     "hours_over_limit_now": {
+      "title": "Hours Over Limit Now",
+      "type": "integer"
+     },
+     "hours_still_over_limit": {
+      "title": "Hours Still Over Limit",
+      "type": "integer"
+     },
+     "overload_mwh": {
+      "title": "Overload Mwh",
+      "type": "number"
+     },
+     "scotland_wind_switched_off_mwh": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Scotland Wind Switched Off Mwh"
+     },
+     "thermal_volume_in_window_mwh": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Thermal Volume In Window Mwh"
+     },
+     "wind_window_hours": {
+      "anyOf": [
+       {
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Wind Window Hours"
+     }
+    },
+    "required": [
+     "extra_mw",
+     "hours",
+     "overload_mwh",
+     "avoided_overload_mwh",
+     "hours_still_over_limit",
+     "hours_over_limit_now",
+     "avoided_cost_gbp",
+     "avoided_cost_days",
+     "avoided_wind_mwh",
+     "scotland_wind_switched_off_mwh"
+    ],
+    "title": "InfraScenario",
+    "type": "object"
+   },
+   "InfraWindow": {
+    "additionalProperties": false,
+    "properties": {
+     "from": {
+      "format": "date-time",
+      "title": "From",
+      "type": "string"
+     },
+     "to": {
+      "format": "date-time",
+      "title": "To",
+      "type": "string"
+     }
+    },
+    "required": [
+     "from",
+     "to"
+    ],
+    "title": "InfraWindow",
+    "type": "object"
+   },
+   "InfrastructureResponse": {
+    "additionalProperties": false,
+    "properties": {
+     "boundaries": {
+      "items": {
+       "$ref": "#/components/schemas/InfraBoundary"
+      },
+      "title": "Boundaries",
+      "type": "array"
+     },
+     "boundary_source": {
+      "title": "Boundary Source",
+      "type": "string"
+     },
+     "connections_queue": {
+      "$ref": "#/components/schemas/ConnectionsQueue"
+     },
+     "constraint_costs": {
+      "anyOf": [
+       {
+        "$ref": "#/components/schemas/InfraConstraintCosts"
+       },
+       {
+        "type": "null"
+       }
+      ]
+     },
+     "counterfactual": {
+      "$ref": "#/components/schemas/InfraCounterfactual"
+     },
+     "etys_capability": {
+      "additionalProperties": {
+       "$ref": "#/components/schemas/EtysCapability"
+      },
+      "title": "Etys Capability",
+      "type": "object"
+     },
+     "interconnector_basis": {
+      "title": "Interconnector Basis",
+      "type": "string"
+     },
+     "interconnectors": {
+      "items": {
+       "$ref": "#/components/schemas/InfraInterconnector"
+      },
+      "title": "Interconnectors",
+      "type": "array"
+     },
+     "kind": {
+      "default": "estimated",
+      "enum": [
+       "actual",
+       "forecast",
+       "modelled",
+       "estimated",
+       "scenario"
+      ],
+      "title": "Kind",
+      "type": "string"
+     },
+     "note": {
+      "title": "Note",
+      "type": "string"
+     },
+     "planned_links": {
+      "items": {
+       "$ref": "#/components/schemas/PlannedLink"
+      },
+      "title": "Planned Links",
+      "type": "array"
+     },
+     "sample": {
+      "default": false,
+      "title": "Sample",
+      "type": "boolean"
+     },
+     "window": {
+      "$ref": "#/components/schemas/InfraWindow"
+     }
+    },
+    "required": [
+     "window",
+     "boundaries",
+     "boundary_source",
+     "etys_capability",
+     "interconnectors",
+     "interconnector_basis",
+     "constraint_costs",
+     "counterfactual",
+     "planned_links",
+     "connections_queue",
+     "note"
+    ],
+    "title": "InfrastructureResponse",
     "type": "object"
    },
    "Interconnector": {
@@ -2111,6 +3110,52 @@
      "gbp"
     ],
     "title": "Party",
+    "type": "object"
+   },
+   "PlannedLink": {
+    "additionalProperties": false,
+    "properties": {
+     "capacity_mw": {
+      "title": "Capacity Mw",
+      "type": "number"
+     },
+     "id": {
+      "title": "Id",
+      "type": "string"
+     },
+     "name": {
+      "title": "Name",
+      "type": "string"
+     },
+     "operational": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Operational"
+     },
+     "source": {
+      "title": "Source",
+      "type": "string"
+     },
+     "status": {
+      "title": "Status",
+      "type": "string"
+     }
+    },
+    "required": [
+     "id",
+     "name",
+     "capacity_mw",
+     "operational",
+     "status",
+     "source"
+    ],
+    "title": "PlannedLink",
     "type": "object"
    },
    "PriceNow": {
@@ -3099,6 +4144,135 @@
     "title": "ValidationError",
     "type": "object"
    },
+   "WeatherGridResponse": {
+    "additionalProperties": false,
+    "properties": {
+     "available_from": {
+      "format": "date-time",
+      "title": "Available From",
+      "type": "string"
+     },
+     "available_to": {
+      "format": "date-time",
+      "title": "Available To",
+      "type": "string"
+     },
+     "kind": {
+      "description": "modelled: Open-Meteo output; synthetic: placeholder before any ingest",
+      "enum": [
+       "modelled",
+       "synthetic"
+      ],
+      "title": "Kind",
+      "type": "string"
+     },
+     "lats": {
+      "description": "Latitude of each grid point; every array below is in this order",
+      "items": {
+       "type": "number"
+      },
+      "title": "Lats",
+      "type": "array"
+     },
+     "lons": {
+      "items": {
+       "type": "number"
+      },
+      "title": "Lons",
+      "type": "array"
+     },
+     "note": {
+      "title": "Note",
+      "type": "string"
+     },
+     "sample": {
+      "default": false,
+      "title": "Sample",
+      "type": "boolean"
+     },
+     "shortwave_wm2": {
+      "description": "Shortwave radiation, whole W/m2",
+      "items": {
+       "type": "integer"
+      },
+      "title": "Shortwave Wm2",
+      "type": "array"
+     },
+     "source": {
+      "title": "Source",
+      "type": "string"
+     },
+     "step_deg": {
+      "title": "Step Deg",
+      "type": "number"
+     },
+     "ts": {
+      "format": "date-time",
+      "title": "Ts",
+      "type": "string"
+     },
+     "units": {
+      "$ref": "#/components/schemas/WeatherGridUnits"
+     },
+     "wind_dir_deg": {
+      "description": "Direction the wind blows from, whole degrees",
+      "items": {
+       "type": "integer"
+      },
+      "title": "Wind Dir Deg",
+      "type": "array"
+     },
+     "wind_speed_dms": {
+      "description": "Wind speed at 100 m, tenths of m/s",
+      "items": {
+       "type": "integer"
+      },
+      "title": "Wind Speed Dms",
+      "type": "array"
+     }
+    },
+    "required": [
+     "ts",
+     "available_from",
+     "available_to",
+     "step_deg",
+     "lats",
+     "lons",
+     "wind_speed_dms",
+     "wind_dir_deg",
+     "shortwave_wm2",
+     "units",
+     "kind",
+     "source",
+     "note"
+    ],
+    "title": "WeatherGridResponse",
+    "type": "object"
+   },
+   "WeatherGridUnits": {
+    "additionalProperties": false,
+    "properties": {
+     "shortwave_wm2": {
+      "title": "Shortwave Wm2",
+      "type": "string"
+     },
+     "wind_dir_deg": {
+      "title": "Wind Dir Deg",
+      "type": "string"
+     },
+     "wind_speed_dms": {
+      "title": "Wind Speed Dms",
+      "type": "string"
+     }
+    },
+    "required": [
+     "wind_speed_dms",
+     "wind_dir_deg",
+     "shortwave_wm2"
+    ],
+    "title": "WeatherGridUnits",
+    "type": "object"
+   },
    "ZoneCarbon": {
     "additionalProperties": false,
     "properties": {
@@ -3154,6 +4328,167 @@
      "imports"
     ],
     "title": "ZoneCarbon",
+    "type": "object"
+   },
+   "ZoneCarbonCost": {
+    "additionalProperties": false,
+    "properties": {
+     "appraisal_cost_per_mwh": {
+      "title": "Appraisal Cost Per Mwh",
+      "type": "number"
+     },
+     "appraisal_value_per_t": {
+      "description": "UK government appraisal value of carbon, in the zone's currency",
+      "title": "Appraisal Value Per T",
+      "type": "number"
+     },
+     "carbon_cost_per_mwh": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "description": "What the carbon price adds to each MWh consumed",
+      "title": "Carbon Cost Per Mwh"
+     },
+     "carbon_price": {
+      "anyOf": [
+       {
+        "$ref": "#/components/schemas/CarbonPrice"
+       },
+       {
+        "type": "null"
+       }
+      ]
+     },
+     "carbon_price_per_t": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "description": "In the zone's currency; null when no carbon price is available",
+      "title": "Carbon Price Per T"
+     },
+     "consumption_gco2_kwh": {
+      "title": "Consumption Gco2 Kwh",
+      "type": "number"
+     },
+     "currency": {
+      "enum": [
+       "GBP",
+       "EUR"
+      ],
+      "title": "Currency",
+      "type": "string"
+     },
+     "data_centre_per_year": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Data Centre Per Year"
+     },
+     "data_centre_unpriced_per_year": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Data Centre Unpriced Per Year"
+     },
+     "household_per_year": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Household Per Year"
+     },
+     "household_unpriced_per_year": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Household Unpriced Per Year"
+     },
+     "name": {
+      "title": "Name",
+      "type": "string"
+     },
+     "production_gco2_kwh": {
+      "title": "Production Gco2 Kwh",
+      "type": "number"
+     },
+     "ts": {
+      "format": "date-time",
+      "title": "Ts",
+      "type": "string"
+     },
+     "unpriced_gap_per_mwh": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "description": "Appraisal cost minus the priced cost: the damage nobody pays for",
+      "title": "Unpriced Gap Per Mwh"
+     },
+     "zone": {
+      "enum": [
+       "GB",
+       "FR",
+       "DE-LU",
+       "NL",
+       "BE",
+       "NO2"
+      ],
+      "title": "Zone",
+      "type": "string"
+     }
+    },
+    "required": [
+     "zone",
+     "name",
+     "ts",
+     "currency",
+     "consumption_gco2_kwh",
+     "production_gco2_kwh",
+     "carbon_price_per_t",
+     "carbon_price",
+     "carbon_cost_per_mwh",
+     "appraisal_value_per_t",
+     "appraisal_cost_per_mwh",
+     "unpriced_gap_per_mwh",
+     "household_per_year",
+     "data_centre_per_year",
+     "household_unpriced_per_year",
+     "data_centre_unpriced_per_year"
+    ],
+    "title": "ZoneCarbonCost",
     "type": "object"
    },
    "ZoneImpact": {
@@ -3454,6 +4789,66 @@
  },
  "openapi": "3.1.0",
  "paths": {
+  "/carbon/costs": {
+   "get": {
+    "operationId": "costs_carbon_costs_get",
+    "parameters": [
+     {
+      "in": "query",
+      "name": "at",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "format": "date-time",
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "At"
+      }
+     },
+     {
+      "in": "query",
+      "name": "data_centre_mw",
+      "required": false,
+      "schema": {
+       "default": 10.0,
+       "title": "Data Centre Mw",
+       "type": "number"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/CarbonCostsResponse"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Costs",
+    "tags": [
+     "unseen"
+    ]
+   }
+  },
   "/compute": {
    "get": {
     "description": "Cheapest start per zone for a job drawing `kw` for `hours`, before `deadline` (default 24 h ahead).\n\n`zones` is a comma-separated list (default all); `at` replays the answer as of an earlier time.",
@@ -3897,6 +5292,131 @@
     ]
    }
   },
+  "/impact/renewables": {
+   "get": {
+    "operationId": "renewables_impact_renewables_get",
+    "parameters": [
+     {
+      "in": "query",
+      "name": "zone",
+      "required": true,
+      "schema": {
+       "title": "Zone",
+       "type": "string"
+      }
+     },
+     {
+      "in": "query",
+      "name": "from",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "format": "date-time",
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "From"
+      }
+     },
+     {
+      "in": "query",
+      "name": "to",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "format": "date-time",
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "To"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ImpactResponse"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Renewables",
+    "tags": [
+     "impact"
+    ]
+   }
+  },
+  "/infrastructure": {
+   "get": {
+    "operationId": "get_infrastructure_infrastructure_get",
+    "parameters": [
+     {
+      "in": "query",
+      "name": "extra_mw",
+      "required": false,
+      "schema": {
+       "default": [
+        2000,
+        4000
+       ],
+       "items": {
+        "type": "number"
+       },
+       "title": "Extra Mw",
+       "type": "array"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/InfrastructureResponse"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Get Infrastructure",
+    "tags": [
+     "unseen"
+    ]
+   }
+  },
   "/intervene": {
    "post": {
     "operationId": "intervene_intervene_post",
@@ -4259,6 +5779,56 @@
     "summary": "Ghost Wind",
     "tags": [
      "unseen"
+    ]
+   }
+  },
+  "/weather/grid": {
+   "get": {
+    "operationId": "weather_grid_weather_grid_get",
+    "parameters": [
+     {
+      "in": "query",
+      "name": "t",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "format": "date-time",
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "T"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/WeatherGridResponse"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Weather Grid",
+    "tags": [
+     "weather"
     ]
    }
   },

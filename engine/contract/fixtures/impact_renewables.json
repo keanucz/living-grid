@@ -1,0 +1,88 @@
+{
+ "zone": "GB",
+ "from": "2026-11-07T06:00:00Z",
+ "to": "2026-11-07T11:00:00Z",
+ "currency": "GBP",
+ "wind_per_gw": -6.507,
+ "solar_per_gw": null,
+ "wind_mean_effect_per_mwh": -31.43,
+ "wind_total_money": -6154323.0,
+ "solar_mean_effect_per_mwh": null,
+ "solar_total_money": null,
+ "sentence": "Wind cut Great Britain prices by £31/MWh on average between 07 Nov 06:00 and 07 Nov 11:00 UTC, about £6m (estimate).",
+ "hours": [
+  {
+   "ts": "2026-11-07T06:00:00Z",
+   "price": 96.53,
+   "wind_mw": 5408.0,
+   "solar_mw": null,
+   "wind_effect_per_mwh": -35.19,
+   "solar_effect_per_mwh": null,
+   "wind_effect_money": -1121597.0,
+   "solar_effect_money": null
+  },
+  {
+   "ts": "2026-11-07T07:00:00Z",
+   "price": 94.91,
+   "wind_mw": 6266.0,
+   "solar_mw": null,
+   "wind_effect_per_mwh": -40.77,
+   "solar_effect_per_mwh": null,
+   "wind_effect_money": -1365800.0,
+   "solar_effect_money": null
+  },
+  {
+   "ts": "2026-11-07T08:00:00Z",
+   "price": 118.15,
+   "wind_mw": 2148.0,
+   "solar_mw": null,
+   "wind_effect_per_mwh": -13.98,
+   "solar_effect_per_mwh": null,
+   "wind_effect_money": -467741.0,
+   "solar_effect_money": null
+  },
+  {
+   "ts": "2026-11-07T09:00:00Z",
+   "price": 113.62,
+   "wind_mw": 3823.0,
+   "solar_mw": null,
+   "wind_effect_per_mwh": -24.87,
+   "solar_effect_per_mwh": null,
+   "wind_effect_money": -932516.0,
+   "solar_effect_money": null
+  },
+  {
+   "ts": "2026-11-07T10:00:00Z",
+   "price": 67.89,
+   "wind_mw": 9488.0,
+   "solar_mw": null,
+   "wind_effect_per_mwh": -61.74,
+   "solar_effect_per_mwh": null,
+   "wind_effect_money": -1881992.0,
+   "solar_effect_money": null
+  },
+  {
+   "ts": "2026-11-07T11:00:00Z",
+   "price": 124.22,
+   "wind_mw": 1847.0,
+   "solar_mw": null,
+   "wind_effect_per_mwh": -12.02,
+   "solar_effect_per_mwh": null,
+   "wind_effect_money": -384677.0,
+   "solar_effect_money": null
+  }
+ ],
+ "fit": {
+  "n_hours": 924,
+  "r2": 0.994,
+  "window_from": "2026-10-01T00:00:00Z",
+  "window_to": "2026-11-08T11:00:00Z",
+  "wind_se": 0.016,
+  "wind_slope_clear": true
+ },
+ "model_check": null,
+ "kind": "estimated",
+ "note": "Estimated from a regression of hourly day-ahead prices on wind, solar, load, gas and time of day; the effect is against an hour with none of that generation, so it is a guide, not a market result. Solar output is not metered for this zone in our data, so no solar effect is shown.",
+ "source": "Energy-Charts / Nord Pool day-ahead prices, Energy-Charts and Elexon generation and load, yfinance TTF gas",
+ "sample": true
+}

@@ -12,6 +12,7 @@ import pandas as pd
 from fastapi import APIRouter, HTTPException
 
 from engine import data
+from engine.schemas import WeatherGridResponse
 from pipeline import cache
 from pipeline.ingest import weather_grid as wg
 
@@ -61,6 +62,6 @@ def build(t=None) -> dict:
     }
 
 
-@router.get("/weather/grid", include_in_schema=False)
+@router.get("/weather/grid", response_model=WeatherGridResponse)
 def weather_grid(t: datetime | None = None) -> dict:
     return build(t)

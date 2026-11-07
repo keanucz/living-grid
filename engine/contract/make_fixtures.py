@@ -583,6 +583,76 @@ def reveal() -> dict:
     }
 
 
+# The four v3 endpoints: built by the engine's own builders from fixed synthetic inputs, so the fixtures keep the
+# exact shape the code returns. Numbers are illustrative only.
+def weather_grid() -> dict:
+    lats = [54.0, 54.0, 54.0, 56.0, 56.0, 56.0, 58.0, 58.0, 58.0]
+    lons = [-4.0, -2.0, 0.0] * 3
+    return {
+        "ts": iso(NOW), "available_from": iso(NOW - timedelta(hours=48)), "available_to": iso(NOW + timedelta(hours=48)),
+        "step_deg": 2.0, "lats": lats, "lons": lons,
+        "wind_speed_dms": [92, 104, 118, 121, 136, 150, 143, 158, 171],
+        "wind_dir_deg": [245, 250, 255, 240, 248, 252, 236, 244, 250],
+        "shortwave_wm2": [212, 220, 231, 168, 175, 183, 120, 126, 131],
+        "units": {"wind_speed_dms": "tenths of m/s at 100 m", "wind_dir_deg": "degrees the wind blows from", "shortwave_wm2": "W/m2"},
+        "kind": "modelled", "source": "Open-Meteo (model analysis and forecast), sample", "note": "Sample grid for the contract, not data.",
+        "sample": True,
+    }
+
+
+def impact_renewables() -> dict:
+    import numpy as np
+    import pandas as pd
+
+    from engine import impact
+
+    g = np.random.default_rng(11)
+    idx = pd.date_range("2026-10-01", periods=24 * 40, freq="h", tz="UTC")
+    n = len(idx)
+    wind = g.uniform(1500, 16000, n)
+    load = g.uniform(24000, 38000, n)
+    price = 95 - 6.5 * wind / 1000 + 1.2 * load / 1000 + g.normal(0, 2, n)
+    a = pd.concat([pd.DataFrame({"ts": idx, "zone": "GB", "series": k, "value": v, "unit": "x"})
+                   for k, v in [("price_da", price), ("gen_wind", wind), ("load", load)]], ignore_index=True)
+    out = impact.renewables("GB", NOW - timedelta(hours=6), NOW - timedelta(hours=1), a=a, gas=pd.Series(dtype=float))
+    return {**out, "model_check": None, "sample": True}
+
+
+def carbon_costs() -> dict:
+    import pandas as pd
+
+    from engine import carbon_costs as cc
+
+    at = pd.Timestamp(NOW)
+    ci = pd.DataFrame([{"ts": at, "zone": z, "production_gco2_kwh": float(p), "consumption_gco2_kwh": float(c)}
+                       for z, (p, c, _) in CARBON.items()])
+    uka = pd.DataFrame({"ts": [pd.Timestamp("2026-09-01", tz="UTC")], "value": [60.17]})
+    eua = pd.Series([78.4], index=[pd.Timestamp("2026-11-06", tz="UTC")])
+    return {**cc.build(at, ci=ci, uka=uka, eua_series=eua), "sample": True}
+
+
+def infrastructure() -> dict:
+    import pandas as pd
+
+    from engine import infrastructure as inf
+
+    t0 = pd.Timestamp("2026-10-25", tz="UTC")
+    ts = pd.date_range(t0, periods=72, freq="h")
+    rows = []
+    for t in ts:
+        b6 = 4300.0 + 1400 * math.sin(t.hour / 24 * 2 * math.pi)
+        rows.append({"ts": t, "boundary": "SCOTEX", "flow_mw": b6, "limit_mw": 4200.0, "utilisation": b6 / 4200})
+        rows.append({"ts": t, "boundary": "SSEN-S", "flow_mw": 1500.0, "limit_mw": 2000.0, "utilisation": 0.75})
+    flows = pd.DataFrame(rows)
+    days = [t0 + pd.Timedelta(days=d) for d in range(3)]
+    costs = pd.DataFrame({"ts": days, "thermal_cost_gbp": [9.1e6, 36.5e6, 4.2e6], "thermal_volume_mwh": [-61000.0, -240000.0, -30000.0],
+                          "total_cost_gbp": [11.0e6, 41.0e6, 5.5e6]})
+    ghost = pd.DataFrame({"ts": ts, "region": "P", "mwh": [max(0.0, f - 4200.0) * 0.8 for f in flows[flows.boundary == "SCOTEX"]["flow_mw"]]})
+    actuals = pd.DataFrame({"ts": ts, "zone": "GB", "series": "flow_GB_NO2", "value": [-1300.0] * len(ts), "unit": "MW"})
+    links = pd.DataFrame({"to_zone": ["NO2"], "capacity_mw": [1400]})
+    return {**inf.build(flows=flows, costs=costs, ghost=ghost, actuals=actuals, links=links), "sample": True}
+
+
 def build() -> dict[str, tuple[type, dict]]:
     z = zones()
     st = state(z)
@@ -601,7 +671,11 @@ def build() -> dict[str, tuple[type, dict]]:
         "household_savings": (s.HouseholdSavingsResponse, household_savings()),
         "replay": (s.ReplayResponse, replay()),
         "reveal": (s.RevealResponse, reveal()),
-        "compute": (s.ComputeResponse, compute()),  # last: it draws from the shared rng
+        "compute": (s.ComputeResponse, compute()),  # last of the shared-rng users
+        "weather_grid": (s.WeatherGridResponse, weather_grid()),
+        "impact_renewables": (s.ImpactResponse, impact_renewables()),
+        "carbon_costs": (s.CarbonCostsResponse, carbon_costs()),
+        "infrastructure": (s.InfrastructureResponse, infrastructure()),
     }
 
 

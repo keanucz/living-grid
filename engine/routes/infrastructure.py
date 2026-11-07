@@ -3,11 +3,12 @@
 from fastapi import APIRouter, HTTPException, Query
 
 from engine import infrastructure
+from engine.schemas import InfrastructureResponse
 
 router = APIRouter(tags=["unseen"])
 
 
-@router.get("/infrastructure", include_in_schema=False)
+@router.get("/infrastructure", response_model=InfrastructureResponse)
 def get_infrastructure(extra_mw: list[float] = Query(list(infrastructure.EXTRA_MW))) -> dict:
     if not extra_mw or any(not 0 < e <= 10000 for e in extra_mw) or len(extra_mw) > 6:
         raise HTTPException(422, "extra_mw: up to 6 values between 0 and 10000")

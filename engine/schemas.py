@@ -645,3 +645,252 @@ class RegionsResponse(Model):
     at: datetime
     regions: list[RegionNow]
     note: str
+
+
+# ---------- GET /weather/grid?t= ----------
+
+
+class WeatherGridUnits(Model):
+    wind_speed_dms: str
+    wind_dir_deg: str
+    shortwave_wm2: str
+
+
+class WeatherGridResponse(Model):
+    ts: datetime
+    available_from: datetime
+    available_to: datetime
+    step_deg: float
+    lats: list[float] = Field(description="Latitude of each grid point; every array below is in this order")
+    lons: list[float]
+    wind_speed_dms: list[int] = Field(description="Wind speed at 100 m, tenths of m/s")
+    wind_dir_deg: list[int] = Field(description="Direction the wind blows from, whole degrees")
+    shortwave_wm2: list[int] = Field(description="Shortwave radiation, whole W/m2")
+    units: WeatherGridUnits
+    kind: Literal["modelled", "synthetic"] = Field(description="modelled: Open-Meteo output; synthetic: placeholder before any ingest")
+    source: str
+    note: str
+    sample: bool = False
+
+
+# ---------- GET /impact/renewables?zone=&from=&to= ----------
+
+
+class ImpactHour(Model):
+    ts: datetime
+    price: float | None
+    wind_mw: float
+    solar_mw: float | None
+    wind_effect_per_mwh: float = Field(description="Estimated change in price from this hour's wind, per MWh (negative = cheaper)")
+    solar_effect_per_mwh: float | None
+    wind_effect_money: float | None = Field(description="wind_effect_per_mwh times load, in the zone's currency")
+    solar_effect_money: float | None
+
+
+class ImpactFit(Model):
+    n_hours: int
+    r2: float
+    window_from: datetime
+    window_to: datetime
+    wind_se: float
+    wind_slope_clear: bool = Field(description="Slope negative and more than two standard errors from zero")
+
+
+class ImpactModelCheck(Model):
+    hours: int
+    wind_mean: float
+    solar_mean: float
+    note: str
+
+
+class ImpactResponse(Model):
+    zone: Zone
+    from_: datetime = Field(alias="from")
+    to: datetime
+    currency: Currency
+    wind_per_gw: float = Field(description="Regression slope: price change per GW of wind")
+    solar_per_gw: float | None
+    wind_mean_effect_per_mwh: float
+    wind_total_money: float
+    solar_mean_effect_per_mwh: float | None
+    solar_total_money: float | None
+    sentence: str
+    hours: list[ImpactHour]
+    fit: ImpactFit
+    model_check: ImpactModelCheck | None
+    kind: Kind = "estimated"
+    note: str
+    source: str
+    sample: bool = False
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True, serialize_by_alias=True)
+
+
+# ---------- GET /carbon/costs?at=&data_centre_mw= ----------
+
+
+class CarbonPrice(Model):
+    value: float
+    currency: Currency
+    scheme: Literal["UK ETS", "EU ETS"]
+    as_of: datetime
+    basis: str
+    source: str
+
+
+class ZoneCarbonCost(Model):
+    zone: Zone
+    name: str
+    ts: datetime
+    currency: Currency
+    consumption_gco2_kwh: float
+    production_gco2_kwh: float
+    carbon_price_per_t: float | None = Field(description="In the zone's currency; null when no carbon price is available")
+    carbon_price: CarbonPrice | None
+    carbon_cost_per_mwh: float | None = Field(description="What the carbon price adds to each MWh consumed")
+    appraisal_value_per_t: float = Field(description="UK government appraisal value of carbon, in the zone's currency")
+    appraisal_cost_per_mwh: float
+    unpriced_gap_per_mwh: float | None = Field(description="Appraisal cost minus the priced cost: the damage nobody pays for")
+    household_per_year: float | None
+    data_centre_per_year: float | None
+    household_unpriced_per_year: float | None
+    data_centre_unpriced_per_year: float | None
+
+
+class CarbonCostsHousehold(Model):
+    kwh_per_year: float
+    source: str
+
+
+class CarbonCostsDataCentre(Model):
+    mw: float
+    hours_per_year: float
+    note: str
+
+
+class CarbonAppraisal(Model):
+    gbp_per_t: float
+    price_base: str
+    source: str
+
+
+class CarbonCostsResponse(Model):
+    at: datetime
+    zones: list[ZoneCarbonCost]
+    household: CarbonCostsHousehold
+    data_centre: CarbonCostsDataCentre
+    appraisal: CarbonAppraisal
+    eur_per_gbp: float
+    kind: Kind = "estimated"
+    note: str
+    sample: bool = False
+
+
+# ---------- GET /infrastructure?extra_mw= ----------
+
+
+class InfraWindow(Model):
+    from_: datetime = Field(alias="from")
+    to: datetime
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True, serialize_by_alias=True)
+
+
+class InfraBoundary(Model):
+    boundary: str = Field(description="NESO boundary code, e.g. SCOTEX (B6)")
+    hours: int
+    median_limit_mw: float
+    mean_flow_mw: float
+    hours_over_limit_share: float
+    overload_mwh: float = Field(description="Forecast flow above the limit, summed over the window")
+    peak_overload_mw: float
+    mean_utilisation: float
+    name: str | None = None
+    max_capacity_mw: float | None = None
+    max_capacity_source: str | None = None
+
+
+class EtysCapability(Model):
+    mw: float
+    source: str
+    label: str
+
+
+class InfraInterconnector(Model):
+    zone: str
+    name: str
+    capacity_mw: float
+    hours: int
+    mean_import_mw: float = Field(description="Positive: GB imports")
+    import_utilisation: float
+    hours_full_import_share: float
+    hours_full_export_share: float
+
+
+class InfraConstraintCosts(Model):
+    days: int
+    from_: datetime = Field(alias="from")
+    to: datetime
+    total_cost_gbp: float
+    thermal_cost_gbp: float
+    thermal_volume_mwh: float
+    thermal_gbp_per_mwh: float | None
+    source: str
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True, serialize_by_alias=True)
+
+
+class InfraScenario(Model):
+    extra_mw: float
+    hours: int
+    overload_mwh: float
+    avoided_overload_mwh: float
+    hours_still_over_limit: int
+    hours_over_limit_now: int
+    avoided_cost_gbp: float | None
+    avoided_cost_days: int
+    avoided_wind_mwh: float | None = Field(description="Upper bound: Scottish wind switched off that the extra capacity could have carried")
+    scotland_wind_switched_off_mwh: float | None
+    avoided_cost_window_overload_mwh: float | None = None
+    thermal_volume_in_window_mwh: float | None = None
+    wind_window_hours: int | None = None
+
+
+class InfraCounterfactual(Model):
+    boundary: str
+    scenarios: list[InfraScenario]
+    ghost_wind_source: str
+
+
+class PlannedLink(Model):
+    id: str
+    name: str
+    capacity_mw: float
+    operational: str | None
+    status: str
+    source: str
+
+
+class ConnectionsQueue(Model):
+    before_reform_gw: str
+    new_pipeline_generation_storage_gw: float
+    new_pipeline_demand_gw: float
+    aligned_with_clean_power_2030_gw: float
+    as_of: date
+    source: str
+
+
+class InfrastructureResponse(Model):
+    window: InfraWindow
+    boundaries: list[InfraBoundary]
+    boundary_source: str
+    etys_capability: dict[str, EtysCapability]
+    interconnectors: list[InfraInterconnector]
+    interconnector_basis: str
+    constraint_costs: InfraConstraintCosts | None
+    counterfactual: InfraCounterfactual
+    planned_links: list[PlannedLink]
+    connections_queue: ConnectionsQueue
+    kind: Kind = "estimated"
+    note: str
+    sample: bool = False

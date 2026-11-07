@@ -6,11 +6,12 @@ import pandas as pd
 from fastapi import APIRouter, HTTPException, Query
 
 from engine import data, impact
+from engine.schemas import ImpactResponse
 
 router = APIRouter(tags=["impact"])
 
 
-@router.get("/impact/renewables", include_in_schema=False)
+@router.get("/impact/renewables", response_model=ImpactResponse)
 def renewables(zone: str, from_: datetime | None = Query(None, alias="from"), to: datetime | None = None) -> dict:
     if zone not in data.ZONES:
         raise HTTPException(404, f"unknown zone {zone!r}")

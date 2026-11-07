@@ -23,6 +23,14 @@ GETS = {
     "/compute?at=2026-11-07T23:00:00Z": ("compute", s.ComputeResponse),
     "/replay?event=2026-10-26": ("replay", s.ReplayResponse),
     "/reveal": ("reveal", s.RevealResponse),
+    "/weather/grid": ("weather_grid", s.WeatherGridResponse),
+    "/carbon/costs": ("carbon_costs", s.CarbonCostsResponse),
+}
+# Routes that answer 404 until their data is ingested (no sample fallback): the fixture is checked, and the live
+# response only when there is one.
+NEEDS_DATA = {
+    "/impact/renewables?zone=GB": ("impact_renewables", s.ImpactResponse),
+    "/infrastructure": ("infrastructure", s.InfrastructureResponse),
 }
 
 
@@ -39,9 +47,19 @@ def test_get_routes_serve_valid_fixture(url):
     model.model_validate(r.json())
 
 
+@pytest.mark.parametrize("url", NEEDS_DATA)
+def test_data_routes_fixture_valid_and_live_valid_or_404(url):
+    name, model = NEEDS_DATA[url]
+    model.model_validate(fixture(name))
+    r = client.get(url)
+    assert r.status_code in (200, 404), r.text
+    if r.status_code == 200:
+        model.model_validate(r.json())
+
+
 def test_get_routes_cover_the_contract():
     paths = {p for p, ops in app.openapi()["paths"].items() if "get" in ops} - {"/health"}
-    assert paths == {u.split("?")[0] for u in GETS}
+    assert paths == {u.split("?")[0] for u in {**GETS, **NEEDS_DATA}}
 
 
 @pytest.mark.parametrize("typ", list(s.InterventionType.__args__))
