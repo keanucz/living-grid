@@ -3,7 +3,7 @@ import { useStore } from '../store/store.js'
 import { SECTIONS, openSection } from './sections.js'
 import LensBar from './lensBar/LensBar.jsx'
 
-export default function TopBar({ at: stateAt, source }) {
+export default function TopBar({ at: stateAt, source, children }) {
   const tab = useStore((s) => s.section) ?? 'overview'
   const lens = useStore((s) => s.lens)
   const when = stateAt
@@ -21,6 +21,8 @@ export default function TopBar({ at: stateAt, source }) {
           ))}
         </div>
       )}
+      {/* Layer chips from App, laid out in the bar so they can never overlap the views */}
+      {children}
       <div className="top-right">
         <span className="chip" title={source === 'live' ? 'Live data from the API' : source ? 'API unreachable: showing bundled fixture data' : 'Waiting for the live API'}>
           <span className={`dot ${source === 'live' ? '' : source ? 'fixture' : 'loading'}`} />

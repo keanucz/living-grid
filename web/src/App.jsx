@@ -101,7 +101,17 @@ function MapApp() {
       <Rail />
       <main className="main">
         <MapView ctx={ctx} />
-        <TopBar at={state.data?.at} source={state.source} />
+        <TopBar at={state.data?.at} source={state.source}>
+          <div className="actions">
+            {visibleLayers.map((l) => (
+              <button key={l.id} className={`chip ${ui.layers[l.id] === false ? 'off' : ''}`} onClick={() => actions.toggleLayer(l.id)}>
+                <span className="swatch" style={{ background: ui.layers[l.id] === false ? 'var(--text-3)' : l.swatch }} />
+                {l.label}
+              </button>
+            ))}
+            <button className="chip" title="Share"><Icon name="share" size={15} /></button>
+          </div>
+        </TopBar>
 
         {title && !simOnView && (
           <div className="headline">
@@ -111,15 +121,6 @@ function MapApp() {
           </div>
         )}
 
-        <div className="actions" style={ui.mode === 'simulate' ? { right: 100 } : undefined}>
-          {visibleLayers.map((l) => (
-            <button key={l.id} className={`chip ${ui.layers[l.id] === false ? 'off' : ''}`} onClick={() => actions.toggleLayer(l.id)}>
-              <span className="swatch" style={{ background: ui.layers[l.id] === false ? 'var(--text-3)' : l.swatch }} />
-              {l.label}
-            </button>
-          ))}
-          <button className="chip" title="Share"><Icon name="share" size={15} /></button>
-        </div>
 
         {SLOTS.map((slot) => (
           <div key={slot} className={`slot slot-${slot}`}>

@@ -266,3 +266,23 @@ h1, .headline h1, .kval, .sim-name, .tile b { letter-spacing: -0.012em; }
 .top-right .chip.num { font-size: 10px; }
 @media (max-width: 1599px) { .actions .chip .swatch { display: none; } .actions .chip { padding: 0 7px; } }
 .topbar .top-right { margin-left: auto; }
+
+/* #190: one flex row that scales; chips live in the bar's flow (no fixed offsets) */
+.topbar { gap: clamp(8px, 1vw, 16px); padding: 0 clamp(12px, 1.5vw, 28px); }
+.topbar .actions, .app .topbar .actions[style] { position: static !important; top: auto !important; right: auto !important;
+  flex: 0 1 auto; min-width: 0; overflow-x: auto; scrollbar-width: none; margin-left: auto; gap: 4px; }
+.topbar .actions::-webkit-scrollbar { display: none; }
+.topbar .actions .chip { flex: none; height: clamp(26px, 1.9vw, 34px); padding: 0 clamp(6px, 0.55vw, 10px); font-size: clamp(9px, 0.6vw, 11px); }
+.topbar .top-right { margin-left: 0; flex: none; }
+.topbar .top-right .chip { height: clamp(26px, 1.9vw, 34px); font-size: clamp(9px, 0.6vw, 11px); padding: 0 clamp(6px, 0.6vw, 12px); }
+.topbar .tabs, .topbar .lb, .topbar [class*="lens"] { flex: 0 1 auto; min-width: 0; }
+.topbar .tabs button, .topbar [class*="lens"] button { padding: clamp(5px, 0.45vw, 8px) clamp(8px, 0.85vw, 16px); font-size: clamp(11px, 0.75vw, 14px); white-space: nowrap; }
+.topbar .brand { flex: none; font-size: clamp(12px, 0.8vw, 15px); }
+@media (max-width: 1300px) { .topbar .brand small, .topbar .top-right .chip.num { display: none; } }
+/* lens bar inside the scaling top bar: anchor left and let its views shrink/scroll instead of spilling */
+.topbar .lb { margin: 0 !important; align-items: flex-start; flex: 0 1 auto; min-width: 0; }
+.topbar .lb-bar { max-width: 100%; min-width: 0; }
+.topbar .lb-views { min-width: 0; overflow-x: auto; scrollbar-width: none; }
+.topbar .lb-views::-webkit-scrollbar { display: none; }
+.topbar .lb-lens-b, .topbar .lb-views button { font-size: clamp(11px, 0.75vw, 14px); padding: clamp(5px, 0.45vw, 8px) clamp(8px, 0.85vw, 16px); white-space: nowrap; }
+.topbar .actions { flex-shrink: 3; }
