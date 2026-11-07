@@ -23,6 +23,9 @@ function useCountUp(target, ms = 1400, key) {
   return v
 }
 
+// Deltas are compared in EUR so zones rank fairly, but each is shown in its own currency.
+const zoneDelta = (zone, eur) => (zone === 'GB' ? `${fmt.signed(eur / 1.15)} £/MWh` : `${fmt.signed(eur)} €/MWh`)
+
 function StatTiles({ ctx }) {
   const sc = ctx.scenario
   const gb = ctx.stateByZone.GB
@@ -36,7 +39,7 @@ function StatTiles({ ctx }) {
   const items = [
     { label: 'Cost to consumers', value: sc ? fmt.money(cost) : '—', note: sc ? `over ${sc.hours >= 168 ? `${Math.round(sc.hours / 168)} weeks` : `${sc.hours} h`}` : 'Run a scenario', hot: true },
     { label: 'GB price', value: gb ? `£${gbNow.toFixed(1)}` : '—', delta: sc ? gbDelta : null, note: 'per MWh now' },
-    { label: 'Hardest hit', value: worst ? worst[0] : '—', note: worst ? `${fmt.signed(worst[1])} €/MWh` : 'no event' },
+    { label: 'Hardest hit', value: worst ? worst[0] : '—', note: worst ? zoneDelta(worst[0], worst[1]) : 'no event' },
     { label: 'Ghost wind', value: `${sc?.ghost_wind_mwh ? ((sc.ghost_wind_mwh * sc.scale) / 1000).toFixed(1) : '0.0'} GWh`, note: 'paid to switch off' },
   ]
   return (
