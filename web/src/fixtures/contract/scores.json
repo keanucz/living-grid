@@ -1,0 +1,738 @@
+{
+ "as_of": "2026-11-07T12:00:00Z",
+ "headline": {
+  "mae_model": 9.4,
+  "mae_persistence": 13.1,
+  "coverage_p10_p90": 0.79,
+  "forecasts_scored": 142,
+  "since": "2026-11-07T12:00:00Z",
+  "battery_share_of_perfect": 0.71,
+  "sentence": "142 forecasts since Saturday noon, all logged before the outcome"
+ },
+ "live": [
+  {
+   "zone": "GB",
+   "target": "gb_system_price",
+   "model": "lgbm_q",
+   "mae": 8.91,
+   "coverage_p10_p90": 0.72,
+   "n": 24
+  },
+  {
+   "zone": "GB",
+   "target": "gb_system_price",
+   "model": "persistence",
+   "mae": 13.7,
+   "coverage_p10_p90": null,
+   "n": 24
+  },
+  {
+   "zone": "FR",
+   "target": "price_da",
+   "model": "lgbm_q",
+   "mae": 8.12,
+   "coverage_p10_p90": 0.84,
+   "n": 24
+  },
+  {
+   "zone": "FR",
+   "target": "price_da",
+   "model": "persistence",
+   "mae": 9.59,
+   "coverage_p10_p90": null,
+   "n": 24
+  },
+  {
+   "zone": "DE-LU",
+   "target": "price_da",
+   "model": "lgbm_q",
+   "mae": 12.18,
+   "coverage_p10_p90": 0.79,
+   "n": 24
+  },
+  {
+   "zone": "DE-LU",
+   "target": "price_da",
+   "model": "persistence",
+   "mae": 18.14,
+   "coverage_p10_p90": null,
+   "n": 24
+  },
+  {
+   "zone": "NL",
+   "target": "price_da",
+   "model": "lgbm_q",
+   "mae": 8.24,
+   "coverage_p10_p90": 0.76,
+   "n": 24
+  },
+  {
+   "zone": "NL",
+   "target": "price_da",
+   "model": "persistence",
+   "mae": 11.92,
+   "coverage_p10_p90": null,
+   "n": 24
+  },
+  {
+   "zone": "BE",
+   "target": "price_da",
+   "model": "lgbm_q",
+   "mae": 9.84,
+   "coverage_p10_p90": 0.81,
+   "n": 24
+  },
+  {
+   "zone": "BE",
+   "target": "price_da",
+   "model": "persistence",
+   "mae": 14.76,
+   "coverage_p10_p90": null,
+   "n": 24
+  },
+  {
+   "zone": "NO2",
+   "target": "price_da",
+   "model": "lgbm_q",
+   "mae": 13.57,
+   "coverage_p10_p90": 0.82,
+   "n": 24
+  },
+  {
+   "zone": "NO2",
+   "target": "price_da",
+   "model": "persistence",
+   "mae": 16.08,
+   "coverage_p10_p90": null,
+   "n": 24
+  }
+ ],
+ "backtest": [
+  {
+   "fold": 0,
+   "zone": "GB",
+   "target": "gb_system_price",
+   "model": "lgbm_q",
+   "mae": 11.91,
+   "coverage_p10_p90": 0.75,
+   "n": 720
+  },
+  {
+   "fold": 0,
+   "zone": "GB",
+   "target": "gb_system_price",
+   "model": "persistence",
+   "mae": 12.97,
+   "coverage_p10_p90": null,
+   "n": 720
+  },
+  {
+   "fold": 1,
+   "zone": "GB",
+   "target": "gb_system_price",
+   "model": "lgbm_q",
+   "mae": 9.78,
+   "coverage_p10_p90": 0.78,
+   "n": 720
+  },
+  {
+   "fold": 1,
+   "zone": "GB",
+   "target": "gb_system_price",
+   "model": "persistence",
+   "mae": 9.95,
+   "coverage_p10_p90": null,
+   "n": 720
+  },
+  {
+   "fold": 2,
+   "zone": "GB",
+   "target": "gb_system_price",
+   "model": "lgbm_q",
+   "mae": 13.79,
+   "coverage_p10_p90": 0.84,
+   "n": 720
+  },
+  {
+   "fold": 2,
+   "zone": "GB",
+   "target": "gb_system_price",
+   "model": "persistence",
+   "mae": 16.63,
+   "coverage_p10_p90": null,
+   "n": 720
+  },
+  {
+   "fold": 3,
+   "zone": "GB",
+   "target": "gb_system_price",
+   "model": "lgbm_q",
+   "mae": 10.87,
+   "coverage_p10_p90": 0.75,
+   "n": 720
+  },
+  {
+   "fold": 3,
+   "zone": "GB",
+   "target": "gb_system_price",
+   "model": "persistence",
+   "mae": 10.94,
+   "coverage_p10_p90": null,
+   "n": 720
+  },
+  {
+   "fold": 0,
+   "zone": "FR",
+   "target": "price_da",
+   "model": "lgbm_q",
+   "mae": 7.18,
+   "coverage_p10_p90": 0.84,
+   "n": 720
+  },
+  {
+   "fold": 0,
+   "zone": "FR",
+   "target": "price_da",
+   "model": "persistence",
+   "mae": 8.91,
+   "coverage_p10_p90": null,
+   "n": 720
+  },
+  {
+   "fold": 1,
+   "zone": "FR",
+   "target": "price_da",
+   "model": "lgbm_q",
+   "mae": 8.17,
+   "coverage_p10_p90": 0.79,
+   "n": 720
+  },
+  {
+   "fold": 1,
+   "zone": "FR",
+   "target": "price_da",
+   "model": "persistence",
+   "mae": 7.88,
+   "coverage_p10_p90": null,
+   "n": 720
+  },
+  {
+   "fold": 2,
+   "zone": "FR",
+   "target": "price_da",
+   "model": "lgbm_q",
+   "mae": 11.22,
+   "coverage_p10_p90": 0.84,
+   "n": 720
+  },
+  {
+   "fold": 2,
+   "zone": "FR",
+   "target": "price_da",
+   "model": "persistence",
+   "mae": 15.99,
+   "coverage_p10_p90": null,
+   "n": 720
+  },
+  {
+   "fold": 3,
+   "zone": "FR",
+   "target": "price_da",
+   "model": "lgbm_q",
+   "mae": 12.57,
+   "coverage_p10_p90": 0.77,
+   "n": 720
+  },
+  {
+   "fold": 3,
+   "zone": "FR",
+   "target": "price_da",
+   "model": "persistence",
+   "mae": 14.48,
+   "coverage_p10_p90": null,
+   "n": 720
+  },
+  {
+   "fold": 0,
+   "zone": "DE-LU",
+   "target": "price_da",
+   "model": "lgbm_q",
+   "mae": 9.64,
+   "coverage_p10_p90": 0.76,
+   "n": 720
+  },
+  {
+   "fold": 0,
+   "zone": "DE-LU",
+   "target": "price_da",
+   "model": "persistence",
+   "mae": 13.46,
+   "coverage_p10_p90": null,
+   "n": 720
+  },
+  {
+   "fold": 1,
+   "zone": "DE-LU",
+   "target": "price_da",
+   "model": "lgbm_q",
+   "mae": 14.88,
+   "coverage_p10_p90": 0.83,
+   "n": 720
+  },
+  {
+   "fold": 1,
+   "zone": "DE-LU",
+   "target": "price_da",
+   "model": "persistence",
+   "mae": 20.73,
+   "coverage_p10_p90": null,
+   "n": 720
+  },
+  {
+   "fold": 2,
+   "zone": "DE-LU",
+   "target": "price_da",
+   "model": "lgbm_q",
+   "mae": 13.55,
+   "coverage_p10_p90": 0.81,
+   "n": 720
+  },
+  {
+   "fold": 2,
+   "zone": "DE-LU",
+   "target": "price_da",
+   "model": "persistence",
+   "mae": 14.56,
+   "coverage_p10_p90": null,
+   "n": 720
+  },
+  {
+   "fold": 3,
+   "zone": "DE-LU",
+   "target": "price_da",
+   "model": "lgbm_q",
+   "mae": 11.14,
+   "coverage_p10_p90": 0.78,
+   "n": 720
+  },
+  {
+   "fold": 3,
+   "zone": "DE-LU",
+   "target": "price_da",
+   "model": "persistence",
+   "mae": 10.76,
+   "coverage_p10_p90": null,
+   "n": 720
+  },
+  {
+   "fold": 0,
+   "zone": "NL",
+   "target": "price_da",
+   "model": "lgbm_q",
+   "mae": 14.65,
+   "coverage_p10_p90": 0.78,
+   "n": 720
+  },
+  {
+   "fold": 0,
+   "zone": "NL",
+   "target": "price_da",
+   "model": "persistence",
+   "mae": 21.47,
+   "coverage_p10_p90": null,
+   "n": 720
+  },
+  {
+   "fold": 1,
+   "zone": "NL",
+   "target": "price_da",
+   "model": "lgbm_q",
+   "mae": 14.9,
+   "coverage_p10_p90": 0.84,
+   "n": 720
+  },
+  {
+   "fold": 1,
+   "zone": "NL",
+   "target": "price_da",
+   "model": "persistence",
+   "mae": 17.14,
+   "coverage_p10_p90": null,
+   "n": 720
+  },
+  {
+   "fold": 2,
+   "zone": "NL",
+   "target": "price_da",
+   "model": "lgbm_q",
+   "mae": 8.76,
+   "coverage_p10_p90": 0.76,
+   "n": 720
+  },
+  {
+   "fold": 2,
+   "zone": "NL",
+   "target": "price_da",
+   "model": "persistence",
+   "mae": 9.27,
+   "coverage_p10_p90": null,
+   "n": 720
+  },
+  {
+   "fold": 3,
+   "zone": "NL",
+   "target": "price_da",
+   "model": "lgbm_q",
+   "mae": 8.63,
+   "coverage_p10_p90": 0.8,
+   "n": 720
+  },
+  {
+   "fold": 3,
+   "zone": "NL",
+   "target": "price_da",
+   "model": "persistence",
+   "mae": 12.47,
+   "coverage_p10_p90": null,
+   "n": 720
+  },
+  {
+   "fold": 0,
+   "zone": "BE",
+   "target": "price_da",
+   "model": "lgbm_q",
+   "mae": 7.68,
+   "coverage_p10_p90": 0.81,
+   "n": 720
+  },
+  {
+   "fold": 0,
+   "zone": "BE",
+   "target": "price_da",
+   "model": "persistence",
+   "mae": 11.14,
+   "coverage_p10_p90": null,
+   "n": 720
+  },
+  {
+   "fold": 1,
+   "zone": "BE",
+   "target": "price_da",
+   "model": "lgbm_q",
+   "mae": 13.26,
+   "coverage_p10_p90": 0.82,
+   "n": 720
+  },
+  {
+   "fold": 1,
+   "zone": "BE",
+   "target": "price_da",
+   "model": "persistence",
+   "mae": 16.08,
+   "coverage_p10_p90": null,
+   "n": 720
+  },
+  {
+   "fold": 2,
+   "zone": "BE",
+   "target": "price_da",
+   "model": "lgbm_q",
+   "mae": 8.43,
+   "coverage_p10_p90": 0.82,
+   "n": 720
+  },
+  {
+   "fold": 2,
+   "zone": "BE",
+   "target": "price_da",
+   "model": "persistence",
+   "mae": 9.55,
+   "coverage_p10_p90": null,
+   "n": 720
+  },
+  {
+   "fold": 3,
+   "zone": "BE",
+   "target": "price_da",
+   "model": "lgbm_q",
+   "mae": 13.41,
+   "coverage_p10_p90": 0.84,
+   "n": 720
+  },
+  {
+   "fold": 3,
+   "zone": "BE",
+   "target": "price_da",
+   "model": "persistence",
+   "mae": 15.66,
+   "coverage_p10_p90": null,
+   "n": 720
+  },
+  {
+   "fold": 0,
+   "zone": "NO2",
+   "target": "price_da",
+   "model": "lgbm_q",
+   "mae": 8.02,
+   "coverage_p10_p90": 0.76,
+   "n": 720
+  },
+  {
+   "fold": 0,
+   "zone": "NO2",
+   "target": "price_da",
+   "model": "persistence",
+   "mae": 11.61,
+   "coverage_p10_p90": null,
+   "n": 720
+  },
+  {
+   "fold": 1,
+   "zone": "NO2",
+   "target": "price_da",
+   "model": "lgbm_q",
+   "mae": 13.45,
+   "coverage_p10_p90": 0.75,
+   "n": 720
+  },
+  {
+   "fold": 1,
+   "zone": "NO2",
+   "target": "price_da",
+   "model": "persistence",
+   "mae": 18.89,
+   "coverage_p10_p90": null,
+   "n": 720
+  },
+  {
+   "fold": 2,
+   "zone": "NO2",
+   "target": "price_da",
+   "model": "lgbm_q",
+   "mae": 14.84,
+   "coverage_p10_p90": 0.81,
+   "n": 720
+  },
+  {
+   "fold": 2,
+   "zone": "NO2",
+   "target": "price_da",
+   "model": "persistence",
+   "mae": 16.96,
+   "coverage_p10_p90": null,
+   "n": 720
+  },
+  {
+   "fold": 3,
+   "zone": "NO2",
+   "target": "price_da",
+   "model": "lgbm_q",
+   "mae": 11.39,
+   "coverage_p10_p90": 0.75,
+   "n": 720
+  },
+  {
+   "fold": 3,
+   "zone": "NO2",
+   "target": "price_da",
+   "model": "persistence",
+   "mae": 10.91,
+   "coverage_p10_p90": null,
+   "n": 720
+  }
+ ],
+ "battery": [
+  {
+   "strategy": "perfect_foresight",
+   "zone": "GB",
+   "profit": 207.4,
+   "currency": "GBP",
+   "share_of_perfect": 1.0,
+   "worst_hour_loss": 0.0
+  },
+  {
+   "strategy": "risk_aware",
+   "zone": "GB",
+   "profit": 147.3,
+   "currency": "GBP",
+   "share_of_perfect": 0.71,
+   "worst_hour_loss": -4.2
+  },
+  {
+   "strategy": "median_only",
+   "zone": "GB",
+   "profit": 141.0,
+   "currency": "GBP",
+   "share_of_perfect": 0.68,
+   "worst_hour_loss": -11.8
+  },
+  {
+   "strategy": "naive",
+   "zone": "GB",
+   "profit": 101.6,
+   "currency": "GBP",
+   "share_of_perfect": 0.49,
+   "worst_hour_loss": -9.5
+  },
+  {
+   "strategy": "perfect_foresight",
+   "zone": "FR",
+   "profit": 193.4,
+   "currency": "EUR",
+   "share_of_perfect": 1.0,
+   "worst_hour_loss": 0.0
+  },
+  {
+   "strategy": "risk_aware",
+   "zone": "FR",
+   "profit": 137.3,
+   "currency": "EUR",
+   "share_of_perfect": 0.71,
+   "worst_hour_loss": -4.2
+  },
+  {
+   "strategy": "median_only",
+   "zone": "FR",
+   "profit": 131.5,
+   "currency": "EUR",
+   "share_of_perfect": 0.68,
+   "worst_hour_loss": -11.8
+  },
+  {
+   "strategy": "naive",
+   "zone": "FR",
+   "profit": 94.8,
+   "currency": "EUR",
+   "share_of_perfect": 0.49,
+   "worst_hour_loss": -9.5
+  },
+  {
+   "strategy": "perfect_foresight",
+   "zone": "DE-LU",
+   "profit": 182.2,
+   "currency": "EUR",
+   "share_of_perfect": 1.0,
+   "worst_hour_loss": 0.0
+  },
+  {
+   "strategy": "risk_aware",
+   "zone": "DE-LU",
+   "profit": 129.4,
+   "currency": "EUR",
+   "share_of_perfect": 0.71,
+   "worst_hour_loss": -4.2
+  },
+  {
+   "strategy": "median_only",
+   "zone": "DE-LU",
+   "profit": 123.9,
+   "currency": "EUR",
+   "share_of_perfect": 0.68,
+   "worst_hour_loss": -11.8
+  },
+  {
+   "strategy": "naive",
+   "zone": "DE-LU",
+   "profit": 89.3,
+   "currency": "EUR",
+   "share_of_perfect": 0.49,
+   "worst_hour_loss": -9.5
+  },
+  {
+   "strategy": "perfect_foresight",
+   "zone": "NL",
+   "profit": 247.2,
+   "currency": "EUR",
+   "share_of_perfect": 1.0,
+   "worst_hour_loss": 0.0
+  },
+  {
+   "strategy": "risk_aware",
+   "zone": "NL",
+   "profit": 175.5,
+   "currency": "EUR",
+   "share_of_perfect": 0.71,
+   "worst_hour_loss": -4.2
+  },
+  {
+   "strategy": "median_only",
+   "zone": "NL",
+   "profit": 168.1,
+   "currency": "EUR",
+   "share_of_perfect": 0.68,
+   "worst_hour_loss": -11.8
+  },
+  {
+   "strategy": "naive",
+   "zone": "NL",
+   "profit": 121.1,
+   "currency": "EUR",
+   "share_of_perfect": 0.49,
+   "worst_hour_loss": -9.5
+  },
+  {
+   "strategy": "perfect_foresight",
+   "zone": "BE",
+   "profit": 212.1,
+   "currency": "EUR",
+   "share_of_perfect": 1.0,
+   "worst_hour_loss": 0.0
+  },
+  {
+   "strategy": "risk_aware",
+   "zone": "BE",
+   "profit": 150.6,
+   "currency": "EUR",
+   "share_of_perfect": 0.71,
+   "worst_hour_loss": -4.2
+  },
+  {
+   "strategy": "median_only",
+   "zone": "BE",
+   "profit": 144.2,
+   "currency": "EUR",
+   "share_of_perfect": 0.68,
+   "worst_hour_loss": -11.8
+  },
+  {
+   "strategy": "naive",
+   "zone": "BE",
+   "profit": 103.9,
+   "currency": "EUR",
+   "share_of_perfect": 0.49,
+   "worst_hour_loss": -9.5
+  },
+  {
+   "strategy": "perfect_foresight",
+   "zone": "NO2",
+   "profit": 257.7,
+   "currency": "EUR",
+   "share_of_perfect": 1.0,
+   "worst_hour_loss": 0.0
+  },
+  {
+   "strategy": "risk_aware",
+   "zone": "NO2",
+   "profit": 183.0,
+   "currency": "EUR",
+   "share_of_perfect": 0.71,
+   "worst_hour_loss": -4.2
+  },
+  {
+   "strategy": "median_only",
+   "zone": "NO2",
+   "profit": 175.2,
+   "currency": "EUR",
+   "share_of_perfect": 0.68,
+   "worst_hour_loss": -11.8
+  },
+  {
+   "strategy": "naive",
+   "zone": "NO2",
+   "profit": 126.3,
+   "currency": "EUR",
+   "share_of_perfect": 0.49,
+   "worst_hour_loss": -9.5
+  }
+ ]
+}

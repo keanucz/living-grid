@@ -1,0 +1,260 @@
+{
+ "region": "N",
+ "name": "South and Central Scotland",
+ "generated_at": "2026-11-07T12:00:00Z",
+ "windows": [
+  {
+   "task": "ev",
+   "label": "Charge your car",
+   "start": "2026-11-08T00:00:00Z",
+   "end": "2026-11-08T04:00:00Z",
+   "avg_p_kwh": 9.8,
+   "saving_gbp": {
+    "p10": 2.1,
+    "p50": 3.4,
+    "p90": 4.2
+   },
+   "kind": "forecast"
+  },
+  {
+   "task": "dishwasher",
+   "label": "Run the dishwasher",
+   "start": "2026-11-07T21:00:00Z",
+   "end": "2026-11-07T22:00:00Z",
+   "avg_p_kwh": 13.2,
+   "saving_gbp": {
+    "p10": 0.18,
+    "p50": 0.24,
+    "p90": 0.29
+   },
+   "kind": "actual"
+  }
+ ],
+ "prices": [
+  {
+   "ts": "2026-11-07T16:00:00Z",
+   "p_kwh": 19.84,
+   "p10": null,
+   "p90": null,
+   "kind": "actual"
+  },
+  {
+   "ts": "2026-11-07T16:30:00Z",
+   "p_kwh": 24.92,
+   "p10": null,
+   "p90": null,
+   "kind": "actual"
+  },
+  {
+   "ts": "2026-11-07T17:00:00Z",
+   "p_kwh": 29.88,
+   "p10": null,
+   "p90": null,
+   "kind": "actual"
+  },
+  {
+   "ts": "2026-11-07T17:30:00Z",
+   "p_kwh": 32.0,
+   "p10": null,
+   "p90": null,
+   "kind": "actual"
+  },
+  {
+   "ts": "2026-11-07T18:00:00Z",
+   "p_kwh": 29.88,
+   "p10": null,
+   "p90": null,
+   "kind": "actual"
+  },
+  {
+   "ts": "2026-11-07T18:30:00Z",
+   "p_kwh": 24.92,
+   "p10": null,
+   "p90": null,
+   "kind": "actual"
+  },
+  {
+   "ts": "2026-11-07T19:00:00Z",
+   "p_kwh": 19.84,
+   "p10": null,
+   "p90": null,
+   "kind": "actual"
+  },
+  {
+   "ts": "2026-11-07T19:30:00Z",
+   "p_kwh": 16.44,
+   "p10": null,
+   "p90": null,
+   "kind": "actual"
+  },
+  {
+   "ts": "2026-11-07T20:00:00Z",
+   "p_kwh": 14.79,
+   "p10": null,
+   "p90": null,
+   "kind": "actual"
+  },
+  {
+   "ts": "2026-11-07T20:30:00Z",
+   "p_kwh": 14.2,
+   "p10": null,
+   "p90": null,
+   "kind": "actual"
+  },
+  {
+   "ts": "2026-11-07T21:00:00Z",
+   "p_kwh": 14.04,
+   "p10": null,
+   "p90": null,
+   "kind": "actual"
+  },
+  {
+   "ts": "2026-11-07T21:30:00Z",
+   "p_kwh": 14.01,
+   "p10": null,
+   "p90": null,
+   "kind": "actual"
+  },
+  {
+   "ts": "2026-11-07T22:00:00Z",
+   "p_kwh": 14.0,
+   "p10": null,
+   "p90": null,
+   "kind": "actual"
+  },
+  {
+   "ts": "2026-11-07T22:30:00Z",
+   "p_kwh": 14.0,
+   "p10": null,
+   "p90": null,
+   "kind": "actual"
+  },
+  {
+   "ts": "2026-11-07T23:00:00Z",
+   "p_kwh": 14.0,
+   "p10": 11.0,
+   "p90": 18.0,
+   "kind": "forecast"
+  },
+  {
+   "ts": "2026-11-07T23:30:00Z",
+   "p_kwh": 14.0,
+   "p10": 11.0,
+   "p90": 18.0,
+   "kind": "forecast"
+  },
+  {
+   "ts": "2026-11-08T00:00:00Z",
+   "p_kwh": 13.37,
+   "p10": 10.37,
+   "p90": 17.37,
+   "kind": "forecast"
+  },
+  {
+   "ts": "2026-11-08T00:30:00Z",
+   "p_kwh": 13.37,
+   "p10": 10.37,
+   "p90": 17.37,
+   "kind": "forecast"
+  },
+  {
+   "ts": "2026-11-08T01:00:00Z",
+   "p_kwh": 11.79,
+   "p10": 8.79,
+   "p90": 15.79,
+   "kind": "forecast"
+  },
+  {
+   "ts": "2026-11-08T01:30:00Z",
+   "p_kwh": 11.79,
+   "p10": 8.79,
+   "p90": 15.79,
+   "kind": "forecast"
+  },
+  {
+   "ts": "2026-11-08T02:00:00Z",
+   "p_kwh": 9.33,
+   "p10": 6.33,
+   "p90": 13.33,
+   "kind": "forecast"
+  },
+  {
+   "ts": "2026-11-08T02:30:00Z",
+   "p_kwh": 9.33,
+   "p10": 6.33,
+   "p90": 13.33,
+   "kind": "forecast"
+  },
+  {
+   "ts": "2026-11-08T03:00:00Z",
+   "p_kwh": 8.0,
+   "p10": 5.0,
+   "p90": 12.0,
+   "kind": "forecast"
+  },
+  {
+   "ts": "2026-11-08T03:30:00Z",
+   "p_kwh": 8.0,
+   "p10": 5.0,
+   "p90": 12.0,
+   "kind": "forecast"
+  },
+  {
+   "ts": "2026-11-08T04:00:00Z",
+   "p_kwh": 9.33,
+   "p10": 6.33,
+   "p90": 13.33,
+   "kind": "forecast"
+  },
+  {
+   "ts": "2026-11-08T04:30:00Z",
+   "p_kwh": 9.33,
+   "p10": 6.33,
+   "p90": 13.33,
+   "kind": "forecast"
+  },
+  {
+   "ts": "2026-11-08T05:00:00Z",
+   "p_kwh": 11.79,
+   "p10": 8.79,
+   "p90": 15.79,
+   "kind": "forecast"
+  },
+  {
+   "ts": "2026-11-08T05:30:00Z",
+   "p_kwh": 11.79,
+   "p10": 8.79,
+   "p90": 15.79,
+   "kind": "forecast"
+  },
+  {
+   "ts": "2026-11-08T06:00:00Z",
+   "p_kwh": 13.37,
+   "p10": 10.37,
+   "p90": 17.37,
+   "kind": "forecast"
+  },
+  {
+   "ts": "2026-11-08T06:30:00Z",
+   "p_kwh": 13.37,
+   "p10": 10.37,
+   "p90": 17.37,
+   "kind": "forecast"
+  },
+  {
+   "ts": "2026-11-08T07:00:00Z",
+   "p_kwh": 13.89,
+   "p10": 10.89,
+   "p90": 17.89,
+   "kind": "forecast"
+  },
+  {
+   "ts": "2026-11-08T07:30:00Z",
+   "p_kwh": 13.89,
+   "p10": 10.89,
+   "p90": 17.89,
+   "kind": "forecast"
+  }
+ ],
+ "note": "Octopus Agile prices where published (retail, include network charges); our forecast beyond them."
+}

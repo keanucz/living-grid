@@ -1,0 +1,143 @@
+{
+ "at": "2026-11-07T12:00:00Z",
+ "zones": [
+  {
+   "zone": "GB",
+   "production_gco2_kwh": 182.0,
+   "consumption_gco2_kwh": 171.0,
+   "imports_share": 0.14,
+   "imports": [
+    {
+     "from_zone": "NL",
+     "mw": 420.0,
+     "exporter_gco2_kwh": 318.0,
+     "contribution_gco2_kwh": 4.7
+    },
+    {
+     "from_zone": "NO2",
+     "mw": 1320.0,
+     "exporter_gco2_kwh": 12.0,
+     "contribution_gco2_kwh": 0.6
+    },
+    {
+     "from_zone": "DK1",
+     "mw": 900.0,
+     "exporter_gco2_kwh": 300.0,
+     "contribution_gco2_kwh": 9.4
+    }
+   ],
+   "kind": "modelled"
+  },
+  {
+   "zone": "FR",
+   "production_gco2_kwh": 38.0,
+   "consumption_gco2_kwh": 52.0,
+   "imports_share": 0.06,
+   "imports": [
+    {
+     "from_zone": "GB",
+     "mw": 1650.0,
+     "exporter_gco2_kwh": 182.0,
+     "contribution_gco2_kwh": 5.1
+    },
+    {
+     "from_zone": "GB",
+     "mw": 880.0,
+     "exporter_gco2_kwh": 182.0,
+     "contribution_gco2_kwh": 2.7
+    },
+    {
+     "from_zone": "GB",
+     "mw": 940.0,
+     "exporter_gco2_kwh": 182.0,
+     "contribution_gco2_kwh": 2.9
+    }
+   ],
+   "kind": "modelled"
+  },
+  {
+   "zone": "DE-LU",
+   "production_gco2_kwh": 392.0,
+   "consumption_gco2_kwh": 371.0,
+   "imports_share": 0.11,
+   "imports": [
+    {
+     "from_zone": "FR",
+     "mw": 1800.0,
+     "exporter_gco2_kwh": 38.0,
+     "contribution_gco2_kwh": 1.5
+    },
+    {
+     "from_zone": "BE",
+     "mw": 300.0,
+     "exporter_gco2_kwh": 154.0,
+     "contribution_gco2_kwh": 1.0
+    },
+    {
+     "from_zone": "NO2",
+     "mw": 1100.0,
+     "exporter_gco2_kwh": 12.0,
+     "contribution_gco2_kwh": 0.3
+    }
+   ],
+   "kind": "modelled"
+  },
+  {
+   "zone": "NL",
+   "production_gco2_kwh": 318.0,
+   "consumption_gco2_kwh": 302.0,
+   "imports_share": 0.18,
+   "imports": [
+    {
+     "from_zone": "DE-LU",
+     "mw": 1400.0,
+     "exporter_gco2_kwh": 392.0,
+     "contribution_gco2_kwh": 48.6
+    },
+    {
+     "from_zone": "NO2",
+     "mw": 650.0,
+     "exporter_gco2_kwh": 12.0,
+     "contribution_gco2_kwh": 0.7
+    }
+   ],
+   "kind": "modelled"
+  },
+  {
+   "zone": "BE",
+   "production_gco2_kwh": 154.0,
+   "consumption_gco2_kwh": 168.0,
+   "imports_share": 0.21,
+   "imports": [
+    {
+     "from_zone": "GB",
+     "mw": 310.0,
+     "exporter_gco2_kwh": 182.0,
+     "contribution_gco2_kwh": 6.3
+    },
+    {
+     "from_zone": "FR",
+     "mw": 2100.0,
+     "exporter_gco2_kwh": 38.0,
+     "contribution_gco2_kwh": 9.0
+    },
+    {
+     "from_zone": "NL",
+     "mw": 600.0,
+     "exporter_gco2_kwh": 318.0,
+     "contribution_gco2_kwh": 21.4
+    }
+   ],
+   "kind": "modelled"
+  },
+  {
+   "zone": "NO2",
+   "production_gco2_kwh": 12.0,
+   "consumption_gco2_kwh": 41.0,
+   "imports_share": 0.09,
+   "imports": [],
+   "kind": "modelled"
+  }
+ ],
+ "note": "Emission factors are standard estimates; consumption intensity is modelled."
+}
