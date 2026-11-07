@@ -1,0 +1,15 @@
+region,name,dno,dno_full,mpan_distributor_id,carbon_intensity_region_id
+A,East England,UKPN,UK Power Networks,10,10
+B,East Midlands,NGED,National Grid Electricity Distribution,11,9
+C,London,UKPN,UK Power Networks,12,13
+D,"North Wales, Merseyside and Cheshire",SPEN,SP Energy Networks,13,6
+E,West Midlands,NGED,National Grid Electricity Distribution,14,8
+F,North East England,NPG,Northern Powergrid,15,4
+G,North West England,ENWL,Electricity North West,16,3
+H,Southern England,SSEN,Scottish and Southern Electricity Networks,20,12
+J,South East England,UKPN,UK Power Networks,19,14
+K,South Wales,NGED,National Grid Electricity Distribution,21,7
+L,South West England,NGED,National Grid Electricity Distribution,22,11
+M,Yorkshire,NPG,Northern Powergrid,23,5
+N,South and Central Scotland,SPEN,SP Energy Networks,18,2
+P,North Scotland,SSEN,Scottish and Southern Electricity Networks,17,1

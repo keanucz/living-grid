@@ -1,0 +1,11 @@
+id,name,elexon_code,from_zone,to_zone,capacity_mw,gb_landing,gb_lat,gb_lon,far_landing,far_lat,far_lon,to_in_v1,basis
+ifa,IFA,INTFR,GB,FR,2000,Sellindge,51.093,0.995,Sangatte,50.950,1.750,true,hand-made: nominal capacity from operator pages; landing coordinates approximate
+ifa2,IFA2,INTIFA2,GB,FR,1000,Lee-on-the-Solent,50.800,-1.200,Ouistreham,49.280,-0.260,true,hand-made: nominal capacity; landing coordinates approximate
+eleclink,ElecLink,INTELEC,GB,FR,1000,Folkestone,51.080,1.150,Peuplingues,50.920,1.760,true,hand-made: nominal capacity; landing coordinates approximate
+britned,BritNed,INTNED,GB,NL,1000,Isle of Grain,51.440,0.710,Maasvlakte,51.950,4.030,true,hand-made: nominal capacity; landing coordinates approximate
+nemo,Nemo Link,INTNEM,GB,BE,1000,Richborough,51.300,1.330,Zeebrugge,51.330,3.200,true,hand-made: nominal capacity; landing coordinates approximate
+nsl,North Sea Link,INTNSL,GB,NO2,1400,Blyth,55.130,-1.500,Kvilldal,59.500,6.620,true,hand-made: nominal capacity; landing coordinates approximate
+viking,Viking Link,INTVKL,GB,DK1,1400,Bicker Fen,52.950,-0.150,Revsing,55.500,9.100,false,hand-made: nominal capacity; DK1 is outside the v1 zones
+greenlink,Greenlink,INTGRNL,GB,SEM,500,Pembroke,51.680,-4.950,Great Island,52.250,-6.970,false,hand-made: nominal capacity; Ireland (SEM) is outside the v1 zones
+ewic,East-West,INTEW,GB,SEM,500,Deeside,53.200,-3.050,Rush,53.520,-6.080,false,hand-made: nominal capacity; Ireland (SEM) is outside the v1 zones
+moyle,Moyle,INTIRL,GB,SEM,500,Auchencrosh,55.180,-5.000,Ballycronan More,54.840,-5.750,false,hand-made: nominal capacity; Northern Ireland sits in SEM which is outside the v1 zones

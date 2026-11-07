@@ -1,0 +1,12 @@
+bm_unit,name,region,capacity_mw,lat,lon,basis
+VKNGW,Viking Wind Farm (Shetland),P,443,60.380,-1.250,hand-mapped: capacity and location approximate; BM unit stem to be checked against Elexon /reference/bmunits/all
+SGRWO,Seagreen,P,1075,56.580,-1.750,hand-mapped: offshore Angus; region assignment approximate
+MOWWO,Moray West,P,882,58.120,-3.000,hand-mapped: offshore Moray Firth; location approximate
+MOWEO,Moray East,P,950,58.150,-2.750,hand-mapped: offshore Moray Firth; location approximate
+BEATO,Beatrice,P,588,58.250,-2.900,hand-mapped: offshore Moray Firth; location approximate
+NNGAO,Neart na Gaoithe,N,448,56.270,-2.350,hand-mapped: offshore Firth of Forth; location approximate
+WHILW,Whitelee,N,539,55.680,-4.270,hand-mapped: onshore East Renfrewshire; BM unit stem to be checked
+CLDCW,Clyde,N,522,55.500,-3.650,hand-mapped: onshore South Lanarkshire and Dumfries; BM unit stem to be checked
+KLGLW,Kilgallioch,N,239,55.050,-4.700,hand-mapped: onshore; BM unit stem to be checked
+STRNW,Stronelairg,P,228,57.120,-4.450,hand-mapped: onshore Highlands; BM unit stem to be checked
+DUNGW,Dunmaglass,P,94,57.280,-4.320,hand-mapped: onshore Highlands; BM unit stem to be checked
