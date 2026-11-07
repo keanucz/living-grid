@@ -2,16 +2,17 @@ import { scaleLinear } from 'd3-scale'
 import { rgb } from 'd3-color'
 
 // One fixed price scale for every zone and every hour (EUR/MWh), so colours are comparable.
+// Wide enough for the autumn 2026 prices (~€300/MWh at peaks), with detail kept below €150.
 const STOPS = [
   [-50, '#7b6cf6'],
   [-0.01, '#5146b8'],
   [0, '#1f3b2c'],
-  [30, '#2f6a3a'],
-  [60, '#7fa33a'],
-  [80, '#d0b043'],
-  [95, '#e08a2e'],
-  [120, '#d4502e'],
-  [200, '#9e1f2e'],
+  [50, '#2f6a3a'],
+  [100, '#7fa33a'],
+  [150, '#d0b043'],
+  [200, '#e08a2e'],
+  [275, '#d4502e'],
+  [400, '#9e1f2e'],
 ]
 const scale = scaleLinear()
   .domain(STOPS.map((s) => s[0]))

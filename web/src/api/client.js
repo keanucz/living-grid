@@ -10,7 +10,7 @@ import { normaliseScenarios, normaliseState, normaliseZones } from './normalise.
 // unreachable, slow, or returns something we cannot read, we fall back to bundled fixtures
 // (already in UI shape) so the page always renders.
 const OFFLINE = import.meta.env.VITE_LG_OFFLINE === '1'
-const TIMEOUT_MS = { '/state': 9000, default: 4000 }
+const TIMEOUT_MS = { '/state': 9000, default: 8000 }
 
 async function fetchLive(path, params = {}) {
   if (OFFLINE) return null

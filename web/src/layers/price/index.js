@@ -1,7 +1,7 @@
 import { ColumnLayer, GeoJsonLayer } from 'deck.gl'
 import { priceColor, COLORS } from '../../styles/tokens.js'
 
-export const towerHeight = (eur) => 20000 + Math.max(0, eur ?? 0) * 2200
+export const towerHeight = (eur) => 20000 + Math.max(0, eur ?? 0) * 700
 
 export default {
   id: 'price',

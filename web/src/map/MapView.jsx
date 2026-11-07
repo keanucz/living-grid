@@ -84,7 +84,7 @@ export default function MapView({ ctx }) {
       controller={{ dragRotate: ui.mode === 'simulate', touchRotate: ui.mode === 'simulate' }}
       layers={layers}
       onClick={(info) => info.object?.properties?.zone && actions.selectZone(info.object.properties.zone)}
-      getTooltip={tooltip}
+      getTooltip={(info) => tooltip(info, ctx)}
       getCursor={({ isHovering }) => (isHovering ? 'pointer' : 'grab')}
     >
       {({ viewport }) => (
@@ -105,9 +105,26 @@ export default function MapView({ ctx }) {
   )
 }
 
-function tooltip({ object, layer }) {
+function zoneCard(id, ctx) {
+  const z = ctx.zoneById[id]
+  const st = ctx.stateByZone[id]
+  if (!z || !st) return null
+  const p = ctx.priceOf(id)
+  const shown = st.currency === 'GBP' ? p / 1.15 : p
+  const mix = Object.entries(st.mix ?? {}).slice(0, 3).map(([k, v]) => `${k} ${(v * 100).toFixed(0)}%`).join(' · ')
+  const net = st.net_import_mw == null ? '' : `<br/>Net ${st.net_import_mw >= 0 ? 'import' : 'export'} ${(Math.abs(st.net_import_mw) / 1000).toFixed(1)} GW`
+  const fc = st.forecast?.p50 != null ? `<br/><span style="opacity:.6">Forecast P50 ${st.forecast.p50.toFixed(0)} (${st.forecast.p10.toFixed(0)}–${st.forecast.p90.toFixed(0)}), +${st.forecast.horizon_h} h</span>` : ''
+  const tag = ctx.scenario ? ' <span style="color:#ff8a1f">modelled</span>' : ''
+  return `<b>${z.name}</b><br/><span style="font-size:18px;font-weight:600">${fmt.price(shown, st.currency)}</span>/MWh${tag}${mix ? `<br/>${mix}` : ''}${net}${fc}`
+}
+
+function tooltip({ object, layer }, ctx) {
   if (!object || !layer) return null
-  const style = { background: '#1c1c1b', color: '#f2f2ef', borderRadius: '10px', border: '1px solid rgba(255,255,255,.12)', fontSize: '12px', padding: '8px 10px' }
+  const style = { background: '#1c1c1b', color: '#f2f2ef', borderRadius: '10px', border: '1px solid rgba(255,255,255,.12)', fontSize: '12px', padding: '8px 10px', lineHeight: '1.5', textTransform: 'none' }
+  if (layer.id === 'price-zones' || layer.id === 'price-towers') {
+    const html = zoneCard(object.properties?.zone ?? object.id, ctx)
+    return html && { html, style }
+  }
   if (layer.id === 'assets-blocks') return { html: `<b>${object.name}</b><br/>${object.type} · ${object.mw.toLocaleString('en-GB')} MW<br/><span style="opacity:.6">Approximate location</span>`, style }
   if (layer.id === 'flows-line') return { html: `<b>${object.name}</b><br/>${object.mw ? `${Math.abs(object.mw).toLocaleString('en-GB')} MW ${object.mw > 0 ? `${object.from} → ${object.to}` : `${object.to} → ${object.from}`}` : 'No flow'} · ${object.capacity_mw.toLocaleString('en-GB')} MW cap`, style }
   return null
