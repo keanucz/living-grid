@@ -1,77 +1,149 @@
-# hackhub
+# The Living Grid
 
-A baseline repo for running many coding agents against one codebase during a hackathon without git falling over. Agents work in parallel on their own branches; a merge queue on a VPS owns `main` and lands work one task at a time, only when it passes your checks. You keep all of git: history, blame, bisect, revert, GitHub.
+A live map of the electricity market in six European zones that forecasts prices with uncertainty bands, lets you trigger events like a Strait of Hormuz closure or a tripped Norway cable, and scores every forecast against what actually happened.
 
-## How it works
+Built in 24 hours at HackTheBurgh XIII (7 to 8 November 2026) for the HRT track, "Best Use of Data for Predictions and Decision Making", and the G-Research track, "Making the Unseen Seen".
 
-Everything runs on one VPS. There is a bare repo that acts as the single remote, an integrator clone that runs the merge queue as a systemd service, and a work clone from which each agent gets its own `git worktree`. Because the worktrees share one object store, agents never wait on network fetches to see each other's work, and rebasing onto `main` is instant.
+**Live:** https://htb.stefvuck.dev
 
-Coordination lives in a small SQLite task board (`hub.db`) driven by `bin/hub`, a single dependency-free Python script. Each task carries the paths it expects to touch, and `bin/hub claim` refuses a task whose paths overlap with work another agent already has in flight. That one rule removes most conflicts before they happen.
+## What you can do with it
 
-When an agent finishes it runs `bin/hub ready`. The integrator takes ready tasks in order, squashes each onto the latest `main`, runs `scripts/check.sh`, and fast-forwards `main` only if it is green. If the branch conflicts or the check fails, the task is bounced back to its agent with the conflicted files or the failing output attached, and the agent fixes it and resubmits. A `pre-receive` hook on the bare repo rejects any push to `main` that does not come from the integrator, so nobody (human or agent) can skip the queue.
+Open the site and you land on a map of GB, France, Germany-Luxembourg, the Netherlands, Belgium and southern Norway (NO2), coloured by this hour's day-ahead price. Arcs between zones show electricity moving through the interconnectors. On the evening of 7 November the map showed £268/MWh in GB, €322 across the four coupled continental zones and €205 in NO2.
 
+From there:
+
+- **Overview** shows prices, demand, generation mix, carbon intensity and flows for the current hour.
+- **Forecast** draws a translucent "ghost" of where prices are heading, with P10 to P90 bands that widen the further ahead you look.
+- **Simulate** runs an event and shows what it costs, in pounds or euros, zone by zone.
+- **Scoreboard** compares our forecasts with simple guesses, using only forecasts logged before their outcome was known.
+- **Batteries** runs a 1 MW / 2 MWh battery in each zone on our forecasts and compares it with a naive rule and with perfect foresight.
+- **Replay** plays back the storm of 26 October 2026 with a model that saw no data from that day onwards.
+- **Household** suggests the cheapest window tonight to charge a car or run the dishwasher.
+
+## How it fits together
+
+Three people built it in three lanes. Stefan owned data and models, Keanu the engine and live state, Manu the front end and demo.
+
+```mermaid
+flowchart LR
+    subgraph sources["Public data (cached as parquet)"]
+        EC[Energy-Charts<br/>continental prices, load, flows]
+        NP[Nord Pool<br/>day-ahead results]
+        EL[Elexon<br/>GB system price, mix, links]
+        OM[Open-Meteo<br/>weather forecasts]
+        NE[NESO, Carbon Intensity,<br/>Octopus Agile, TTF gas, EUA]
+    end
+
+    subgraph A["Lane A: pipeline/"]
+        F[features] --> M[LightGBM quantile models<br/>P10 / P50 / P90]
+        M --> LOG[(forecast log<br/>append-only, made_at on every row)]
+        LOG --> SC[scorer + backtest]
+    end
+
+    subgraph B["Lane B: engine/ + spacetime/"]
+        API[FastAPI<br/>/state /intervene /scores /replay ...]
+        PUB[publisher] --> STDB[(SpacetimeDB<br/>live shared state)]
+    end
+
+    subgraph C["Lane C: web/"]
+        WEB[React + deck.gl map]
+    end
+
+    sources --> F
+    sources --> API
+    LOG --> API
+    SC --> API
+    LOG --> PUB
+    API -->|HTTPS| WEB
+    STDB -->|websocket| WEB
 ```
- agents/alice ─┐                         ┌─> check.sh ─> main
- agents/bob   ─┼─ agent/* branches ─> merge queue
- agents/carol ─┘        │                └─> bounce note ─> agent fixes, resubmits
-                    hub.db (tasks, claims, notes)
+
+Python fetches and caches every source to `data/` as parquet. The forecast scheduler runs at five past each hour, builds features, predicts, and appends to the forecast log. FastAPI answers request-response questions (what was the state at 15:00, what happens if Norway's cable trips). The publisher pushes the latest actuals, forecasts, scores and battery runs into SpacetimeDB every minute, so every open screen updates at once.
+
+## Why you can trust the scoreboard
+
+The pitch rests on one rule: a forecast counts only if it was written down before its outcome existed.
+
+```mermaid
+flowchart TD
+    A["Scheduler, :05 every hour"] -->|"writes made_at = now"| B[("Forecast log<br/>rows are never edited")]
+    C["Outcome published<br/>Elexon about 15 min after each period;<br/>day-ahead auctions next day"] --> D
+    B --> D["Scorer, :12 every hour<br/>joins forecasts to outcomes<br/>where made_at is earlier than the outcome"]
+    D --> E["Scoreboard: our error vs persistence,<br/>share of outcomes inside P10 to P90,<br/>number of forecasts scored"]
 ```
 
-## What the agents get
+The final Monday forecast freezes at 09:15 UTC on Sunday, before the GB auction closes at 09:50 and the continental one at 11:00 UTC. The reveal view then shows the frozen forecast meeting the real auction result during the 12:30 demo.
 
-The `.claude/` directory makes this work out of the box with Claude Code.
+## Results so far
 
-There are four skills. **`hub`** teaches the loop: check the inbox, claim one task, work inside its paths, sync, verify, ready, wait, repeat. **`plan-tasks`** explains how to slice a goal into small, path-scoped tasks with shared contracts landing first, which is where most of the real conflict avoidance comes from. **`contract-first`** covers how to define and change an API or schema boundary that several agents build against at once. **`verify`** is the checklist an agent runs before handing work to the queue: the gate, types and lint, a test for the change, a sweep of the diff for secrets, debug output and swallowed errors, and a scope check against the claimed paths, finishing with a handoff note.
+Walk-forward backtest, six folds of seven days each with a 48-hour purge, run on 7 November 2026 at 16:35 UTC:
 
-There are four subagents. `planner` fills the board from a goal and spots files that keep colliding. `conflict-resolver` works through a stopped rebase, reading what the other agent was trying to do so both intents survive. `build-fixer` gets a failing check green with the smallest possible diff. `reviewer` checks a branch before it goes to the queue, including for silent failures.
+| Model | Day-ahead price error (MAE) |
+|---|---|
+| Our LightGBM quantile model | **31.6** |
+| Same hour yesterday | 36.8 |
+| Last known price when the forecast was made (persistence) | 43.7 |
 
-`settings.json` wires in hooks. On session start each agent is shown the board and its inbox, and whenever an agent stops (or a subagent finishes) its work is committed and pushed to its branch, so nothing is ever stranded in a worktree. Before every edit and shell command, `bin/hub guard` runs: it refuses writes outside the task's claimed paths (pointing the agent at `bin/hub widen`, which extends the claim only if no one else holds those paths), refuses edits before a task is claimed, and blocks destructive commands such as `git push`, `git reset --hard`, `git clean -f`, `--no-verify`, `rm -rf .` and `DROP TABLE`. This keeps the board honest: the overlap check at claim time is only as good as agents staying within what they claimed.
+The model beats persistence by 28% on day-ahead prices. It loses to persistence on NO2 prices and French wind, and the backtest reports those losses rather than hiding them.
 
-### Credits
+The uncertainty bands are too narrow. Across the backtest, 63% of outcomes fell inside P10 to P90, where a calibrated model would catch about 80%. Two single-day replays show where it struggles:
 
-`contract-first` is taken from [Everything Claude Code](https://github.com/affaan-m/ecc) with a hub-specific section added. `verify`, `build-fixer`, the reviewer's silent-failure checks and the guard hook are adapted from ECC's `verification-loop`, `build-error-resolver`, `silent-failure-hunter` and `safety-guard`. ECC is MIT licensed; its licence is in `.claude/ECC-LICENSE`.
+| Day | Hours inside the band |
+|---|---|
+| 2 November 2026 (calm) | 136 of 168 (81%) |
+| 26 October 2026 (storm) | 83 of 168 (49%) |
 
-## Setup
+On 26 October, NESO's data puts GB constraint costs at £36.5M for the day. A recalibration of the bands is task #92 on the board.
 
-You need a Linux VPS with Python 3.11 or newer and git. Two or four cores and 4 to 8 GB of RAM comfortably runs five or six agents plus the check.
+## Events you can trigger
+
+| Event | What it changes |
+|---|---|
+| Strait of Hormuz closes | Raises the gas price; power prices follow through a merit-order estimate where gas sets the price |
+| Norway to GB link trips | Removes the link's recent flow: GB residual load rises, Norway's falls |
+| French nuclear outage | Removes reactors (default four 1,450 MW units, capped at the 63 GW fleet) |
+| North Sea storm or windless week | Scales wind through a turbine power curve (cut-in 3, rated 12, cut-out 25 m/s) |
+| Cold snap | Lowers temperature; French demand rises 2,400 MW per degree, RTE's own figure |
+| Carbon price spike | Raises the EUA price and passes it through gas plants at 0.334 tCO₂/MWh |
+| Storm over Scotland | More Scottish wind than the 6.7 GW B6 boundary can carry: prices fall, but more wind is paid to switch off |
+
+The model learned from two years of history and has never seen a gas shock like a Hormuz closure, so the price change uses a merit-order estimate: a gas plant at 58% efficiency burns 1.72 MWh of gas per MWh of power. The screen says this is an approximation of market coupling.
+
+## Where the numbers come from
+
+Every constant in the engine (interconnector capacities, plant efficiencies, emission factors, wind farm sizes, boundary limits) lives in `engine/reference/facts/` with its source URL, the quote it came from and a confidence rating. Each was researched with the Parallel Task API, checked by a second independent research run, and every figure re-found on the source page with a plain HTTP fetch. 51 of 53 facts pass. The two that do not are marked, and the code refuses to load them.
+
+| Source | Used for | Limit we respect |
+|---|---|---|
+| Energy-Charts | Continental prices, load, generation, flows | 2 requests per minute per endpoint |
+| Nord Pool | Day-ahead prices, including GB (N2EX) | About 60 days of history on the free API |
+| Elexon Insights | GB system price, generation mix, interconnector flows, wind curtailment | 7-day windows |
+| Open-Meteo | Historical and live weather forecasts | 10,000 calls a day |
+| NESO | Constraint costs, boundary flows | Costs arrive about a week late |
+| Carbon Intensity API | GB regional carbon intensity | Modelled data, labelled as such |
+| Octopus Agile | Household tariff prices | Next day published around 16:00 UK |
+| Yahoo Finance | TTF gas and EUA carbon prices | Daily closes, refreshed each hourly run |
+
+## Known limits
+
+- The P10 to P90 bands are too narrow, as above.
+- Energy-Charts reports load for all of Norway, not NO2 alone (15.3 GW against roughly 5 GW), so NO2 demand is left blank.
+- Ghost wind (wind paid to switch off) is estimated two ways, from accepted balancing bids and from the gap between weather-implied and metered output. Both are labelled as estimates.
+- Carbon traced through imports uses standard emission factors per fuel, not plant-level data.
+
+## Running it locally
 
 ```bash
-git clone <this repo> hackhub && cd hackhub
-# edit CLAUDE.md (project description) and scripts/check.sh (your build and tests)
-sudo ./scripts/vps-setup.sh /srv/hack alice bob carol
+uv sync                                    # Python 3.12, fetched by uv
+uv run uvicorn engine.app:app --port 8000  # API
+cd web && npm install && npm run dev       # front end on :5173
+./scripts/check.sh                         # tests, then the web build (the merge gate)
 ```
 
-That creates the bare repo with the hook, the integrator and work clones, a shared `hack` group so everyone's agents can use the same board, and starts the `hub-integrator` service. Each teammate then needs SSH access as their user and the Claude Code CLI installed and signed in.
+`LG_OFFLINE=1` runs the whole app from cached files and committed fixtures with no network; the demo has to survive the venue Wi-Fi dropping.
 
-To start an agent:
+## How we built it
 
-```bash
-cd /srv/hack/work
-bin/hub spawn alice-1
-cd /srv/hack/agents/alice-1 && claude
-```
+Each person ran one to three Claude Code agents on a 4 GB Hetzner VPS. They took tasks from a shared board (hackhub; see [HACKHUB.md](HACKHUB.md)), each task limited to the files it claimed, and a merge queue landed one task at a time only when tests and the web build passed. Agents in different lanes talked over an ntfy message bus. Main was mirrored to GitHub every minute. By 16:40 on Saturday that process had merged 63 of 89 tasks.
 
-Run each agent in its own `tmux` window so they survive disconnects. A good first prompt for the very first agent is "use the planner subagent to plan: <your idea>". Every other agent can simply be told "work through the board".
-
-Laptops can still clone `ssh://<user>@<vps>/srv/hack/repo.git` to read and test `main` locally, but the board is a local SQLite file, so agents themselves should run on the VPS.
-
-## Day-to-day
-
-```bash
-bin/hub list            # the board
-bin/hub log -n 50       # what every agent has been doing
-journalctl -u hub-integrator -f    # live merge queue
-bin/hub add "Title" -d "acceptance check" -p src/thing/   # add work by hand
-bin/hub release 7       # free a task an agent abandoned
-bin/hub show 7          # detail, handoff note and any bounce reason
-```
-
-## Configuration
-
-`hub.toml` sets the main branch, the check command and its timeout, and whether merges are squashed (one commit per task, the default) or rebased to keep each agent's commits. The integrator reads it at start-up, so restart the service after changing it: `sudo systemctl restart hub-integrator`. `HUB_CHECK` in the environment overrides the check command, and `HUB_AGENT` overrides an agent's name, which otherwise comes from its worktree folder.
-
-Keep `scripts/check.sh` fast. It runs once per task, serially, so a five-minute test suite caps you at twelve merges an hour. For anything slow, gate on a quick build plus smoke tests and run the full suite separately.
-
-## Tips that matter more than tooling
-
-Land the shared types, API shapes and schema first, as one task, before fanning out. Keep tasks to 30 to 45 minutes; long-lived branches are what make conflicts painful. Make hot files (route tables, barrel exports, dependency manifests) either finished early or structured so each feature registers itself in its own file. When `bin/hub log` shows the same file bouncing repeatedly, have the planner add a task to split it.
+Stack: Python 3.12 with pandas, LightGBM and FastAPI; SpacetimeDB 2.14 for live state; React, Vite, deck.gl 9.4 and MapLibre 5.24 for the map.
