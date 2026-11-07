@@ -47,6 +47,7 @@ class Shock:
     edit: callable = None  # (features DataFrame) -> edited copy, for the model path
     residual_mw: dict[str, float] = field(default_factory=dict)  # structural path, per zone
     structural_delta: dict[str, float] = field(default_factory=dict)  # direct price change per zone, if known
+    structural_fn: callable = None  # (features) -> per-row price change, for effects that vary by hour
     ghost_wind: dict | None = None
 
 
@@ -56,7 +57,8 @@ def clamp(value: float, lo: float, hi: float) -> tuple[float, bool]:
 
 
 def latest_features() -> pd.DataFrame:
-    return pipeline_features.latest().sort_values(["zone", "ts"]).reset_index(drop=True)
+    # The scheduler refreshes features hourly; requests read the cached file rather than rebuilding.
+    return pipeline_features.latest(rebuild=False).sort_values(["zone", "ts"]).reset_index(drop=True)
 
 
 def money(v: float, currency: str) -> str:
@@ -68,7 +70,10 @@ def _structural(feats: pd.DataFrame, shock: Shock) -> pd.Series:
     by_zone = {z: shock.residual_mw.get(z, 0.0) / 1000 * MERIT_SLOPE_PER_GW[z] for z in data.ZONES}
     for z, d in shock.structural_delta.items():
         by_zone[z] = by_zone.get(z, 0.0) + d
-    return feats["zone"].map(by_zone).fillna(0.0)
+    out = feats["zone"].map(by_zone).fillna(0.0)
+    if shock.structural_fn:
+        out = out + np.asarray(shock.structural_fn(feats), float)
+    return out
 
 
 def _battery(prices: np.ndarray) -> float:
