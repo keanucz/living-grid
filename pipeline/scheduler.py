@@ -3,7 +3,7 @@
     uv run python -m pipeline.scheduler          # loop, one run per hour
     uv run python -m pipeline.scheduler --once   # single run, for cron and tests
 
-Only horizons after made_at are logged, and the log is append-only, so every row was written before its outcome.
+Uses the newest trained model under data/models/, or the stub when none exists. Only horizons after made_at are logged, and the log is append-only, so every row was written before its outcome.
 """
 
 import argparse
@@ -19,7 +19,6 @@ from pipeline.models import quantile
 log = logging.getLogger("pipeline.scheduler")
 
 LOG_COLUMNS = ["made_at", "zone", "target", "ts", "horizon_h", "p10", "p50", "p90", "model_version"]
-GB_TARGETS = ("price_da", "gb_system_price")
 OFFSET_AFTER_HOUR_S = 120
 
 
@@ -46,12 +45,8 @@ def refresh(now: pd.Timestamp) -> list[str]:
 
 
 def to_log_rows(predicted: pd.DataFrame, made_at: pd.Timestamp, version: str) -> pd.DataFrame:
-    p = predicted[predicted["ts"] > made_at]
-    frames = []
-    for target in ("price_da", "gb_system_price"):
-        part = p if target == "price_da" else p[p["zone"] == "GB"]
-        frames.append(part.assign(target=target))
-    df = pd.concat(frames, ignore_index=True)
+    """predicted is the long ts, zone, target, p10, p50, p90 frame from QuantileModel.predict_all."""
+    df = predicted[predicted["ts"] > made_at].copy()
     df["made_at"] = made_at
     df["horizon_h"] = ((df["ts"] - made_at) / pd.Timedelta(hours=1)).round().astype("int32")
     df["model_version"] = version
@@ -65,8 +60,8 @@ def run_once(now=None, do_refresh: bool = True) -> int:
         made_at = made_at.tz_localize("UTC")
     if do_refresh:
         refresh(made_at)
-    predicted = quantile.predict(features.latest())
-    rows = to_log_rows(predicted, made_at, quantile.VERSION)
+    model = quantile.active()
+    rows = to_log_rows(model.predict_all(features.latest()), made_at, model.version)
     if rows.empty:
         log.warning("no future feature rows after %s; nothing logged", made_at)
         return 0
