@@ -6,7 +6,6 @@ the same hours, and only on hours whose real day-ahead price is known, so profit
 on a forecast.
 """
 
-import numpy as np
 import pandas as pd
 
 from engine.battery import baselines
@@ -19,6 +18,10 @@ FORECAST_LOG = "forecasts/log"
 STRATEGIES = ("median_only", "risk_aware", "naive", "perfect_foresight")
 MODES = {"median_only": "median", "risk_aware": "risk_aware"}
 CURRENCY = {"GB": "GBP"}
+EUR_PER_GBP = 1.15
+# Below these, a share of perfect foresight is noise: report null with a reason instead of a number.
+MIN_PERFECT_PROFIT = 10.0  # per zone, in its currency (a 1 MW / 2 MWh battery earns ~100-150 a day here)
+MIN_HOURS = 12  # settled hours per zone
 
 
 def _utc(s):
@@ -71,21 +74,58 @@ def compare_zone(forecasts: pd.DataFrame, actual: pd.DataFrame, battery: Battery
     return out
 
 
-def summarise(zone: str, settled: dict[str, pd.DataFrame]) -> list[dict]:
-    """BatteryResult rows (engine.schemas) for one zone; empty when nothing has settled."""
+def terminal_value(rows: pd.DataFrame, mark_price: float, battery: Battery = Battery()) -> float:
+    """Value of energy still stored when the settled window ends: sold at the window's mean real price.
+
+    Without this, a battery that charged for a peak beyond the window shows the purchase as a pure loss.
+    """
+    if rows.empty:
+        return 0.0
+    sold = float(rows["soc_mwh"].iloc[-1]) * battery.eta
+    return sold * mark_price - battery.degradation_per_mwh * sold
+
+
+def summarise(zone: str, settled: dict[str, pd.DataFrame], battery: Battery = Battery()) -> list[dict]:
+    """BatteryResult rows (engine.schemas) for one zone; empty when nothing has settled.
+
+    Profit is hourly settled P&L plus the value of energy left in store at the end of the window.
+    """
     if settled["perfect_foresight"].empty:
         return []
-    best = float(settled["perfect_foresight"]["pnl"].sum())
+    mark = float(settled["perfect_foresight"]["price"].mean())
+    profit = {name: float(settled[name]["pnl"].sum()) + terminal_value(settled[name], mark, battery) for name in STRATEGIES}
+    best, hours = profit["perfect_foresight"], len(settled["perfect_foresight"])
+    ok = best >= MIN_PERFECT_PROFIT and hours >= MIN_HOURS
     rows = []
     for name in STRATEGIES:
         pnl = settled[name]["pnl"]
-        profit = float(pnl.sum())
         rows.append({
-            "strategy": name, "zone": zone, "profit": round(profit, 2), "currency": CURRENCY.get(zone, "EUR"),
-            "share_of_perfect": round(profit / best, 4) if best > 0 else 0.0,
-            "worst_hour_loss": round(max(0.0, -float(pnl.min())), 2),
+            "strategy": name, "zone": zone, "profit": round(profit[name], 2), "currency": CURRENCY.get(zone, "EUR"),
+            "share_of_perfect": round(profit[name] / best, 4) if ok else None,
+            "worst_hour_loss": round(max(0.0, -float(pnl.min())), 2) if len(pnl) else 0.0,
         })
     return rows
+
+
+def pooled_share(results: list[dict], hours: dict[str, int]) -> tuple[float | None, int, str]:
+    """Risk-aware profit over perfect-foresight profit, summed over zones in EUR (not a mean of zone ratios)."""
+    def total(strategy: str) -> float:
+        return sum(
+            r["profit"] * (EUR_PER_GBP if r["currency"] == "GBP" else 1.0) for r in results if r["strategy"] == strategy
+        )
+
+    n = sum(hours.values())
+    zones = len(hours)
+    best = total("perfect_foresight")
+    if not zones or n < MIN_HOURS * zones:
+        return None, n, f"Too few settled hours ({n}) on real day-ahead prices to score the batteries yet"
+    if best < MIN_PERFECT_PROFIT * zones:
+        return None, n, "Prices have been too flat for perfect foresight to earn much, so a share would be noise"
+    return (
+        round(total("risk_aware") / best, 4),
+        n,
+        f"Pooled over {zones} zones and {n} settled hours; energy still stored at the end is valued at the mean real price",
+    )
 
 
 def load_inputs() -> tuple[pd.DataFrame | None, pd.DataFrame | None]:
@@ -109,19 +149,20 @@ def run(log: pd.DataFrame | None = None, actual: pd.DataFrame | None = None, bat
     if log is None or actual is None:
         log, actual = load_inputs()
     if log is None or actual is None or log.empty or actual.empty:
-        return {"results": [], "settled": {}, "share": 0.0, "bad_hours": {}}
+        return {"results": [], "settled": {}, "share": None, "n_hours": 0, "note": "No settled hours yet", "bad_hours": {}}
     actual = actual.assign(ts=_utc(actual["ts"]).dt.floor("h")).groupby(["zone", "ts"], as_index=False)["value"].mean()
-    results, settled, shares, bad = [], {}, [], {}
+    results, settled, hours, bad = [], {}, {}, {}
     for zone, fz in log.groupby("zone"):
         az = actual[actual["zone"] == zone].rename(columns={"value": "price"})
         s = compare_zone(fz, az, battery)
-        rows = summarise(zone, s)
+        rows = summarise(zone, s, battery)
         if rows:
             results += rows
             settled[zone] = s
-            shares.append(next(r["share_of_perfect"] for r in rows if r["strategy"] == "risk_aware"))
+            hours[zone] = len(s["perfect_foresight"])
             bad[zone] = bad_hour_saving(s)
-    return {"results": results, "settled": settled, "share": float(np.mean(shares)) if shares else 0.0, "bad_hours": bad}
+    share, n_hours, note = pooled_share(results, hours)
+    return {"results": results, "settled": settled, "share": share, "n_hours": n_hours, "note": note, "bad_hours": bad}
 
 
 def bad_hour_saving(settled: dict[str, pd.DataFrame]) -> float:
@@ -139,7 +180,8 @@ def battery_rows(out: dict, battery: Battery = Battery()) -> tuple[pd.DataFrame,
         for r in (x for x in out["results"] if x["zone"] == zone):
             rows = s[r["strategy"]]
             bats.append({"zone": zone, "strategy": r["strategy"], "soc_mwh": float(rows["soc_mwh"].iloc[-1]),
-                         "profit": r["profit"], "currency": r["currency"], "share_of_perfect": r["share_of_perfect"]})
+                         "profit": r["profit"], "currency": r["currency"],
+                         "share_of_perfect": float("nan") if r["share_of_perfect"] is None else r["share_of_perfect"]})
             acts.append(rows[["ts", "action", "mw", "soc_mwh", "price"]].assign(zone=zone, strategy=r["strategy"]))
     actions = pd.concat(acts, ignore_index=True) if acts else pd.DataFrame(
         columns=["ts", "zone", "strategy", "action", "mw", "soc_mwh", "price"])

@@ -38,7 +38,7 @@ def live_rows(scores: pd.DataFrame) -> list[dict]:
     return out
 
 
-def headline(scores: pd.DataFrame, sample: bool, battery_share: float) -> dict:
+def headline(scores: pd.DataFrame, sample: bool, battery: dict) -> dict:
     """MAE of the newest model against persistence on the same rows, pooled over zones for the day-ahead price.
 
     Pooled across zones, so GBP and EUR are treated as comparable; the ratio is what to read.
@@ -66,7 +66,8 @@ def headline(scores: pd.DataFrame, sample: bool, battery_share: float) -> dict:
         if len(c):
             coverage = float(np.average(c["value"], weights=c["n"]))
     return {"mae_model": mae_model, "mae_persistence": mae_persistence, "coverage_p10_p90": coverage,
-            "forecasts_scored": total, "since": since.to_pydatetime(), "battery_share_of_perfect": battery_share,
+            "forecasts_scored": total, "since": since.to_pydatetime(), "battery_share_of_perfect": battery.get("share"),
+            "battery_hours": battery.get("n_hours"), "battery_note": battery.get("note"),
             "sentence": text + (SAMPLE_NOTE if sample else "")}
 
 
@@ -84,14 +85,15 @@ def build_scores() -> dict:
         scores = pd.DataFrame(columns=["window_start", "window_end", "zone", "target", "metric", "model", "value", "n"])
     if sample:
         sample_body = fixture("scores")
-        battery, share = sample_body["battery"], sample_body["headline"]["battery_share_of_perfect"]
+        battery = sample_body["battery"]
+        summary = {"share": sample_body["headline"]["battery_share_of_perfect"], "n_hours": None, "note": "Sample data"}
     else:
         out = compare.run()
-        battery, share = out["results"], out["share"]
+        battery, summary = out["results"], out
     as_of = pd.to_datetime(scores["window_end"]).max() if len(scores) else pd.Timestamp.now(tz="UTC")
     return {
         "as_of": as_of.to_pydatetime(),
-        "headline": headline(scores, sample, share),
+        "headline": headline(scores, sample, summary),
         "live": live_rows(scores) if len(scores) else [],
         "backtest": backtest_rows(backtest) if len(backtest) else [],
         "battery": battery,

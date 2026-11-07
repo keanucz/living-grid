@@ -165,4 +165,7 @@ def test_live_battery_fields_never_show_sample_numbers(fixtures_only):
     cache.write("scores/scores", live_scores())
     body = client.get("/scores").json()
     assert all(b["strategy"] in ("median_only", "risk_aware", "naive", "perfect_foresight") for b in body["battery"])
-    assert 0.0 <= body["headline"]["battery_share_of_perfect"] <= 1.0
+    share = body["headline"]["battery_share_of_perfect"]
+    assert share is None or 0.0 <= share <= 1.0
+    if share is None:
+        assert body["headline"]["battery_note"], "a null share always carries a reason"

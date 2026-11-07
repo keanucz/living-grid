@@ -308,7 +308,12 @@ class Headline(Model):
     coverage_p10_p90: float
     forecasts_scored: int
     since: datetime
-    battery_share_of_perfect: float
+    battery_share_of_perfect: float | None = Field(
+        description="Risk-aware profit / perfect-foresight profit, pooled over zones and hours; null when too few "
+        "hours have settled or perfect foresight earns too little for the ratio to mean anything"
+    )
+    battery_hours: int | None = Field(None, description="Zone-hours settled on real prices behind the battery share")
+    battery_note: str | None = Field(None, description="Why the battery share is null, or how it was computed")
     sentence: str
 
 
@@ -336,7 +341,7 @@ class BatteryResult(Model):
     zone: Zone
     profit: float
     currency: Currency
-    share_of_perfect: float
+    share_of_perfect: float | None = Field(description="Null when perfect foresight earns too little in this zone")
     worst_hour_loss: float
 
 

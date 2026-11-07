@@ -92,7 +92,7 @@ def test_no_settled_hours_means_no_results():
     log, actual = make()
     future = actual.assign(ts=actual["ts"] + pd.Timedelta(days=30))
     out = compare.run(log, future)
-    assert out["results"] == [] and out["share"] == 0.0
+    assert out["results"] == [] and out["share"] is None and out["n_hours"] == 0
 
 
 def test_publish_rows_shape():

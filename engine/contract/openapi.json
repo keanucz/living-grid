@@ -122,8 +122,16 @@
       "type": "number"
      },
      "share_of_perfect": {
-      "title": "Share Of Perfect",
-      "type": "number"
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "description": "Null when perfect foresight earns too little in this zone",
+      "title": "Share Of Perfect"
      },
      "strategy": {
       "enum": [
@@ -779,9 +787,41 @@
    "Headline": {
     "additionalProperties": false,
     "properties": {
+     "battery_hours": {
+      "anyOf": [
+       {
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "description": "Zone-hours settled on real prices behind the battery share",
+      "title": "Battery Hours"
+     },
+     "battery_note": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "description": "Why the battery share is null, or how it was computed",
+      "title": "Battery Note"
+     },
      "battery_share_of_perfect": {
-      "title": "Battery Share Of Perfect",
-      "type": "number"
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "description": "Risk-aware profit / perfect-foresight profit, pooled over zones and hours; null when too few hours have settled or perfect foresight earns too little for the ratio to mean anything",
+      "title": "Battery Share Of Perfect"
      },
      "coverage_p10_p90": {
       "title": "Coverage P10 P90",
