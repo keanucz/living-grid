@@ -28,13 +28,18 @@ CONTINENTAL_LINKS = [
     ("de-no2", "NordLink", "DE-LU", "NO2", 1400, (9.3, 54.0), (7.0, 58.3)),
 ]
 PRICE_SOURCES = ["nordpool", "energycharts", "entsoe"]
+# File stems are <source>_<rest>; some sources contain an underscore. Normalised by dropping underscores.
+SOURCES = ["energy_charts", "energycharts", "carbon_intensity", "carbonintensity", "elexon", "nordpool", "entsoe", "octopus", "neso"]
+# Energy-Charts public_power and load for Norway cover the whole country, not the NO2 bidding zone.
+COUNTRY_LEVEL = {("energycharts", "NO2")}
 AS_OF_TOLERANCE = pd.Timedelta(hours=3)
+METERED_TOLERANCE = pd.Timedelta(hours=6)  # Energy-Charts load and generation run about 3 hours behind
 
 
 def _files(sub: str) -> dict[str, Path]:
-    """name -> path, preferring data/ over fixtures for the same name."""
+    """name -> path under data/. Committed fixtures are only read offline, never served as live data."""
     out: dict[str, Path] = {}
-    for base in (cache.FIXTURES, cache.DATA):
+    for base in (cache.FIXTURES, cache.DATA) if cache.offline() else (cache.DATA,):
         d = base / sub
         if d.is_dir():
             out.update({p.stem: p for p in d.glob("*.parquet")})
@@ -55,10 +60,15 @@ def actuals() -> pd.DataFrame:
     for stem, p in sorted(_files("actuals").items()):
         df = _read(p)
         if len(df):
-            parts.append(df.assign(source=stem.split("_", 1)[0]))
+            parts.append(df.assign(source=source_of(stem)))
     if not parts:
         return pd.DataFrame(columns=["ts", "zone", "series", "value", "unit", "source"])
     return pd.concat(parts, ignore_index=True)
+
+
+def source_of(stem: str) -> str:
+    src = next((s for s in SOURCES if stem == s or stem.startswith(s + "_")), stem.split("_", 1)[0])
+    return src.replace("_", "")
 
 
 def forecast_log() -> pd.DataFrame:
@@ -97,6 +107,13 @@ def prices(at: pd.Timestamp) -> dict[str, dict]:
 def latest_price_ts() -> pd.Timestamp | None:
     a = actuals()
     ts = a.loc[a["series"] == "price_da", "ts"]
+    return ts.max() if len(ts) else None
+
+
+def latest_actual_ts() -> pd.Timestamp | None:
+    """Latest hour of metered load or generation (day-ahead prices and forecasts run into tomorrow)."""
+    a = actuals()
+    ts = a.loc[(a["series"] == "load") | a["series"].str.startswith("gen_"), "ts"]
     return ts.max() if len(ts) else None
 
 
@@ -140,8 +157,9 @@ def zone_series(at: pd.Timestamp) -> tuple[dict[str, float], dict[str, dict[str,
     """(load MW per zone, generation mix MW per zone) as of `at`; Elexon preferred for GB."""
     a = actuals()
     a = a[(a["series"] == "load") | a["series"].str.startswith("gen_")].copy()
+    a = a[[(src, z) not in COUNTRY_LEVEL for src, z in zip(a["source"], a["zone"], strict=True)]]
     a["rank"] = (a["source"] == "elexon") & (a["zone"] == "GB")
-    a = a[(a["ts"] <= at) & (a["ts"] > at - AS_OF_TOLERANCE)].sort_values(["ts", "rank"])
+    a = a[(a["ts"] <= at) & (a["ts"] > at - METERED_TOLERANCE)].sort_values(["ts", "rank"])
     last = a.groupby(["zone", "series"], as_index=False).last()
     load, mix = {}, {}
     for r in last.itertuples():

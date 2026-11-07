@@ -27,7 +27,10 @@ def test_state_has_all_zones_from_pipeline_fixtures():
         assert z.forecast and z.forecast.p10 <= z.forecast.p50 <= z.forecast.p90
         assert z.forecast.made_at <= body.at
         assert z.carbon and z.carbon.kind == "modelled"
-        assert z.load_mw and z.mix_mw
+        if z.zone == "NO2":
+            assert z.load_mw is None and z.mix_mw == {}, "Energy-Charts Norway is country-level, not NO2"
+        else:
+            assert z.load_mw and z.mix_mw
     assert body.zones[0].price.unit == "GBP/MWh"
     assert body.zones[1].price.unit == "EUR/MWh"
 
@@ -37,8 +40,12 @@ def test_state_never_shows_a_forecast_made_after_at():
     assert all(z["forecast"] is None for z in body["zones"])
 
 
-def test_state_defaults_to_latest_actual_hour():
-    assert client.get("/state").json()["at"].startswith("2026-11-07T23:00")
+def test_state_defaults_to_now_capped_at_latest_data_offline():
+    from datetime import UTC, datetime
+
+    now = pd.Timestamp(datetime.now(UTC)).floor("h")
+    expected = min(now, pd.Timestamp("2026-11-07T23:00Z"))
+    assert pd.Timestamp(client.get("/state").json()["at"]) == expected
 
 
 def test_flows_match_fixture_and_split_by_capacity():
