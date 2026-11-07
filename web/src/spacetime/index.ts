@@ -40,6 +40,11 @@ import ClearInterventionReducer from "./clear_intervention_reducer";
 import DecideReducer from "./decide_reducer";
 import DeleteKeysReducer from "./delete_keys_reducer";
 import JoinReducer from "./join_reducer";
+import MarketBuyReducer from "./market_buy_reducer";
+import MarketResetReducer from "./market_reset_reducer";
+import MarketSellReducer from "./market_sell_reducer";
+import MarketStartReducer from "./market_start_reducer";
+import MarketTickReducer from "./market_tick_reducer";
 import PruneBeforeReducer from "./prune_before_reducer";
 import RemoveAdminReducer from "./remove_admin_reducer";
 import ResetGameReducer from "./reset_game_reducer";
@@ -67,6 +72,12 @@ import GhostWindRow from "./ghost_wind_table";
 import InterventionRow from "./intervention_table";
 import LatestForecastRow from "./latest_forecast_table";
 import LeaderboardRow from "./leaderboard_table";
+import MarketAccountRow from "./market_account_table";
+import MarketFeedRow from "./market_feed_table";
+import MarketLeaderboardRow from "./market_leaderboard_table";
+import MarketPositionRow from "./market_position_table";
+import MarketQuestionRow from "./market_question_table";
+import MarketRoundRow from "./market_round_table";
 import PlayerRow from "./player_table";
 import PlayerDecisionRow from "./player_decision_table";
 import ScoreRow from "./score_table";
@@ -177,6 +188,67 @@ const tablesSchema = __schema({
       { name: 'intervention_slot_key', constraint: 'unique', columns: ['slot'] },
     ],
   }, InterventionRow),
+  marketAccount: __table({
+    name: 'market_account',
+    indexes: [
+      { accessor: 'identity', name: 'market_account_identity_idx_btree', algorithm: 'btree', columns: [
+        'identity',
+      ] },
+    ],
+    constraints: [
+      { name: 'market_account_identity_key', constraint: 'unique', columns: ['identity'] },
+    ],
+  }, MarketAccountRow),
+  marketFeed: __table({
+    name: 'market_feed',
+    indexes: [
+      { accessor: 'key', name: 'market_feed_key_idx_btree', algorithm: 'btree', columns: [
+        'key',
+      ] },
+    ],
+    constraints: [
+      { name: 'market_feed_key_key', constraint: 'unique', columns: ['key'] },
+    ],
+  }, MarketFeedRow),
+  marketPosition: __table({
+    name: 'market_position',
+    indexes: [
+      { accessor: 'identity', name: 'market_position_identity_idx_btree', algorithm: 'btree', columns: [
+        'identity',
+      ] },
+      { accessor: 'key', name: 'market_position_key_idx_btree', algorithm: 'btree', columns: [
+        'key',
+      ] },
+      { accessor: 'question_id', name: 'market_position_question_id_idx_btree', algorithm: 'btree', columns: [
+        'questionId',
+      ] },
+    ],
+    constraints: [
+      { name: 'market_position_key_key', constraint: 'unique', columns: ['key'] },
+    ],
+  }, MarketPositionRow),
+  marketQuestion: __table({
+    name: 'market_question',
+    indexes: [
+      { accessor: 'id', name: 'market_question_id_idx_btree', algorithm: 'btree', columns: [
+        'id',
+      ] },
+    ],
+    constraints: [
+      { name: 'market_question_id_key', constraint: 'unique', columns: ['id'] },
+    ],
+  }, MarketQuestionRow),
+  marketRound: __table({
+    name: 'market_round',
+    indexes: [
+      { accessor: 'id', name: 'market_round_id_idx_btree', algorithm: 'btree', columns: [
+        'id',
+      ] },
+    ],
+    constraints: [
+      { name: 'market_round_id_key', constraint: 'unique', columns: ['id'] },
+    ],
+  }, MarketRoundRow),
   player: __table({
     name: 'player',
     indexes: [
@@ -241,6 +313,13 @@ const tablesSchema = __schema({
     constraints: [
     ],
   }, LeaderboardRow),
+  marketLeaderboard: __table({
+    name: 'market_leaderboard',
+    indexes: [
+    ],
+    constraints: [
+    ],
+  }, MarketLeaderboardRow),
 });
 
 /** The schema information for all reducers in this module. This is defined the same way as the reducers would have been defined in the server, except the body of the reducer is omitted in code generation. */
@@ -251,6 +330,11 @@ const reducersSchema = __reducers(
   __reducerSchema("decide", DecideReducer),
   __reducerSchema("delete_keys", DeleteKeysReducer),
   __reducerSchema("join", JoinReducer),
+  __reducerSchema("market_buy", MarketBuyReducer),
+  __reducerSchema("market_reset", MarketResetReducer),
+  __reducerSchema("market_sell", MarketSellReducer),
+  __reducerSchema("market_start", MarketStartReducer),
+  __reducerSchema("market_tick", MarketTickReducer),
   __reducerSchema("prune_before", PruneBeforeReducer),
   __reducerSchema("remove_admin", RemoveAdminReducer),
   __reducerSchema("reset_game", ResetGameReducer),
@@ -277,10 +361,22 @@ type __SchemaWithTableAccessorAliases = Omit<typeof tablesSchema.schemaType, "ta
     readonly "battery_action": Omit<typeof tablesSchema.schemaType.tables["batteryAction"], "accessorName"> & { readonly accessorName: "battery_action" };
     /** @deprecated Use `ghostWind` instead. This alias will be removed in the next major version. */
     readonly "ghost_wind": Omit<typeof tablesSchema.schemaType.tables["ghostWind"], "accessorName"> & { readonly accessorName: "ghost_wind" };
+    /** @deprecated Use `marketAccount` instead. This alias will be removed in the next major version. */
+    readonly "market_account": Omit<typeof tablesSchema.schemaType.tables["marketAccount"], "accessorName"> & { readonly accessorName: "market_account" };
+    /** @deprecated Use `marketFeed` instead. This alias will be removed in the next major version. */
+    readonly "market_feed": Omit<typeof tablesSchema.schemaType.tables["marketFeed"], "accessorName"> & { readonly accessorName: "market_feed" };
+    /** @deprecated Use `marketPosition` instead. This alias will be removed in the next major version. */
+    readonly "market_position": Omit<typeof tablesSchema.schemaType.tables["marketPosition"], "accessorName"> & { readonly accessorName: "market_position" };
+    /** @deprecated Use `marketQuestion` instead. This alias will be removed in the next major version. */
+    readonly "market_question": Omit<typeof tablesSchema.schemaType.tables["marketQuestion"], "accessorName"> & { readonly accessorName: "market_question" };
+    /** @deprecated Use `marketRound` instead. This alias will be removed in the next major version. */
+    readonly "market_round": Omit<typeof tablesSchema.schemaType.tables["marketRound"], "accessorName"> & { readonly accessorName: "market_round" };
     /** @deprecated Use `playerDecision` instead. This alias will be removed in the next major version. */
     readonly "player_decision": Omit<typeof tablesSchema.schemaType.tables["playerDecision"], "accessorName"> & { readonly accessorName: "player_decision" };
     /** @deprecated Use `latestForecast` instead. This alias will be removed in the next major version. */
     readonly "latest_forecast": Omit<typeof tablesSchema.schemaType.tables["latestForecast"], "accessorName"> & { readonly accessorName: "latest_forecast" };
+    /** @deprecated Use `marketLeaderboard` instead. This alias will be removed in the next major version. */
+    readonly "market_leaderboard": Omit<typeof tablesSchema.schemaType.tables["marketLeaderboard"], "accessorName"> & { readonly accessorName: "market_leaderboard" };
   };
 };
 
@@ -301,8 +397,14 @@ const REMOTE_MODULE = {
 const tableAccessorAliases = {
   "battery_action": "batteryAction",
   "ghost_wind": "ghostWind",
+  "market_account": "marketAccount",
+  "market_feed": "marketFeed",
+  "market_position": "marketPosition",
+  "market_question": "marketQuestion",
+  "market_round": "marketRound",
   "player_decision": "playerDecision",
   "latest_forecast": "latestForecast",
+  "market_leaderboard": "marketLeaderboard",
 } as const;
 
 function __withTableAccessorAliases<T extends object>(target: T, freeze = false): T {
@@ -327,10 +429,22 @@ export type DbView = __DbViewBase & {
   readonly "battery_action": __DbViewBase["batteryAction"];
   /** @deprecated Use `ghostWind` instead. This alias will be removed in the next major version. */
   readonly "ghost_wind": __DbViewBase["ghostWind"];
+  /** @deprecated Use `marketAccount` instead. This alias will be removed in the next major version. */
+  readonly "market_account": __DbViewBase["marketAccount"];
+  /** @deprecated Use `marketFeed` instead. This alias will be removed in the next major version. */
+  readonly "market_feed": __DbViewBase["marketFeed"];
+  /** @deprecated Use `marketPosition` instead. This alias will be removed in the next major version. */
+  readonly "market_position": __DbViewBase["marketPosition"];
+  /** @deprecated Use `marketQuestion` instead. This alias will be removed in the next major version. */
+  readonly "market_question": __DbViewBase["marketQuestion"];
+  /** @deprecated Use `marketRound` instead. This alias will be removed in the next major version. */
+  readonly "market_round": __DbViewBase["marketRound"];
   /** @deprecated Use `playerDecision` instead. This alias will be removed in the next major version. */
   readonly "player_decision": __DbViewBase["playerDecision"];
   /** @deprecated Use `latestForecast` instead. This alias will be removed in the next major version. */
   readonly "latest_forecast": __DbViewBase["latestForecast"];
+  /** @deprecated Use `marketLeaderboard` instead. This alias will be removed in the next major version. */
+  readonly "market_leaderboard": __DbViewBase["marketLeaderboard"];
 };
 
 type __TablesBase = __QueryBuilder<typeof tablesSchema.schemaType>;
@@ -339,10 +453,22 @@ export type Tables = __TablesBase & {
   readonly "battery_action": __TablesBase["batteryAction"];
   /** @deprecated Use `ghostWind` instead. This alias will be removed in the next major version. */
   readonly "ghost_wind": __TablesBase["ghostWind"];
+  /** @deprecated Use `marketAccount` instead. This alias will be removed in the next major version. */
+  readonly "market_account": __TablesBase["marketAccount"];
+  /** @deprecated Use `marketFeed` instead. This alias will be removed in the next major version. */
+  readonly "market_feed": __TablesBase["marketFeed"];
+  /** @deprecated Use `marketPosition` instead. This alias will be removed in the next major version. */
+  readonly "market_position": __TablesBase["marketPosition"];
+  /** @deprecated Use `marketQuestion` instead. This alias will be removed in the next major version. */
+  readonly "market_question": __TablesBase["marketQuestion"];
+  /** @deprecated Use `marketRound` instead. This alias will be removed in the next major version. */
+  readonly "market_round": __TablesBase["marketRound"];
   /** @deprecated Use `playerDecision` instead. This alias will be removed in the next major version. */
   readonly "player_decision": __TablesBase["playerDecision"];
   /** @deprecated Use `latestForecast` instead. This alias will be removed in the next major version. */
   readonly "latest_forecast": __TablesBase["latestForecast"];
+  /** @deprecated Use `marketLeaderboard` instead. This alias will be removed in the next major version. */
+  readonly "market_leaderboard": __TablesBase["marketLeaderboard"];
 };
 
 /** The tables available in this remote SpacetimeDB module. Each table reference doubles as a query builder. */

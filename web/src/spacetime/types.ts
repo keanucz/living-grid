@@ -182,6 +182,119 @@ export const LeaderboardRow = __t.object("LeaderboardRow", {
 });
 export type LeaderboardRow = __Infer<typeof LeaderboardRow>;
 
+export const MarketAccount = __t.object("MarketAccount", {
+  identity: __t.identity(),
+  name: __t.string(),
+  points: __t.f64(),
+  isModel: __t.bool(),
+});
+export type MarketAccount = __Infer<typeof MarketAccount>;
+
+export const MarketAnswer = __t.object("MarketAnswer", {
+  questionId: __t.string(),
+  outcome: __t.bool(),
+  actual: __t.f64(),
+});
+export type MarketAnswer = __Infer<typeof MarketAnswer>;
+
+export const MarketAnswerIn = __t.object("MarketAnswerIn", {
+  questionId: __t.string(),
+  outcome: __t.bool(),
+  actual: __t.f64(),
+});
+export type MarketAnswerIn = __Infer<typeof MarketAnswerIn>;
+
+export const MarketFeed = __t.object("MarketFeed", {
+  key: __t.string(),
+  hour: __t.u32(),
+  label: __t.string(),
+  value: __t.f64(),
+  unit: __t.string(),
+});
+export type MarketFeed = __Infer<typeof MarketFeed>;
+
+export const MarketFeedIn = __t.object("MarketFeedIn", {
+  label: __t.string(),
+  value: __t.f64(),
+  unit: __t.string(),
+});
+export type MarketFeedIn = __Infer<typeof MarketFeedIn>;
+
+export const MarketLeaderboard = __t.object("MarketLeaderboard", {});
+export type MarketLeaderboard = __Infer<typeof MarketLeaderboard>;
+
+export const MarketLeaderboardRow = __t.object("MarketLeaderboardRow", {
+  rank: __t.u32(),
+  name: __t.string(),
+  points: __t.f64(),
+  isModel: __t.bool(),
+});
+export type MarketLeaderboardRow = __Infer<typeof MarketLeaderboardRow>;
+
+export const MarketPosition = __t.object("MarketPosition", {
+  key: __t.string(),
+  identity: __t.identity(),
+  questionId: __t.string(),
+  yes: __t.f64(),
+  no: __t.f64(),
+  spent: __t.f64(),
+});
+export type MarketPosition = __Infer<typeof MarketPosition>;
+
+export const MarketQuestion = __t.object("MarketQuestion", {
+  id: __t.string(),
+  text: __t.string(),
+  kind: __t.string(),
+  targetHour: __t.u32(),
+  unit: __t.string(),
+  threshold: __t.f64(),
+  qYes: __t.f64(),
+  qNo: __t.f64(),
+  priceYes: __t.f64(),
+  modelP: __t.f64(),
+  modelNote: __t.string(),
+  status: __t.string(),
+  outcome: __t.string(),
+  actual: __t.f64(),
+  roomPClose: __t.f64(),
+});
+export type MarketQuestion = __Infer<typeof MarketQuestion>;
+
+export const MarketQuestionIn = __t.object("MarketQuestionIn", {
+  id: __t.string(),
+  text: __t.string(),
+  kind: __t.string(),
+  targetHour: __t.u32(),
+  unit: __t.string(),
+  threshold: __t.f64(),
+  modelP: __t.f64(),
+  modelNote: __t.string(),
+});
+export type MarketQuestionIn = __Infer<typeof MarketQuestionIn>;
+
+export const MarketRound = __t.object("MarketRound", {
+  id: __t.u32(),
+  status: __t.string(),
+  title: __t.string(),
+  dayRevealed: __t.string(),
+  clockHour: __t.u32(),
+  startHour: __t.u32(),
+  endHour: __t.u32(),
+  secondsPerHour: __t.u32(),
+  b: __t.f64(),
+  roomBrier: __t.f64(),
+  modelBrier: __t.f64(),
+  nSettled: __t.u32(),
+  startedAt: __t.timestamp(),
+});
+export type MarketRound = __Infer<typeof MarketRound>;
+
+export const MarketSecret = __t.object("MarketSecret", {
+  round: __t.u32(),
+  day: __t.string(),
+});
+export type MarketSecret = __Infer<typeof MarketSecret>;
+
 export const Player = __t.object("Player", {
   identity: __t.identity(),
   name: __t.string(),
