@@ -9,17 +9,31 @@ Uses the newest trained model under data/models/, or the stub when none exists. 
 import argparse
 import logging
 import time
+from collections.abc import Callable
 
 import pandas as pd
 
 from pipeline import cache, commit_chain, features, forecast_log
-from pipeline.ingest import boalf, carbon_intensity, elexon, energy_charts, markets, metered, neso, nordpool, octopus, open_meteo
+from pipeline.ingest import boalf, carbon_intensity, elexon, energy_charts, markets, metered, neso, neso_boundaries, nordpool, octopus, open_meteo, uk_ets, weather_grid
 from pipeline.models import quantile
 
 log = logging.getLogger("pipeline.scheduler")
 
 LOG_COLUMNS = ["made_at", "zone", "target", "ts", "horizon_h", "p10", "p50", "p90", "model_version"]
 OFFSET_AFTER_HOUR_S = 120
+
+
+def due(name: str, now: pd.Timestamp, every: pd.Timedelta) -> bool:
+    """True when the cached parquet is missing or was last written at least `every` before now."""
+    p = cache.path(name)
+    return not p.exists() or now - pd.Timestamp(p.stat().st_mtime, unit="s", tz="UTC") >= every - pd.Timedelta(minutes=10)
+
+
+def every(hours: float, cached: str, now: pd.Timestamp, job: Callable) -> Callable:
+    """Run job only when its cache is older than `hours`. For slow or slow-changing sources: the weather grid is
+    1,719 Open-Meteo locations (~2.5 min, and each location counts against the 10k calls a day per IP, so hourly
+    would blow the quota); UK ETS prices are monthly averages. A failed run leaves the cache old, so it retries."""
+    return lambda: job() if due(cached, now, pd.Timedelta(hours=hours)) else None
 
 
 def refresh(now: pd.Timestamp) -> list[str]:
@@ -40,6 +54,11 @@ def refresh(now: pd.Timestamp) -> list[str]:
         "boalf": lambda: boalf.run(recent, now),
         "metered": lambda: metered.run(now - pd.Timedelta(days=7), now),
         "neso": lambda: neso.run(now - pd.Timedelta(days=21), ahead),
+        # Map overlays and the carbon cost panel: day-ahead flows for every NESO boundary, the weather grid
+        # (one past day overlaps the previous run) and UK ETS monthly prices.
+        "neso_boundaries": lambda: neso_boundaries.run(now - pd.Timedelta(days=1), ahead),
+        "weather_grid": every(6, weather_grid.NAME, now, lambda: weather_grid.write(weather_grid.fetch(past_days=1))),
+        "uk_ets": every(24, uk_ets.NAME, now, uk_ets.run),
     }
     failed = []
     for name, job in jobs.items():

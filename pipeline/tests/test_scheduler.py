@@ -1,8 +1,10 @@
+import os
+
 import pandas as pd
 import pytest
 
 from pipeline import cache, forecast_log, scheduler
-from pipeline.ingest import boalf, carbon_intensity, elexon, energy_charts, markets, metered, neso, nordpool, octopus, open_meteo
+from pipeline.ingest import boalf, carbon_intensity, elexon, energy_charts, markets, metered, neso, neso_boundaries, nordpool, octopus, open_meteo, uk_ets, weather_grid
 
 T1 = pd.Timestamp("2026-11-07T14:00Z")
 T2 = pd.Timestamp("2026-11-07T15:00Z")
@@ -51,7 +53,8 @@ def test_refresh_is_skipped_offline(monkeypatch):
         raise AssertionError("network used while offline")
 
     for mod, fn in ((elexon, "run"), (energy_charts, "fetch"), (nordpool, "run"), (markets, "run"), (carbon_intensity, "run"), (octopus, "run"),
-                    (boalf, "run"), (metered, "run"), (neso, "run")):
+                    (boalf, "run"), (metered, "run"), (neso, "run"), (neso_boundaries, "run"), (weather_grid, "fetch"),
+                    (uk_ets, "run")):
         monkeypatch.setattr(mod, fn, boom)
     assert scheduler.refresh(T1) == []
 
@@ -77,10 +80,69 @@ def test_failing_source_does_not_stop_the_forecast(monkeypatch):
     monkeypatch.setattr(boalf, "run", ok("bo"))
     monkeypatch.setattr(metered, "run", ok("me"))
     monkeypatch.setattr(neso, "run", boom)
-    assert scheduler.refresh(T1) == ["elexon", "neso"]
-    assert called == ["ec", "np", "mk", "ci", "oc", "om", "bo", "me"]
+    monkeypatch.setattr(neso_boundaries, "run", ok("nb"))
+    monkeypatch.setattr(weather_grid, "fetch", boom)
+    monkeypatch.setattr(uk_ets, "run", ok("ets"))
+    assert scheduler.refresh(T1) == ["elexon", "neso", "weather_grid"]
+    assert called == ["ec", "np", "mk", "ci", "oc", "om", "bo", "me", "nb", "ets"]
     monkeypatch.setenv("LG_OFFLINE", "1")
     assert scheduler.run_once(now=T1, do_refresh=False) > 0
+
+
+def _stub_hourly_sources(monkeypatch):
+    for mod, fn in ((elexon, "run"), (energy_charts, "fetch"), (nordpool, "run"), (markets, "run"), (carbon_intensity, "run"),
+                    (octopus, "run"), (boalf, "run"), (metered, "run"), (neso, "run"), (neso_boundaries, "run")):
+        monkeypatch.setattr(mod, fn, lambda *a, **k: None)
+    monkeypatch.setattr(open_meteo, "fetch_live", lambda *a, **k: None)
+    monkeypatch.setattr(open_meteo, "write", lambda *a, **k: None)
+
+
+def _written_at(name, ts):
+    p = cache.path(name)
+    p.parent.mkdir(parents=True, exist_ok=True)
+    p.touch()
+    os.utime(p, (ts.timestamp(), ts.timestamp()))
+
+
+def test_slow_sources_run_only_when_their_cache_is_old(monkeypatch):
+    monkeypatch.delenv("LG_OFFLINE")
+    _stub_hourly_sources(monkeypatch)
+    calls = []
+    monkeypatch.setattr(weather_grid, "fetch", lambda past_days, **k: calls.append(("grid", past_days)) or pd.DataFrame())
+    monkeypatch.setattr(weather_grid, "write", lambda df: weather_grid.NAME)
+    monkeypatch.setattr(uk_ets, "run", lambda *a, **k: calls.append("ets"))
+
+    assert scheduler.refresh(T1) == []
+    assert calls == [("grid", 1), "ets"], "nothing cached yet, so both run"
+
+    calls.clear()
+    _written_at(weather_grid.NAME, T1 - pd.Timedelta(hours=1))
+    _written_at(uk_ets.NAME, T1 - pd.Timedelta(hours=1))
+    scheduler.refresh(T1)
+    assert calls == []
+
+    calls.clear()
+    _written_at(weather_grid.NAME, T1 - pd.Timedelta(hours=6))
+    _written_at(uk_ets.NAME, T1 - pd.Timedelta(hours=12))
+    scheduler.refresh(T1)
+    assert calls == [("grid", 1)], "the grid refreshes every 6 h, UK ETS daily"
+
+    calls.clear()
+    _written_at(uk_ets.NAME, T1 - pd.Timedelta(hours=24))
+    scheduler.refresh(T1)
+    assert "ets" in calls
+
+
+def test_neso_boundaries_window_covers_yesterday_to_day_ahead(monkeypatch):
+    monkeypatch.delenv("LG_OFFLINE")
+    _stub_hourly_sources(monkeypatch)
+    seen = []
+    monkeypatch.setattr(neso_boundaries, "run", lambda start, end, **k: seen.append((start, end)))
+    monkeypatch.setattr(weather_grid, "fetch", lambda *a, **k: pd.DataFrame())
+    monkeypatch.setattr(weather_grid, "write", lambda df: weather_grid.NAME)
+    monkeypatch.setattr(uk_ets, "run", lambda *a, **k: None)
+    scheduler.refresh(T1)
+    assert seen == [(T1 - pd.Timedelta(days=1), T1 + pd.Timedelta(days=2))]
 
 
 def test_once_cli(monkeypatch):
