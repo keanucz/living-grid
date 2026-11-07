@@ -257,3 +257,12 @@ h1, .headline h1, .kval, .sim-name, .tile b { letter-spacing: -0.012em; }
 
 /* #157: scrubber sits above the legend, clear of the layer chips and the Forecast blurb */
 .app.mode-overview .slot-bottom { top: auto !important; bottom: 88px !important; left: 50% !important; right: auto !important; transform: translateX(-50%) !important; }
+/* top bar on one line: brand, views (left), ...; layer chips as a separate group on the right before Live/date */
+.topbar { gap: 16px; }
+.topbar .tabs, .topbar .lb, .topbar .lens-bar { margin: 0 !important; }
+.actions, .app .actions[style] { top: 20px !important; right: 404px !important; gap: 4px; z-index: 5; }
+.actions .chip { height: 32px; padding: 0 9px; font-size: 10px; border-radius: 6px; }
+.actions .chip.icon, .actions .chip:last-child { padding: 0 9px; }
+.top-right .chip.num { font-size: 10px; }
+@media (max-width: 1599px) { .actions .chip .swatch { display: none; } .actions .chip { padding: 0 7px; } }
+.topbar .top-right { margin-left: auto; }
