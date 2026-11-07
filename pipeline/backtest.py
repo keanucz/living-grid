@@ -10,7 +10,9 @@ The model (lgbm_q) and both baselines are scored on exactly the same rows, so a 
   yesterday    the same hour a whole number of days earlier
 Writes data/backtest/walk_forward.parquet: fold, zone, target, model, mae, coverage_p10_p90, n. Baselines have no
 band, so their coverage is null. Prices are GBP/MWh for GB and EUR/MWh elsewhere, so compare within a zone.
-Losses to a baseline are printed as plainly as wins. The model's P10-P90 band is conformally calibrated inside
+With bots (the default on the command line) the four league bots of pipeline.models.bots are scored on the same rows
+for the price targets, as models bot_yesterday, bot_last_week, bot_engineer and bot_committee; data/backtest/bot_league.parquet
+adds their pinball loss (and our model's). Losses to a baseline are printed as plainly as wins. The model's P10-P90 band is conformally calibrated inside
 each fold using only that fold's training rows (pipeline.models.calibrate); --no-calibrate scores the raw band.
 """
 
@@ -24,11 +26,15 @@ import pyarrow as pa
 
 from pipeline import cache, schemas
 from pipeline.features import build
+from pipeline.models import bots as league
 from pipeline.models import calibrate, quantile, train
+from pipeline.models.bots.base import Context, pinball
+from pipeline.models.bots.lgbm import OurModel
 
 log = logging.getLogger("pipeline.backtest")
 
 NAME = "backtest/walk_forward"
+LEAGUE_NAME = "backtest/bot_league"
 MODEL = "lgbm_q"
 BASELINES = ("persistence", "yesterday")
 MIN_TRAIN_ROWS = 500
@@ -58,30 +64,53 @@ def baselines(wide: pd.DataFrame, zone: str, ts: pd.DatetimeIndex, lead_h: int) 
     )
 
 
-def _fold_rows(fold, target, test, boosters, wide, lead_h, scale=None) -> list[dict]:
+def _fold_rows(fold, target, test, boosters, wide, lead_h, scale=None, extra=None) -> list[dict]:
+    """Rows for the model, the baselines and (extra: name -> (len(test), 3) quantiles) any league bots, same rows each.
+
+    Every row carries `pinball` (mean pinball loss of the three quantiles; None for point-forecast baselines).
+    """
     raw = quantile.raw_quantiles(boosters, test)
     q = calibrate.apply(raw, scale) if scale else raw
+    extra = extra or {}
     rows = []
     for zone, g in test.reset_index(drop=True).groupby("zone"):
         base = baselines(wide, zone, pd.DatetimeIndex(g["ts"]), lead_h)
         y = g["y"].to_numpy()
-        ok = base.notna().all(axis=1).to_numpy()
+        idx = g.index.to_numpy()
+        ok = base.notna().all(axis=1).to_numpy().copy()
+        for e in extra.values():
+            ok &= np.isfinite(e[idx]).all(axis=1)
         if not ok.any():
             continue
-        qz = q[g.index.to_numpy()][ok]
+        qz = q[idx][ok]
         n = int(ok.sum())
         covered = calibrate.coverage(y[ok], qz)
         rows.append({"fold": fold, "zone": zone, "target": target, "model": MODEL,
                      "mae": float(np.abs(y[ok] - qz[:, 1]).mean()), "coverage_p10_p90": covered, "n": n,
-                     "coverage_raw": calibrate.coverage(y[ok], raw[g.index.to_numpy()][ok])})
+                     "coverage_raw": calibrate.coverage(y[ok], raw[idx][ok]), "pinball": pinball(y[ok], qz)})
         for b in BASELINES:
             rows.append({"fold": fold, "zone": zone, "target": target, "model": b,
-                         "mae": float(np.abs(y[ok] - base[b].to_numpy()[ok]).mean()), "coverage_p10_p90": np.nan, "n": n})
+                         "mae": float(np.abs(y[ok] - base[b].to_numpy()[ok]).mean()), "coverage_p10_p90": np.nan, "n": n,
+                         "pinball": np.nan})
+        for name, e in extra.items():
+            ez = e[idx][ok]
+            rows.append({"fold": fold, "zone": zone, "target": target, "model": name,
+                         "mae": float(np.abs(y[ok] - ez[:, 1]).mean()), "coverage_p10_p90": calibrate.coverage(y[ok], ez), "n": n,
+                         "pinball": pinball(y[ok], ez)})
     return rows
 
 
-def run(n_folds=6, test_days=7, purge_h=48, targets=None, lead_h=build.HISTORY_LEAD_H, params=None, inputs=None,
-        min_train_rows=MIN_TRAIN_ROWS, calibrate_bands=True) -> pd.DataFrame:
+def run(*args, **kwargs) -> pd.DataFrame:
+    """The contract table only (model, baselines, and bots when bots=True). See run_with_league."""
+    return run_with_league(*args, **kwargs)[0]
+
+
+def run_with_league(n_folds=6, test_days=7, purge_h=48, targets=None, lead_h=build.HISTORY_LEAD_H, params=None, inputs=None,
+                    min_train_rows=MIN_TRAIN_ROWS, calibrate_bands=True, bots=False) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """(walk_forward, bot_league). bots=True adds the four league bots on the price targets, scored on the same rows.
+
+    bot_league has the same keys as walk_forward plus the pinball loss, for every model that gives a band.
+    """
     inp = inputs or build.Inputs()
     hist = build.build_history(lead_h=lead_h, inputs=inp)
     if hist.empty:
@@ -106,17 +135,29 @@ def run(n_folds=6, test_days=7, purge_h=48, targets=None, lead_h=build.HISTORY_L
             cal = train.calibration(tr, params) if calibrate_bands else None
             if cal:
                 log.info("fold %d %s: P10-P90 scale %.2f fitted on %d held-out training rows", k, t, cal["scale"], cal["n"])
-            rows += _fold_rows(k, t, te, train.fit_target(tr, params), wides[t], lead_h, cal["scale"] if cal else None)
+            boosters = train.fit_target(tr, params)
+            scale = cal["scale"] if cal else None
+            extra = None
+            if bots and t in league.TARGETS:
+                te = te.reset_index(drop=True)
+                ctx = Context(wide=wides[t], lead_h=lead_h, params=params)
+                ours = OurModel(boosters, scale)
+                ours.trained_through = tr["ts"].max()
+                fitted = league.fit_league(tr, ctx, ours)
+                extra = {n: q for n, q in league.predict_league(fitted, te, ctx).items() if n != MODEL}
+            rows += _fold_rows(k, t, te, boosters, wides[t], lead_h, scale, extra)
     raw = pd.DataFrame([r for r in rows if r["model"] == MODEL])
     if len(raw):
         for t, g in raw.groupby("target"):
             log.info("%s P10-P90 coverage: uncalibrated %.1f%%, calibrated %.1f%% (n=%d)", t,
                      100 * np.average(g["coverage_raw"], weights=g["n"]),
                      100 * np.average(g["coverage_p10_p90"], weights=g["n"]), g["n"].sum())
-    out = pd.DataFrame(rows, columns=schemas.WALK_FORWARD.names)
-    if out.empty:
+    full = pd.DataFrame(rows, columns=[*schemas.WALK_FORWARD.names, "pinball"])
+    if full.empty:
         raise ValueError("no fold had enough data; run the backfill or lower --folds / --test-days")
-    return out.astype({"fold": "int32", "n": "int64"})
+    full = full.astype({"fold": "int32", "n": "int64"})
+    out = full[schemas.WALK_FORWARD.names].reset_index(drop=True)
+    return out, full[full["pinball"].notna()].reset_index(drop=True)
 
 
 def check(df: pd.DataFrame) -> pd.DataFrame:
@@ -142,6 +183,26 @@ def summary(df: pd.DataFrame) -> pd.DataFrame:
 
     with np.errstate(divide="ignore", invalid="ignore"):
         return df.groupby(["target", "zone"]).apply(agg, include_groups=False).reset_index()
+
+
+def league_summary(lg: pd.DataFrame) -> pd.DataFrame:
+    """Per target and model over all folds and zones: n-weighted MAE and pinball loss, coverage, and rank by pinball."""
+    def agg(g):
+        w = g["n"]
+        return pd.Series({"n": int(w.sum()), "mae": np.average(g["mae"], weights=w), "pinball": np.average(g["pinball"], weights=w),
+                          "coverage_p10_p90": np.average(g["coverage_p10_p90"], weights=w)})
+
+    out = lg.groupby(["target", "model"]).apply(agg, include_groups=False).reset_index()
+    out["rank_pinball"] = out.groupby("target")["pinball"].rank(method="min").astype(int)
+    return out.sort_values(["target", "rank_pinball"]).reset_index(drop=True)
+
+
+def league_report(lg: pd.DataFrame) -> str:
+    lines = ["Bot league (n-weighted over folds and zones; lower MAE and pinball are better, nominal coverage 0.80)",
+             "target model n mae pinball coverage rank"]
+    for r in league_summary(lg).itertuples():
+        lines.append(f"{r.target} {r.model} {r.n} {r.mae:.2f} {r.pinball:.2f} {r.coverage_p10_p90:.2f} {r.rank_pinball}")
+    return "\n".join(lines)
 
 
 def losses(summ: pd.DataFrame) -> pd.DataFrame:
@@ -171,16 +232,22 @@ def main(argv=None) -> int:
     ap.add_argument("--purge-hours", type=int, default=48)
     ap.add_argument("--targets", default="all", help="comma-separated or 'all': " + ", ".join(schemas.TARGETS))
     ap.add_argument("--no-calibrate", action="store_true", help="score the raw quantile bands (before conformal scaling)")
+    ap.add_argument("--no-bots", action="store_true", help="skip the bot league (Yesterday, Last week, Engineer, Committee)")
     args = ap.parse_args(argv)
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
     try:
-        df = check(run(args.folds, args.test_days, args.purge_hours, args.targets.split(","),
-                       calibrate_bands=not args.no_calibrate))
+        df, lg = run_with_league(args.folds, args.test_days, args.purge_hours, args.targets.split(","),
+                                 calibrate_bands=not args.no_calibrate, bots=not args.no_bots)
+        df = check(df)
     except (ValueError, FileNotFoundError) as e:
         log.error("%s", e)
         return 1
     cache.write(NAME, df)
-    log.info("wrote %s\n%s", cache.path(NAME), report(df))
+    msg = report(df)
+    if len(lg):
+        cache.write(LEAGUE_NAME, lg)
+        msg += "\n" + league_report(lg)
+    log.info("wrote %s\n%s", cache.path(NAME), msg)
     return 0
 
 

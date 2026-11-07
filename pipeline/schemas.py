@@ -77,6 +77,21 @@ WALK_FORWARD = pa.schema(
     ]
 )
 
+# data/backtest/bot_league.parquet (pipeline.backtest): walk-forward bot results with pinball loss. Not in SCHEMAS:
+# SCHEMAS entries need an offline fixture, and nothing reads this table yet.
+BOT_LEAGUE = pa.schema(
+    [
+        ("fold", pa.int32()),
+        ("zone", pa.string()),
+        ("target", pa.string()),
+        ("model", pa.string()),
+        ("mae", pa.float64()),
+        ("pinball", pa.float64()),
+        ("coverage_p10_p90", pa.float64()),
+        ("n", pa.int64()),
+    ]
+)
+
 GAS_MARGINAL_SHARE = pa.schema(
     [("zone", pa.string()), ("hour_of_day", pa.int32()), ("month", pa.int32()), ("share", pa.float64())]
 )

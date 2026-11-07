@@ -8,6 +8,7 @@ from engine.battery import compare
 from engine.routes._fixtures import fixture
 from engine.schemas import ScoresResponse
 from pipeline import cache
+from pipeline.models.bots import NAMES as BOT_MODELS
 from pipeline.scoring import BASELINES
 
 router = APIRouter(tags=["proof"])
@@ -120,6 +121,8 @@ def build_scores() -> dict:
     sample = not cache.exists(SCORES)
     scores = _read(SCORES)
     backtest = _read(WALK_FORWARD)
+    if len(backtest):
+        backtest = backtest[~backtest["model"].isin(BOT_MODELS)]  # bots are rivals for the market, not our headline
     if scores.empty and not sample:
         scores = pd.DataFrame(columns=["window_start", "window_end", "zone", "target", "metric", "model", "value", "n"])
     if sample:

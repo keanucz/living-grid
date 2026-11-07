@@ -83,3 +83,15 @@ def test_enough_scored_uses_live_numbers(offline):
 def test_threshold_is_configurable():
     h = route.headline(one_scored(), sample=False, battery={"share": 0.5}, backtest=walk_forward(), min_scored=1)
     assert h["sentence"].startswith("31 forecasts since")
+
+
+def test_bot_league_rows_in_the_backtest_do_not_change_the_scores_route(offline):
+    plain = walk_forward()
+    bots = plain[plain["model"] == "lgbm"].assign(model="bot_engineer", mae=1.0, coverage_p10_p90=0.8)
+    cache.write("scores/scores", one_scored())
+    cache.write("backtest/walk_forward", plain)
+    want = client.get("/scores").json()
+    cache.write("backtest/walk_forward", pd.concat([plain, bots], ignore_index=True))
+    got = client.get("/scores").json()
+    assert got["headline"] == want["headline"]
+    assert got["backtest"] == want["backtest"]
