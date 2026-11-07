@@ -2,6 +2,8 @@
 
 Series (zone GB, hourly UTC means of half-hours):
   system_price         GBP/MWh, systemSellPrice
+  market_index         GBP/MWh, market index price (MID, APX provider; zero-volume periods dropped). Out within
+                       minutes, so the room game uses it as provisional feedback before the system price lands.
   load                 MW, initial national demand outturn
   gen_<fuel>           MW, FUELHH (CCGT + OCGT are summed into gen_gas)
   flow_GB_<zone>       MW from GB to <zone>: positive is export, so imports are negative.
@@ -17,6 +19,7 @@ from pipeline import cache, schemas
 
 BASE = "https://data.elexon.co.uk/bmrs/api/v1"
 MAX_DAYS = 7
+MID_PROVIDER = "APXMIDP"  # N2EXMIDP is published with zero price and volume
 
 FUELS = {
     "WIND": "wind",
@@ -81,6 +84,16 @@ def _system_price(client, start, end) -> pd.DataFrame:
     return _hourly(_frame(rows, "startTime", "systemSellPrice"), "system_price", "GBP/MWh")
 
 
+def _market_index(client, start, end) -> pd.DataFrame:
+    rows = []
+    for a, b in _windows(start, end):
+        params = {"from": f"{a:%Y-%m-%dT00:00Z}", "to": f"{b:%Y-%m-%dT23:30Z}", "dataProviders": MID_PROVIDER}
+        rows += _get(client, "balancing/pricing/market-index", params)["data"]
+    rows = [r for r in rows if r.get("dataProvider") == MID_PROVIDER and (r.get("volume") or 0) > 0]
+    df = _frame(rows, "startTime", "price").drop_duplicates("ts", keep="last")
+    return _hourly(df, "market_index", "GBP/MWh")
+
+
 def _stream(client, path, start, end):
     rows = []
     for a, b in _windows(start, end):
@@ -121,7 +134,7 @@ def fetch(start, end, client: httpx.Client | None = None) -> pd.DataFrame:
     own = client is None
     client = client or httpx.Client(timeout=60)
     try:
-        parts = [_system_price(client, start, end), _demand(client, start, end), *_fuelhh(client, start, end)]
+        parts = [_system_price(client, start, end), _market_index(client, start, end), _demand(client, start, end), *_fuelhh(client, start, end)]
     finally:
         if own:
             client.close()

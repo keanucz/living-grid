@@ -21,7 +21,8 @@ def client(calls):
     def handler(req: httpx.Request):
         calls.append(req)
         p = req.url.path
-        name = "system_prices" if "system-prices" in p else "demand" if "demand" in p else "fuelhh"
+        name = ("system_prices" if "system-prices" in p else "market_index" if "market-index" in p
+                else "demand" if "demand" in p else "fuelhh")
         return httpx.Response(200, json=json.loads((FX / f"{name}.json").read_text()))
 
     return httpx.Client(transport=httpx.MockTransport(handler))
@@ -46,6 +47,18 @@ def test_hourly_mean_and_flow_sign(no_offline):
     sp = json.loads((FX / "system_prices.json").read_text())["data"]
     first = [r["systemSellPrice"] for r in sp if r["startTime"].startswith("2026-11-05T00:")]
     assert df[(df.series == "system_price") & (df.ts == START)]["value"].iloc[0] == pytest.approx(sum(first) / 2)
+
+
+def test_market_index_is_hourly_apx_mean_without_empty_provider(no_offline):
+    calls = []
+    df = elexon.fetch(START, END, client=client(calls))
+    raw = json.loads((FX / "market_index.json").read_text())["data"]
+    apx = [r["price"] for r in raw if r["dataProvider"] == "APXMIDP" and r["startTime"].startswith("2026-11-05T00:")]
+    mid = df[df.series == "market_index"].set_index("ts")["value"]
+    assert len(mid) == 6 and (mid > 0).all()
+    assert mid[START] == pytest.approx(sum(apx) / len(apx))
+    q = next(c for c in calls if "market-index" in c.url.path).url.params
+    assert q["dataProviders"] == "APXMIDP"
 
 
 def test_gas_sums_ccgt_and_ocgt(no_offline):

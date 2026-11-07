@@ -138,6 +138,7 @@ EXPLANATION_COLUMNS = ["ts", "zone", "base"] + GROUPS
 SERIES = [
     "price_da",
     "system_price",
+    "market_index",
     "load",
     "load_forecast",
     "boalf_mwh",
