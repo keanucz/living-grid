@@ -13,7 +13,7 @@ import time
 import pandas as pd
 
 from pipeline import cache, commit_chain, features, forecast_log
-from pipeline.ingest import elexon, energy_charts, markets, nordpool, open_meteo
+from pipeline.ingest import carbon_intensity, elexon, energy_charts, markets, nordpool, octopus, open_meteo
 from pipeline.models import quantile
 
 log = logging.getLogger("pipeline.scheduler")
@@ -32,6 +32,8 @@ def refresh(now: pd.Timestamp) -> list[str]:
         "energy_charts": lambda: energy_charts.fetch(recent, ahead),
         "nordpool": lambda: nordpool.run(recent, ahead),
         "markets": lambda: markets.run(now - pd.Timedelta(days=10)),
+        "carbon_intensity": lambda: carbon_intensity.run(recent, now),
+        "octopus": lambda: octopus.run(recent, ahead),
         "open_meteo_live": lambda: [open_meteo.write(open_meteo.fetch_live(now=now), "live_forecast")],
     }
     failed = []
