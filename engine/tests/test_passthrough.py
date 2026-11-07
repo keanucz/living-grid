@@ -90,3 +90,41 @@ def test_differentiated_pipeline_share_wins(tmp_path):
     d = deltas(post(type="hormuz", magnitude=50))
     assert d["NL"] == pytest.approx(17.5 * pt.gas_pass_through() * pt.SHARE_BOUNDS["NL"][0], rel=0.01), "estimate 0 is lifted to the NL floor"
     assert d["GB"] == pytest.approx(17.5 * pt.gas_pass_through() / 1.15, rel=0.01)
+
+
+def _differentiated(tmp_path, basis):
+    import pandas as pd
+
+    feats = pd.read_parquet(cache.FIXTURES / "features" / "latest.parquet")
+    share = pd.DataFrame(
+        {"zone": feats["zone"], "hour_of_day": feats["ts"].dt.hour, "month": feats["ts"].dt.month}
+    ).drop_duplicates()
+    share["share"] = share["zone"].map({"GB": 0.9, "BE": 0.30, "FR": 0.40}).fillna(0.5)
+    (tmp_path / "features").mkdir(exist_ok=True)
+    share.to_parquet(tmp_path / "features" / "gas_marginal_share.parquet")
+    pd.DataFrame({"zone": list(basis), "n_hours": 100, "raw_share": 0.1, "basis": list(basis.values())}).to_parquet(
+        tmp_path / "features" / "gas_marginal_share_meta.parquet"
+    )
+    return feats
+
+
+def test_prior_only_zones_use_and_are_labelled_as_standard_estimates(tmp_path):
+    feats = _differentiated(tmp_path, {"GB": "estimated", "FR": "estimated", "BE": "prior only"})
+    share, source = pt.marginal_share(feats)
+    by = dict(zip(feats["zone"], share))
+    assert by["BE"] == pytest.approx(pt.PRIOR_GAS_MARGINAL_SHARE["BE"]) and by["FR"] == pytest.approx(0.40)
+    assert "estimated from generation mix" in source and "standard estimates for BE" in source
+    res = post(type="hormuz", magnitude=50)
+    assert "standard estimates for BE" in res.method_note
+
+
+def test_all_prior_only_says_standard_estimates(tmp_path):
+    feats = _differentiated(tmp_path, {z: "prior only" for z in pt.PRIOR_GAS_MARGINAL_SHARE})
+    share, source = pt.marginal_share(feats)
+    assert source.startswith("standard estimates") and "estimated from" not in source
+
+
+def test_all_estimated_keeps_the_estimated_label(tmp_path):
+    feats = _differentiated(tmp_path, {z: "estimated" for z in pt.PRIOR_GAS_MARGINAL_SHARE})
+    _, source = pt.marginal_share(feats)
+    assert source.startswith("estimated from generation mix and 2021 to 2026 prices,") and "standard estimates for" not in source

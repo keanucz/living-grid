@@ -45,23 +45,46 @@ def gas_pass_through() -> float:
     return 1.0 / CCGT_EFFICIENCY
 
 
+def _read(name: str) -> pd.DataFrame | None:
+    try:
+        return cache.read(name)
+    except FileNotFoundError:
+        return None
+
+
+def prior_only_zones() -> set[str]:
+    """Zones the pipeline (#33) marks as falling back to its prior rather than estimating from history."""
+    meta = _read("features/gas_marginal_share_meta")
+    if meta is None or "basis" not in meta:
+        return set()
+    return set(meta.loc[meta["basis"] == "prior only", "zone"])
+
+
 def marginal_share(feats: pd.DataFrame) -> tuple[np.ndarray, str]:
     """Share of each row's hour in which gas is marginal, and where the figure came from."""
-    try:
-        s = cache.read("features/gas_marginal_share")
-    except FileNotFoundError:
-        s = None
+    s = _read("features/gas_marginal_share")
     zones = feats["zone"]
+    prior = zones.map(PRIOR_GAS_MARGINAL_SHARE).to_numpy(float)
     if s is not None and len(s) and s.groupby("zone")["share"].mean().nunique() > 1:
         key = pd.DataFrame(
             {"zone": zones.to_numpy(), "hour_of_day": feats["ts"].dt.hour.to_numpy(), "month": feats["ts"].dt.month.to_numpy()}
         )
         merged = key.merge(s, on=["zone", "hour_of_day", "month"], how="left")
-        prior = merged["zone"].map(PRIOR_GAS_MARGINAL_SHARE)
-        share = merged["share"].fillna(prior).fillna(0.0).to_numpy(float)
-        source = "estimated from generation mix and 2021 to 2026 prices, " + BOUNDS_NOTE.format(gb=GB_GAS_MARGINAL_SHARE)
+        share = merged["share"].fillna(pd.Series(prior)).fillna(0.0).to_numpy(float)
+        prior_only = sorted(prior_only_zones() & set(zones))
+        if prior_only:
+            use_prior = zones.isin(prior_only).to_numpy()
+            share = np.where(use_prior, np.nan_to_num(prior), share)
+        estimated = sorted(set(zones) - set(prior_only), key=list(zones.unique()).index)
+        if not prior_only:
+            source = "estimated from generation mix and 2021 to 2026 prices"
+        elif estimated:
+            source = f"estimated from generation mix and 2021 to 2026 prices for {', '.join(estimated)}; standard estimates for {', '.join(prior_only)}"
+        else:
+            source = "standard estimates"
+        source += ", " + BOUNDS_NOTE.format(gb=GB_GAS_MARGINAL_SHARE)
     else:
-        share = zones.map(PRIOR_GAS_MARGINAL_SHARE).fillna(0.0).to_numpy(float)
+        share = np.nan_to_num(prior)
         source = "standard estimates"
     return bounded(share, zones), source
 
