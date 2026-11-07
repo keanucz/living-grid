@@ -11,7 +11,7 @@ import '../../styles/mobile.css'
 const TABS = [
   { id: 'map', label: 'Map', icon: 'globe', mode: 'overview', panels: ['zoneList', 'explain', 'zoneChart', 'constraintBill'] },
   { id: 'events', label: 'Events', icon: 'sim', mode: 'simulate', panels: ['simDock', 'statTiles'] },
-  { id: 'scores', label: 'Scores', icon: 'chart', mode: 'overview', panels: ['kpis', 'scoreboard', 'battery', 'compute', 'leaderboard'] },
+  { id: 'scores', label: 'Scores', icon: 'chart', mode: 'overview', panels: ['kpis', 'scoreboard', 'botLeague', 'battery', 'compute', 'leaderboard'] },
   { id: 'tonight', label: 'Tonight', icon: 'phone', mode: 'overview', view: '/household' },
 ]
 

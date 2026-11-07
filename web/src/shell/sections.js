@@ -16,7 +16,7 @@ export const SECTIONS = [
     panels: ['simDock', 'statTiles', 'battery'], layers: {} },
   { id: 'scores', label: 'Scores', icon: 'battery', mode: 'overview', at: 'now',
     title: 'How right are we?', blurb: 'Every forecast logged before its outcome, scored against simple baselines',
-    panels: ['scoreboard', 'compute', 'leaderboard'], layers: { ghost: false, ghostWind: false, carbon: false } },
+    panels: ['scoreboard', 'botLeague', 'compute', 'leaderboard'], layers: { ghost: false, ghostWind: false, carbon: false } },
 ]
 
 export const sectionById = Object.fromEntries(SECTIONS.map((s) => [s.id, s]))
