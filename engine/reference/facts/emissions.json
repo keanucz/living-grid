@@ -18,7 +18,28 @@
       }
     ],
     "verified": true,
-    "verification": "'937' found in an independent fetch of https://www.neso.energy/document/373936/download"
+    "verification": "independent cross-check agrees and all figures ['937'] were re-found in an independent fetch",
+    "crosscheck": {
+      "run_id": "srun_791b0c3367af41480b6e58d4c35483fe",
+      "independent_value": "937 gCO2/kWh of electricity. The GB Carbon Intensity API lists \"Coal\": 937, and NESO’s methodology table likewise gives coal as 937 gCO2/kWh.",
+      "agrees": true,
+      "disagreement": "none",
+      "confidence": "high",
+      "sources": [
+        {
+          "url": "https://api.carbonintensity.org.uk/intensity/factors",
+          "quote": "\"Coal\": 937,"
+        },
+        {
+          "url": "https://www.neso.energy/document/373936/download",
+          "quote": "**Coal** 937 … **Fuel Type** **Carbon Intensity gCO2/kWh** … Table 1 shows the peer-reviewed carbon intensity factors of GB fuel types used in this methodology. Carbon intensity factors are based on the output-weight average efficiency of generation in GB and DUKES CO2 emission factors for fuels [4]."
+        }
+      ]
+    },
+    "figures_found": [
+      "937"
+    ],
+    "figures_missing": []
   },
   {
     "id": "em_gas_ccgt_ci_api",
@@ -43,7 +64,33 @@
       }
     ],
     "verified": true,
-    "verification": "'394' found in an independent fetch of https://www.neso.energy/document/373936/download"
+    "verification": "independent cross-check agrees and all figures ['394', '651'] were re-found in an independent fetch",
+    "crosscheck": {
+      "run_id": "srun_791b0c3367af4148b1fdf052741e2743",
+      "independent_value": "The GB Carbon Intensity API methodology lists gas CCGT (Combined Cycle) at 394 gCO₂/kWh and gas OCGT (Open Cycle) at 651 gCO₂/kWh. The published API factors response gives the same values.",
+      "agrees": true,
+      "disagreement": "none",
+      "confidence": "high",
+      "sources": [
+        {
+          "url": "https://raw.githubusercontent.com/carbon-intensity/methodology/master/Carbon%20Intensity%20Forecast%20Methodology.pdf",
+          "quote": "Gas (Combined Cycle) 394 … Gas (Open Cycle) 651"
+        },
+        {
+          "url": "https://carbon-intensity.github.io/api-definitions/",
+          "quote": "Parameters"
+        },
+        {
+          "url": "https://api.carbonintensity.org.uk/intensity/factors",
+          "quote": "{ \"data\":[{ \"Biomass\": 120, \"Coal\": 937, \"Dutch Imports\": 474, \"French Imports\": 53, \"Gas (Combined Cycle)\": 394, \"Gas (Open Cycle)\": 651, \"Hydro\": 0, \"Irish Imports\": 458, \"Nuclear\": 0, \"Oil\": 935, \"Other\": 300, \"Pumped Storage\": 0, \"Solar\": 0, \"Wind\": 0 }] }"
+        }
+      ]
+    },
+    "figures_found": [
+      "394",
+      "651"
+    ],
+    "figures_missing": []
   },
   {
     "id": "em_ipcc_lifecycle",
@@ -64,7 +111,29 @@
       }
     ],
     "verified": true,
-    "verification": "'820' found in an independent fetch of https://www.ipcc.ch/site/assets/uploads/2018/02/ipcc_wg3_ar5_annex-iii.pdf"
+    "verification": "independent cross-check agrees and all figures ['820', '490', '12', '11', '41', '48'] were re-found in an independent fetch",
+    "crosscheck": {
+      "run_id": "srun_791b0c3367af4148ff1d1f4274350871",
+      "independent_value": "IPCC AR5 (2014), Annex III, Table A.III.2 gives the following median lifecycle emissions for currently commercially available technologies, all in gCO2eq/kWh: coal — PC: 820; gas — combined cycle: 490; nuclear: 12; onshore wind: 11; offshore wind: 12; solar PV — rooftop: 41; solar PV — utility: 48; hydropower: 24. These are lifecycle values, not direct operational emissions.",
+      "agrees": true,
+      "disagreement": "none",
+      "confidence": "high",
+      "sources": [
+        {
+          "url": "https://www.ipcc.ch/site/assets/uploads/2018/02/ipcc_wg3_ar5_annex-iii.pdf",
+          "quote": "**Table A.III.2 |** Emissions of selected electricity supply technologies (gCO2eq / kWh) i **Options Direct emissions Infrastructure & supply chain emissions Biogenic CO2 emissions and albedo effect Methane emissions Lifecycle emissions (incl. albedo effect)** … **Currently Commercially Available Technologies** … Coal — PC 670 / 760 / 870 9.6 0 47 **740 / 820 / 910** … Gas — Combined Cycle 350 / 370 / 490 1.6 0 91 **410 / 490 / 650** … Nuclear 0 18 0 0 **3\\.7 / 12 / 110** … Wind onshore 0 15 0 0 **7\\.0 / 11 / 56** … Wind offshore 0 17 0 0 **8\\.0 / 12 / 35** … Solar PV — rooftop 0 42 0 0 **26 /"
+        }
+      ]
+    },
+    "figures_found": [
+      "820",
+      "490",
+      "12",
+      "11",
+      "41",
+      "48"
+    ],
+    "figures_missing": []
   },
   {
     "id": "em_lignite",
@@ -89,7 +158,24 @@
       }
     ],
     "verified": true,
-    "verification": "'1049' found in an independent fetch of https://www.volker-quaschning.de/datserv/CO2-spez/index_e.php"
+    "verification": "independent cross-check agrees and all figures ['1049'] were re-found in an independent fetch",
+    "crosscheck": {
+      "run_id": "srun_791b0c3367af4148a5acb6c44067a36a",
+      "independent_value": "A supported reference mean is 1,049 g CO₂/kWh of electricity. Volker Quaschning’s emissions-factor table gives this figure for lignite at 38% net electrical efficiency, using a fuel-input factor of 398.7 g CO₂/kWh of primary energy and citing Umweltbundesamt’s 2022 fuel factors. It excludes upstream emissions and other greenhouse gases. This is an efficiency-dependent reference mean, not a universal constant or an average assigned to a specific operating year. Source: https://www.volker-quaschning.de/datserv/CO2-spez/index_e.php",
+      "agrees": true,
+      "disagreement": "none",
+      "confidence": "medium",
+      "sources": [
+        {
+          "url": "https://www.volker-quaschning.de/datserv/CO2-spez/index_e.php",
+          "quote": "| |% |g CO ₂ /kWh el | … |**Lignite** | | | | |old |34 3) |1173 |1200 | |modern |48 3) |831 |850 | |mean |**38** 3) |**1049** |1073 | … |Lignite 3) |398\\.7 |110\\.8 | … Calculated from the primary energy-related CO ₂ emission factors (excluding upstream chain emissions, excluding other greenhouse gases) divided by power plant efficiency. Source: Umweltbundesamt 2022, [Kohlendioxid-Emissionsfaktoren für die deutsche Berichterstattung atmosphärischer Emissionen"
+        }
+      ]
+    },
+    "figures_found": [
+      "1049"
+    ],
+    "figures_missing": []
   },
   {
     "id": "em_oil_biomass",
@@ -110,6 +196,24 @@
       }
     ],
     "verified": true,
-    "verification": "'120' found in an independent fetch of https://www.neso.energy/document/373936/download"
+    "verification": "independent cross-check agrees and all figures ['120', '935'] were re-found in an independent fetch",
+    "crosscheck": {
+      "run_id": "srun_791b0c3367af4148588d87c8e29652fc",
+      "independent_value": "Oil: 935 gCO2/kWh; biomass: 120 gCO2/kWh. These are the Table 1 factors in the GB Carbon Intensity API methodology included in NESO’s response dated 24 November 2025.",
+      "agrees": true,
+      "disagreement": "none",
+      "confidence": "high",
+      "sources": [
+        {
+          "url": "https://www.neso.energy/document/373936/download",
+          "quote": "**Fuel Type** **Carbon Intensity gCO2/kWh** **Biomass** **i** 120 … **Oil** 935 … 24 November 2025"
+        }
+      ]
+    },
+    "figures_found": [
+      "120",
+      "935"
+    ],
+    "figures_missing": []
   }
 ]

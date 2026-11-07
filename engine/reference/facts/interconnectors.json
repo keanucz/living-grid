@@ -22,7 +22,28 @@
       }
     ],
     "verified": true,
-    "verification": "'1000' found in an independent fetch of https://www.tennet.eu/news/britned-marks-15-years-cross-border-electricity-trading"
+    "verification": "independent cross-check agrees and all figures ['1000'] were re-found in an independent fetch",
+    "crosscheck": {
+      "run_id": "srun_791b0c3367af41486df8242401bc6fa6",
+      "independent_value": "1,000 MW. TenneT’s announcement published 01/04/2026 states a capacity of “1,000 MW”; BritNed’s own trading report also states “1000MW”.",
+      "agrees": true,
+      "disagreement": "none",
+      "confidence": "high",
+      "sources": [
+        {
+          "url": "https://www.tennet.eu/nl-en/news/britned-marks-15-years-cross-border-electricity-trading",
+          "quote": "With a capacity of 1,000 MW, [BritNed](https://www.tennet.eu/projects/britned \"BritNed_EN\") has facilitated nearly 93 TWh of electricity trading between the two countries over the past 15 years. … Published 01/04/2026"
+        },
+        {
+          "url": "https://www.britned.com/wp-content/uploads/2025/07/BritNed-Trading-Report-Extended-Edition-v1-January-to-June-2025.pdf",
+          "quote": "BritNed operates the 1000MW interconnector between Great Britain and the Netherlands, connecting the electrical grids of the countries via a 260km submarine cable, powering 1.4 million homes per year."
+        }
+      ]
+    },
+    "figures_found": [
+      "1000"
+    ],
+    "figures_missing": []
   },
   {
     "id": "ic_eleclink_capacity",
@@ -43,7 +64,24 @@
       }
     ],
     "verified": true,
-    "verification": "'1000' found in an independent fetch of https://www.eleclink.co.uk/about-us/what-we-do"
+    "verification": "independent cross-check agrees and all figures ['1000'] were re-found in an independent fetch",
+    "crosscheck": {
+      "run_id": "srun_791b0c3367af4148c7688c9a8abc4615",
+      "independent_value": "1,000 MW. ElecLink’s official website describes it as a “1000MW electricity interconnector through the Channel Tunnel.”",
+      "agrees": true,
+      "disagreement": "none",
+      "confidence": "high",
+      "sources": [
+        {
+          "url": "https://www.eleclink.co.uk/about-us/what-we-do",
+          "quote": "Own and operate an exempted 1000MW electricity interconnector through the Channel Tunnel"
+        }
+      ]
+    },
+    "figures_found": [
+      "1000"
+    ],
+    "figures_missing": []
   },
   {
     "id": "ic_ifa2_capacity",
@@ -64,7 +102,24 @@
       }
     ],
     "verified": true,
-    "verification": "'000' found in an independent fetch of https://www.ofgem.gov.uk/sites/default/files/docs/2020/06/schedule_4_-_ifa2_licence_guidance_0.pdf"
+    "verification": "independent cross-check agrees and all figures ['1000'] were re-found in an independent fetch",
+    "crosscheck": {
+      "run_id": "srun_791b0c3367af414820d8f5101f45fcf8",
+      "independent_value": "1,000 MW. National Grid states that IFA2 is “capable of exporting or importing 1000MW of electricity”.",
+      "agrees": true,
+      "disagreement": "none",
+      "confidence": "high",
+      "sources": [
+        {
+          "url": "https://www.nationalgrid.com/ifa2-interconnector/connecting-britain-to-clean-energy",
+          "quote": "It helps us to exchange clean energy between the UK and France and is capable of exporting or importing 1000MW of electricity – enough to power one million homes."
+        }
+      ]
+    },
+    "figures_found": [
+      "1000"
+    ],
+    "figures_missing": []
   },
   {
     "id": "ic_ifa_capacity",
@@ -85,7 +140,24 @@
       }
     ],
     "verified": true,
-    "verification": "'2000' found in an independent fetch of https://www.ofgem.gov.uk/sites/default/files/2023-04/Approval%20of%20the%20modified%20Access%20Rules%20and%20the%20modified%20Charging%20Methodology%20for%20the%20Interconnexion%20France%20%281%29.pdf"
+    "verification": "independent cross-check agrees and all figures ['2000'] were re-found in an independent fetch",
+    "crosscheck": {
+      "run_id": "srun_791b0c3367af41487a495d8accef7ac7",
+      "independent_value": "2,000 MW. Ofgem describes IFA as a “2000MW high voltage direct current (HVDC) link” connecting Great Britain and France.",
+      "agrees": true,
+      "disagreement": "none",
+      "confidence": "high",
+      "sources": [
+        {
+          "url": "https://www.ofgem.gov.uk/sites/default/files/docs/2019/10/ifa_access_rules_and_charging_methodology_decision_letter.pdf",
+          "quote": "1 The IFA interconnector is a 2000MW high voltage direct current (HVDC) link, connecting the transmission systems of Great Britain (GB) and France."
+        }
+      ]
+    },
+    "figures_found": [
+      "2000"
+    ],
+    "figures_missing": []
   },
   {
     "id": "ic_nemo_capacity",
@@ -110,7 +182,24 @@
       }
     ],
     "verified": true,
-    "verification": "'000' found in an independent fetch of https://www.ofgem.gov.uk/sites/default/files/docs/2016/11/nemo_licence_guidance.pdf"
+    "verification": "independent cross-check agrees and all figures ['1000'] were re-found in an independent fetch",
+    "crosscheck": {
+      "run_id": "srun_791b0c3367af41481487bba23186505b",
+      "independent_value": "1,000 MW. Ofgem’s guidance published on 15 November 2016 states: “RC means the Rated Capacity of Nemo Link’s interconnector and has a value of 1,000MW”.",
+      "agrees": true,
+      "disagreement": "none",
+      "confidence": "high",
+      "sources": [
+        {
+          "url": "https://www.ofgem.gov.uk/sites/default/files/docs/2016/11/nemo_licence_guidance.pdf",
+          "quote": "RC means the Rated Capacity of Nemo Link’s interconnector and has a value of 1,000MW … **Publication date:** 15 November 2016 **Contact:** Ikbal Hussain"
+        }
+      ]
+    },
+    "figures_found": [
+      "1000"
+    ],
+    "figures_missing": []
   },
   {
     "id": "ic_neuconnect_status",
@@ -135,7 +224,29 @@
       }
     ],
     "verified": true,
-    "verification": "'2028' found in an independent fetch of https://neuconnect-interconnector.com/neuconnect-project-highlighted-during-historic-uk-german-state-visit-copy"
+    "verification": "independent cross-check agrees and all figures ['1400', '1.4'] were re-found in an independent fetch",
+    "crosscheck": {
+      "run_id": "srun_791b0c3367af414861a6eab221e15c29",
+      "independent_value": "No. As of November 2026, NeuConnect was not in commercial operation. Its official update dated 25 September 2026 reported converter-station fit-out underway. Trial operations were expected towards the end of 2027, with full operations in 2028. Rated capacity: 1,400 MW, officially stated as “1.4GW”, flowing in either direction.",
+      "agrees": true,
+      "disagreement": "none",
+      "confidence": "medium",
+      "sources": [
+        {
+          "url": "https://neuconnect-interconnector.com/neuconnect-moves-into-next-stage-of-construction",
+          "quote": "September 25, 2026 … NeuConnect has moved into the next stage of construction with fit out works now underway at its huge Converter Stations in the UK and Germany – the works will see key mechanical and electrical systems being installed to help to power the first direct energy link between the UK and Germany. … The new link will allow 1.4GW of electricity – enough to power up to 1.5 million homes – to flow in either direction, helping to boost energy security and integrating UK and German renewable energy sources."
+        },
+        {
+          "url": "https://neuconnect-interconnector.com/neuconnect-project-highlighted-during-historic-uk-german-state-visit-copy",
+          "quote": "With major construction on NeuConnect [well-underway](https://neuconnect-interconnector.com/continued-construction-progress-on-neuconnect-with-super-structure-works-on-uk-converter-station-well-underway/) , the interconnector is starting to look ahead to the start of trial operations towards the end of 2027 and full operations in 2028."
+        }
+      ]
+    },
+    "figures_found": [
+      "1400",
+      "1.4"
+    ],
+    "figures_missing": []
   },
   {
     "id": "ic_nsl_capacity",
@@ -160,7 +271,28 @@
       }
     ],
     "verified": true,
-    "verification": "'1400' found in an independent fetch of http://www.jao.eu/sites/default/files/2026-08/1786626651698-nsl-access-rules-charging-methodology---ofgem-approved-aug2026.pdf"
+    "verification": "independent cross-check agrees and all figures ['1400'] were re-found in an independent fetch",
+    "crosscheck": {
+      "run_id": "srun_791b0c3367af4148d3b9c604e516f0ca",
+      "independent_value": "1,400 MW. The Ofgem-approved NSL Access Rules identify the Kvilldal–Blyth link as a “1400MW Interconnector.”",
+      "agrees": true,
+      "disagreement": "none",
+      "confidence": "high",
+      "sources": [
+        {
+          "url": "http://www.jao.eu/sites/default/files/2026-08/1786626651698-nsl-access-rules-charging-methodology---ofgem-approved-aug2026.pdf",
+          "quote": "NSL is a 1400MW Interconnector, connecting between Blyth, Northumberland in GB and Kvilldal in Norway."
+        },
+        {
+          "url": "https://www.statnett.no/en/about-statnett/news-and-press-releases/news-archive-2023/reduced-capacity-on-norway-uk-interconnector",
+          "quote": "Statnett has decided to reduce the maximum capacity on North Sea Link, the interconnector between Norway and the UK, in accordance with the interconnector Government License. Capacity will be set to a maximum of 1100 MW from the installed capacity of 1400 MW."
+        }
+      ]
+    },
+    "figures_found": [
+      "1400"
+    ],
+    "figures_missing": []
   },
   {
     "id": "ic_viking_capacity",
@@ -189,6 +321,23 @@
       }
     ],
     "verified": true,
-    "verification": "'1400' found in an independent fetch of https://www.ofgem.gov.uk/sites/default/files/2026-06/Approval-of-the-Access-Rules-and-Charging-Methodology-submitted-by-Viking-Link.pdf"
+    "verification": "independent cross-check agrees and all figures ['1400'] were re-found in an independent fetch",
+    "crosscheck": {
+      "run_id": "srun_791b0c3367af4148bb175328a89fda74",
+      "independent_value": "1,400 MW. JAO’s Viking Link description states that the Denmark–Great Britain interconnector allows trading of “up to 1400 MW” in either direction.",
+      "agrees": true,
+      "disagreement": "none",
+      "confidence": "medium",
+      "sources": [
+        {
+          "url": "https://www.jao.eu/about-viking-link",
+          "quote": "It connects the GB and Danish electricity markets with substations at Bicker Fen in Lincolnshire, Great Britain and Revsing in southern Jutland, Denmark. … The interconnector went into commercial operation on the 29th of December 2023 and offers customers the opportunity to trade up to 1400 MW in either direction through a variety of long term and short term explicit products."
+        }
+      ]
+    },
+    "figures_found": [
+      "1400"
+    ],
+    "figures_missing": []
   }
 ]

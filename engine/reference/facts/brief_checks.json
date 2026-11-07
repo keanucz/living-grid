@@ -21,8 +21,29 @@
         "quote": "_Get Carbon Intensity data between specified datetimes for GB regions_ … Get Regional Carbon Intensity data between specified datetimes. All times provided in UTC (+00:00). … ### Parameters … |Parameter |In |Type |Required |Description | … | --- | --- | --- | --- | --- | … |from |path |string |true |Start datetime in in ISO8601 format YYYY-MM-DDThh:mmZ e.g. 2017-08-25T12:35Z | … |to |path |string |true |End datetime in in ISO8601 format YYYY-MM-DDThh:mmZ e.g. 2017-08-25T12:35Z | … _Get Carbon Intensity data between from and to datetime_ … Get Carbon Intensity data between the {from} and {to} d"
       }
     ],
-    "verified": true,
-    "verification": "'14' found in an independent fetch of https://carbon-intensity.github.io/api-definitions/"
+    "verified": false,
+    "verification": "cross-check disagrees: The documented 14-day limit applies to the national /intensity/{from}/{to} endpoint, not explicitly to regional endpoints. A successful 31-day regional request contradicts a 14-day regional maximum. The exact regional maximum remains unconfirmed.",
+    "crosscheck": {
+      "run_id": "srun_791b0c3367af4148da297334f56fce52",
+      "independent_value": "No maximum date range is explicitly stated for regional endpoints in the official documentation I found. A regional request covering 31 days (1 January–1 February 2024) successfully returned data across that period, establishing support for at least 31 days—not an exact maximum.",
+      "agrees": false,
+      "disagreement": "The documented 14-day limit applies to the national /intensity/{from}/{to} endpoint, not explicitly to regional endpoints. A successful 31-day regional request contradicts a 14-day regional maximum. The exact regional maximum remains unconfirmed.",
+      "confidence": "medium",
+      "sources": [
+        {
+          "url": "https://carbon-intensity.github.io/api-definitions/",
+          "quote": "GET /regional/intensity/{from}/{to}/postcode/{postcode} … GET /regional/intensity/{from}/{to}/regionid/{regionid}"
+        },
+        {
+          "url": "https://api.carbonintensity.org.uk/regional/intensity/2024-01-01T00:00Z/2024-02-01T00:00Z/regionid/1",
+          "quote": "{\"data\":{\"regionid\":1,\"dnoregion\":\"Scottish Hydro Electric Power Distribution\",\"shortname\":\"North Scotland\",\"data\":[{\"from\":\"2023-12-31T23:30Z\",\"to\":\"2024-01-01T00:00Z\",\"intensity\":{\"forecast\":4,\"index\":\"very low\"},\"generationmix\":[{\"fuel\":\"biomass\",\"perc\":0.6},{\"fuel\":\"coal\",\"perc\":0},{\"fuel\":\"imports\",\"perc\":0},{\"fuel\":\"gas\",\"perc\":0.8},{\"fuel\":\"nuclear\",\"perc\":6.8},{\"fuel\":\"other\",\"perc\":0},{\"fuel\":\"hydro\",\"perc\":44.4},{\"fuel\":\"solar\",\"perc\":0},{\"fuel\":\"wind\",\"perc\":47.4}]},{\"from\":\"2024-01-01T00:00Z\",\"to\":\"2024-01-01T00:30Z\",\"intensity\":{\"forecast\":3,\"index\":\"very low\"},\"generationmix\":[{\""
+        }
+      ]
+    },
+    "figures_found": [
+      "14"
+    ],
+    "figures_missing": []
   },
   {
     "id": "bc_elexon_system_price_lag",
@@ -47,28 +68,67 @@
       }
     ],
     "verified": true,
-    "verification": "'15' found in an independent fetch of https://www.elexon.co.uk/bsc/article/indicative-settlement-price-data-now-available-on-the-insights-solution"
+    "verification": "independent cross-check agrees and all figures ['15'] were re-found in an independent fetch",
+    "crosscheck": {
+      "run_id": "srun_791b0c3367af41488d0a442885d01b54",
+      "independent_value": "Approximately 15 minutes after the end of each Settlement Period. Elexon’s article, last updated 26 February 2024, states: “We have set the Indicative Settlement Price data to be ready approximately 15 minutes after any given Settlement Period”. The current System Prices page likewise states: “The indicative price calculation is published 15 minutes after the effective Settlement Period”. This is the initial indicative System Buy/Sell Price, not a final settled price.",
+      "agrees": true,
+      "disagreement": "none",
+      "confidence": "high",
+      "sources": [
+        {
+          "url": "https://www.elexon.co.uk/bsc/article/indicative-settlement-price-data-now-available-on-the-insights-solution",
+          "quote": "We have set the Indicative Settlement Price data to be ready approximately 15 minutes after any given Settlement Period, any sooner than this and the data will not reflect bid/offer acceptances, and [Balancing Services Adjustment Data.](https://www.elexon.co.uk/bsc/glossary/balancing-services-adjustment-data/) … **Last Updated** 26 February 2024"
+        },
+        {
+          "url": "https://bmrs.elexon.co.uk/system-prices",
+          "quote": "The indicative price calculation is published 15 minutes after the effective Settlement Period based on parameters available at the time the calculations were run. … System Buy/Sell Prices is displaying the indicative £/MWh for a settlement period."
+        }
+      ]
+    },
+    "figures_found": [
+      "15"
+    ],
+    "figures_missing": []
   },
   {
     "id": "bc_energy_charts_rate_limit",
     "question": "What is the current public rate limit of the Energy-Charts API (api.energy-charts.info) per client IP, per endpoint and for the /price endpoint?",
     "used_by": "brief",
-    "processor": "core",
-    "run_id": "srun_051cfaf41dc04532a2acc79b7e981a00",
-    "retrieved_at": "2026-11-07T14:00:46+00:00",
-    "value": "The default is 2 requests per minute with a burst of 4; /price 2 per minute (burst 2).",
-    "unit": "requests per minute; burst requests",
-    "as_of": "Current documentation, accessed 2026-11-07 (no effective date stated).",
-    "caveat": "The limits are adjusted dynamically to current server load, so the effective limit can be lower during peak times. On HTTP 429, honor the Retry-After header.",
+    "processor": "pro",
+    "run_id": "srun_ca3dde3a037047935f74e9e7aaecd46d",
+    "retrieved_at": "2026-11-07T14:16:18+00:00",
+    "value": "Limits apply per client IP and per endpoint. Default: “2 requests per minute with a burst of 4”; /price: “2 per minute (burst 2)”.",
+    "unit": "requests per minute; requests for burst capacity",
+    "as_of": "No effective date stated; documentation last verified on 2026-11-07.",
+    "caveat": "Limits are adjusted dynamically with server load and may be lower during peak times. Exceeding a limit returns HTTP 429 with a Retry-After header specifying seconds to wait; clients should honour that header and cache responses.",
     "confidence": "high",
     "sources": [
       {
         "url": "https://api.energy-charts.info/",
-        "quote": "#### Rate Limiting … Requests are limited per client IP **and** per endpoint (token bucket, so short bursts are allowed). The default is 2 requests per minute with a burst of 4; `/signal` allows 20 per minute (burst 40), `/price` 2 per minute (burst 2), and every `/v2` endpoint inherits the limit of its v1 counterpart. In addition, the limits are adjusted dynamically to the current server load, so the effective limit can be lower during peak times. … Exceeding a limit returns **HTTP 429** with a `Retry-After` header giving the number of seconds to wait. Clients should honour that header instea"
+        "quote": "Requests are limited per client IP **and** per endpoint (token bucket, so short bursts are allowed). The default is 2 requests per minute with a burst of 4; `/signal` allows 20 per minute (burst 40), `/price` 2 per minute (burst 2), and every `/v2` endpoint inherits the limit of its v1 counterpart. In addition, the limits are adjusted dynamically to the current server load, so the effective limit can be lower during peak times."
       }
     ],
-    "verified": false,
-    "verification": "no numeric figure in the answer to check; needs a human"
+    "crosscheck": {
+      "run_id": "srun_34632112fcf8493c84de428f8773a211",
+      "independent_value": "The official Energy-Charts API documentation states that limits apply per client IP and per endpoint using a token bucket. Default: “2 requests per minute with a burst of 4.” For /price: “2 per minute (burst 2).” Burst capacities are 4 requests and 2 requests, respectively. Limits are dynamically adjusted to server load and can be lower during peak times. Exceeding a limit returns HTTP 429 with a Retry-After header specifying how many seconds to wait. No effective date is stated.",
+      "agrees": true,
+      "disagreement": "none",
+      "confidence": "high",
+      "sources": [
+        {
+          "url": "https://api.energy-charts.info/",
+          "quote": "Requests are limited per client IP **and** per endpoint (token bucket, so short bursts are allowed). The default is 2 requests per minute with a burst of 4; `/signal` allows 20 per minute (burst 40), `/price` 2 per minute (burst 2), and every `/v2` endpoint inherits the limit of its v1 counterpart. … In addition, the limits are adjusted dynamically to the current server load, so the effective limit can be lower during peak times. Exceeding a limit returns **HTTP 429** with a `Retry-After` header giving the number of seconds to wait."
+        }
+      ]
+    },
+    "figures_found": [
+      "2",
+      "4"
+    ],
+    "figures_missing": [],
+    "verified": true,
+    "verification": "independent cross-check agrees and all figures ['2', '4'] were re-found in an independent fetch"
   },
   {
     "id": "bc_gb_dst",
@@ -89,7 +149,28 @@
       }
     ],
     "verified": true,
-    "verification": "'25' found in an independent fetch of https://time-and-date.uk.com/british-summer-time-bst"
+    "verification": "independent cross-check agrees and all figures ['25'] were re-found in an independent fetch",
+    "crosscheck": {
+      "run_id": "srun_791b0c3367af414880b90a8a24ec4bbf",
+      "independent_value": "25 October 2026.",
+      "agrees": true,
+      "disagreement": "none",
+      "confidence": "medium",
+      "sources": [
+        {
+          "url": "https://time-and-date.uk.com/british-summer-time-bst",
+          "quote": "In 2026, BST begins on 29 March and ends on 25 October."
+        },
+        {
+          "url": "https://www.timeanddate.com/time/zone/uk/london",
+          "quote": "| Sun, Oct 25 at 2:00 am | BST → GMT | -1 hour (DST end) | UTC"
+        }
+      ]
+    },
+    "figures_found": [
+      "25"
+    ],
+    "figures_missing": []
   },
   {
     "id": "bc_n2ex_timing",
@@ -118,32 +199,94 @@
       }
     ],
     "verified": true,
-    "verification": "'09' found in an independent fetch of https://support.nordpoolgroup.com/support/solutions/articles/8000088463-about-the-n2ex-day-ahead-auction"
+    "verification": "independent cross-check agrees and all figures ['09', '50', '10', '00'] were re-found in an independent fetch",
+    "crosscheck": {
+      "run_id": "srun_791b0c3367af41483feb152477735546",
+      "independent_value": "Gate closure: 09:50 UK time; results published at latest 10:00 UK time, for delivery the following day. Nord Pool states 09:50 GMT and 10:00 GMT; North Sea Link explicitly confirms the corresponding times as UK time.",
+      "agrees": true,
+      "disagreement": "none",
+      "confidence": "high",
+      "sources": [
+        {
+          "url": "https://support.nordpoolgroup.com/support/solutions/articles/8000088463-about-the-n2ex-day-ahead-auction",
+          "quote": "The N2EX Day Ahead Auction in the UK is a daily auction with physical delivery the following day (d+1). Gate closure time is 09:50 GMT / 10:50 CET and results are published at latest 10:00 GMT / 11:00 CET."
+        },
+        {
+          "url": "https://www.northsealink.com/en/trade-with-us/register",
+          "quote": "Nord Pool's N2EX auction gate closure time is 09:50 UK time (NO2 auction - 10:50 CET), with preliminary results finalised by 10:00 UK time (11:00 CET)."
+        }
+      ]
+    },
+    "figures_found": [
+      "09",
+      "50",
+      "10",
+      "00"
+    ],
+    "figures_missing": []
   },
   {
     "id": "bc_nordpool_history",
-    "question": "How far back in time does the free Nord Pool data portal (data.nordpoolgroup.com) API allow day-ahead price history to be queried without a subscription?",
+    "question": "Using the free Nord Pool data portal API (dataportal-api.nordpoolgroup.com, no subscription), how many days or since what date can day-ahead prices be retrieved? Distinguish what the API returns from what the website table shows.",
     "used_by": "#19",
-    "processor": "core",
-    "run_id": "srun_051cfaf41dc04532d6d8c53f9aa7456c",
-    "retrieved_at": "2026-11-07T14:00:46+00:00",
-    "value": "2021-01-01",
-    "unit": "n/a",
-    "as_of": "Earliest date shown in the portal’s yearly day-ahead price table; 2021-01-01 to 2021-12-31.",
-    "caveat": "The public portal table shows 2021 as its earliest year. Nord Pool says historical data is limited for non-subscribers and a Data Portal subscription provides the full available history, but does not specify an exact API cutoff; 2021-01-01 is therefore the earliest date confirmed in the public rendering.",
+    "processor": "pro",
+    "run_id": "srun_ca3dde3a037047930ab5b52c4a00afec",
+    "retrieved_at": "2026-11-07T14:16:18+00:00",
+    "value": "API: a populated SE3/EUR response was confirmed for \"2026-10-01\", but the earliest retrievable date or a fixed maximum number of days could not be established. Website: the detailed table requested for \"2021-01-01\" shows \"You need to be logged in to view this data.\" and \"No data\", although the yearly aggregate table displays prices for 2021. That website restriction does not establish the API's historical cutoff.",
+    "unit": "n/a (calendar dates)",
+    "as_of": "Website observation: \"07.11.2026 14:15:08 (GMT/BST)\". API sample: delivery date \"2026-10-01\", updated at \"2026-09-30T12:03:43.5343052Z\".",
+    "caveat": "Partial finding: the API sample date is not an established oldest-available date or proof of the current lookback window. Nord Pool states, \"Historical data is limited for non-subscribers, while a Data Portal subscription provides access to the full available history and enables download\", but that FAQ does not quantify the free API's history.",
     "confidence": "medium",
     "sources": [
       {
-        "url": "https://data.nordpoolgroup.com/auction/day-ahead/prices?aggregation=YearlyAggregate&currency=EUR&deliveryAreas=NO2%2CNO3%2CNO4%2CNO5&deliveryDate=latest",
-        "quote": "# Day-ahead … ## Prices [Become a Certified Day-Ahead Trader](https://www.nordpoolgroup.com/en/services/nord-pool-academy/nord-pool-day-ahead-trader-course/) … Time interval Currency … Filters expand\\_less Hide Graph … Areas … Baltic EE ELE LT LV … CWE AT BE ELES FR GER KT NL PL … Nordic DK1 DK2 FI FRE NO1 NO2 NO3 NO4 NO5 SE SE1 SE2 SE3 SE4 … SEE BG TEL … System SYS … UK UK … |Year |Delivery Date Start (CET) |Delivery Date End (CET) |NO2 (EUR) |NO3 (EUR) |NO4 (EUR) |NO5 (EUR) | … | --- | --- | --- | --- | --- | --- | --- | … |2026 |2026-01-01 |2026-11-08 |112,97 |84,96 |32,74 |108,14 | … |2025"
+        "url": "https://dataportal-api.nordpoolgroup.com/api/DayAheadPrices?date=2026-10-01&market=DayAhead&deliveryArea=SE3&currency=EUR",
+        "quote": "{\"deliveryDateCET\":\"2026-10-01\",\"version\":3,\"updatedAt\":\"2026-09-30T12:03:43.5343052Z\",\"deliveryAreas\":[\"SE3\"],\"market\":\"DayAhead\",\"multiAreaEntries\":[{\"deliveryStart\":\"2026-09-30T22:00:00Z\",\"deliveryEnd\":\"2026-09-30T22:15:00Z\",\"entryPerArea\":{\"SE3\":73.05}},{\"deliveryStart\":\"2026-09-30T22:15:00Z\",\"deliveryEnd\":\"2026-09-30T22:30:00Z\",\"entryPerArea\":{\"SE3\":49.00}},{\"deliveryStart\":\"2026-09-30T22:30:00Z\",\"deliveryEnd\":\"2026-09-30T22:45:00Z\",\"entryPerArea\":{\"SE3\":41.99}},{\"deliveryStart\":\"2026-09-30T22:45:00Z\",\"deliveryEnd\":\"2026-09-30T23:00:00Z\",\"entryPerArea\":{\"SE3\":37.72}},{\"deliveryStart\":\"202"
+      },
+      {
+        "url": "https://data.nordpoolgroup.com/auction/day-ahead/prices?deliveryDate=2021-01-01&currency=EUR&aggregation=DeliveryPeriod&deliveryAreas=SE3",
+        "quote": "You need to be logged in to view this data. … No data"
+      },
+      {
+        "url": "https://data.nordpoolgroup.com/auction/day-ahead/prices?deliveryDate=2024-10-31&currency=SEK&aggregation=YearlyAggregate&deliveryAreas=AT,SE1,SE2,SE3,SE4",
+        "quote": "|2021 |2021-01-01 |2021-12-31 | |432,27 |432,90 |671,60 |818,66 |"
       },
       {
         "url": "https://www.nordpoolgroup.com/en/services/power-market-data-services/faq/faq-premium-container/what-data-is-available-in-the-data-portal",
-        "quote": "Historical data is limited for non-subscribers, while a Data Portal ## Historical data is limited for non-subscribers, while a Data Portal subscription provides access to the full available history and enables download"
+        "quote": "Historical data is limited for non-subscribers, while a Data Portal subscription provides access to the full available history and enables download"
       }
     ],
-    "verified": false,
-    "verification": "manual downgrade: '2021' appears only in the portal's yearly web table; Nord Pool says non-subscriber history is limited, and the team's ingest (#18) observed ~60 days via the API. Do not plan a backfill on this."
+    "crosscheck": {
+      "run_id": "srun_34632112fcf8493cc90cc3ec3674e59f",
+      "independent_value": "API: I confirmed populated SE3/EUR responses from /api/DayAheadPrices for delivery dates 2026-09-30 and 2026-10-01. The 2026-10-01 response reports updatedAt=\"2026-09-30T12:03:43.5343052Z\", matching the claimed sample. These establish working historical examples—not an earliest available date, continuous coverage since that date, or a fixed maximum lookback. I could not establish the API's historical cutoff.\n\nWebsite: The detailed table requested for 2021-01-01 says “You need to be logged in to view this data.” and “No data”. Separately, the yearly aggregate table includes 2021, with SE3 shown as 66,00 EUR. The detailed website restriction therefore does not establish the API's historical cutoff.",
+      "agrees": true,
+      "disagreement": "No substantive disagreement. I additionally confirmed the older API delivery date 2026-09-30. My detailed-table observation showed 07.11.2026 14:15:18 (GMT/BST), ten seconds later than the quoted observation, with the same restriction messages.",
+      "confidence": "medium",
+      "sources": [
+        {
+          "url": "https://dataportal-api.nordpoolgroup.com/api/DayAheadPrices?currency=EUR&date=2026-09-30&deliveryArea=SE3&market=DayAhead",
+          "quote": "{\"deliveryDateCET\":\"2026-09-30\",\"version\":3,\"updatedAt\":\"2026-09-29T11:22:05.3409847Z\""
+        },
+        {
+          "url": "https://dataportal-api.nordpoolgroup.com/api/DayAheadPrices?currency=EUR&date=2026-10-01&deliveryArea=SE3&market=DayAhead",
+          "quote": "{\"deliveryDateCET\":\"2026-10-01\",\"version\":3,\"updatedAt\":\"2026-09-30T12:03:43.5343052Z\""
+        },
+        {
+          "url": "https://data.nordpoolgroup.com/auction/day-ahead/prices?aggregation=DeliveryPeriod&currency=EUR&deliveryAreas=SE3&deliveryDate=2021-01-01",
+          "quote": "You need to be logged in to view this data. … No data"
+        },
+        {
+          "url": "https://data.nordpoolgroup.com/auction/day-ahead/prices?aggregation=YearlyAggregate&currency=EUR&deliveryAreas=SE1%2CSE2%2CSE3%2CSE4&deliveryDate=latest",
+          "quote": "|2021 |2021-01-01 |2021-12-31 |42,49 |42,55 |66,00 |80,52 |"
+        }
+      ]
+    },
+    "figures_found": [
+      "10",
+      "01"
+    ],
+    "figures_missing": [],
+    "verified": true,
+    "verification": "independent cross-check agrees and all figures ['10', '01'] were re-found in an independent fetch"
   },
   {
     "id": "bc_open_meteo_limit",
@@ -172,7 +315,34 @@
       }
     ],
     "verified": true,
-    "verification": "'10' found in an independent fetch of https://open-meteo.com/en/terms"
+    "verification": "independent cross-check agrees and all figures ['10', '000', '14'] were re-found in an independent fetch",
+    "crosscheck": {
+      "run_id": "srun_791b0c3367af41483399dbb238902109",
+      "independent_value": "Open-Meteo’s published terms specify “Less than 10'000 API calls per day” for free non-commercial use. A single request containing multiple coordinates is not necessarily counted as one API call. Its multiple-location guidance explicitly includes locations in the published formula: `weight = nLocations * (nDays / 14) * (nVariables / 10)`. The guidance gives an example counted as “260.7 API calls, not just 1.” A maintainer further clarifies that a minimum weight of 1 is applied to the single-coordinate call before multiplying by the number of coordinates.",
+      "agrees": true,
+      "disagreement": "none",
+      "confidence": "medium",
+      "sources": [
+        {
+          "url": "https://openmeteo.substack.com/p/weather-data-for-multiple-locations",
+          "quote": "In this case, the API call is weighted as 260.7 API calls, not just 1."
+        },
+        {
+          "url": "https://github.com/open-meteo/open-meteo/issues/1295",
+          "quote": "Hi, using multiple coordinates multiples the value of a single coordinate API call, though a minimum of 1 is always applied before."
+        },
+        {
+          "url": "https://open-meteo.com/en/terms",
+          "quote": "Less than 10'000 API calls per day, 5'000 per hour and 600 per minute."
+        }
+      ]
+    },
+    "figures_found": [
+      "10",
+      "000",
+      "14"
+    ],
+    "figures_missing": []
   },
   {
     "id": "bc_sdac_timing",
@@ -197,6 +367,29 @@
       }
     ],
     "verified": true,
-    "verification": "'12' found in an independent fetch of https://eepublicdownloads.blob.core.windows.net/public-cdn-container/clean-documents/Network%20codes%20documents/NC%20CACM/SDAC%202025/SDAC_Fallback_Manual.pdf"
+    "verification": "independent cross-check agrees and all figures ['12', '00', '55'] were re-found in an independent fetch",
+    "crosscheck": {
+      "run_id": "srun_791b0c3367af4148e67aaca22a6b1d3b",
+      "independent_value": "SDAC normal-day auction: gate closure is 12:00; preliminary results are published no earlier than 12:55; final results have no predefined fixed publication time. The SDAC Fallback Manual, Version 1.4, states: “Preliminary publication of the results can never take place before 12:55” and “Final publication of results has no predefined fixed time.” All times follow the manual’s CET/CEST convention. Thus, 12:55 is an earliest publication time, not a guaranteed exact publication time.",
+      "agrees": true,
+      "disagreement": "none",
+      "confidence": "high",
+      "sources": [
+        {
+          "url": "https://www.epexspot.com/sites/default/files/download_center_files/sdac-fallback-manual.pdf",
+          "quote": "_Version 1.4_ … **Important to know:** ✓ Preliminary publication of the results can never take place before 12:55. ✓ Final publication of results has no predefined fixed time. … **CET/CEST** Central European Time (CET) / Central European Summer Time (CEST) **All times in this document are expressed in CET/CEST.**"
+        },
+        {
+          "url": "https://www.omel.es/sites/default/files/2025-11/sdac-fallback-manual.pdf",
+          "quote": "normal: the NEMOs order book gate closure is the usual one (12:00)"
+        }
+      ]
+    },
+    "figures_found": [
+      "12",
+      "00",
+      "55"
+    ],
+    "figures_missing": []
   }
 ]

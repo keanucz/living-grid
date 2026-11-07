@@ -22,7 +22,26 @@
       }
     ],
     "verified": true,
-    "verification": "'63' found in an independent fetch of https://cnpp.iaea.org/public/countries/FR/profile/highlights"
+    "verification": "independent cross-check agrees and all figures ['63', '63000', '57'] were re-found in an independent fetch",
+    "crosscheck": {
+      "run_id": "srun_791b0c3367af4148490477d236f283b3",
+      "independent_value": "France had 63 GW of installed net nuclear generating capacity (63 000 MW(e)) across 57 nuclear power reactors in operation, according to IAEA data as of 2026-11-06.",
+      "agrees": true,
+      "disagreement": "none",
+      "confidence": "high",
+      "sources": [
+        {
+          "url": "https://cnpp.iaea.org/public/countries/FR/profile/highlights",
+          "quote": "France has 57 nuclear power reactors in operation (63 000 MW(e) Net Capacity) … Data as of 2026-11-06 from IAEA Power Reactor Information System."
+        }
+      ]
+    },
+    "figures_found": [
+      "63",
+      "63000",
+      "57"
+    ],
+    "figures_missing": []
   },
   {
     "id": "ev_fr_reactor_size",
@@ -55,7 +74,36 @@
       }
     ],
     "verified": true,
-    "verification": "'900' found in an independent fetch of https://www-pub.iaea.org/mtcd/publications/pdf/cnpp-2021/countryprofiles/France/France.htm"
+    "verification": "independent cross-check agrees and all figures ['900', '1300', '1450', '1630', '1620'] were re-found in an independent fetch",
+    "crosscheck": {
+      "run_id": "srun_791b0c3367af4148ef940f68b70cab0c",
+      "independent_value": "EDF’s 2025 Facts & Figures gives the standard-series ratings as 900 MW(e), 1,300 MW(e), and 1,450 MW(e), respectively. These are nominal series values, not exact net ratings for every individual reactor. For Flamanville 3, IAEA PRIS explicitly lists 1,630 MW(e) reference unit net capacity and 1,620 MW(e) design net capacity. PRIS lists it as Operational, with first grid connection on 21 December 2024.",
+      "agrees": true,
+      "disagreement": "none numerically. The qualification is that EDF’s standard-series figures are nominal series ratings; the cited passages do not explicitly identify them as exact net capacities.",
+      "confidence": "medium",
+      "sources": [
+        {
+          "url": "https://www.edf.fr/sites/groupe/files/2026-04/2026-04-02-edf-facts-and-figures-2025.pdf",
+          "quote": "**22** **27 2** **9**"
+        },
+        {
+          "url": "https://www-pub.iaea.org/mtcd/publications/pdf/cnpp-2021/countryprofiles/France/France.htm",
+          "quote": "Over time, the unit capacity of France’s reactors increased from 900 MW(e) to 1300 MW(e) and later to 1450 MW(e)."
+        },
+        {
+          "url": "https://pris.iaea.org/pris/CountryStatistics/ReactorDetails.aspx?current=873",
+          "quote": "|Reference Unit Power (Net Capacity) |Design Net Capacity |Gross Capacity |Thermal Capacity | |##### 1630 MW e |##### 1620 MW e … FLAMANVILLE-3 Operational … |First Grid Connection |Commercial Operation Date | | | |##### 21 Dec, 2024 |##### N/A | | |"
+        }
+      ]
+    },
+    "figures_found": [
+      "900",
+      "1300",
+      "1450",
+      "1630",
+      "1620"
+    ],
+    "figures_missing": []
   },
   {
     "id": "ev_fr_temp_sensitivity",
@@ -76,36 +124,72 @@
       }
     ],
     "verified": true,
-    "verification": "'2400' found in an independent fetch of https://assets.rte-france.com/prod/public/2021-03/Bilan%20electrique%202020_0.pdf"
+    "verification": "independent cross-check agrees and all figures ['2400'] were re-found in an independent fetch",
+    "crosscheck": {
+      "run_id": "srun_791b0c3367af41489623a6e2aeae9021",
+      "independent_value": "According to RTE’s Bilan électrique 2020, French electricity demand rises by approximately 2,400 MW for each 1°C decrease in temperature in winter, on average: « environ 2 400 MW par degré Celsius en moins en hiver ».",
+      "agrees": true,
+      "disagreement": "none",
+      "confidence": "high",
+      "sources": [
+        {
+          "url": "https://assets.rte-france.com/prod/public/2021-03/Bilan%20electrique%202020_0.pdf",
+          "quote": "Cette sensibilité à la température de la consommation d'électricité est variable au cours de la journée. Elle est estimée en moyenne à environ 2 400 MW par degré Celsius en moins en hiver."
+        }
+      ]
+    },
+    "figures_found": [
+      "2400"
+    ],
+    "figures_missing": []
   },
   {
     "id": "ev_gb_temp_sensitivity",
-    "question": "By how many MW or GW does Great Britain's electricity demand change per 1 degree Celsius change in temperature in winter, according to NESO (National Grid ESO) or academic sources?",
+    "question": "By how many MW (or GW) does Great Britain's electricity demand rise for each 1 degree Celsius drop in temperature in winter? Give an absolute MW figure from NESO, National Grid ESO, Elexon or a peer-reviewed study, not a percentage; if only a percentage is published, give the percentage and the base demand it applies to.",
     "used_by": "#50",
     "processor": "pro",
-    "run_id": "srun_051cfaf41dc045328283d9b607804181",
-    "retrieved_at": "2026-11-07T14:00:40+00:00",
-    "value": "A 1 °C reduction in daily winter temperature typically gives a ∼1% increase in daily electricity demand.",
-    "unit": "% change in daily demand per 1 °C",
-    "as_of": "Electricity-demand data period: 1975 to 2013.",
-    "caveat": "The academic source gives a percentage, not an absolute MW/GW change; it describes the relationship as typical over the data period. The NESO review does not state a specific per-degree MW/GW figure.",
-    "confidence": "high",
+    "run_id": "srun_ca3dde3a03704793b0af5b64e63c47c4",
+    "retrieved_at": "2026-11-07T14:16:18+00:00",
+    "value": "Approximately 417–500 MW (0.417–0.500 GW) of additional daily-average demand per 1°C drop in winter temperature. The peer-reviewed study by Thornton, Hoskins and Scaife (2016), Environmental Research Letters, states that a 1°C decrease typically produces a “10 – 12 GWh increase in daily electricity demand”.",
+    "unit": "MW per °C of cooling; source figure expressed in GWh/day per °C",
+    "as_of": "Great Britain electricity-demand observations analysed over 1975–2013; study published in 2016.",
+    "caveat": "The MW figure is calculated, not quoted directly: 10–12 GWh divided by 24 hours equals approximately 417–500 MW. This is a historical daily-average response, not an instantaneous or winter peak-demand increment.",
+    "confidence": "medium",
     "sources": [
       {
-        "url": "https://iopscience.iop.org/article/10.1088/1748-9326/11/11/114015",
-        "quote": "Over the data period, a 1 °C reduction in daily temperature in winter typically gives a ∼1% increase in daily electricity demand and a 3%–4% increase in gas demand."
-      },
-      {
-        "url": "https://centaur.reading.ac.uk/68474/",
-        "quote": "The daily relationship of electricity and gas demand with temperature in Great Britain is analysed from 1975 to 2013 and 1996 to 2013 respectively."
-      },
-      {
-        "url": "https://www.neso.energy/document/354451/download",
-        "quote": "o Literature reviewed reveals that historically, there has been a moderate correlation between temperature and electricity demand for Great Britain (0.5 < _R_ _2_ < 0.8; _R_ _2_ is the regression coefficient) (Thornton et al 2016)."
+        "url": "https://centaur.reading.ac.uk/68474/1/Thornton_2016_Environ._Res._Lett._11_114015.pdf",
+        "quote": "Over the data period, a 1 ° C decrease in daily temper- ature during winter months will typically give rise to a 10 – 12 GWh increase in daily electricity demand ( ∼ 1% increase, established using the monthly linear fi ts in fi gure 10 ) and a 105 – 115 GWh increase in daily gas demand ( 3% – 4% increase ) ."
       }
     ],
+    "crosscheck": {
+      "run_id": "srun_34632112fcf8493ca798b8e477b874ef",
+      "independent_value": "Approximately 417–500 MW (0.417–0.500 GW) of additional daily-average electricity demand per 1°C drop in winter temperature. Thornton, Hoskins and Scaife (2016), Environmental Research Letters, explicitly state: “a 1 °C decrease in daily temperature during winter months will typically give rise to a 10–12 GWh increase in daily electricity demand”. Converting daily energy to average power gives 10–12 × 1,000 ÷ 24 = 416.666…–500 MW. This is a historical daily-average sensitivity, not a peak-demand sensitivity; the study analysed Great Britain electricity-demand observations over 1975–2013.",
+      "agrees": true,
+      "disagreement": "none",
+      "confidence": "medium",
+      "sources": [
+        {
+          "url": "https://iopscience.iop.org/article/10.1088/1748-9326/11/11/114015",
+          "quote": "Over the data period, a 1 °C decrease in daily temperature during winter months will typically give rise to a 10–12 GWh increase in daily electricity demand (∼1% increase, established using the monthly linear fits in figure 10 ) and a 105–115 GWh increase in daily gas demand (3%–4% increase)."
+        },
+        {
+          "url": "https://centaur.reading.ac.uk/68474",
+          "quote": "The daily relationship of electricity and gas demand with temperature in Great Britain is analysed from 1975 to 2013 and 1996 to 2013 respectively."
+        }
+      ]
+    },
+    "figures_found": [
+      "10",
+      "12"
+    ],
+    "figures_missing": [
+      "417",
+      "500",
+      "0.417",
+      "0.500"
+    ],
     "verified": false,
-    "verification": "no numeric figure in the answer to check; needs a human"
+    "verification": "cross-check agrees, but figures ['417', '500', '0.417', '0.500'] were not found in an independent fetch of the cited sources"
   },
   {
     "id": "ev_gb_wind_capacity",
@@ -126,35 +210,73 @@
       }
     ],
     "verified": true,
-    "verification": "'14.3' found in an independent fetch of https://researchbriefings.files.parliament.uk/documents/CBP-10182/CBP-10182.pdf"
+    "verification": "independent cross-check agrees and all figures ['14.3', '16.0'] were re-found in an independent fetch",
+    "crosscheck": {
+      "run_id": "srun_791b0c3367af41483cb33e64dff8495a",
+      "independent_value": "June 2026: onshore 14.3 GW; offshore 16.0 GW. These are Great Britain’s operational-project capacities reported in the House of Commons Library’s Clean power targets briefing, using DESNZ’s July 2026 Renewable Energy Planning Database extract. Coverage caveat: the database includes projects above 1 MW before 2021 and uses a 150 kW threshold from 2021, so these are not an exhaustive census of installations of every size.",
+      "agrees": true,
+      "disagreement": "none numerically; the claim matches the June 2026 operational-project figures, subject to the database coverage caveat.",
+      "confidence": "medium",
+      "sources": [
+        {
+          "url": "https://researchbriefings.files.parliament.uk/documents/CBP-10182/CBP-10182.pdf",
+          "quote": "GW, Great Britain, June 2026 Operational Under Construction Awaiting Construction Wind Offshore 16.0 11.8 30.8 Wind Onshore 14.3 2.0 6.8 Solar Photovoltaics 10.9 3.2 26.7 Other 7.7 1.1 5.1 **Total 49.0 18.2 69.4 … Source: DESNZ, Renewable Energy Planning Database: quarterly extract: July 2026 … Before 2021 includes projects with a capacity of over 1MW. … This threshold was reduced to 150kW from 2021."
+        }
+      ]
+    },
+    "figures_found": [
+      "14.3",
+      "16.0"
+    ],
+    "figures_missing": []
   },
   {
     "id": "ev_scotland_wind_capacity",
     "question": "What is the total installed wind generation capacity (onshore plus offshore) in Scotland in GW, as of the latest Scottish Government energy statistics in 2026?",
     "used_by": "#50 #47",
-    "processor": "core",
-    "run_id": "srun_051cfaf41dc04532cf8ed8e9dcb2c342",
-    "retrieved_at": "2026-11-07T14:00:40+00:00",
-    "value": "Approximately 15.0 GW (10.7 GW onshore + 4.3 GW offshore).",
+    "processor": "pro",
+    "run_id": "srun_ca3dde3a037047935bf0269d3d127eeb",
+    "retrieved_at": "2026-11-07T14:16:18+00:00",
+    "value": "15.2 GW total, calculated from “10.9 GW” onshore wind plus “4.3 GW” offshore wind.",
     "unit": "GW",
-    "as_of": "Q2 2026 (end of June 2026; Scottish Government bulletin published 29 September 2026)",
-    "caveat": "The latest Scottish Government bulletin reports total renewable capacity of 18.4 GW and onshore wind growth, but does not state a separate onshore-plus-offshore wind total in its text. The 10.7 GW and 4.3 GW components are reported in a separate August 2026 source; their sum is rounded.",
+    "as_of": "Q2 2026; Scottish Government statistics published 29 September 2026.",
+    "caveat": "The total is calculated from Figure 3’s component figures, reported to one decimal place. The headline 18.4 GW figure covers all renewable electricity capacity, not wind alone.",
     "confidence": "medium",
     "sources": [
       {
-        "url": "https://www.scotsman.com/news/politics/scottish-government-net-zero-onshore-renewable-wind-power-8920495",
-        "quote": "Scotland has a capacity of 10.7GW of onshore wind power, compared to just 4.3GW for the more high-profile offshore wind. But SNP ministers, who have not published a full energy strategy in nine years, have set a target to deploy 20GW of onshore wind by 2030. ..."
+        "url": "https://www.gov.scot/binaries/content/gallery/publications/statistics/2026/09/energy-statistics-for-scotland---q2-2026/pages/renewable-electricity-capacity/energy-stats-q2-fig-3-png",
+        "quote": "Onshore wind remains the largest component throughout and reaches 10.9 GW by Q2 2026. … Offshore wind is the second-largest component at 4.3 GW, followed by large-scale hydro at 1.3 GW and solar photovoltaics at 0.9 GW."
       },
       {
-        "url": "https://www.gov.scot/publications/energy-statistics-for-scotland-q2-2026/pages/renewable-electricity-capacity/",
+        "url": "https://www.gov.scot/publications/energy-statistics-for-scotland-q2-2026/pages/renewable-electricity-capacity",
         "quote": "Energy Statistics for Scotland - Q2 2026 Published **29 September 2026**"
-      },
-      {
-        "url": "https://www.gov.scot/publications/energy-statistics-for-scotland-q2-2026/pages/key-notes/",
-        "quote": "Scotland’s capacity for electricity generation from renewable sources has continued to increase and currently stands at 18.4 GW – a 3.3% increase compared to 17.8 GW at the end of the second quarter of 2025. There was 1,663 MW of operational electricity storage in Scotland as of the end of June 2026."
       }
     ],
+    "crosscheck": {
+      "run_id": "srun_34632112fcf8493cebc73a45ae1e715d",
+      "independent_value": "15.2 GW total installed wind generation capacity in Scotland as of Q2 2026, calculated from “10.9 GW” onshore wind plus “4.3 GW” offshore wind in the Scottish Government’s Energy Statistics for Scotland – Q2 2026, published 29 September 2026.",
+      "agrees": true,
+      "disagreement": "none",
+      "confidence": "medium",
+      "sources": [
+        {
+          "url": "https://www.gov.scot/binaries/content/gallery/publications/statistics/2026/09/energy-statistics-for-scotland---q2-2026/pages/renewable-electricity-capacity/energy-stats-q2-fig-3-png",
+          "quote": "Onshore wind remains the largest component throughout and reaches 10.9 GW by Q2 2026. … Offshore wind is the second-largest component at 4.3 GW, followed by large-scale hydro at 1.3 GW and solar photovoltaics at 0.9 GW."
+        },
+        {
+          "url": "https://www.gov.scot/publications/energy-statistics-for-scotland-q2-2026/pages/renewable-electricity-capacity",
+          "quote": "Energy Statistics for Scotland - Q2 2026 Published **29 September 2026**"
+        }
+      ]
+    },
+    "figures_found": [
+      "10.9",
+      "4.3"
+    ],
+    "figures_missing": [
+      "15.2"
+    ],
     "verified": false,
-    "verification": "'15.0' not found in independent fetches of the top 3 cited sources"
+    "verification": "cross-check agrees, but figures ['15.2'] were not found in an independent fetch of the cited sources"
   }
 ]

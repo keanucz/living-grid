@@ -21,8 +21,31 @@
         "quote": "Find out more or switch to Agile Octopus … Published on 13th February 2019 by: … Philip Steele"
       }
     ],
-    "verified": true,
-    "verification": "'95' found in an independent fetch of https://octopus.energy/blog/agile-pricing-explained"
+    "verified": false,
+    "verification": "cross-check agrees, but figures ['2.10', '13', '2.00', '14'] were not found in an independent fetch of the cited sources",
+    "crosscheck": {
+      "run_id": "srun_791b0c3367af4148f2cbe5d011e8bc18",
+      "independent_value": "Octopus Energy’s official “Agile pricing explained” article, published 13 February 2019, gives:\n\nRate before VAT (p/kWh) = min(D × W + P, 95).\n\nW is the wholesale electricity cost for the half-hour in p/kWh. D is a dimensionless regional coefficient incorporating distribution costs. P is the regional peak premium in p/kWh, applied only from 4pm to 7pm; otherwise P = 0. Octopus states that 95 is chosen to keep the price capped at 100p/kWh once VAT is added—an intended ceiling, not a statement that the VAT-inclusive result equals exactly 100p.\n\nRegional values (D / P):\nEast England: 2.10 / 13\nEast Midlands: 2.00 / 14\nLondon: 2.00 / 12\nMerseyside & Northern Wales: 2.20 / 13\nWest Midlands: 2.10 / 12\nNorth East England: 2.10 / 12\nNorth West England: 2.10 / 12\nSouth England: 2.10 / 12\nSouth East England: 2.20 / 12\nSouth Wales: 2.20 / 12\nSouth West England: 2.30 / 11\nYorkshire: 2.00 / 13\nSouth Scotland: 2.10 / 13\nNorth Scotland: 2.40 / 12\n\nThe article gives no separate effective date for this formula. It defines W as the wholesale cost for the period without identifying a particular day-ahead exchange or auction.\n\nSource: https://octopus.energy/blog/agile-pricing-explained",
+      "agrees": true,
+      "disagreement": "none",
+      "confidence": "medium",
+      "sources": [
+        {
+          "url": "https://octopus.energy/blog/agile-pricing-explained",
+          "quote": "_min(D x W + P, 95)_ … **D** is a coefficient that includes our **distribution costs,** which varies based on where you are in Britain; **W** is the **wholesale cost of electricity** for that period in _pence per kilowatt-hour_ (p/kWh); **P** is the **peak-time premium** , which ranges from roughly 12 - 24 based on where you are, and is only applied between 4pm and 7pm. … **95** is chosen to ensure the price is capped at 100p/kWh once VAT is added. … **East England** D 2.10 P 13 … **East Midlands** D 2.00 P 14 … **London** D 2.00 P 12 … **Merseyside & Northern Wales** D 2.20 P 13 … **West Midl"
+        }
+      ]
+    },
+    "figures_found": [
+      "95",
+      "100"
+    ],
+    "figures_missing": [
+      "2.10",
+      "13",
+      "2.00",
+      "14"
+    ]
   },
   {
     "id": "hh_agile_publish_time",
@@ -47,32 +70,60 @@
       }
     ],
     "verified": true,
-    "verification": "'100' found in an independent fetch of https://octopus.energy/agile"
+    "verification": "independent cross-check agrees and all figures ['100'] were re-found in an independent fetch",
+    "crosscheck": {
+      "run_id": "srun_791b0c3367af41484c3c4e4ab7408667",
+      "independent_value": "Octopus Energy’s official Agile tariff page states that the next day’s half-hourly unit rates are updated “Between 4-8pm every day (usually nearer 4pm)” for the next 24 hours. Agile Price Cap Protect guarantees that the electricity rate will not exceed 100p/kWh (£1/kWh).",
+      "agrees": true,
+      "disagreement": "none",
+      "confidence": "high",
+      "sources": [
+        {
+          "url": "https://octopus.energy/agile",
+          "quote": "Between 4-8pm every day (usually nearer 4pm), your unit rates are updated for the next 24 hours, based on the wholesale market rates. … While price spikes are short-lived, typically lasting 30 minutes to an hour, they do happen. **Agile Octopus includes Price Cap Protect** , which ensures you'll never pay more than 100p / kWh for your electricity, guaranteed."
+        }
+      ]
+    },
+    "figures_found": [
+      "100"
+    ],
+    "figures_missing": []
   },
   {
     "id": "hh_agile_regions",
-    "question": "What are the 14 GB electricity distribution regions used by Octopus Agile tariffs, with their region letter codes (A to P, excluding I and O) and names?",
+    "question": "List the 14 GB electricity distribution region letter codes used in Octopus Energy tariff codes (e.g. the final letter in E-1R-AGILE-...-C) and the region name for each, as published by Octopus Energy or Energy Stats UK.",
     "used_by": "#56",
-    "processor": "core",
-    "run_id": "srun_051cfaf41dc045322175cb2035516ee3",
-    "retrieved_at": "2026-11-07T14:00:45+00:00",
-    "value": "A — Eastern England; B — East Midlands; C — London; D — Merseyside and North Wales; E — West Midlands; F — North Eastern England; G — North Western England; H — Southern England; J — South Eastern England; K — South Wales; L — South Western England; M — Yorkshire; N — Southern Scotland; P — Northern Scotland.",
+    "processor": "pro",
+    "run_id": "srun_ca3dde3a0370479308f353791ac39c87",
+    "retrieved_at": "2026-11-07T14:16:18+00:00",
+    "value": "Energy Stats UK lists:\nA — Eastern England\nB — East Midlands\nC — London\nD — Merseyside & North Wales\nE — West Midlands\nF — North East England\nG — North West England\nH — Southern England\nJ — South Eastern England\nK — South Wales\nL — South Western England\nM — Yorkshire\nN — Southern Scotland\nP — Northern Scotland",
     "unit": "n/a",
-    "as_of": "",
-    "caveat": "Some sources use slightly different wording for region names (for example, North East/West England for F/G); the list uses the common labels in the Octopus tariff-code mapping.",
-    "confidence": "medium",
+    "as_of": "The source page displays “May 14, 2020” and “August 6th, 2026”; no separate effective date is stated.",
+    "caveat": "The same page’s MPAN table uses naming variants: D “Merseyside & N. Wales”, J “South East England”, and L “South West England”.",
+    "confidence": "high",
     "sources": [
       {
-        "url": "https://switchtooctopus.co.uk/docs/reference/regional-pricing",
-        "quote": "## The 14 electricity regions … Great Britain is divided into 14 electricity distribution regions. These are often called distribution areas, DNO regions or GSP groups. Octopus tariff codes use the same single-letter region suffixes. … The electricity regions and their common letter codes are: … |Code |Region | … | --- | --- | … |A |Eastern England | … |B |East Midlands | … |C |London | … |D |Merseyside and North Wales | … |E |West Midlands | … |F |North Eastern England | … |G |North Western England | … |H |Southern England | … |J |South Eastern England | … |K |South Wales | … |L |South Wester"
-      },
-      {
-        "url": "https://octotariffs.co.uk/regions",
-        "quote": "A Grid Supply Point (GSP) group is the fourteen-region geography used by electricity tariff codes in Great Britain. The letter identifies the same tariff region as the readable name and slug below. … ## Find your tariff region … Use Octopus Energy's postcode lookup to identify the GSP group used for your address. … Postcode Show my prices … ## All fourteen GSP groups … |GSP |Region |Tariff tools | … | --- | --- | --- | … |A |Eastern England eastern-england |[Agile rates](https://octotariffs.co.uk/agile/eastern-england) Compare tariffs Calculator | … |B |East Midlands east-midlands |[Agile rate"
+        "url": "https://energy-stats.uk/dno-region-codes-explained",
+        "quote": "[West Midlands](https://energy-stats.uk/octopus-cosy-west-midlands/) [Yorkshire](https://energy-stats.uk/octopus-cosy-yorkshire/) [Tracker](https://energy-stats.uk/octopus-tracker-tariff-pricing/) [Octopus Tracker Tariff](https://energy-stats.uk/octopus-tracker-tariff-pricing/) [Eastern England](https://energy-stats.uk/octopus-tracker-eastern-england/) [East Midlands](https://energy-stats.uk/octopus-tracker-east-midlands/) [London](https://energy-stats.uk/octopus-tracker-london/) [Merseyside and Northern Wales](https://energy-stats.uk/octopus-tracker-merseyside-and-northern-wales/) [North East"
       }
     ],
-    "verified": false,
-    "verification": "no numeric figure in the answer to check; needs a human"
+    "crosscheck": {
+      "run_id": "srun_34632112fcf8493cfc813fc17a725895",
+      "independent_value": "Energy Stats UK lists these 14 region codes:\nA — Eastern England\nB — East Midlands\nC — London\nD — Merseyside & North Wales\nE — West Midlands\nF — North East England\nG — North West England\nH — Southern England\nJ — South Eastern England\nK — South Wales\nL — South Western England\nM — Yorkshire\nN — Southern Scotland\nP — Northern Scotland\n\nThe page explicitly connects these letters to the final letter in Octopus Agile tariff codes. It displays “May 14, 2020” and “August 6th, 2026”; these are page dates, not a stated effective date for the mapping.\nSource: https://energy-stats.uk/dno-region-codes-explained",
+      "agrees": true,
+      "disagreement": "none",
+      "confidence": "high",
+      "sources": [
+        {
+          "url": "https://energy-stats.uk/dno-region-codes-explained",
+          "quote": "[West Midlands](https://energy-stats.uk/octopus-cosy-west-midlands/) [Yorkshire](https://energy-stats.uk/octopus-cosy-yorkshire/) [Tracker](https://energy-stats.uk/octopus-tracker-tariff-pricing/) [Octopus Tracker Tariff](https://energy-stats.uk/octopus-tracker-tariff-pricing/) [Eastern England](https://energy-stats.uk/octopus-tracker-eastern-england/) [East Midlands](https://energy-stats.uk/octopus-tracker-east-midlands/) [London](https://energy-stats.uk/octopus-tracker-london/) [Merseyside and Northern Wales](https://energy-stats.uk/octopus-tracker-merseyside-and-northern-wales/) [North East"
+        }
+      ]
+    },
+    "figures_found": [],
+    "figures_missing": [],
+    "verified": true,
+    "verification": "no figures to re-find; verified by an agreeing independent cross-check only"
   },
   {
     "id": "hh_dishwasher_kwh",
@@ -97,35 +148,82 @@
       }
     ],
     "verified": true,
-    "verification": "'0.9' found in an independent fetch of https://energysavingtrust.org.uk/wp-content/uploads/2022/11/Energy-Saving-Trust-Warm-Home-Hacks-guide-final.pdf"
+    "verification": "independent cross-check agrees and all figures ['0.9', '0.5'] were re-found in an independent fetch",
+    "crosscheck": {
+      "run_id": "srun_791b0c3367af4148995b7d5abf68f1f5",
+      "independent_value": "Energy Saving Trust’s November 2022 guide, “Your guide to staying warm and saving money this winter,” lists “One dishwasher cycle” as 0.9 kWh and “One load of washing in the washing machine” as 0.5 kWh. These are guide figures: actual consumption varies with the appliance’s age and energy-efficiency rating.",
+      "agrees": true,
+      "disagreement": "none",
+      "confidence": "high",
+      "sources": [
+        {
+          "url": "https://energysavingtrust.org.uk/wp-content/uploads/2022/11/Energy-Saving-Trust-Warm-Home-Hacks-guide-final.pdf",
+          "quote": "One dishwasher cycle 0.9 kWh **31p … **Activity kWh\\* Cost** One load of washing in the washing machine 0.5 kWh **17p** … The exact kWhs and costs many vary depending on the age of the item and its energy efficiency rating."
+        }
+      ]
+    },
+    "figures_found": [
+      "0.9",
+      "0.5"
+    ],
+    "figures_missing": []
   },
   {
     "id": "hh_ev_charge_kwh",
     "question": "How many kWh does a typical UK electric car use for an average overnight home charge, based on average daily UK car mileage and typical EV efficiency (miles per kWh)?",
     "used_by": "#56",
-    "processor": "core",
-    "run_id": "srun_051cfaf41dc045320896c92174bc403a",
-    "retrieved_at": "2026-11-07T14:00:45+00:00",
-    "value": "About 5.6 kWh of battery energy for an average day of driving: 7,100 miles/year ÷ 365 ≈ 19.5 miles/day, and 19.5 ÷ 3.5 miles/kWh ≈ 5.6 kWh. Allow roughly 6.1–6.4 kWh from the wall if typical 10–15% home-charging losses are included.",
-    "unit": "kWh",
-    "as_of": "2025 average-mileage baseline; typical EV efficiency estimate published 19 September 2026.",
-    "caveat": "The mileage benchmark is for all cars in England, not a UK-wide EV-specific average; actual daily mileage and efficiency vary. The higher wall-draw estimate includes typical charging losses.",
+    "processor": "pro",
+    "run_id": "srun_ca3dde3a03704793b4341ebe7137de96",
+    "retrieved_at": "2026-11-07T14:16:18+00:00",
+    "value": "Approximately 5.6 kWh delivered to the battery per night—roughly 6 kWh drawn from the electricity supply allowing for charging losses.",
+    "unit": "kWh per overnight charge",
+    "as_of": "2025 average mileage; typical EV efficiency from a source dated 19 September 2026.",
+    "caveat": "Calculated estimate, not a directly measured average charging session: “7,100 miles” annually ÷ 365 ÷ “3.5 miles per kWh” ≈ 5.6 kWh/day. The mileage figure covers England and is used as a UK proxy. Typical home charging losses are “10 to 15 percent”. This assumes each overnight charge replaces one average day’s driving, rather than filling an empty battery.",
     "confidence": "medium",
     "sources": [
       {
         "url": "https://www.racfoundation.org/motoring-faqs/mobility",
-        "quote": "**Q33) What is the average annual mileage per car in England?** … **A33)** The estimated average annual mileage per car in England has decreased as the number of cars per household has risen, falling from around 9,200 miles in 2002 to 7,100 miles in 2025. … The estimated average annual mileage was 6,200 for petrol cars, 8,100 for hybrid cars, 8,000 for diesel cars and 9,400 for battery electric cars in 2025. … Source: [Table NTS0901](https://www.gov.uk/government/statistical-data-sets/nts09-vehicle-mileage-and-occupancy)"
+        "quote": "**A33)** The estimated average annual mileage per car in England has decreased as the number of cars per household has risen, falling from around 9,200 miles in 2002 to 7,100 miles in 2025."
       },
       {
         "url": "https://www.carsa.co.uk/blog/how-much-cost-charge-electric-car-uk-2026",
-        "quote": "## What that means per mile … A typical modern EV covers around 3.5 miles per kWh in mixed real-world conditions. Converting the four rates above: … **Home off-peak at 7p/kWh:** approximately 2 pence per mile."
+        "quote": "A typical modern EV covers around 3.5 miles per kWh in mixed real-world conditions."
       },
       {
         "url": "https://www.c-lecelectrical.co.uk/how-many-kwh-to-charge-an-electric-car",
-        "quote": "A 60kWh EV battery actually draws around 66 kWh from the wall socket for a full empty-to-full charge including losses. … 10-15 % … Charging Loss … Typical UK home charging loss is 10 to 15 percent. Heat from the onboard charger and inverter is the main source."
+        "quote": "Typical UK home charging loss is 10 to 15 percent."
       }
     ],
+    "crosscheck": {
+      "run_id": "srun_34632112fcf8493c40afc12e6c5a2f63",
+      "independent_value": "Approximately 5.6 kWh delivered to the battery and roughly 6 kWh drawn from the supply per overnight top-up. The RAC Foundation reports average annual mileage of 7,100 miles per car in England in 2025; Carsa states that a typical modern EV achieves around 3.5 miles/kWh. Thus: 7,100 ÷ 365 = 19.452 miles/day; 19.452 ÷ 3.5 = 5.558 kWh/day. ADAC testing reported by The Next Web found losses of 5.1%–7% using an 11 kW wallbox, implying 5.86–5.98 kWh from the supply. This assumes replacing one average day’s driving each night—not charging an empty battery fully. England’s mileage is a proxy for the UK, and actual efficiency and charging losses vary.",
+      "agrees": true,
+      "disagreement": "none",
+      "confidence": "medium",
+      "sources": [
+        {
+          "url": "https://www.racfoundation.org/motoring-faqs/mobility",
+          "quote": "**A33)** The estimated average annual mileage per car in England has decreased as the number of cars per household has risen, falling from around 9,200 miles in 2002 to 7,100 miles in 2025."
+        },
+        {
+          "url": "https://www.carsa.co.uk/blog/how-much-cost-charge-electric-car-uk-2026",
+          "quote": "A typical modern EV covers around 3.5 miles per kWh in mixed real-world conditions."
+        },
+        {
+          "url": "https://thenextweb.com/news/adac-ev-home-charging-losses-wallbox-socket",
+          "quote": "An 11 kW wallbox cut every car’s losses to between 5.1% and 7%."
+        },
+        {
+          "url": "https://oneevgroup.com/insights/electric-vs-petrol-vs-diesel-uk-2026/",
+          "quote": "Real efficiency depends on the vehicle, temperature, speed, traffic, terrain, tyres, load and driving style."
+        }
+      ]
+    },
+    "figures_found": [],
+    "figures_missing": [
+      "5.6"
+    ],
     "verified": false,
-    "verification": "'5.6' not found in independent fetches of the top 3 cited sources"
+    "verification": "cross-check agrees, but figures ['5.6'] were not found in an independent fetch of the cited sources"
   }
 ]

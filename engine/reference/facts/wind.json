@@ -3,18 +3,18 @@
     "id": "wind_beatrice_capacity",
     "question": "What is the installed capacity in MW of the Beatrice offshore wind farm in Scotland, and what are its Elexon BM unit IDs?",
     "used_by": "#46 #47",
-    "processor": "core",
-    "run_id": "srun_051cfaf41dc0453237e6d3b1b108798a",
-    "retrieved_at": "2026-11-07T14:00:42+00:00",
-    "value": "588 MW; Elexon generation BMU IDs: T_BEATO-1, T_BEATO-2, T_BEATO-3, and T_BEATO-4.",
-    "unit": "MW for capacity; BMU IDs are identifiers.",
-    "as_of": "Capacity: UK Offshore Wind Report 2023; BMU IDs: Elexon market-view data dated 28 October 2026.",
-    "caveat": "The report notes capacities are rounded to the nearest whole MW. A NETA listing separately labels T_BEATD-1 as the Beatrice demand BMU; it is distinct from the four generation BMUs shown in Elexon's market view.",
-    "confidence": "medium",
+    "processor": "pro",
+    "run_id": "srun_ca3dde3a037047930730f1d29536b69a",
+    "retrieved_at": "2026-11-07T14:16:18+00:00",
+    "value": "Installed capacity: 588 MW. Elexon generation BM unit IDs: T_BEATO-1, T_BEATO-2, T_BEATO-3, T_BEATO-4.",
+    "unit": "MW for capacity; n/a for BM unit IDs.",
+    "as_of": "Capacity: UK Offshore Wind Report 2023. Generation BM unit listings: 28 October 2026.",
+    "caveat": "A separate demand BM unit is also listed: T_BEATD-1.",
+    "confidence": "high",
     "sources": [
       {
         "url": "https://downloads.ctfassets.net/nv65su7t80y5/5Ej0qLFMQnqiT3QuWfFj9g/c130a6294ccaea40b8f04db7dd7f8830/11964_OffshoreWindReport_2023_Final300424.pdf",
-        "quote": "02 Beatrice 2 588 03 Blyth Demonstration Phase 1 42 04 Burbo Bank 90 05 Burbo Bank Extension 259 06 Dudgeon 402 07 East Anglia ONE 714 08 European Offshore Wind Deployment Centre 2 97 09 Galloper 353 24 Lincs 270 25 London Array 630 26 Lynn 97 27 Moray East 2 953 28 North Hoyle 60 29 Ormonde 150 30 Race Bank 573 31 Rampion 400 32 Rhyl Flats 90 33 Robin Rigg East 2 84 34 Robin Rigg West 2 90 35 Scroby Sands 60 36 Seagreen Phase 1 2 1,075 37 Sheringham Shoal 317 38 Teesside 62 39 Thanet 300 40 Triton Knoll 857 41 Walney 1 184 42 Walney 2 184 43 Walney Extension 659 44 West of Duddon Sands 389 45"
+        "quote": "Capacity MW 1 01 Barrow 90 02 Beatrice 2 588"
       },
       {
         "url": "https://bmrs.elexon.co.uk/balancing-mechanism-market-view",
@@ -25,8 +25,29 @@
         "quote": "Beatrice Offshore Windfarm Demand (T\\_BEATD-1) Beatrice Offshore Wind Unit 1 (T\\_BEATO-1)"
       }
     ],
-    "verified": false,
-    "verification": "'588' not found in independent fetches of the top 3 cited sources"
+    "crosscheck": {
+      "run_id": "srun_34632112fcf8493c2ff5bba2dcaa9fcb",
+      "independent_value": "Installed capacity: 588 MW, as listed in the UK Offshore Wind Report 2023. Elexon generation BM unit IDs: T_BEATO-1, T_BEATO-2, T_BEATO-3, T_BEATO-4.",
+      "agrees": true,
+      "disagreement": "none",
+      "confidence": "medium",
+      "sources": [
+        {
+          "url": "https://downloads.ctfassets.net/nv65su7t80y5/5Ej0qLFMQnqiT3QuWfFj9g/c130a6294ccaea40b8f04db7dd7f8830/11964_OffshoreWindReport_2023_Final300424.pdf",
+          "quote": "Capacity MW 1 01 Barrow 90 02 Beatrice 2 588 03 Blyth Demonstration Phase 1 42 04 Burbo Bank 90 05 Burbo Bank Extension 259 06 Dudgeon 402 07 East Anglia ONE 714 08 European Offshore Wind Deployment Centre 2 97 09 Galloper 353 Offshore Wind Report 2023 Offshore wind farm overview Offshore wind farm performance The Seagreen Phase 1 project completed commissioning works in October 2023, with all 114 turbines successfully installed and generating."
+        },
+        {
+          "url": "https://osuked.github.io/Power-Station-Dictionary/objects/10297.html",
+          "quote": "|Related |Settlement BMU ID |T\\_BEATO-1, T\\_BEATO-2, T\\_BEATO-3, T\\_BEATO-4 |"
+        }
+      ]
+    },
+    "figures_found": [
+      "588"
+    ],
+    "figures_missing": [],
+    "verified": true,
+    "verification": "independent cross-check agrees and all figures ['588'] were re-found in an independent fetch"
   },
   {
     "id": "wind_clyde_capacity",
@@ -67,7 +88,28 @@
       }
     ],
     "verified": true,
-    "verification": "'522.4' found in an independent fetch of https://www.sserenewables.com/news-and-views/2017/09/clyde-extension-completed-and-operational/"
+    "verification": "independent cross-check agrees and all figures ['522.4'] were re-found in an independent fetch",
+    "crosscheck": {
+      "run_id": "srun_791b0c3367af4148caa06332fcb8c5b9",
+      "independent_value": "Clyde wind farm in South Lanarkshire has an installed capacity of 522.4 MW including its extension, according to SSE’s announcement dated 5 September 2017. Its Elexon BM Unit IDs are T_CLDCW-1 (Clyde Central), T_CLDNW-1 (Clyde North), and T_CLDSW-1 (Clyde South).",
+      "agrees": true,
+      "disagreement": "none",
+      "confidence": "medium",
+      "sources": [
+        {
+          "url": "https://www.sserenewables.com/news-and-views/2017/09/clyde-extension-completed-and-operational",
+          "quote": "The Clyde windfarm and its extension are located in South Lanarkshire with a new total capacity of 522.4MW and SSE believes it is one of the most efficient large wind farms in Great Britain. … 05 Sep 2017"
+        },
+        {
+          "url": "https://www.netareports.com/data/elexon/bmu.jsp",
+          "quote": "Unit 1 (T\\_CARR-1) Carrington Unit 2 (T\\_CARR-2) Castner Kellner (Ineos Chlor) (T\\_CASKD-1) Cottam Development Centre Limited (T\\_CDCL-1) Corriegarth Wind Farm (T\\_CGTHW-1) Chapelcross Demand (T\\_CHAPD-1) Clachan Station Demand (T\\_CLACD-1) Clyde Central Windfarm (T\\_CLDCW-1) Clyde North Windfarm (T\\_CLDNW-1) Clyde South Windfarm (T\\_CLDSW-1) Cleve Hill Solar 1 (T\\_CLVHS-1) Cleve Hill"
+        }
+      ]
+    },
+    "figures_found": [
+      "522.4"
+    ],
+    "figures_missing": []
   },
   {
     "id": "wind_moray_east_capacity",
@@ -104,7 +146,28 @@
       }
     ],
     "verified": true,
-    "verification": "'950' found in an independent fetch of https://www.morayeast.com/"
+    "verification": "independent cross-check agrees and all figures ['950'] were re-found in an independent fetch",
+    "crosscheck": {
+      "run_id": "srun_791b0c3367af41487d813402822cc8ab",
+      "independent_value": "Moray East’s official project website states an installed capacity of 950 MW. Its Elexon settlement BMU IDs are T_MOWEO-1, T_MOWEO-2 and T_MOWEO-3; the corresponding NGC BMU names are MOWEO-1, MOWEO-2 and MOWEO-3.",
+      "agrees": true,
+      "disagreement": "none",
+      "confidence": "medium",
+      "sources": [
+        {
+          "url": "https://www.morayeast.com/",
+          "quote": "### 950 MW capacity"
+        },
+        {
+          "url": "https://offshoredataatlas.com/wind-farms/moray-east/",
+          "quote": "|Balancing Mechanism units |T\\_MOWEO-1, T\\_MOWEO-2, T\\_MOWEO-3 |"
+        }
+      ]
+    },
+    "figures_found": [
+      "950"
+    ],
+    "figures_missing": []
   },
   {
     "id": "wind_moray_west_capacity",
@@ -137,7 +200,32 @@
       }
     ],
     "verified": true,
-    "verification": "'882' found in an independent fetch of https://assets.publishing.service.gov.uk/media/69fc56908cc72d2f863ea58d/REPD_publication_Q1_2026.csv"
+    "verification": "independent cross-check agrees and all figures ['882'] were re-found in an independent fetch",
+    "crosscheck": {
+      "run_id": "srun_791b0c3367af41482410cb8829f66624",
+      "independent_value": "Moray West has an installed capacity of 882 MW (MWelec), according to the REPD Q1 2026 record updated 14/05/2026, which lists it as Operational. Yes, it is fully operational as of 2026: Ocean Winds confirms it completed construction and reached full power in April 2025. Elexon’s market-view data dated 28 October 2026 lists BM Unit IDs T_MOWWO-1, T_MOWWO-2, T_MOWWO-3 and T_MOWWO-4, with corresponding NGC IDs MOWWO-1, MOWWO-2, MOWWO-3 and MOWWO-4.",
+      "agrees": true,
+      "disagreement": "none",
+      "confidence": "high",
+      "sources": [
+        {
+          "url": "https://assets.publishing.service.gov.uk/media/69fc56908cc72d2f863ea58d/REPD_publication_Q1_2026.csv",
+          "quote": "Installed Capacity (MWelec),Share Community Scheme,CHP Enabled,CfD Allocation Round,RO Banding (ROC/MWh),FiT Tariff (p/kWh),CfD Capacity (MW),Turbine Capacity (MW),No. of Turbines,Height of Turbines (m),Mounting Type for Solar,Development Status,Development Status (short),Are they re-applying (New REPD Ref),Are they re-applying (Old REPD Ref) ,Address,County,Region,Country,Post Code,X-coordinate,Y-coordinate,Planning Authority,Planning Application Reference,Appeal Reference,Secretary of State Reference,Type of ... ,6158,14/05/2026,EDPR,Moray West Offshore Wind Farm Project,Wind Offshore,,,882,"
+        },
+        {
+          "url": "https://www.oceanwinds.com/projects/moray-west",
+          "quote": "Moray West has successfully finished its construction phase, achieved safe and quality delivery of the project on schedule and reached full power in April 2025."
+        },
+        {
+          "url": "https://bmrs.elexon.co.uk/balancing-mechanism-market-view",
+          "quote": "|[T\\_MOWWO-1](https://bmrs.elexon.co.uk/balancing-mechanism-bmu-view?bmuId=T_MOWWO-1&activeTab=Physical&startDate=2026-10-28T00%3A00%3A00.000Z&endDate=2026-10-28T13%3A00%3A00.000Z) |Moray Offshore Wind West Ltd |T |MOWWO-1 |12:30 |189 |13:00 |189 | … |[T\\_MOWWO-2](https://bmrs.elexon.co.uk/balancing-mechanism-bmu-view?bmuId=T_MOWWO-2&activeTab=Physical&startDate=2026-10-28T00%3A00%3A00.000Z&endDate=2026-10-28T13%3A00%3A00.000Z) |Moray Offshore Wind West Ltd |T |MOWWO-2 |12:30 |195 |13:00 |195 | … |[T\\_MOWWO-3](https://bmrs.elexon.co.uk/balancing-mechanism-bmu-view?bmuId=T_MOWWO-3&activeTab=Phy"
+        }
+      ]
+    },
+    "figures_found": [
+      "882"
+    ],
+    "figures_missing": []
   },
   {
     "id": "wind_power_curve",
@@ -166,7 +254,30 @@
       }
     ],
     "verified": true,
-    "verification": "'12' found in an independent fetch of https://www.nyserda.ny.gov/-/media/Project/Nyserda/Files/Publications/Research/Biomass-Solar-Wind/Understanding-Wind-Energy.pdf"
+    "verification": "independent cross-check agrees and all figures ['12', '13', '25'] were re-found in an independent fetch",
+    "crosscheck": {
+      "run_id": "srun_791b0c3367af4148e342d5eaea5722b7",
+      "independent_value": "A reasonable general benchmark is: cut-in about 3 m/s; rated approximately 12–13 m/s; cut-out approximately 25 m/s. NYSERDA explicitly gives rated speed as 12–13 m/s and cut-out as 25 m/s. Vestas specifies a 3 m/s cut-in for its V126-3.45 MW onshore turbine. These are approximate benchmarks, not universal settings: that Vestas model, for example, specifies a 22.5 m/s cut-out.",
+      "agrees": true,
+      "disagreement": "none",
+      "confidence": "medium",
+      "sources": [
+        {
+          "url": "https://www.nyserda.ny.gov/-/media/Project/Nyserda/Files/Publications/Research/Biomass-Solar-Wind/Understanding-Wind-Energy.pdf",
+          "quote": "A turbine will achieve its nominal, or rated, power at approximately 26 mph to 30 mph (12 m/s to13 m/s); this value is often used to describe the turbine’s generating capacity (or nameplate capacity). The turbine will reach its cut-out speed at approximately 55 mph (25 m/s)."
+        },
+        {
+          "url": "https://www.energy.gov/eere/articles/how-do-wind-turbines-survive-severe-storms",
+          "quote": "The cut-in speed (typically between 6 and 9 mph) is when the blades start rotating and generating power."
+        }
+      ]
+    },
+    "figures_found": [
+      "12",
+      "13",
+      "25"
+    ],
+    "figures_missing": []
   },
   {
     "id": "wind_seagreen_capacity",
@@ -191,7 +302,32 @@
       }
     ],
     "verified": true,
-    "verification": "'075' found in an independent fetch of https://www.seagreenwindenergy.com/"
+    "verification": "independent cross-check agrees and all figures ['1075'] were re-found in an independent fetch",
+    "crosscheck": {
+      "run_id": "srun_791b0c3367af4148d6f19c848f56d076",
+      "independent_value": "Seagreen’s installed generating capacity is 1,075 MW. Its six generating Elexon BM Unit IDs are T_SGRWO-1, T_SGRWO-2, T_SGRWO-3, T_SGRWO-4, T_SGRWO-5 and T_SGRWO-6 (short names SGRWO-1 through SGRWO-6). Elexon’s paper dated 3 May 2022 lists units 1–5 as non-standard and unit 6 as standard.",
+      "agrees": true,
+      "disagreement": "none",
+      "confidence": "medium",
+      "sources": [
+        {
+          "url": "https://www.seagreenwindenergy.com/",
+          "quote": "Seagreen has 114 turbines with a total generating capacity of 1,075MW."
+        },
+        {
+          "url": "https://www.elexon.co.uk/documents/groups/isg/2022-meetings-isg/253-may/isg253-03-application-for-non-standard-bm-unit-seagreen-1-0",
+          "quote": "Seagreen Wind Energy Limited is applying for five non-standard BM Units: BM Units T\\_SGRWO-1, T\\_SGRWO-2, T\\_SGRWO-3, T\\_SGRWO-4, T\\_SGRWO-5 (Attachment A) for Seagreen Offshore Wind Farm. The Wind Farm will also have two standard BM Units (T\\_SGRWO-6 and T\\_SGRWD-1). … Date of meeting **03 May 2022**"
+        },
+        {
+          "url": "https://bmrs.elexon.co.uk/balancing-mechanism-bmu-view?bmuId=T_SGRWO-3&activeTab=Physical&startDate=2026-10-19T23%3A00%3A00.000Z&endDate=2026-10-20T01%3A00%3A00.000Z",
+          "quote": "NGC BMU Name: SGRWO-3."
+        }
+      ]
+    },
+    "figures_found": [
+      "1075"
+    ],
+    "figures_missing": []
   },
   {
     "id": "wind_shear_exponent",
@@ -220,7 +356,30 @@
       }
     ],
     "verified": true,
-    "verification": "'0.143' found in an independent fetch of https://docs.nlr.gov/docs/legosti/fy97/22223.pdf"
+    "verification": "independent cross-check agrees and all figures ['0.143', '0.14', '0.11'] were re-found in an independent fetch",
+    "crosscheck": {
+      "run_id": "srun_791b0c3367af414889d26d909a040648",
+      "independent_value": "Open terrain: α = 0.143 (the 1/7th power law, approximately 0.14), identified by NREL as a first approximation for a well-mixed atmosphere over flat, open terrain. Over sea: α = 0.11; NREL explicitly uses this exponent to extrapolate 10 m winds to 90 m. Both are dimensionless. These are conventional approximations, not universal constants; actual wind shear depends on site and atmospheric conditions.",
+      "agrees": true,
+      "disagreement": "none",
+      "confidence": "high",
+      "sources": [
+        {
+          "url": "https://data.openei.org/submissions/351",
+          "quote": "To extrapolate them to 90m heights, a power-law wind-shear adjustment using a shear exponent of 0.11 was applied."
+        },
+        {
+          "url": "https://docs.nlr.gov/docs/legosti/fy97/22223.pdf",
+          "quote": "As a first approximation, the wind shear exponent is often assigned a value of 0.143, known as the 1/7th power law, to predict wind profiles in a well-mixed atmosphere over flat, open terrain."
+        }
+      ]
+    },
+    "figures_found": [
+      "0.143",
+      "0.14",
+      "0.11"
+    ],
+    "figures_missing": []
   },
   {
     "id": "wind_viking_capacity",
@@ -249,7 +408,29 @@
       }
     ],
     "verified": true,
-    "verification": "'443' found in an independent fetch of https://www.sserenewables.com/media/og1hcpg2/vewf_operational-newsletter-spring-2025_final.pdf"
+    "verification": "independent cross-check agrees and all figures ['443', '103'] were re-found in an independent fetch",
+    "crosscheck": {
+      "run_id": "srun_791b0c3367af41483062051a30442d85",
+      "independent_value": "Viking Wind Farm has an installed capacity of 443 MW and 103 turbines. Its Elexon BMU IDs are T_VKNGW-1, T_VKNGW-2, T_VKNGW-3, and T_VKNGW-4. SSE says it was completed in September 2024.",
+      "agrees": true,
+      "disagreement": "None on the capacity, turbine count, or BMU IDs. I did not independently verify the claimed Elexon listing date of 28 October 2026; the Elexon market view I consulted displayed 7 November 2026.",
+      "confidence": "high",
+      "sources": [
+        {
+          "url": "https://www.sserenewables.com/onshore-wind/great-britain/viking",
+          "quote": "The £580m Viking wind farm is a 103-turbine, 443MW onshore wind farm that harnesses the excellent wind conditions in the Shetland Islands; producing enough energy to power the equivalent of almost half a million homes, including every home in Shetland\\*. … Completed in September 2024, Viking will play a crucial role in contributing towards the UK and Scotland’s net zero targets."
+        },
+        {
+          "url": "https://bmrs.elexon.co.uk/balancing-mechanism-market-view",
+          "quote": "|[T\\_VKNGW-1](https://bmrs.elexon.co.uk/balancing-mechanism-bmu-view?bmuId=T_VKNGW-1&activeTab=Physical&startDate=2026-11-07T00%3A00%3A00.000Z&endDate=2026-11-07T15%3A00%3A00.000Z) |Viking Energy Wind Farm LLP |T |VKNGW-1 |14:30 |0 |15:00 |0 | … |[T\\_VKNGW-2](https://bmrs.elexon.co.uk/balancing-mechanism-bmu-view?bmuId=T_VKNGW-2&activeTab=Physical&startDate=2026-11-07T00%3A00%3A00.000Z&endDate=2026-11-07T15%3A00%3A00.000Z) |Viking Energy Wind Farm LLP |T |VKNGW-2 |14:30 |0 |15:00 |0 | … |[T\\_VKNGW-3](https://bmrs.elexon.co.uk/balancing-mechanism-bmu-view?bmuId=T_VKNGW-3&activeTab=Physical&star"
+        }
+      ]
+    },
+    "figures_found": [
+      "443",
+      "103"
+    ],
+    "figures_missing": []
   },
   {
     "id": "wind_whitelee_capacity",
@@ -274,6 +455,27 @@
       }
     ],
     "verified": true,
-    "verification": "'539' found in an independent fetch of https://www.scottishpowerrenewables.com/onshore-new/onshore-scotland/wind-scotland/windfarms-in-development/whitelee-windfarm-repowering"
+    "verification": "independent cross-check agrees and all figures ['539'] were re-found in an independent fetch",
+    "crosscheck": {
+      "run_id": "srun_791b0c3367af4148712ffab4a3e964c2",
+      "independent_value": "Whitelee wind farm near Glasgow, including Whitelee Extension, has a combined installed capacity of 539 MW. ScottishPower’s REMIT fact sheet lists BM unit IDs T_WHILW-1 for Whitelee and T_WHILW-2 for Whitelee Extension.",
+      "agrees": true,
+      "disagreement": "none",
+      "confidence": "high",
+      "sources": [
+        {
+          "url": "https://www.scottishpowerrenewables.com/onshore-new/onshore-scotland/wind-scotland/windfarms-in-development/whitelee-windfarm-repowering",
+          "quote": "The operational Whitelee and Whitelee Extension Windfarms, consented in 2006 and 2009 respectively, have a combined total of 215 turbines which generate 539MW."
+        },
+        {
+          "url": "https://www.scottishpower.com/documents/d/guest/remit-static-data",
+          "quote": "**Whitelee** T\\_WHILW-1 Onshore Wind 305 … **Whitelee Extension** T\\_WHILW-2 Onshore Wind 238 217"
+        }
+      ]
+    },
+    "figures_found": [
+      "539"
+    ],
+    "figures_missing": []
   }
 ]

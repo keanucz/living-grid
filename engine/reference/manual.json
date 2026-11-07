@@ -1,0 +1,6 @@
+{
+  "con_2026_10_26_cost": {
+    "verified": true,
+    "verification": "manual 2026-11-07 14:02 UTC: re-ran the cited NESO datastore SQL query directly; 48 periods, Constraints = 36530868.70 GBP, six categories sum to 38650310.28 GBP"
+  }
+}

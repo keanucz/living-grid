@@ -18,7 +18,25 @@
       }
     ],
     "verified": true,
-    "verification": "'334' found in an independent fetch of https://pmc.ncbi.nlm.nih.gov/articles/PMC11603766/"
+    "verification": "independent cross-check agrees and all figures ['334', '0.334'] were re-found in an independent fetch",
+    "crosscheck": {
+      "run_id": "srun_791b0c3367af4148aec619ca0bbf2e9f",
+      "independent_value": "Approximately 0.334 tCO₂/MWh of electricity (334 kgCO₂/MWh). Cownden and Lucquiaud’s paper, “Assessing Best Practices in Natural Gas Production and Emerging CO₂ Capture Techniques to Minimize the Carbon Footprint of Electricity Generation,” explicitly reports this direct-emissions figure for state-of-the-art CCGTs, distinguishing it from additional indirect emissions.",
+      "agrees": true,
+      "disagreement": "No numerical disagreement. The qualification is that the source describes state-of-the-art CCGTs, not a fleet-wide average for all CCGT plants.",
+      "confidence": "medium",
+      "sources": [
+        {
+          "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11603766/",
+          "quote": "State-of-the-art combined cycle gas turbines (CCGTs) generate electricity with direct CO ₂ emissions of approximately 334 kgCO ₂ /MWh ¹⁴ and also cause substantial indirect GHG emissions and other environmental impacts."
+        }
+      ]
+    },
+    "figures_found": [
+      "334",
+      "0.334"
+    ],
+    "figures_missing": []
   },
   {
     "id": "gas_ccgt_efficiency",
@@ -39,7 +57,29 @@
       }
     ],
     "verified": true,
-    "verification": "'53' found in an independent fetch of https://eur-lex.europa.eu/legal-content/EN/TXT/PDF?uri=CELEX%3A32021D2326"
+    "verification": "independent cross-check agrees and all figures ['53', '58.5', '50', '600', '57', '60.5'] were re-found in an independent fetch",
+    "crosscheck": {
+      "run_id": "srun_791b0c3367af4148083682346a330532",
+      "independent_value": "A reasonable illustrative assumption for a modern large European CCGT is 58% net electrical efficiency on a lower-heating-value (LHV) basis. Gas input is the reciprocal: 1/0.58 = 1.7241 MWh_LHV per MWh of net electricity, or about 1.72. Commission Implementing Decision (EU) 2021/2326, adopted 30 November 2021, gives new-CCGT BAT-AEELs of 53–58.5% for 50 ≤ thermal input < 600 MWth and 57–60.5% for thermal input ≥600 MWth. These imply gas inputs of 1.7094–1.8868 and 1.6529–1.7544 MWh_LHV/MWh_net, respectively. Thus the large-plant range rounds to 1.65–1.75. These are full-load BAT efficiency benchmarks, not measured fleet averages; 58% is an illustrative assumption within the large-plant range.",
+      "agrees": true,
+      "disagreement": "none",
+      "confidence": "medium",
+      "sources": [
+        {
+          "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/HTML?uri=CELEX:32021D2326",
+          "quote": "|— |Iron and Steel Production (IS) | |— |Monitoring of Emissions to Air and Water from IED installations (ROM) | … For the purposes of these BAT conclusions, when a range of values for the total rated thermal input is indicated, this is to be read as ‘equal to or greater than the lower end of the range and lower than the upper end of the range’. For example, the plant category 100–300 MW th is to be read as: combustion plants with a total rated thermal input equal to or greater than 100 MW and lower than 300 MW. … BAT-AEELs are expressed as a percentage. The fuel/feedstock energy input is expr"
+        }
+      ]
+    },
+    "figures_found": [
+      "53",
+      "58.5",
+      "50",
+      "600",
+      "57",
+      "60.5"
+    ],
+    "figures_missing": []
   },
   {
     "id": "gas_gb_marginal_share",
@@ -72,7 +112,33 @@
       }
     ],
     "verified": true,
-    "verification": "'97' found in an independent fetch of https://www.ons.gov.uk/economy/economicoutputandproductivity/output/articles/theimpactofhigherenergycostsonukbusinesses/2021to2024"
+    "verification": "independent cross-check agrees and all figures ['97', '60'] were re-found in an independent fetch",
+    "crosscheck": {
+      "run_id": "srun_791b0c3367af4148a274e05458853c6e",
+      "independent_value": "Historical estimate: 97% of the time in 2021. ONS states that gas-fired power stations “set the system price 97% of the time”; UKERC also reports the 97% figure. Newer estimate: “around 60% today” for Britain, according to the UK government’s statement published on 21 April 2026. Thus, 97% refers to 2021, while around 60% describes the position reported in April 2026. The historical sources use “UK” rather than explicitly “Great Britain”.",
+      "agrees": true,
+      "disagreement": "none",
+      "confidence": "medium",
+      "sources": [
+        {
+          "url": "https://www.ons.gov.uk/economy/economicoutputandproductivity/output/articles/theimpactofhigherenergycostsonukbusinesses/2021to2024/pdf",
+          "quote": "in 2021 gas-fired power stations accounted for 43% of electricity generation in the UK, this form of generation set the system price 97% of the time."
+        },
+        {
+          "url": "https://ukerc.rl.ac.uk/publications/policy_briefing_paper/175720_UKERC_Mission_on_bills_brochure_v6acc.pdf",
+          "quote": "Research from 2021 indicated that gas fired power plants set the wholesale electricity price in the UK 97% of the time."
+        },
+        {
+          "url": "https://www.gov.uk/government/news/decisive-action-to-break-influence-of-gas-on-electricity-prices",
+          "quote": "Published: 21 April 2026 … Britain has already moved from gas setting the price of electricity around 90% of the time in the early 2020s, to around 60% today."
+        }
+      ]
+    },
+    "figures_found": [
+      "97",
+      "60"
+    ],
+    "figures_missing": []
   },
   {
     "id": "gas_hormuz_lng_share",
@@ -97,56 +163,123 @@
       }
     ],
     "verified": true,
-    "verification": "'20' found in an independent fetch of https://www.iea.org/about/oil-security-and-emergency-response/strait-of-hormuz"
+    "verification": "independent cross-check agrees and all figures ['20'] were re-found in an independent fetch",
+    "crosscheck": {
+      "run_id": "srun_791b0c3367af41485555b1404c0531d0",
+      "independent_value": "According to the IEA, “almost 20%” of global LNG trade passed through the Strait of Hormuz in 2025, with a total volume of “just over 112 bcm.”",
+      "agrees": true,
+      "disagreement": "none",
+      "confidence": "high",
+      "sources": [
+        {
+          "url": "https://www.iea.org/about/oil-security-and-emergency-response/strait-of-hormuz",
+          "quote": "Qatar and the UAE supplied almost 7 bcm to Kuwait in 2025, while the total volume of LNG transiting the Strait was just over 112 bcm in 2025, equating to almost 20% of global LNG trade."
+        }
+      ]
+    },
+    "figures_found": [
+      "20"
+    ],
+    "figures_missing": []
   },
   {
     "id": "gas_natgas_emission_factor",
     "question": "What is the standard CO2 emission factor of natural gas combustion in tonnes CO2 per MWh of thermal energy (IPCC default or UK government conversion factor)?",
     "used_by": "#36",
-    "processor": "core",
-    "run_id": "srun_051cfaf41dc045321a2bdefe6c49eeb9",
-    "retrieved_at": "2026-11-07T14:00:39+00:00",
-    "value": "56,100 kg/TJ (equivalent to 0.202 tCO₂/MWh thermal)",
-    "unit": "tCO₂/MWh thermal",
-    "as_of": "2006 IPCC Guidelines",
-    "caveat": "The IPCC factor is on a net calorific value basis; the table gives a 95% confidence interval of 54,300–58,300 kg/TJ. The default is suggested when country-specific factors are unavailable.",
-    "confidence": null,
-    "sources": [],
+    "processor": "pro",
+    "run_id": "srun_ca3dde3a037047935a2dc4f6b906262e",
+    "retrieved_at": "2026-11-07T14:16:18+00:00",
+    "value": "0.20196 (converted from the IPCC default of “56 100” kg CO2/TJ)",
+    "unit": "tCO2/MWh of thermal energy, net calorific value (NCV) basis",
+    "as_of": "2006 IPCC Guidelines for National Greenhouse Gas Inventories, Volume 2, Table 1.4",
+    "caveat": "This is a combustion CO2 factor on a net, not gross, calorific-value basis and assumes 100% carbon oxidation. IPCC recommends this default when country-specific factors are unavailable. Conversion: 56 100 kg/TJ × 0.0036 TJ/MWh ÷ 1000 kg/t = 0.20196 tCO2/MWh.",
+    "confidence": "medium",
+    "sources": [
+      {
+        "url": "https://www.ipcc-nggip.iges.or.jp/public/2006gl/pdf/2_Volume2/V2_1_Ch1_Introduction.pdf",
+        "quote": "Natural Gas 15.3 1 56 100 54 300 58 300 … **Effective CO2 emission factor (kg/TJ)** **2** **Fuel type English description Default carbon content (kg/GJ)**"
+      }
+    ],
+    "crosscheck": {
+      "run_id": "srun_34632112fcf8493c1f3bb626909a09f3",
+      "independent_value": "0.20196 tCO2/MWh of thermal energy on a net calorific value (NCV) basis. The 2006 IPCC Guidelines, Volume 2, Table 1.4 give natural gas a default combustion emission factor of “56 100” kg CO2/TJ. Since 1 MWh = 0.0036 TJ, the conversion is 56,100 × 0.0036 ÷ 1,000 = 0.20196 tCO2/MWh.",
+      "agrees": true,
+      "disagreement": "none",
+      "confidence": "medium",
+      "sources": [
+        {
+          "url": "https://www.ipcc-nggip.iges.or.jp/public/2006gl/pdf/2_Volume2/V2_1_Ch1_Introduction.pdf",
+          "quote": "Natural Gas 15.3 1 56 100 54 300 58 300"
+        },
+        {
+          "url": "https://www.ipcc-nggip.iges.or.jp/public/2006gl/pdf/2_Volume2/V2_2_Ch2_Stationary_Combustion.pdf",
+          "quote": "Emission factors for CO2 are in units of kg CO2/TJ on a net calorific value basis … The CO2 emission factors are the same ones as presented in Table 1.4 of the Introduction chapter."
+        }
+      ]
+    },
+    "figures_found": [
+      "56100"
+    ],
+    "figures_missing": [
+      "0.20196"
+    ],
     "verified": false,
-    "verification": "'56100' not found in independent fetches of the top 0 cited sources"
+    "verification": "cross-check agrees, but figures ['0.20196'] were not found in an independent fetch of the cited sources"
   },
   {
     "id": "gas_qatar_eu_lng_share",
-    "question": "What share of EU plus UK LNG imports came from Qatar in 2025, as a percentage?",
+    "question": "What share of EU LNG imports (and separately UK LNG imports) came from Qatar in 2025, as a percentage, quoted directly from a named source such as Eurostat, IEEFA, Kpler, ACER or the European Commission? Do not compute your own estimate.",
     "used_by": "#36",
     "processor": "pro",
-    "run_id": "srun_051cfaf41dc04532b441ddac603480ef",
-    "retrieved_at": "2026-11-07T14:00:39+00:00",
-    "value": "Approximately 7.8% (estimated by volume-weighting the reported “8% of EU LNG imports” and “6.0 per cent of LNG imports” for the UK).",
+    "run_id": "srun_ca3dde3a03704793056e902f6a058f85",
+    "retrieved_at": "2026-11-07T14:16:18+00:00",
+    "value": "EU: “8% of EU LNG imports” — ACER, Analysis of the European LNG Market Developments, 2026 Monitoring Report. UK: “In 2025, Qatar represented 6% of the UK’s LNG imports” — IEEFA, European LNG Tracker.",
     "unit": "%",
-    "as_of": "2025",
-    "caveat": "No source located states a combined EU+UK percentage directly. This estimate uses separately reported, rounded shares. EU LNG-import totals also differ between sources: the European Commission reports 131 bcm for 2025, while ACER's 311 bcm total gas imports and 47% LNG imply about 146 bcm; either denominator gives approximately 7.8% when combined with the UK's reported 12.9 bcm of LNG imports.",
+    "as_of": "Full-year 2025, for both EU and UK figures.",
+    "caveat": "These are shares of LNG imports, not total gas imports or consumption. The UK government’s DUKES 2026 also directly reports “6.0 per cent of LNG imports”, consistent with IEEFA’s “6%”. No percentages were calculated.",
     "confidence": "medium",
     "sources": [
       {
         "url": "https://www.acer.europa.eu/sites/default/files/documents/Publications/ACER-LNG-Monitoring-Report-2026.pdf",
-        "quote": "36 Imports from Qatar, the EU’s third-largest LNG supplier, accounted for 8% of EU LNG imports and around 4% of EU gas consumption."
+        "quote": "Imports from Qatar, the EU’s third-largest LNG supplier, accounted for 8% of EU LNG imports and around 4% of EU gas consumption."
+      },
+      {
+        "url": "https://ieefa.org/european-lng-tracker",
+        "quote": "In 2025, Qatar represented 6% of the UK’s LNG imports and 3% of Spain’s."
       },
       {
         "url": "https://assets.publishing.service.gov.uk/media/6a69f4232c4b5ba9d1242a67/DUKES_2026_Chapter_4.pdf",
         "quote": "Qatar was the fourth largest import source in 2025 accounting for 6.0 per cent of LNG imports,1.8 per cent of total imports."
-      },
-      {
-        "url": "https://energy.ec.europa.eu/document/download/73b16f0c-1c65-478f-a004-d991d8bd0b2f_en?filename=New%20Quarterly%20Report%20on%20European%20Gas%20Markets%20Q4%202025.pdf&prefLang=nl",
-        "quote": "**_Annual overview of EU LNG imports for 2025:_** Source: LSEG. In 2025 **EU LNG imports increased by 29%** compared to 2024 and amounted to **131 bcm** . The US increased its market share by 13 percentage points from 45% to 58%, whereas Russia reduced its share by 7 percentage points from 20% to 13%."
-      },
-      {
-        "url": "https://montelnews.com/news/b0ab0fe0-80fc-49dc-a1e6-4688f03d0acb/uk-lng-imports-surge-23-to-13bcm-in-2025",
-        "quote": "(Montel) The UK’s LNG imports rose by almost a quarter last year to 12.9bcm, with the fuel increasingly used to meet heating demand rather than placed into storage, an analyst told Montel."
       }
     ],
-    "verified": false,
-    "verification": "'7.8' not found in independent fetches of the top 3 cited sources"
+    "crosscheck": {
+      "run_id": "srun_34632112fcf8493c636a378748239e81",
+      "independent_value": "Full-year 2025: EU — 8%, quoted in ACER’s 2026 LNG monitoring report as “8% of EU LNG imports”. UK — 6%, with IEEFA’s European LNG Tracker stating: “In 2025, Qatar represented 6% of the UK's LNG imports”. The UK’s Digest of UK Energy Statistics 2026, Chapter 4, corroborates this with “6.0 per cent of LNG imports” from Qatar in 2025. These are directly published percentages, not calculated estimates.",
+      "agrees": true,
+      "disagreement": "none",
+      "confidence": "medium",
+      "sources": [
+        {
+          "url": "https://www.acer.europa.eu/sites/default/files/documents/Publications/ACER-LNG-Monitoring-Report-2026.pdf",
+          "quote": "Imports from Qatar, the EU's third-largest LNG supplier, accounted for 8% of EU LNG imports and around 4% of EU gas consumption. … Figure 15: Evolution of LNG supply sources into the EU 2019 – 2025 (bcm)"
+        },
+        {
+          "url": "https://ieefa.org/european-lng-tracker",
+          "quote": "In 2025, Qatar represented 6% of the UK's LNG imports and 3% of Spain's."
+        },
+        {
+          "url": "https://assets.publishing.service.gov.uk/media/6a69f4232c4b5ba9d1242a67/DUKES_2026_Chapter_4.pdf",
+          "quote": "Qatar was the fourth largest import source in 2025 accounting for 6.0 per cent of LNG imports,1.8 per cent of total imports."
+        }
+      ]
+    },
+    "figures_found": [
+      "8",
+      "6"
+    ],
+    "figures_missing": [],
+    "verified": true,
+    "verification": "independent cross-check agrees and all figures ['8', '6'] were re-found in an independent fetch"
   },
   {
     "id": "gas_ttf_2022_peak",
@@ -175,6 +308,24 @@
       }
     ],
     "verified": true,
-    "verification": "'339.20' found in an independent fetch of https://aleasoft.com/gas-european-electricity-markets-prices-break-records-again-august/"
+    "verification": "independent cross-check agrees and all figures ['339.20', '26'] were re-found in an independent fetch",
+    "crosscheck": {
+      "run_id": "srun_791b0c3367af4148fbe548dacbe073cd",
+      "independent_value": "€339.20/MWh on 26 August 2022. AleaSoft’s September 1, 2022 review reports this as the monthly maximum daily settlement price for ICE Dutch TTF front-month futures, rather than an intraday high.",
+      "agrees": true,
+      "disagreement": "none",
+      "confidence": "medium",
+      "sources": [
+        {
+          "url": "https://aleasoft.com/gas-european-electricity-markets-prices-break-records-again-august",
+          "quote": "As for settlement prices of **TTF gas** futures in the ICE market for the Front‑Month, they maintained an upward trend for most of the month, with values above €200/MWh. The monthly maximum settlement price, of €339.20/MWh, was reached on August 26 and it was the highest in history."
+        }
+      ]
+    },
+    "figures_found": [
+      "339.20",
+      "26"
+    ],
+    "figures_missing": []
   }
 ]

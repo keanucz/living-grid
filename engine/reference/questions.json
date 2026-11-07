@@ -1,115 +1,373 @@
 [
-  {"id": "ic_nsl_capacity", "topic": "interconnectors", "used_by": "#35", "processor": "core",
-   "question": "What is the rated transmission capacity in MW of the North Sea Link (NSL) interconnector between Norway (Kvilldal) and Great Britain (Blyth)?"},
-  {"id": "ic_ifa_capacity", "topic": "interconnectors", "used_by": "#35", "processor": "core",
-   "question": "What is the rated capacity in MW of the IFA (Interconnexion France-Angleterre) interconnector between France and Great Britain?"},
-  {"id": "ic_ifa2_capacity", "topic": "interconnectors", "used_by": "#35", "processor": "core",
-   "question": "What is the rated capacity in MW of the IFA2 interconnector between France and Great Britain?"},
-  {"id": "ic_eleclink_capacity", "topic": "interconnectors", "used_by": "#35", "processor": "core",
-   "question": "What is the rated capacity in MW of the ElecLink interconnector through the Channel Tunnel between France and Great Britain?"},
-  {"id": "ic_britned_capacity", "topic": "interconnectors", "used_by": "#35", "processor": "core",
-   "question": "What is the rated capacity in MW of the BritNed interconnector between the Netherlands and Great Britain?"},
-  {"id": "ic_nemo_capacity", "topic": "interconnectors", "used_by": "#35", "processor": "core",
-   "question": "What is the rated capacity in MW of the Nemo Link interconnector between Belgium and Great Britain?"},
-  {"id": "ic_viking_capacity", "topic": "interconnectors", "used_by": "#35", "processor": "core",
-   "question": "What is the rated capacity in MW of the Viking Link interconnector between Denmark and Great Britain?"},
-  {"id": "ic_neuconnect_status", "topic": "interconnectors", "used_by": "#35", "processor": "core",
-   "question": "As of November 2026, is the NeuConnect interconnector between Germany and Great Britain in commercial operation, and what is its rated capacity in MW?"},
-
-  {"id": "gas_ccgt_efficiency", "topic": "gas_carbon", "used_by": "#36", "processor": "core",
-   "question": "What is the typical net electrical efficiency (LHV or HHV, state which) of a modern combined-cycle gas turbine (CCGT) plant in Europe, and the corresponding MWh of gas burned per MWh of electricity?"},
-  {"id": "gas_ccgt_co2_intensity", "topic": "gas_carbon", "used_by": "#36", "processor": "core",
-   "question": "What is the direct CO2 emission intensity of electricity from a typical CCGT gas plant, in tonnes CO2 per MWh of electricity?"},
-  {"id": "gas_natgas_emission_factor", "topic": "gas_carbon", "used_by": "#36", "processor": "core",
-   "question": "What is the standard CO2 emission factor of natural gas combustion in tonnes CO2 per MWh of thermal energy (IPCC default or UK government conversion factor)?"},
-  {"id": "gas_hormuz_lng_share", "topic": "gas_carbon", "used_by": "#36", "processor": "pro",
-   "question": "What share of global LNG trade passes through the Strait of Hormuz (mainly Qatar and UAE exports), as a percentage, according to the IEA or EIA?"},
-  {"id": "gas_qatar_eu_lng_share", "topic": "gas_carbon", "used_by": "#36", "processor": "pro",
-   "question": "What share of EU plus UK LNG imports came from Qatar in 2025, as a percentage?"},
-  {"id": "gas_ttf_2022_peak", "topic": "gas_carbon", "used_by": "#36", "processor": "core",
-   "question": "What was the peak daily closing price of the Dutch TTF front-month natural gas contract in August 2022, in EUR per MWh, and on what date?"},
-  {"id": "gas_gb_marginal_share", "topic": "gas_carbon", "used_by": "#36 #33", "processor": "pro",
-   "question": "In what share of hours does gas-fired generation set the marginal wholesale electricity price in Great Britain, according to UK government, Ofgem or UKERC analysis, and for which year?"},
-
-  {"id": "ev_fr_nuclear_capacity", "topic": "events", "used_by": "#50", "processor": "core",
-   "question": "What is the total installed nuclear generating capacity in France in GW as of 2026, and how many reactors are in operation?"},
-  {"id": "ev_fr_reactor_size", "topic": "events", "used_by": "#50", "processor": "core",
-   "question": "What are the typical net capacities in MW of French nuclear reactors in the 900 MW, 1300 MW and 1450 MW series, and of Flamanville 3?"},
-  {"id": "ev_fr_temp_sensitivity", "topic": "events", "used_by": "#50", "processor": "core",
-   "question": "According to RTE, by how many MW does French electricity demand rise for each 1 degree Celsius drop in temperature in winter?"},
-  {"id": "ev_gb_temp_sensitivity", "topic": "events", "used_by": "#50", "processor": "pro",
-   "question": "By how many MW or GW does Great Britain's electricity demand change per 1 degree Celsius change in temperature in winter, according to NESO (National Grid ESO) or academic sources?"},
-  {"id": "ev_scotland_wind_capacity", "topic": "events", "used_by": "#50 #47", "processor": "core",
-   "question": "What is the total installed wind generation capacity (onshore plus offshore) in Scotland in GW, as of the latest Scottish Government energy statistics in 2026?"},
-  {"id": "ev_gb_wind_capacity", "topic": "events", "used_by": "#50", "processor": "core",
-   "question": "What is the total installed wind generation capacity in Great Britain in GW (onshore and offshore separately) as of 2026?"},
-
-  {"id": "wind_power_curve", "topic": "wind", "used_by": "#47", "processor": "core",
-   "question": "What are the typical cut-in, rated and cut-out wind speeds in m/s of a modern utility-scale wind turbine (for example a Vestas or Siemens Gamesa onshore model)?"},
-  {"id": "wind_shear_exponent", "topic": "wind", "used_by": "#47", "processor": "core",
-   "question": "What is the standard wind shear power-law exponent (alpha) used to extrapolate 10 m wind speed to turbine hub height over open terrain and over sea?"},
-  {"id": "wind_viking_capacity", "topic": "wind", "used_by": "#46 #47", "processor": "core",
-   "question": "What is the installed capacity in MW and the number of turbines of the Viking Energy wind farm in Shetland, and what is its BM unit ID on Elexon (e.g. VKNGW)?"},
-  {"id": "wind_seagreen_capacity", "topic": "wind", "used_by": "#46 #47", "processor": "core",
-   "question": "What is the installed capacity in MW of the Seagreen offshore wind farm in Scotland, and what are its Elexon BM unit IDs (e.g. SGRWO-1)?"},
-  {"id": "wind_moray_east_capacity", "topic": "wind", "used_by": "#46 #47", "processor": "core",
-   "question": "What is the installed capacity in MW of the Moray East offshore wind farm, and what are its Elexon BM unit IDs (e.g. MOWEO)?"},
-  {"id": "wind_moray_west_capacity", "topic": "wind", "used_by": "#46 #47", "processor": "core",
-   "question": "What is the installed capacity in MW of the Moray West offshore wind farm and is it fully operational as of 2026? What are its Elexon BM unit IDs (e.g. MOWWO)?"},
-  {"id": "wind_beatrice_capacity", "topic": "wind", "used_by": "#46 #47", "processor": "core",
-   "question": "What is the installed capacity in MW of the Beatrice offshore wind farm in Scotland, and what are its Elexon BM unit IDs?"},
-  {"id": "wind_clyde_capacity", "topic": "wind", "used_by": "#46 #47", "processor": "core",
-   "question": "What is the installed capacity in MW of the Clyde wind farm (including its extension) in South Lanarkshire, and what are its Elexon BM unit IDs?"},
-  {"id": "wind_whitelee_capacity", "topic": "wind", "used_by": "#46 #47", "processor": "core",
-   "question": "What is the installed capacity in MW of the Whitelee wind farm near Glasgow, including its extension, and what are its Elexon BM unit IDs?"},
-
-  {"id": "con_2026_10_26_cost", "topic": "constraints", "used_by": "#48 #53", "processor": "pro",
-   "question": "What were Great Britain's total balancing or constraint costs (in GBP) on 26 October 2026, a stormy day, according to NESO data or news coverage?"},
-  {"id": "con_annual_cost", "topic": "constraints", "used_by": "#48", "processor": "core",
-   "question": "What were Great Britain's total annual transmission constraint costs in GBP for the most recent full year (2025 or financial year 2025/26), according to NESO?"},
-  {"id": "con_b6_capability", "topic": "constraints", "used_by": "#48", "processor": "pro",
-   "question": "What is the transfer capability in MW of the B6 transmission boundary (the Scotland to England boundary) in Great Britain as of 2025 or 2026, according to NESO's Electricity Ten Year Statement or other NESO publications?"},
-  {"id": "con_b4_capability", "topic": "constraints", "used_by": "#48", "processor": "pro",
-   "question": "What is the transfer capability in MW of the B4 transmission boundary (SSEN to SP Transmission, within Scotland) as of 2025 or 2026, according to NESO publications?"},
-  {"id": "con_wind_curtailment_2025", "topic": "constraints", "used_by": "#46 #48", "processor": "core",
-   "question": "How many TWh of wind generation were curtailed (paid to switch off) in Great Britain in 2025, and what was the cost of these payments in GBP?"},
-
-  {"id": "em_coal", "topic": "emissions", "used_by": "#49 #45", "processor": "core",
-   "question": "What direct-combustion CO2 emission factor in gCO2 per kWh of electricity does the GB Carbon Intensity API (National Grid ESO / NESO methodology) use for coal generation?"},
-  {"id": "em_gas_ccgt_ci_api", "topic": "emissions", "used_by": "#49 #45", "processor": "core",
-   "question": "What emission factors in gCO2 per kWh does the GB Carbon Intensity API methodology use for gas CCGT and gas OCGT generation?"},
-  {"id": "em_oil_biomass", "topic": "emissions", "used_by": "#49 #45", "processor": "core",
-   "question": "What emission factors in gCO2 per kWh does the GB Carbon Intensity API methodology use for oil and biomass generation?"},
-  {"id": "em_ipcc_lifecycle", "topic": "emissions", "used_by": "#49 #45", "processor": "core",
-   "question": "What are the IPCC AR5 median lifecycle emission factors in gCO2eq per kWh for coal, gas combined cycle, nuclear, onshore wind, offshore wind, solar PV and hydro?"},
-  {"id": "em_lignite", "topic": "emissions", "used_by": "#49 #45", "processor": "core",
-   "question": "What is a standard direct CO2 emission factor in gCO2 per kWh for lignite (brown coal) power generation in Germany?"},
-
-  {"id": "hh_agile_regions", "topic": "household", "used_by": "#56", "processor": "core",
-   "question": "What are the 14 GB electricity distribution regions used by Octopus Agile tariffs, with their region letter codes (A to P, excluding I and O) and names?"},
-  {"id": "hh_agile_publish_time", "topic": "household", "used_by": "#56", "processor": "core",
-   "question": "At what time of day are the next day's Octopus Agile half-hourly prices published, and what is the price cap per kWh on the Agile tariff?"},
-  {"id": "hh_agile_formula", "topic": "household", "used_by": "#56", "processor": "core",
-   "question": "What is the formula Octopus Energy uses to derive Agile Octopus unit rates from the wholesale day-ahead price (multiplier, peak adder for 4pm to 7pm, and regional factors)?"},
-  {"id": "hh_ev_charge_kwh", "topic": "household", "used_by": "#56", "processor": "core",
-   "question": "How many kWh does a typical UK electric car use for an average overnight home charge, based on average daily UK car mileage and typical EV efficiency (miles per kWh)?"},
-  {"id": "hh_dishwasher_kwh", "topic": "household", "used_by": "#56", "processor": "core",
-   "question": "How many kWh does a typical dishwasher cycle and a typical washing machine cycle use in the UK, according to the Energy Saving Trust or similar?"},
-
-  {"id": "bc_energy_charts_rate_limit", "topic": "brief_checks", "used_by": "brief", "processor": "core",
-   "question": "What is the current public rate limit of the Energy-Charts API (api.energy-charts.info) per client IP, per endpoint and for the /price endpoint?"},
-  {"id": "bc_n2ex_timing", "topic": "brief_checks", "used_by": "#54 #55", "processor": "core",
-   "question": "What are the gate closure time and result publication time (UK time) of the Nord Pool N2EX day-ahead auction for Great Britain?"},
-  {"id": "bc_sdac_timing", "topic": "brief_checks", "used_by": "#54 #55", "processor": "core",
-   "question": "What are the gate closure time and the result publication time (CET) of the European Single Day-Ahead Coupling (SDAC) auction?"},
-  {"id": "bc_elexon_system_price_lag", "topic": "brief_checks", "used_by": "#64", "processor": "core",
-   "question": "How long after the end of each settlement period does Elexon publish the initial GB system price (System Sell / Buy Price) on the Insights Solution (BMRS)?"},
-  {"id": "bc_nordpool_history", "topic": "brief_checks", "used_by": "#19", "processor": "core",
-   "question": "How far back in time does the free Nord Pool data portal (data.nordpoolgroup.com) API allow day-ahead price history to be queried without a subscription?"},
-  {"id": "bc_open_meteo_limit", "topic": "brief_checks", "used_by": "#47", "processor": "core",
-   "question": "What is the free-tier daily API call limit of Open-Meteo for non-commercial use, and does a single call with multiple coordinates count as one call?"},
-  {"id": "bc_carbon_intensity_range", "topic": "brief_checks", "used_by": "#49", "processor": "core",
-   "question": "What is the maximum date range per request of the GB Carbon Intensity API (api.carbonintensity.org.uk) regional endpoints?"},
-  {"id": "bc_gb_dst", "topic": "brief_checks", "used_by": "all", "processor": "core",
-   "question": "On which date in 2026 did British Summer Time end (clocks went back to GMT) in the UK?"}
+ {
+  "id": "ic_nsl_capacity",
+  "topic": "interconnectors",
+  "used_by": "#35",
+  "processor": "core",
+  "question": "What is the rated transmission capacity in MW of the North Sea Link (NSL) interconnector between Norway (Kvilldal) and Great Britain (Blyth)?"
+ },
+ {
+  "id": "ic_ifa_capacity",
+  "topic": "interconnectors",
+  "used_by": "#35",
+  "processor": "core",
+  "question": "What is the rated capacity in MW of the IFA (Interconnexion France-Angleterre) interconnector between France and Great Britain?"
+ },
+ {
+  "id": "ic_ifa2_capacity",
+  "topic": "interconnectors",
+  "used_by": "#35",
+  "processor": "core",
+  "question": "What is the rated capacity in MW of the IFA2 interconnector between France and Great Britain?"
+ },
+ {
+  "id": "ic_eleclink_capacity",
+  "topic": "interconnectors",
+  "used_by": "#35",
+  "processor": "core",
+  "question": "What is the rated capacity in MW of the ElecLink interconnector through the Channel Tunnel between France and Great Britain?"
+ },
+ {
+  "id": "ic_britned_capacity",
+  "topic": "interconnectors",
+  "used_by": "#35",
+  "processor": "core",
+  "question": "What is the rated capacity in MW of the BritNed interconnector between the Netherlands and Great Britain?"
+ },
+ {
+  "id": "ic_nemo_capacity",
+  "topic": "interconnectors",
+  "used_by": "#35",
+  "processor": "core",
+  "question": "What is the rated capacity in MW of the Nemo Link interconnector between Belgium and Great Britain?"
+ },
+ {
+  "id": "ic_viking_capacity",
+  "topic": "interconnectors",
+  "used_by": "#35",
+  "processor": "core",
+  "question": "What is the rated capacity in MW of the Viking Link interconnector between Denmark and Great Britain?"
+ },
+ {
+  "id": "ic_neuconnect_status",
+  "topic": "interconnectors",
+  "used_by": "#35",
+  "processor": "core",
+  "question": "As of November 2026, is the NeuConnect interconnector between Germany and Great Britain in commercial operation, and what is its rated capacity in MW?"
+ },
+ {
+  "id": "gas_ccgt_efficiency",
+  "topic": "gas_carbon",
+  "used_by": "#36",
+  "processor": "core",
+  "question": "What is the typical net electrical efficiency (LHV or HHV, state which) of a modern combined-cycle gas turbine (CCGT) plant in Europe, and the corresponding MWh of gas burned per MWh of electricity?"
+ },
+ {
+  "id": "gas_ccgt_co2_intensity",
+  "topic": "gas_carbon",
+  "used_by": "#36",
+  "processor": "core",
+  "question": "What is the direct CO2 emission intensity of electricity from a typical CCGT gas plant, in tonnes CO2 per MWh of electricity?"
+ },
+ {
+  "id": "gas_natgas_emission_factor",
+  "topic": "gas_carbon",
+  "used_by": "#36",
+  "processor": "pro",
+  "question": "What is the standard CO2 emission factor of natural gas combustion in tonnes CO2 per MWh of thermal energy (IPCC default or UK government conversion factor)?"
+ },
+ {
+  "id": "gas_hormuz_lng_share",
+  "topic": "gas_carbon",
+  "used_by": "#36",
+  "processor": "pro",
+  "question": "What share of global LNG trade passes through the Strait of Hormuz (mainly Qatar and UAE exports), as a percentage, according to the IEA or EIA?"
+ },
+ {
+  "id": "gas_qatar_eu_lng_share",
+  "topic": "gas_carbon",
+  "used_by": "#36",
+  "processor": "pro",
+  "question": "What share of EU LNG imports (and separately UK LNG imports) came from Qatar in 2025, as a percentage, quoted directly from a named source such as Eurostat, IEEFA, Kpler, ACER or the European Commission? Do not compute your own estimate."
+ },
+ {
+  "id": "gas_ttf_2022_peak",
+  "topic": "gas_carbon",
+  "used_by": "#36",
+  "processor": "core",
+  "question": "What was the peak daily closing price of the Dutch TTF front-month natural gas contract in August 2022, in EUR per MWh, and on what date?"
+ },
+ {
+  "id": "gas_gb_marginal_share",
+  "topic": "gas_carbon",
+  "used_by": "#36 #33",
+  "processor": "pro",
+  "question": "In what share of hours does gas-fired generation set the marginal wholesale electricity price in Great Britain, according to UK government, Ofgem or UKERC analysis, and for which year?"
+ },
+ {
+  "id": "ev_fr_nuclear_capacity",
+  "topic": "events",
+  "used_by": "#50",
+  "processor": "core",
+  "question": "What is the total installed nuclear generating capacity in France in GW as of 2026, and how many reactors are in operation?"
+ },
+ {
+  "id": "ev_fr_reactor_size",
+  "topic": "events",
+  "used_by": "#50",
+  "processor": "core",
+  "question": "What are the typical net capacities in MW of French nuclear reactors in the 900 MW, 1300 MW and 1450 MW series, and of Flamanville 3?"
+ },
+ {
+  "id": "ev_fr_temp_sensitivity",
+  "topic": "events",
+  "used_by": "#50",
+  "processor": "core",
+  "question": "According to RTE, by how many MW does French electricity demand rise for each 1 degree Celsius drop in temperature in winter?"
+ },
+ {
+  "id": "ev_gb_temp_sensitivity",
+  "topic": "events",
+  "used_by": "#50",
+  "processor": "pro",
+  "question": "By how many MW (or GW) does Great Britain's electricity demand rise for each 1 degree Celsius drop in temperature in winter? Give an absolute MW figure from NESO, National Grid ESO, Elexon or a peer-reviewed study, not a percentage; if only a percentage is published, give the percentage and the base demand it applies to."
+ },
+ {
+  "id": "ev_scotland_wind_capacity",
+  "topic": "events",
+  "used_by": "#50 #47",
+  "processor": "pro",
+  "question": "What is the total installed wind generation capacity (onshore plus offshore) in Scotland in GW, as of the latest Scottish Government energy statistics in 2026?"
+ },
+ {
+  "id": "ev_gb_wind_capacity",
+  "topic": "events",
+  "used_by": "#50",
+  "processor": "core",
+  "question": "What is the total installed wind generation capacity in Great Britain in GW (onshore and offshore separately) as of 2026?"
+ },
+ {
+  "id": "wind_power_curve",
+  "topic": "wind",
+  "used_by": "#47",
+  "processor": "core",
+  "question": "What are the typical cut-in, rated and cut-out wind speeds in m/s of a modern utility-scale wind turbine (for example a Vestas or Siemens Gamesa onshore model)?"
+ },
+ {
+  "id": "wind_shear_exponent",
+  "topic": "wind",
+  "used_by": "#47",
+  "processor": "core",
+  "question": "What is the standard wind shear power-law exponent (alpha) used to extrapolate 10 m wind speed to turbine hub height over open terrain and over sea?"
+ },
+ {
+  "id": "wind_viking_capacity",
+  "topic": "wind",
+  "used_by": "#46 #47",
+  "processor": "core",
+  "question": "What is the installed capacity in MW and the number of turbines of the Viking Energy wind farm in Shetland, and what is its BM unit ID on Elexon (e.g. VKNGW)?"
+ },
+ {
+  "id": "wind_seagreen_capacity",
+  "topic": "wind",
+  "used_by": "#46 #47",
+  "processor": "core",
+  "question": "What is the installed capacity in MW of the Seagreen offshore wind farm in Scotland, and what are its Elexon BM unit IDs (e.g. SGRWO-1)?"
+ },
+ {
+  "id": "wind_moray_east_capacity",
+  "topic": "wind",
+  "used_by": "#46 #47",
+  "processor": "core",
+  "question": "What is the installed capacity in MW of the Moray East offshore wind farm, and what are its Elexon BM unit IDs (e.g. MOWEO)?"
+ },
+ {
+  "id": "wind_moray_west_capacity",
+  "topic": "wind",
+  "used_by": "#46 #47",
+  "processor": "core",
+  "question": "What is the installed capacity in MW of the Moray West offshore wind farm and is it fully operational as of 2026? What are its Elexon BM unit IDs (e.g. MOWWO)?"
+ },
+ {
+  "id": "wind_beatrice_capacity",
+  "topic": "wind",
+  "used_by": "#46 #47",
+  "processor": "pro",
+  "question": "What is the installed capacity in MW of the Beatrice offshore wind farm in Scotland, and what are its Elexon BM unit IDs?"
+ },
+ {
+  "id": "wind_clyde_capacity",
+  "topic": "wind",
+  "used_by": "#46 #47",
+  "processor": "core",
+  "question": "What is the installed capacity in MW of the Clyde wind farm (including its extension) in South Lanarkshire, and what are its Elexon BM unit IDs?"
+ },
+ {
+  "id": "wind_whitelee_capacity",
+  "topic": "wind",
+  "used_by": "#46 #47",
+  "processor": "core",
+  "question": "What is the installed capacity in MW of the Whitelee wind farm near Glasgow, including its extension, and what are its Elexon BM unit IDs?"
+ },
+ {
+  "id": "con_2026_10_26_cost",
+  "topic": "constraints",
+  "used_by": "#48 #53",
+  "processor": "pro",
+  "question": "What were Great Britain's total balancing or constraint costs (in GBP) on 26 October 2026, a stormy day, according to NESO data or news coverage?"
+ },
+ {
+  "id": "con_annual_cost",
+  "topic": "constraints",
+  "used_by": "#48",
+  "processor": "core",
+  "question": "What were Great Britain's total annual transmission constraint costs in GBP for the most recent full year (2025 or financial year 2025/26), according to NESO?"
+ },
+ {
+  "id": "con_b6_capability",
+  "topic": "constraints",
+  "used_by": "#48",
+  "processor": "pro",
+  "question": "What is the transfer capability in MW of the B6 transmission boundary (the Scotland to England boundary) in Great Britain as of 2025 or 2026, according to NESO's Electricity Ten Year Statement or other NESO publications?"
+ },
+ {
+  "id": "con_b4_capability",
+  "topic": "constraints",
+  "used_by": "#48",
+  "processor": "pro",
+  "question": "What is the transfer capability in MW of the B4 transmission boundary (SSEN to SP Transmission, within Scotland) as of 2025 or 2026, according to NESO publications?"
+ },
+ {
+  "id": "con_wind_curtailment_2025",
+  "topic": "constraints",
+  "used_by": "#46 #48",
+  "processor": "pro",
+  "question": "How many TWh of wind generation were curtailed (paid to switch off) in Great Britain in 2025, and what was the cost of these payments in GBP?"
+ },
+ {
+  "id": "em_coal",
+  "topic": "emissions",
+  "used_by": "#49 #45",
+  "processor": "core",
+  "question": "What direct-combustion CO2 emission factor in gCO2 per kWh of electricity does the GB Carbon Intensity API (National Grid ESO / NESO methodology) use for coal generation?"
+ },
+ {
+  "id": "em_gas_ccgt_ci_api",
+  "topic": "emissions",
+  "used_by": "#49 #45",
+  "processor": "core",
+  "question": "What emission factors in gCO2 per kWh does the GB Carbon Intensity API methodology use for gas CCGT and gas OCGT generation?"
+ },
+ {
+  "id": "em_oil_biomass",
+  "topic": "emissions",
+  "used_by": "#49 #45",
+  "processor": "core",
+  "question": "What emission factors in gCO2 per kWh does the GB Carbon Intensity API methodology use for oil and biomass generation?"
+ },
+ {
+  "id": "em_ipcc_lifecycle",
+  "topic": "emissions",
+  "used_by": "#49 #45",
+  "processor": "core",
+  "question": "What are the IPCC AR5 median lifecycle emission factors in gCO2eq per kWh for coal, gas combined cycle, nuclear, onshore wind, offshore wind, solar PV and hydro?"
+ },
+ {
+  "id": "em_lignite",
+  "topic": "emissions",
+  "used_by": "#49 #45",
+  "processor": "core",
+  "question": "What is a standard direct CO2 emission factor in gCO2 per kWh for lignite (brown coal) power generation in Germany?"
+ },
+ {
+  "id": "hh_agile_regions",
+  "topic": "household",
+  "used_by": "#56",
+  "processor": "pro",
+  "question": "List the 14 GB electricity distribution region letter codes used in Octopus Energy tariff codes (e.g. the final letter in E-1R-AGILE-...-C) and the region name for each, as published by Octopus Energy or Energy Stats UK."
+ },
+ {
+  "id": "hh_agile_publish_time",
+  "topic": "household",
+  "used_by": "#56",
+  "processor": "core",
+  "question": "At what time of day are the next day's Octopus Agile half-hourly prices published, and what is the price cap per kWh on the Agile tariff?"
+ },
+ {
+  "id": "hh_agile_formula",
+  "topic": "household",
+  "used_by": "#56",
+  "processor": "core",
+  "question": "What is the formula Octopus Energy uses to derive Agile Octopus unit rates from the wholesale day-ahead price (multiplier, peak adder for 4pm to 7pm, and regional factors)?"
+ },
+ {
+  "id": "hh_ev_charge_kwh",
+  "topic": "household",
+  "used_by": "#56",
+  "processor": "pro",
+  "question": "How many kWh does a typical UK electric car use for an average overnight home charge, based on average daily UK car mileage and typical EV efficiency (miles per kWh)?"
+ },
+ {
+  "id": "hh_dishwasher_kwh",
+  "topic": "household",
+  "used_by": "#56",
+  "processor": "core",
+  "question": "How many kWh does a typical dishwasher cycle and a typical washing machine cycle use in the UK, according to the Energy Saving Trust or similar?"
+ },
+ {
+  "id": "bc_energy_charts_rate_limit",
+  "topic": "brief_checks",
+  "used_by": "brief",
+  "processor": "pro",
+  "question": "What is the current public rate limit of the Energy-Charts API (api.energy-charts.info) per client IP, per endpoint and for the /price endpoint?"
+ },
+ {
+  "id": "bc_n2ex_timing",
+  "topic": "brief_checks",
+  "used_by": "#54 #55",
+  "processor": "core",
+  "question": "What are the gate closure time and result publication time (UK time) of the Nord Pool N2EX day-ahead auction for Great Britain?"
+ },
+ {
+  "id": "bc_sdac_timing",
+  "topic": "brief_checks",
+  "used_by": "#54 #55",
+  "processor": "core",
+  "question": "What are the gate closure time and the result publication time (CET) of the European Single Day-Ahead Coupling (SDAC) auction?"
+ },
+ {
+  "id": "bc_elexon_system_price_lag",
+  "topic": "brief_checks",
+  "used_by": "#64",
+  "processor": "core",
+  "question": "How long after the end of each settlement period does Elexon publish the initial GB system price (System Sell / Buy Price) on the Insights Solution (BMRS)?"
+ },
+ {
+  "id": "bc_nordpool_history",
+  "topic": "brief_checks",
+  "used_by": "#19",
+  "processor": "pro",
+  "question": "Using the free Nord Pool data portal API (dataportal-api.nordpoolgroup.com, no subscription), how many days or since what date can day-ahead prices be retrieved? Distinguish what the API returns from what the website table shows."
+ },
+ {
+  "id": "bc_open_meteo_limit",
+  "topic": "brief_checks",
+  "used_by": "#47",
+  "processor": "core",
+  "question": "What is the free-tier daily API call limit of Open-Meteo for non-commercial use, and does a single call with multiple coordinates count as one call?"
+ },
+ {
+  "id": "bc_carbon_intensity_range",
+  "topic": "brief_checks",
+  "used_by": "#49",
+  "processor": "core",
+  "question": "What is the maximum date range per request of the GB Carbon Intensity API (api.carbonintensity.org.uk) regional endpoints?"
+ },
+ {
+  "id": "bc_gb_dst",
+  "topic": "brief_checks",
+  "used_by": "all",
+  "processor": "core",
+  "question": "On which date in 2026 did British Summer Time end (clocks went back to GMT) in the UK?"
+ }
 ]
