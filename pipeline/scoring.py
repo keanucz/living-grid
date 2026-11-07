@@ -2,8 +2,9 @@
 
     uv run python -m pipeline.scoring
 
-A forecast is scored only if its outcome time is strictly after made_at. Day-ahead prices are public from
-12:00 UTC the day before delivery, so a price_da forecast made after that is not scored either. Both
+A forecast is scored only if its outcome time is strictly after made_at. Day-ahead prices are public the day
+before delivery (GB about 10:00 UTC, the continent about 11:55 UTC), so a price_da forecast made after that is not
+scored either. Both
 baselines use only values that were fully known at made_at:
   persistence  the last completed hour before made_at
   yesterday    the same hour a whole number of days earlier (1 day up to 23 h ahead, 2 days up to 47 h, ...)
@@ -24,7 +25,10 @@ SCORES = "scores/scores"
 OVERALL = "scores/overall"
 OVERALL_COLUMNS = ["window_start", "window_end", "target", "metric", "model", "value", "n"]
 TARGET_SERIES = {"price_da": "price_da", "gb_system_price": "system_price", "load": "load", "wind": "gen_wind"}
-DAY_AHEAD_PUBLIC_HOUR_UTC = 12
+# When the day-before day-ahead result is public, as UTC time of day: GB (N2EX) about 10:00, the coupled
+# continental auction about 11:55. A price_da forecast made at or after this proves nothing.
+DAY_AHEAD_PUBLIC_UTC = {"GB": pd.Timedelta(hours=10)}
+DAY_AHEAD_PUBLIC_DEFAULT_UTC = pd.Timedelta(hours=11, minutes=55)
 SOURCE_PRIORITY = ["nordpool", "energy_charts", "elexon"]
 BASELINES = ("persistence", "yesterday")
 
@@ -61,7 +65,8 @@ def attach_outcomes(log: pd.DataFrame, actuals: pd.DataFrame) -> pd.DataFrame:
     df["persistence"] = look(df["made_at"].dt.floor("h") - pd.Timedelta(hours=1))
     days = np.ceil((df["ts"] - df["made_at"] + pd.Timedelta(hours=1)) / pd.Timedelta(days=1))
     df["yesterday"] = look(df["ts"] - pd.to_timedelta(days, unit="D"))
-    public = df["ts"].dt.floor("D") - pd.Timedelta(days=1) + pd.Timedelta(hours=DAY_AHEAD_PUBLIC_HOUR_UTC)
+    time_of_day = df["zone"].map(DAY_AHEAD_PUBLIC_UTC).fillna(DAY_AHEAD_PUBLIC_DEFAULT_UTC)
+    public = df["ts"].dt.floor("D") - pd.Timedelta(days=1) + time_of_day
     leaked = (df["target"] == "price_da") & (df["made_at"] >= public)
     df["valid"] = df["actual"].notna() & (df["ts"] > df["made_at"]) & ~leaked
     return df

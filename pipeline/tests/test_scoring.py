@@ -66,9 +66,9 @@ def test_baselines_use_only_values_known_at_made_at():
     assert on_the_hour.loc[0, "yesterday"] == 100 + 54 - 48  # 24 h ahead needs two days, the day-old hour is not complete yet
 
 
-def test_day_ahead_results_are_public_from_noon_the_day_before():
+def test_day_ahead_results_are_public_from_late_morning_the_day_before():
     base = actuals(("FR",), "price_da")
-    rows = [fc(h_, 58, 140, 150, 160, "FR", "price_da") for h_ in (35, 36, 37)]  # 58 is 10:00 on 3 Nov; noon on 2 Nov is hour 36
+    rows = [fc(h_, 58, 140, 150, 160, "FR", "price_da") for h_ in (35, 36, 37)]  # 58 is 10:00 on 3 Nov; 12:00 on 2 Nov is hour 36
     rows += [fc(h_, 58, 140, 150, 160, "FR", "load") for h_ in (35, 36, 37)]
     base = pd.concat([base, actuals(("FR",), "load")])
     df = scoring.attach_outcomes(pd.DataFrame(rows), base)
@@ -125,3 +125,32 @@ def test_fixtures_only_when_nothing_cached(tmp_path, monkeypatch):
     monkeypatch.setattr(cache, "DATA", tmp_path)
     zones, overall = scoring.score()
     assert list(zones.columns) == schemas.SCORES.names and list(overall.columns) == scoring.OVERALL_COLUMNS
+
+
+def at(zone, made, target="price_da"):
+    return {"made_at": made, "zone": zone, "target": target, "ts": h(58), "horizon_h": 24, "p10": 1.0, "p50": 2.0, "p90": 3.0,
+            "model_version": "m1"}
+
+
+def valid_flags(zone, times, target="price_da"):
+    rows = [at(zone, T0 + pd.Timedelta(hours=34) + pd.Timedelta(minutes=m), target) for m in times]
+    base = actuals((zone,), "price_da" if target == "price_da" else "load")
+    return list(scoring.attach_outcomes(pd.DataFrame(rows), base)["valid"])
+
+
+# hour 58 is 10:00 on 3 Nov, so day-before 10:00 is hour 34 (minute 0 below), 11:55 is minute 115, 12:00 is minute 120
+def test_gb_day_ahead_is_public_from_10_00_utc_the_day_before():
+    assert valid_flags("GB", [-30, 0, 30, 90]) == [True, False, False, False]
+
+
+def test_continental_day_ahead_is_public_from_11_55_utc_the_day_before():
+    assert valid_flags("FR", [0, 90, 114, 115, 120]) == [True, True, True, False, False]
+
+
+def test_gb_forecast_made_between_10_00_and_12_00_is_not_scored_but_the_same_time_for_fr_is():
+    gb, fr = valid_flags("GB", [60]), valid_flags("FR", [60])
+    assert gb == [False] and fr == [True]
+
+
+def test_the_public_time_applies_only_to_day_ahead_prices():
+    assert valid_flags("GB", [0, 60, 90], target="load") == [True, True, True]
