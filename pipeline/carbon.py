@@ -23,10 +23,14 @@ Outputs:
                                              being local generation.
 """
 
+import logging
+
 import numpy as np
 import pandas as pd
 
 from pipeline import cache, emission_factors, schemas, scoring
+
+log = logging.getLogger("pipeline.carbon")
 
 CONSUMPTION = "carbon/consumption_intensity"
 CONTRIBUTIONS = "carbon/import_contributions"
@@ -137,7 +141,7 @@ def run(since: pd.Timestamp | None = None) -> dict[str, int]:
         _merge(CONSUMPTION, cons, ["ts", "zone"])
         _merge(CONTRIBUTIONS, contrib, ["ts", "zone", "from_zone"])
     if unmapped:
-        print("unrecognised generation series, counted at the 'other' factor:", sorted(unmapped))
+        log.warning("unrecognised generation series, counted at the 'other' factor: %s", sorted(unmapped))
     return {CONSUMPTION: len(cons), CONTRIBUTIONS: len(contrib)}
 
 
