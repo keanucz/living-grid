@@ -68,8 +68,7 @@ export default {
         getLineWidth: (f) => (f.properties.zone === ui.selectedZone ? 2 : 1),
         lineWidthUnits: 'pixels',
         pickable: true,
-        autoHighlight: true,
-        highlightColor: [255, 255, 255, 28],
+        // No autoHighlight: on some GPUs the hover-highlight pass hid this whole layer except while dragging.
         // No attribute transitions here: on some GPUs an extruded polygon layer with transitions does not draw at all.
         updateTriggers: {
           getFillColor: [ui.selectedZone, ui.scenario?.ranAt, sim],
