@@ -7,11 +7,11 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from engine.market import book, lmsr, questions
+from engine.market import book, bots, lmsr, questions
 from engine.market import __main__ as runner
 
 B = lmsr.B
-MODULE = Path(__file__).resolve().parents[2] / "spacetime" / "module" / "src" / "reducers" / "market.ts"
+MODULE = Path(__file__).resolve().parents[2] / "spacetime" / "module" / "src" / "market_core.ts"
 
 
 # ---------------- LMSR ----------------
@@ -226,3 +226,9 @@ def test_runner_starts_a_round_and_ticks_to_the_end(monkeypatch):
     assert {a["question_id"] for a in answers} == set(ids)
     ticks = [a[0] for n, a in c.calls[1:]]
     assert ticks == list(range(13, 20)) and all(n == "market_tick" for n, _ in c.calls[1:])
+
+
+def test_module_bot_specs_match_the_reference():
+    ts = MODULE.read_text()
+    rows = re.findall(r"\{ name: '(\w+)', title: '([^']+)', method: '([^']+)', kelly: ([\d.]+) \}", ts)
+    assert [{"name": n, "title": t, "method": m, "kelly": float(k)} for n, t, m, k in rows] == bots.specs()

@@ -1,0 +1,95 @@
+#!/usr/bin/env bash
+# Lobby smoke test: start an in-memory SpacetimeDB, publish the module, load a one-day pool, then run two lobbies
+# at once (host + two phones each) through countdown, play, reveal and rematch. Needs the spacetime CLI; not in check.sh.
+set -euo pipefail
+cd "$(dirname "$0")"
+PORT=${PORT:-3198}
+H=http://127.0.0.1:$PORT
+DB=lg-lobby-smoke
+
+spacetime start --listen-addr "127.0.0.1:$PORT" --in-memory --non-interactive >/dev/null 2>&1 &
+SERVER=$!
+trap 'kill $SERVER 2>/dev/null || true' EXIT
+for _ in $(seq 30); do curl -sf -o /dev/null "$H/v1/ping" && break; sleep 0.5; done
+(cd module && npm install --no-audit --no-fund --silent && spacetime publish --server "$H" -y "$DB" >/dev/null)
+
+ident() { curl -sf -X POST "$H/v1/identity"; }
+field() { python3 -c 'import sys, json; print(json.loads(sys.argv[1])[sys.argv[2]])' "$1" "$2"; }
+new_user() { local j; j=$(ident); echo "$(field "$j" token) $(field "$j" identity)"; }
+call_as() {
+  local tok=$1 code; shift
+  code=$(curl -s -o /tmp/lobby_smoke_out -w '%{http_code}' -X POST "$H/v1/database/$DB/call/$1" \
+    -H "Authorization: Bearer $tok" -H 'Content-Type: application/json' -d "$2")
+  [ "$code" = "$3" ] || { echo "FAIL $1: expected $3, got $code: $(cat /tmp/lobby_smoke_out)" >&2; exit 1; }
+}
+sql() { spacetime sql --server "$H" "$DB" "$1" 2>/dev/null; }
+# Poll until `sql QUERY | grep -c WORD` equals N (the timers are real time, and the machine may be busy).
+wait_count() {
+  for _ in $(seq 90); do [ "$(sql "$1" | grep -c "$2")" = "$3" ] && return 0; sleep 1; done
+  echo "FAIL waiting for $3 x $2 in: $1 -> $(sql "$1")" >&2; exit 1
+}
+
+read -r PUB PUB_ID < <(new_user)
+spacetime call --server "$H" "$DB" add_admin "\"$PUB_ID\"" '"smoke"' >/dev/null 2>&1
+
+POOL=$(python3 - <<'PY'
+import json
+qs = [{"id": f"q{i}", "text": f"Question {i}?", "kind": "price_above", "target_hour": 12 + i, "unit": "GBP/MWh", "threshold": 100.0,
+       "model_p": 0.6, "model_note": "n", "bot_p": [{"bot": "lgbm_q", "p": 0.6, "note": "n"}, {"bot": "bot_yesterday", "p": 0.4, "note": "n"}],
+       "series": "", "profile_json": ""} for i in (1, 2)]
+ans = [{"question_id": f"q{i}", "outcome": i == 1, "actual": 120.0 if i == 1 else 80.0} for i in (1, 2)]
+feed = {str(h): [{"label": "price", "value": 90.0 + h, "unit": "GBP/MWh"}] for h in range(12, 15)}
+print(json.dumps(["2026-10-26", "windy", 12, 13, json.dumps(qs), json.dumps(ans), json.dumps(feed), "{}"]))
+PY
+)
+call_as "$PUB" pool_put "$POOL" 200
+# Bad pools are refused, and anonymous callers cannot load one.
+read -r ANON_T _ < <(new_user)
+call_as "$ANON_T" pool_put "$POOL" 530
+call_as "$PUB" pool_put '["2026-10-27","stormy",12,13,"[]","[]","{}","{}"]' 530
+
+declare -A TOK ID
+for u in a_host a_p1 a_p2 b_host b_p1 b_p2; do read -r TOK[$u] ID[$u] < <(new_user); done
+call_as "${TOK[a_host]}" lobby_create '["Hosta","turbine","market"]' 200
+call_as "${TOK[b_host]}" lobby_create '["Hostb","pylon","market"]' 200
+CODE_A=$(sql "SELECT code FROM lobby WHERE id = 1" | tail -1 | tr -d ' "')
+CODE_B=$(sql "SELECT code FROM lobby WHERE id = 2" | tail -1 | tr -d ' "')
+[ -n "$CODE_A" ] && [ "$CODE_A" != "$CODE_B" ] && [ ${#CODE_A} = 4 ] || { echo "FAIL codes: $CODE_A $CODE_B" >&2; exit 1; }
+call_as "${TOK[a_p1]}" lobby_join "[\"${CODE_A,,}\",\"Ann\",\"solar\"]" 200
+call_as "${TOK[a_p2]}" lobby_join "[\"$CODE_A\",\"Ben\",\"flame\"]" 200
+call_as "${TOK[b_p1]}" lobby_join "[\"$CODE_B\",\"Cat\",\"wave\"]" 200
+call_as "${TOK[b_p2]}" lobby_join "[\"$CODE_B\",\"Dan\",\"battery\"]" 200
+call_as "${TOK[a_p1]}" lobby_join '["ZZZZ","Nope","solar"]' 530
+call_as "${TOK[a_p1]}" lobby_ready '[true]' 200
+# Only the host starts or changes settings.
+call_as "${TOK[a_p1]}" lobby_start '[]' 530
+call_as "${TOK[a_p1]}" lobby_settings '[5,2,true,"market"]' 530
+call_as "${TOK[a_host]}" lobby_settings '[5,2,true,"market"]' 200
+call_as "${TOK[b_host]}" lobby_settings '[5,2,true,"market"]' 200
+call_as "${TOK[a_host]}" lobby_settings '[1,2,true,"market"]' 530
+call_as "${TOK[a_host]}" lobby_start '[]' 200
+call_as "${TOK[b_host]}" lobby_start '[]' 200
+wait_count "SELECT state FROM lobby" playing 2
+# Questions, accounts and bots are scoped per lobby.
+[ "$(sql 'SELECT id FROM market_question WHERE lobby_id = 1' | grep -c '1|q')" = 2 ] || { echo "FAIL lobby 1 questions" >&2; exit 1; }
+[ "$(sql 'SELECT id FROM market_question WHERE lobby_id = 2' | grep -c '2|q')" = 2 ] || { echo "FAIL lobby 2 questions" >&2; exit 1; }
+[ "$(sql 'SELECT key FROM market_account WHERE lobby_id = 1' | grep -c '^ "1|')" -ge 5 ] || { echo "FAIL lobby 1 accounts" >&2; exit 1; }
+# A player trades in their own lobby only.
+call_as "${TOK[a_p1]}" market_buy '["1|q2","yes",20]' 200
+call_as "${TOK[a_p1]}" market_buy '["2|q2","yes",20]' 530
+call_as "${TOK[b_p1]}" market_buy '["1|q2","yes",20]' 530
+# The day stays hidden while playing.
+sql "SELECT * FROM market_round" | grep -c '2026-10-26' | grep -qv '^0$' && { echo "FAIL day leaked" >&2; exit 1; }
+wait_count "SELECT state FROM lobby" reveal 2
+sql "SELECT * FROM market_round" | grep -c '2026-10-26' | grep -qv '^0$' || { echo "FAIL day not revealed" >&2; exit 1; }
+sql "SELECT outcome FROM market_question WHERE lobby_id = 1" | grep -c yes | grep -qv '^0$' || { echo "FAIL settled" >&2; exit 1; }
+call_as "${TOK[a_p1]}" lobby_rematch '[]' 530
+call_as "${TOK[a_host]}" lobby_rematch '[]' 200
+sql "SELECT id, state FROM lobby WHERE id = 1" | grep -c waiting | grep -qv '^0$' || { echo "FAIL rematch" >&2; exit 1; }
+[ "$(sql 'SELECT id FROM market_question WHERE lobby_id = 1' | grep -c '|')" = 0 ] || { echo "FAIL rematch cleared" >&2; exit 1; }
+[ "$(sql 'SELECT key FROM lobby_player WHERE lobby_id = 1' | grep -c '^ "1|')" = 3 ] || { echo "FAIL players kept" >&2; exit 1; }
+call_as "${TOK[a_p2]}" lobby_leave '[]' 200
+call_as "${TOK[a_host]}" lobby_kick "[\"${ID[a_p1]}\"]" 200
+call_as "${TOK[a_host]}" lobby_leave '[]' 200
+sql "SELECT id FROM lobby" | grep -c '^ 1 ' | grep -qv '^0$' && { echo "FAIL empty lobby kept" >&2; exit 1; }
+echo "lobby smoke: PASS"

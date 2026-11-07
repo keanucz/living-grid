@@ -34,18 +34,22 @@ export const leaderboard = spacetimedb.anonymousView(
 );
 
 const MarketLeaderboardRow = t.row('MarketLeaderboardRow', {
+  lobby_id: t.u32(),
   rank: t.u32(),
   name: t.string(),
   points: t.f64(),
   is_model: t.bool(),
 });
 
-// Points after settled questions (open positions are not valued).
+// Points after settled questions (open positions are not valued), ranked within each lobby.
 export const market_leaderboard = spacetimedb.anonymousView(
   { name: 'market_leaderboard', public: true },
   t.array(MarketLeaderboardRow),
-  ctx =>
-    [...ctx.db.market_account.iter()]
-      .sort((a, b) => b.points - a.points)
-      .map((a, i) => ({ rank: i + 1, name: a.name, points: a.points, is_model: a.is_model }))
+  ctx => {
+    const by = new Map<number, ReturnType<typeof ctx.db.market_account.iter> extends Iterable<infer R> ? R[] : never>();
+    for (const a of ctx.db.market_account.iter()) (by.get(a.lobby_id) ?? by.set(a.lobby_id, []).get(a.lobby_id)!).push(a);
+    return [...by.entries()].flatMap(([lobby_id, rows]) =>
+      rows.sort((a, b) => b.points - a.points).map((a, i) => ({ lobby_id, rank: i + 1, name: a.name, points: a.points, is_model: a.is_model }))
+    );
+  }
 );

@@ -164,11 +164,13 @@ export const admin = table(
   }
 );
 
-// Mystery-day prediction market (points only). One round at a time; engine/market drives the clock.
+// Mystery-day prediction market (points only). Every market table carries lobby_id and every key is prefixed
+// '<lobby_id>|' so several rooms play at once; market_round.id IS the lobby id. The module runs the clock
+// itself (lobby_tick below), so no engine process is needed.
 export const market_round = table(
   { name: 'market_round', public: true },
   {
-    id: t.u32().primaryKey(),
+    id: t.u32().primaryKey(), // = lobby.id
     status: t.string(), // running | done
     title: t.string(),
     day_revealed: t.string(), // empty until the round is over
@@ -187,7 +189,8 @@ export const market_round = table(
 export const market_question = table(
   { name: 'market_question', public: true },
   {
-    id: t.string().primaryKey(),
+    id: t.string().primaryKey(), // '<lobby_id>|<question id>'
+    lobby_id: t.u32().index('btree'),
     text: t.string(),
     kind: t.string(),
     target_hour: t.u32(),
@@ -210,6 +213,7 @@ export const market_answer = table(
   { name: 'market_answer' },
   {
     question_id: t.string().primaryKey(),
+    lobby_id: t.u32().index('btree'),
     outcome: t.bool(),
     actual: t.f64(),
   }
@@ -218,7 +222,7 @@ export const market_answer = table(
 export const market_secret = table(
   { name: 'market_secret' },
   {
-    round: t.u32().primaryKey(),
+    round: t.u32().primaryKey(), // = lobby.id
     day: t.string(),
   }
 );
@@ -226,7 +230,9 @@ export const market_secret = table(
 export const market_account = table(
   { name: 'market_account', public: true },
   {
-    identity: t.identity().primaryKey(),
+    key: t.string().primaryKey(), // '<lobby_id>|<identity hex>'
+    lobby_id: t.u32().index('btree'),
+    identity: t.identity().index('btree'),
     name: t.string(),
     points: t.f64(),
     is_model: t.bool(),
@@ -237,6 +243,7 @@ export const market_position = table(
   { name: 'market_position', public: true },
   {
     key: t.string().primaryKey(),
+    lobby_id: t.u32().index('btree'),
     identity: t.identity().index('btree'),
     question_id: t.string().index('btree'),
     yes: t.f64(),
@@ -248,7 +255,8 @@ export const market_position = table(
 export const market_feed = table(
   { name: 'market_feed', public: true },
   {
-    key: t.string().primaryKey(),
+    key: t.string().primaryKey(), // '<lobby_id>|<hour>|<label>'
+    lobby_id: t.u32().index('btree'),
     hour: t.u32(),
     label: t.string(),
     value: t.f64(),
@@ -256,12 +264,15 @@ export const market_feed = table(
   }
 );
 
-// Bot league: one row per bot (Brier is the mean over the questions it priced, -1 before any settles; points are
-// in market_account under the same identity), each bot's probability per question, and the Nowcaster's inputs.
+// Bot league: one row per bot and lobby (Brier is the mean over the questions it priced, -1 before any settles;
+// points are in market_account under the same identity), each bot's probability per question, and the
+// Nowcaster's inputs.
 export const market_bot = table(
   { name: 'market_bot', public: true },
   {
-    name: t.string().primaryKey(),
+    key: t.string().primaryKey(), // '<lobby_id>|<name>'
+    lobby_id: t.u32().index('btree'),
+    name: t.string(),
     title: t.string(),
     method: t.string(),
     kelly: t.f64(),
@@ -274,7 +285,8 @@ export const market_bot = table(
 export const market_bot_p = table(
   { name: 'market_bot_p', public: true },
   {
-    key: t.string().primaryKey(),
+    key: t.string().primaryKey(), // '<bot>|<question id>' (the question id carries the lobby prefix)
+    lobby_id: t.u32().index('btree'),
     bot: t.string(),
     question_id: t.string().index('btree'),
     p: t.f64(),
@@ -288,7 +300,72 @@ export const market_profile = table(
   { name: 'market_profile' },
   {
     question_id: t.string().primaryKey(),
+    lobby_id: t.u32().index('btree'),
     series: t.string(),
     profile_json: t.string(),
+  }
+);
+
+// ---------------------------------------------------------------------------------------------------------------
+// Lobbies. A lobby is a room with a 4-letter code and a host; one market round runs inside it.
+export const lobby = table(
+  { name: 'lobby', public: true },
+  {
+    id: t.u32().primaryKey().autoInc(),
+    code: t.string().unique(),
+    host: t.identity(),
+    mode: t.string(), // market | battery
+    state: t.string(), // waiting | countdown | playing | reveal
+    seconds_per_hour: t.u32(),
+    n_questions: t.u32(),
+    bots: t.bool(),
+    created_at: t.timestamp(),
+    state_since: t.timestamp(),
+  }
+);
+
+export const lobby_player = table(
+  { name: 'lobby_player', public: true },
+  {
+    key: t.string().primaryKey(), // '<lobby_id>|<identity hex>'
+    lobby_id: t.u32().index('btree'),
+    identity: t.identity().index('btree'),
+    name: t.string(),
+    avatar: t.string(),
+    ready: t.bool(),
+    points: t.f64(),
+  }
+);
+
+// Private pool of mystery days (filled by the engine with pool_put). The day is never sent to clients; it is
+// copied to market_secret and shown only when a round ends.
+export const market_day_pool = table(
+  { name: 'market_day_pool' },
+  {
+    day: t.string().primaryKey(),
+    regime: t.string(), // calm | windy
+    start_hour: t.u32(),
+    end_hour: t.u32(),
+    questions_json: t.string(), // MarketLeagueQuestionIn[]
+    answers_json: t.string(), // {question_id, outcome, actual}[]
+    feed_json: t.string(), // {"<hour>": [{label, value, unit}]}
+    clues_json: t.string(), // owned by the clue shop (#167); the lobby code never reads it
+  }
+);
+
+export const lobby_day_played = table(
+  { name: 'lobby_day_played' },
+  { key: t.string().primaryKey(), lobby_id: t.u32().index('btree'), day: t.string() }
+);
+
+// Scheduled work: kind 'begin' (countdown over, start the round), 'tick' (advance one game hour) or 'sweep'
+// (delete lobbies idle for 2 h). Rows are only ever created by the module itself.
+export const lobby_tick = table(
+  { name: 'lobby_tick' },
+  {
+    scheduled_id: t.u64().primaryKey().autoInc(),
+    scheduled_at: t.scheduleAt(),
+    kind: t.string(),
+    lobby_id: t.u32(),
   }
 );
