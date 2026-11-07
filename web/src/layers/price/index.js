@@ -56,7 +56,8 @@ export default {
         getFillColor: (f) => {
           const p = priceOf(f.properties.zone)
           const on = f.properties.zone === ui.selectedZone
-          return p == null ? COLORS.land : priceColor(p, sim ? 150 : on ? 235 : 205)
+          // Foggy tint: ~90% transparent price colour over the glass slab; the border carries the colour.
+          return p == null ? COLORS.land : priceColor(p, sim ? 46 : on ? 64 : 30)
         },
         getLineColor: (f) => (f.properties.zone === ui.selectedZone ? [...COLORS.accent, 220] : [255, 255, 255, 46]),
         getLineWidth: (f) => (f.properties.zone === ui.selectedZone ? 2 : 1),
@@ -73,14 +74,25 @@ export default {
         },
       }),
       new PathLayer({
+        id: 'price-zone-glow',
+        data: outlines(zoneFeatures, (sim ? 6000 : 2500) + 60),
+        getPath: (d) => d.path,
+        getColor: (d) => priceColor(priceOf(d.zone) ?? 0, 70),
+        getWidth: 7,
+        widthUnits: 'pixels',
+        jointRounded: true,
+        capRounded: true,
+        updateTriggers: { getColor: [ui.scenario?.ranAt, data.state] },
+      }),
+      new PathLayer({
         id: 'price-zone-borders',
         data: outlines(zoneFeatures, (sim ? 6000 : 2500) + 60),
         getPath: (d) => d.path,
-        getColor: (d) => (d.zone === ui.selectedZone ? [...COLORS.accent, 255] : [236, 236, 228, 210]),
-        getWidth: (d) => (d.zone === ui.selectedZone ? 2.2 : 1.3),
+        getColor: (d) => (d.zone === ui.selectedZone ? [...COLORS.accent, 255] : priceColor(priceOf(d.zone) ?? 0, 235)),
+        getWidth: (d) => (d.zone === ui.selectedZone ? 2.2 : 1.6),
         widthUnits: 'pixels',
         jointRounded: true,
-        updateTriggers: { getColor: [ui.selectedZone], getWidth: [ui.selectedZone] },
+        updateTriggers: { getColor: [ui.selectedZone, ui.scenario?.ranAt, data.state], getWidth: [ui.selectedZone] },
       }),
       sim &&
         new ColumnLayer({
