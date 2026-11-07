@@ -122,7 +122,6 @@ export default {
         pickable: true,
         updateTriggers: { getColor: [scenario?.type], getWidth: [scenario?.type] },
       }),
-      trips('flows-bar-glow', (d) => 10 + 6 * d.l.util, 0.28, false),
       trips('flows-bar', (d) => 3 + 1.5 * d.l.util, 0.95, false),
       trips('flows-bar-core', 1.4, 0.9, true),
     ]
