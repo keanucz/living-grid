@@ -107,3 +107,47 @@ def test_safely_swallows_errors():
         raise RuntimeError("x")
 
     assert cc.safely(boom) is None
+
+
+def test_no_default_wallet(monkeypatch):
+    monkeypatch.delenv("LG_SOLANA_KEYPAIR", raising=False)
+    with pytest.raises(cc.PostingRefused):
+        cc.keypair_path()
+    with pytest.raises(cc.PostingRefused):
+        cc.load_wallet()
+    monkeypatch.setenv("LG_SOLANA_KEYPAIR", "   ")
+    with pytest.raises(cc.PostingRefused):
+        cc.keypair_path()
+
+
+def test_writes_are_refused_under_pytest_even_with_a_working_network(monkeypatch):
+    monkeypatch.setattr(cc.httpx, "post", lambda *a, **k: pytest.fail("a write reached the network"))
+    for method in cc.WRITE_METHODS:
+        with pytest.raises(cc.PostingRefused):
+            cc.rpc(method, [])
+
+
+def test_reads_still_work_under_pytest(monkeypatch):
+    class R:
+        def raise_for_status(self): pass
+        def json(self): return {"result": 7}
+
+    monkeypatch.setattr(cc.httpx, "post", lambda *a, **k: R())
+    assert cc.rpc("getLatestBlockhash", []) == 7
+
+
+def test_post_memo_cannot_sign_and_send_in_a_test(tmp_path, monkeypatch):
+    monkeypatch.setenv("LG_SOLANA_KEYPAIR", str(tmp_path / "w.json"))
+    cc.keygen()
+    calls = []
+
+    def fake_post(url, json, timeout):
+        calls.append(json["method"])
+        if json["method"] == "getLatestBlockhash":
+            return type("R", (), {"raise_for_status": lambda s: None, "json": lambda s: {"result": {"value": {"blockhash": cc.b58encode(bytes(32))}}}})()
+        pytest.fail("write reached the network")
+
+    monkeypatch.setattr(cc.httpx, "post", fake_post)
+    with pytest.raises(cc.PostingRefused):
+        cc.post_memo("lg1|run|x|abc")
+    assert calls == ["getLatestBlockhash"]

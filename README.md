@@ -91,7 +91,9 @@ Monday's forecast freezes at 09:15 UTC on Sunday, before the GB auction (09:50 U
 
 Each frozen forecast, and each hourly run, is hashed with SHA-256 and the hash is posted to Solana (**devnet**, so a network reset can erase it) as a Memo-program transaction from one published wallet:
 
-`H82mxBj3HeSsgUpz1xSgxeteQquSvk4HvFyiUE8sc8Gv` ([every transaction](https://explorer.solana.com/address/H82mxBj3HeSsgUpz1xSgxeteQquSvk4HvFyiUE8sc8Gv?cluster=devnet))
+`FYgaqPzTFtMhdJU7DSx3pt65bsH76W17K4WixM6XfS2x` ([every transaction](https://explorer.solana.com/address/FYgaqPzTFtMhdJU7DSx3pt65bsH76W17K4WixM6XfS2x?cluster=devnet))
+
+This is our second wallet. We retired the first, `H82mxBj3HeSsgUpz1xSgxeteQquSvk4HvFyiUE8sc8Gv`, on 7 November 2026 because a test run on a developer account posted about 66 junk memos to it, some labelled with future freeze times, so its history no longer proves anything. Its two real commitments are the freeze at 20:00 UTC (transaction `4fCxKkxHLnRXbUsP7UDJaFB9rCkaxBjHRqXhdF6k7tDV8wyMCgDtmEYbX4WZpMuVM1sc2Qr5A2rXWNHuPs1XKJeF`) and the hourly run at 20:05 UTC (`5YddW2t167bUtrKv6f9ShpXcME1LCAZS1bCoThRQ2YFg1LGqx4pDu3dfQWgesfPfe8p6zZE4J4B4DDnTApkbLpAr`). We moved its balance to the new wallet in a plain transfer. Only the scheduled jobs hold the key, and the code refuses to post under pytest or without an explicit key path.
 
 The memo reads `lg1|<freeze or run>|<UTC time>|<sha256>`. The hashed bytes are the canonical CSV in `data/commitments/` (header, rows sorted by every column, UTC times ending in Z, floats as Python prints them). A hash proves a forecast existed unchanged at that time; it cannot prove we did not post others, so the wallet's full history is the check. `python -m pipeline.commit_chain verify` recomputes the hashes and reads the memos back. Code: `pipeline/commit_chain.py`.
 

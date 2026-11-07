@@ -15,9 +15,12 @@ every transaction from it is listed.
 Records go to data/commitments.jsonl (append-only; a pending record is superseded by a later line with the
 same id). LG_OFFLINE=1 posts nothing and records status "offline" (hash and file are still kept).
 
+Safety: the RPC call that writes (sendTransaction, requestAirdrop) refuses to run under pytest, and a wallet is only
+loaded from an explicit LG_SOLANA_KEYPAIR. Tests mock rpc or post_memo; they must never reach a real wallet.
+
 Configuration (environment):
   LG_SOLANA_KEYPAIR   path to the wallet file (Solana CLI format, JSON array of 64 bytes)
-                      default ~/.config/living-grid/solana-keypair.json, never inside the repo
+                      no default: unset means nothing can be signed or posted. Only the cron scripts set it.
   LG_SOLANA_RPC       default https://api.devnet.solana.com
   LG_SOLANA_CLUSTER   explorer cluster label, default devnet
 """
@@ -41,7 +44,7 @@ log = logging.getLogger("pipeline.commit_chain")
 
 MEMO_PROGRAM = "MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr"
 DEFAULT_RPC = "https://api.devnet.solana.com"
-DEFAULT_KEYPAIR = "~/.config/living-grid/solana-keypair.json"
+WRITE_METHODS = ("sendTransaction", "requestAirdrop")
 LOG_COLUMNS = ["made_at", "zone", "target", "ts", "horizon_h", "p10", "p50", "p90", "model_version"]
 _B58 = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
 
@@ -168,8 +171,15 @@ def verify_signature(pub: bytes, msg: bytes, sig: bytes) -> bool:
 # --- wallet --------------------------------------------------------------------------------------------------
 
 
+class PostingRefused(RuntimeError):
+    pass
+
+
 def keypair_path() -> Path:
-    return Path(os.environ.get("LG_SOLANA_KEYPAIR", DEFAULT_KEYPAIR)).expanduser()
+    p = os.environ.get("LG_SOLANA_KEYPAIR", "").strip()
+    if not p:
+        raise PostingRefused("LG_SOLANA_KEYPAIR is not set; there is deliberately no default wallet")
+    return Path(p).expanduser()
 
 
 def keygen(path: Path | None = None) -> str:
@@ -233,6 +243,8 @@ def cluster() -> str:
 
 
 def rpc(method: str, params: list, client: httpx.Client | None = None):
+    if method in WRITE_METHODS and os.environ.get("PYTEST_CURRENT_TEST"):
+        raise PostingRefused(f"{method} refused under pytest: tests must mock rpc and never post")
     c = client or httpx
     r = c.post(rpc_url(), json={"jsonrpc": "2.0", "id": 1, "method": method, "params": params}, timeout=10)
     r.raise_for_status()
