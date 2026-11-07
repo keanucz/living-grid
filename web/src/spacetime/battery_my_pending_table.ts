@@ -10,13 +10,10 @@ import {
   type Infer as __Infer,
 } from "spacetimedb";
 
-import {
-  MarketFeedIn,
-} from "./types";
-
-export default {
-  hour: __t.u32(),
-  get feed() {
-    return __t.array(MarketFeedIn);
-  },
-};
+export default __t.row({
+  key: __t.string().primaryKey(),
+  lobbyId: __t.u32().name("lobby_id"),
+  identity: __t.identity(),
+  slot: __t.u32(),
+  action: __t.string(),
+});

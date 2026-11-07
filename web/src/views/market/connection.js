@@ -1,10 +1,13 @@
 import { DbConnection } from '../../spacetime/index.ts'
+import { BATTERY_TABLES, readBattery } from '../game/battery.js'
 
 // Mystery-day market connection. Shares the room game's token key, so a phone that joined the game is the same
 // player here. Subscribes to the public market tables; outcomes live in private tables the client cannot read.
 const DB = 'living-grid'
 const TOKEN_KEY = 'lg-game-token'
 const TABLES = ['player', 'market_round', 'market_question', 'market_account', 'market_position', 'market_feed', 'market_leaderboard', 'market_bot', 'market_bot_p']
+// Lobby tables exist once the lobby module (#165) is published and the bindings regenerated; skipped before that.
+const LOBBY_TABLES = ['lobby', 'lobby_player', 'reaction', ...BATTERY_TABLES]
 
 const tokenStore = {
   get: () => {
@@ -40,9 +43,12 @@ export function tradeCost(q, side, shares, b) {
   return lse(y, n, b) - lse(q.qYes, q.qNo, b)
 }
 
-function read(conn, me) {
+const ms = (t) => (t == null ? null : typeof t === 'number' ? t : Number(t.microsSinceUnixEpoch / 1000n))
+
+function read(conn, me, lobbyId = null) {
   const hex = me?.toHexString()
-  const rows = (t) => [...conn.db[t].iter()]
+  // With a lobby id, only that room's rows; without, everything (the original single-room /market view).
+  const rows = (t) => (conn.db[t] ? [...conn.db[t].iter()] : []).filter((r) => lobbyId == null || r.lobbyId == null || r.lobbyId === lobbyId)
   const positions = {}
   for (const p of rows('market_position')) if (p.identity.toHexString() === hex) positions[p.questionId] = p
   const account = rows('market_account').find((a) => a.identity.toHexString() === hex) ?? null
@@ -53,12 +59,31 @@ function read(conn, me) {
     .sort((a, b) => (b.points ?? 0) - (a.points ?? 0))
   const botP = {}
   for (const p of rows('market_bot_p')) (botP[p.questionId] ??= {})[p.bot] = { p: p.p, note: p.note, hour: p.updatedHour }
+  const lobbies = (conn.db.lobby ? [...conn.db.lobby.iter()] : []).map((l) => ({
+    id: l.id, code: l.code, host: l.host.toHexString(), mode: l.mode, state: l.state, secondsPerHour: l.secondsPerHour,
+    nQuestions: l.nQuestions, botsOn: l.bots ?? l.botsOn, createdAt: ms(l.createdAt), stateSince: ms(l.stateSince),
+    // The server stamps when the state began; the 5 s countdown ends 5 s after that.
+    countdownS: l.countdownS ?? 5, kind: l.kind ?? 'private', roundNo: l.roundNo ?? 0,
+    // The module stamps when the countdown ends (countdown_until); older modules only gave state_since.
+    countdownEnd: l.countdownUntil != null ? ms(l.countdownUntil) : l.state === 'countdown' ? ms(l.stateSince) + (l.countdownS ?? 5) * 1000 : null,
+  }))
+  const identities = {}
+  const lobbyPlayers = (conn.db.lobby_player ? [...conn.db.lobby_player.iter()] : []).map((p) => {
+    identities[p.identity.toHexString()] = p.identity
+    return { lobbyId: p.lobbyId, id: p.identity.toHexString(), name: p.name, avatar: p.avatar, ready: p.ready, points: p.points }
+  })
   return {
+    me: hex ?? null,
+    battery: lobbyId != null && conn.db.battery_round ? readBattery(conn, lobbyId, me) : null,
+    lobbies,
+    lobbyPlayers,
+    identities,
     player,
     account,
     bots,
     botP,
-    round: rows('market_round')[0] ?? null,
+    // market_round.id is the lobby id
+    round: (conn.db.market_round ? [...conn.db.market_round.iter()] : []).find((r) => lobbyId == null || r.id === lobbyId) ?? null,
     questions: rows('market_question').sort((a, b) => a.targetHour - b.targetHour || a.id.localeCompare(b.id)),
     positions,
     feed: rows('market_feed').sort((a, b) => a.hour - b.hour),
@@ -67,13 +92,13 @@ function read(conn, me) {
 }
 
 // onState({ status, ...snapshot }); returns { join, buy, sell, close }.
-export function connectMarket({ onState, withToken = true }) {
+export function connectMarket({ onState, withToken = true, lobbyId = null }) {
   let identity = null
   let timer = 0
   let conn = null
   const emit = (status = 'live') => {
     clearTimeout(timer)
-    timer = setTimeout(() => conn && onState({ status, ...read(conn, identity) }), 100)
+    timer = setTimeout(() => conn && onState({ status, ...read(conn, identity, lobbyId) }), 100)
   }
   conn = DbConnection.builder()
     .withUri(uri())
@@ -82,22 +107,51 @@ export function connectMarket({ onState, withToken = true }) {
     .onConnect((c, id, token) => {
       identity = id
       if (withToken) tokenStore.set(token)
-      for (const name of TABLES) {
+      const names = [...TABLES, ...LOBBY_TABLES.filter((n) => c.db[n])]
+      for (const name of names) {
         const t = c.db[name]
         t.onInsert(() => emit())
         t.onDelete(() => emit())
         t.onUpdate?.(() => emit())
       }
+      // Two subscriptions: the market tables every module has, and the lobby / battery tables that only a newer module
+      // has. A server without the second set (the module not republished yet) must not take the first set down.
       c.subscriptionBuilder()
         .onApplied(() => emit())
         .onError(() => onState({ status: 'offline' }))
         .subscribe(TABLES.map((t) => `SELECT * FROM ${t}`))
+      const extra = names.filter((n) => !TABLES.includes(n))
+      if (extra.length) {
+        c.subscriptionBuilder()
+          .onApplied(() => emit())
+          .onError(() => emit())
+          .subscribe(extra.map((t) => `SELECT * FROM ${t}`))
+      }
     })
     .onConnectError(() => onState({ status: 'offline' }))
     .onDisconnect(() => onState({ status: 'offline' }))
     .build()
 
+  const call = (name, args) => {
+    const fn = conn.reducers[name]
+    if (!fn) return Promise.reject(new Error('The lobby is not available on this server yet.'))
+    return fn(args)
+  }
   return {
+    // Reducers of the lobby module (#165). The host joins their own room when it is created.
+    lobbyCreate: (o) => call('lobbyCreate', { name: o.name, avatar: o.avatar, mode: o.mode ?? 'market' }),
+    lobbyJoin: (code, name, avatar) => call('lobbyJoin', { code, name, avatar }),
+    lobbyReady: (ready) => call('lobbyReady', { ready }),
+    lobbyLeave: () => call('lobbyLeave', {}),
+    lobbyKick: (identityHex) => call('lobbyKick', { identityHex }),
+    lobbySettings: (o) => call('lobbySettings', { secondsPerHour: o.secondsPerHour, nQuestions: o.nQuestions, bots: o.botsOn, mode: o.mode ?? 'market' }),
+    batteryDecide: (slot, action) => call('batteryDecide', { slot, action }),
+    lobbyStart: () => call('lobbyStart', {}),
+    // Optional, present once the module has them (quick play, #176): the capability check hides the buttons until then.
+    can: (reducer) => !!conn.reducers[reducer],
+    quickPlay: (name, avatar) => call('quickPlay', { name, avatar }),
+    lobbyVote: (choice) => call('lobbyVote', { choice }), // 'start' | 'wait'
+    lobbyRematch: () => call('lobbyRematch', {}),
     join: (name) => conn.reducers.join({ name }),
     buy: (questionId, side, shares) => conn.reducers.marketBuy({ questionId, side, shares }),
     sell: (questionId, side, shares) => conn.reducers.marketSell({ questionId, side, shares }),

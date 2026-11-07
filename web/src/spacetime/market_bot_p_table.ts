@@ -12,6 +12,7 @@ import {
 
 export default __t.row({
   key: __t.string().primaryKey(),
+  lobbyId: __t.u32().name("lobby_id"),
   bot: __t.string(),
   questionId: __t.string().name("question_id"),
   p: __t.f64(),

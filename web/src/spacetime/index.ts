@@ -35,17 +35,25 @@ import {
 
 // Import all reducer arg schemas
 import AddAdminReducer from "./add_admin_reducer";
+import BatteryDecideReducer from "./battery_decide_reducer";
+import BatteryPoolPutReducer from "./battery_pool_put_reducer";
 import ClaimZoneReducer from "./claim_zone_reducer";
 import ClearInterventionReducer from "./clear_intervention_reducer";
 import DecideReducer from "./decide_reducer";
 import DeleteKeysReducer from "./delete_keys_reducer";
 import JoinReducer from "./join_reducer";
+import LobbyCreateReducer from "./lobby_create_reducer";
+import LobbyJoinReducer from "./lobby_join_reducer";
+import LobbyKickReducer from "./lobby_kick_reducer";
+import LobbyLeaveReducer from "./lobby_leave_reducer";
+import LobbyReadyReducer from "./lobby_ready_reducer";
+import LobbyRematchReducer from "./lobby_rematch_reducer";
+import LobbySettingsReducer from "./lobby_settings_reducer";
+import LobbyStartReducer from "./lobby_start_reducer";
 import MarketBuyReducer from "./market_buy_reducer";
-import MarketResetReducer from "./market_reset_reducer";
 import MarketSellReducer from "./market_sell_reducer";
-import MarketStartReducer from "./market_start_reducer";
-import MarketStartLeagueReducer from "./market_start_league_reducer";
-import MarketTickReducer from "./market_tick_reducer";
+import PoolDeleteReducer from "./pool_delete_reducer";
+import PoolPutReducer from "./pool_put_reducer";
 import PruneBeforeReducer from "./prune_before_reducer";
 import RemoveAdminReducer from "./remove_admin_reducer";
 import ResetGameReducer from "./reset_game_reducer";
@@ -67,12 +75,20 @@ import UpsertZonesReducer from "./upsert_zones_reducer";
 import ActualRow from "./actual_table";
 import BatteryRow from "./battery_table";
 import BatteryActionRow from "./battery_action_table";
+import BatteryDecisionRow from "./battery_decision_table";
+import BatteryMyPendingRow from "./battery_my_pending_table";
+import BatteryPlayerRow from "./battery_player_table";
+import BatteryRoundRow from "./battery_round_table";
+import BatterySlotRow from "./battery_slot_table";
 import CarbonRow from "./carbon_table";
 import ForecastRow from "./forecast_table";
+import GameResultRow from "./game_result_table";
 import GhostWindRow from "./ghost_wind_table";
 import InterventionRow from "./intervention_table";
 import LatestForecastRow from "./latest_forecast_table";
 import LeaderboardRow from "./leaderboard_table";
+import LobbyRow from "./lobby_table";
+import LobbyPlayerRow from "./lobby_player_table";
 import MarketAccountRow from "./market_account_table";
 import MarketBotRow from "./market_bot_table";
 import MarketBotPRow from "./market_bot_p_table";
@@ -132,6 +148,65 @@ const tablesSchema = __schema({
       { name: 'battery_action_key_key', constraint: 'unique', columns: ['key'] },
     ],
   }, BatteryActionRow),
+  batteryDecision: __table({
+    name: 'battery_decision',
+    indexes: [
+      { accessor: 'identity', name: 'battery_decision_identity_idx_btree', algorithm: 'btree', columns: [
+        'identity',
+      ] },
+      { accessor: 'key', name: 'battery_decision_key_idx_btree', algorithm: 'btree', columns: [
+        'key',
+      ] },
+      { accessor: 'lobby_id', name: 'battery_decision_lobby_id_idx_btree', algorithm: 'btree', columns: [
+        'lobbyId',
+      ] },
+    ],
+    constraints: [
+      { name: 'battery_decision_key_key', constraint: 'unique', columns: ['key'] },
+    ],
+  }, BatteryDecisionRow),
+  batteryPlayer: __table({
+    name: 'battery_player',
+    indexes: [
+      { accessor: 'identity', name: 'battery_player_identity_idx_btree', algorithm: 'btree', columns: [
+        'identity',
+      ] },
+      { accessor: 'key', name: 'battery_player_key_idx_btree', algorithm: 'btree', columns: [
+        'key',
+      ] },
+      { accessor: 'lobby_id', name: 'battery_player_lobby_id_idx_btree', algorithm: 'btree', columns: [
+        'lobbyId',
+      ] },
+    ],
+    constraints: [
+      { name: 'battery_player_key_key', constraint: 'unique', columns: ['key'] },
+    ],
+  }, BatteryPlayerRow),
+  batteryRound: __table({
+    name: 'battery_round',
+    indexes: [
+      { accessor: 'lobby_id', name: 'battery_round_lobby_id_idx_btree', algorithm: 'btree', columns: [
+        'lobbyId',
+      ] },
+    ],
+    constraints: [
+      { name: 'battery_round_lobby_id_key', constraint: 'unique', columns: ['lobbyId'] },
+    ],
+  }, BatteryRoundRow),
+  batterySlot: __table({
+    name: 'battery_slot',
+    indexes: [
+      { accessor: 'key', name: 'battery_slot_key_idx_btree', algorithm: 'btree', columns: [
+        'key',
+      ] },
+      { accessor: 'lobby_id', name: 'battery_slot_lobby_id_idx_btree', algorithm: 'btree', columns: [
+        'lobbyId',
+      ] },
+    ],
+    constraints: [
+      { name: 'battery_slot_key_key', constraint: 'unique', columns: ['key'] },
+    ],
+  }, BatterySlotRow),
   carbon: __table({
     name: 'carbon',
     indexes: [
@@ -166,6 +241,23 @@ const tablesSchema = __schema({
       { name: 'forecast_key_key', constraint: 'unique', columns: ['key'] },
     ],
   }, ForecastRow),
+  gameResult: __table({
+    name: 'game_result',
+    indexes: [
+      { accessor: 'identity', name: 'game_result_identity_idx_btree', algorithm: 'btree', columns: [
+        'identity',
+      ] },
+      { accessor: 'key', name: 'game_result_key_idx_btree', algorithm: 'btree', columns: [
+        'key',
+      ] },
+      { accessor: 'lobby_id', name: 'game_result_lobby_id_idx_btree', algorithm: 'btree', columns: [
+        'lobbyId',
+      ] },
+    ],
+    constraints: [
+      { name: 'game_result_key_key', constraint: 'unique', columns: ['key'] },
+    ],
+  }, GameResultRow),
   ghostWind: __table({
     name: 'ghost_wind',
     indexes: [
@@ -191,26 +283,67 @@ const tablesSchema = __schema({
       { name: 'intervention_slot_key', constraint: 'unique', columns: ['slot'] },
     ],
   }, InterventionRow),
+  lobby: __table({
+    name: 'lobby',
+    indexes: [
+      { accessor: 'code', name: 'lobby_code_idx_btree', algorithm: 'btree', columns: [
+        'code',
+      ] },
+      { accessor: 'id', name: 'lobby_id_idx_btree', algorithm: 'btree', columns: [
+        'id',
+      ] },
+    ],
+    constraints: [
+      { name: 'lobby_code_key', constraint: 'unique', columns: ['code'] },
+      { name: 'lobby_id_key', constraint: 'unique', columns: ['id'] },
+    ],
+  }, LobbyRow),
+  lobbyPlayer: __table({
+    name: 'lobby_player',
+    indexes: [
+      { accessor: 'identity', name: 'lobby_player_identity_idx_btree', algorithm: 'btree', columns: [
+        'identity',
+      ] },
+      { accessor: 'key', name: 'lobby_player_key_idx_btree', algorithm: 'btree', columns: [
+        'key',
+      ] },
+      { accessor: 'lobby_id', name: 'lobby_player_lobby_id_idx_btree', algorithm: 'btree', columns: [
+        'lobbyId',
+      ] },
+    ],
+    constraints: [
+      { name: 'lobby_player_key_key', constraint: 'unique', columns: ['key'] },
+    ],
+  }, LobbyPlayerRow),
   marketAccount: __table({
     name: 'market_account',
     indexes: [
       { accessor: 'identity', name: 'market_account_identity_idx_btree', algorithm: 'btree', columns: [
         'identity',
       ] },
+      { accessor: 'key', name: 'market_account_key_idx_btree', algorithm: 'btree', columns: [
+        'key',
+      ] },
+      { accessor: 'lobby_id', name: 'market_account_lobby_id_idx_btree', algorithm: 'btree', columns: [
+        'lobbyId',
+      ] },
     ],
     constraints: [
-      { name: 'market_account_identity_key', constraint: 'unique', columns: ['identity'] },
+      { name: 'market_account_key_key', constraint: 'unique', columns: ['key'] },
     ],
   }, MarketAccountRow),
   marketBot: __table({
     name: 'market_bot',
     indexes: [
-      { accessor: 'name', name: 'market_bot_name_idx_btree', algorithm: 'btree', columns: [
-        'name',
+      { accessor: 'key', name: 'market_bot_key_idx_btree', algorithm: 'btree', columns: [
+        'key',
+      ] },
+      { accessor: 'lobby_id', name: 'market_bot_lobby_id_idx_btree', algorithm: 'btree', columns: [
+        'lobbyId',
       ] },
     ],
     constraints: [
-      { name: 'market_bot_name_key', constraint: 'unique', columns: ['name'] },
+      { name: 'market_bot_key_key', constraint: 'unique', columns: ['key'] },
     ],
   }, MarketBotRow),
   marketBotP: __table({
@@ -218,6 +351,9 @@ const tablesSchema = __schema({
     indexes: [
       { accessor: 'key', name: 'market_bot_p_key_idx_btree', algorithm: 'btree', columns: [
         'key',
+      ] },
+      { accessor: 'lobby_id', name: 'market_bot_p_lobby_id_idx_btree', algorithm: 'btree', columns: [
+        'lobbyId',
       ] },
       { accessor: 'question_id', name: 'market_bot_p_question_id_idx_btree', algorithm: 'btree', columns: [
         'questionId',
@@ -233,6 +369,9 @@ const tablesSchema = __schema({
       { accessor: 'key', name: 'market_feed_key_idx_btree', algorithm: 'btree', columns: [
         'key',
       ] },
+      { accessor: 'lobby_id', name: 'market_feed_lobby_id_idx_btree', algorithm: 'btree', columns: [
+        'lobbyId',
+      ] },
     ],
     constraints: [
       { name: 'market_feed_key_key', constraint: 'unique', columns: ['key'] },
@@ -247,6 +386,9 @@ const tablesSchema = __schema({
       { accessor: 'key', name: 'market_position_key_idx_btree', algorithm: 'btree', columns: [
         'key',
       ] },
+      { accessor: 'lobby_id', name: 'market_position_lobby_id_idx_btree', algorithm: 'btree', columns: [
+        'lobbyId',
+      ] },
       { accessor: 'question_id', name: 'market_position_question_id_idx_btree', algorithm: 'btree', columns: [
         'questionId',
       ] },
@@ -260,6 +402,9 @@ const tablesSchema = __schema({
     indexes: [
       { accessor: 'id', name: 'market_question_id_idx_btree', algorithm: 'btree', columns: [
         'id',
+      ] },
+      { accessor: 'lobby_id', name: 'market_question_lobby_id_idx_btree', algorithm: 'btree', columns: [
+        'lobbyId',
       ] },
     ],
     constraints: [
@@ -327,6 +472,13 @@ const tablesSchema = __schema({
       { name: 'zone_code_key', constraint: 'unique', columns: ['code'] },
     ],
   }, ZoneRow),
+  batteryMyPending: __table({
+    name: 'battery_my_pending',
+    indexes: [
+    ],
+    constraints: [
+    ],
+  }, BatteryMyPendingRow),
   latestForecast: __table({
     name: 'latest_forecast',
     indexes: [
@@ -353,17 +505,25 @@ const tablesSchema = __schema({
 /** The schema information for all reducers in this module. This is defined the same way as the reducers would have been defined in the server, except the body of the reducer is omitted in code generation. */
 const reducersSchema = __reducers(
   __reducerSchema("add_admin", AddAdminReducer),
+  __reducerSchema("battery_decide", BatteryDecideReducer),
+  __reducerSchema("battery_pool_put", BatteryPoolPutReducer),
   __reducerSchema("claim_zone", ClaimZoneReducer),
   __reducerSchema("clear_intervention", ClearInterventionReducer),
   __reducerSchema("decide", DecideReducer),
   __reducerSchema("delete_keys", DeleteKeysReducer),
   __reducerSchema("join", JoinReducer),
+  __reducerSchema("lobby_create", LobbyCreateReducer),
+  __reducerSchema("lobby_join", LobbyJoinReducer),
+  __reducerSchema("lobby_kick", LobbyKickReducer),
+  __reducerSchema("lobby_leave", LobbyLeaveReducer),
+  __reducerSchema("lobby_ready", LobbyReadyReducer),
+  __reducerSchema("lobby_rematch", LobbyRematchReducer),
+  __reducerSchema("lobby_settings", LobbySettingsReducer),
+  __reducerSchema("lobby_start", LobbyStartReducer),
   __reducerSchema("market_buy", MarketBuyReducer),
-  __reducerSchema("market_reset", MarketResetReducer),
   __reducerSchema("market_sell", MarketSellReducer),
-  __reducerSchema("market_start", MarketStartReducer),
-  __reducerSchema("market_start_league", MarketStartLeagueReducer),
-  __reducerSchema("market_tick", MarketTickReducer),
+  __reducerSchema("pool_delete", PoolDeleteReducer),
+  __reducerSchema("pool_put", PoolPutReducer),
   __reducerSchema("prune_before", PruneBeforeReducer),
   __reducerSchema("remove_admin", RemoveAdminReducer),
   __reducerSchema("reset_game", ResetGameReducer),
@@ -388,8 +548,20 @@ type __SchemaWithTableAccessorAliases = Omit<typeof tablesSchema.schemaType, "ta
   tables: typeof tablesSchema.schemaType.tables & {
     /** @deprecated Use `batteryAction` instead. This alias will be removed in the next major version. */
     readonly "battery_action": Omit<typeof tablesSchema.schemaType.tables["batteryAction"], "accessorName"> & { readonly accessorName: "battery_action" };
+    /** @deprecated Use `batteryDecision` instead. This alias will be removed in the next major version. */
+    readonly "battery_decision": Omit<typeof tablesSchema.schemaType.tables["batteryDecision"], "accessorName"> & { readonly accessorName: "battery_decision" };
+    /** @deprecated Use `batteryPlayer` instead. This alias will be removed in the next major version. */
+    readonly "battery_player": Omit<typeof tablesSchema.schemaType.tables["batteryPlayer"], "accessorName"> & { readonly accessorName: "battery_player" };
+    /** @deprecated Use `batteryRound` instead. This alias will be removed in the next major version. */
+    readonly "battery_round": Omit<typeof tablesSchema.schemaType.tables["batteryRound"], "accessorName"> & { readonly accessorName: "battery_round" };
+    /** @deprecated Use `batterySlot` instead. This alias will be removed in the next major version. */
+    readonly "battery_slot": Omit<typeof tablesSchema.schemaType.tables["batterySlot"], "accessorName"> & { readonly accessorName: "battery_slot" };
+    /** @deprecated Use `gameResult` instead. This alias will be removed in the next major version. */
+    readonly "game_result": Omit<typeof tablesSchema.schemaType.tables["gameResult"], "accessorName"> & { readonly accessorName: "game_result" };
     /** @deprecated Use `ghostWind` instead. This alias will be removed in the next major version. */
     readonly "ghost_wind": Omit<typeof tablesSchema.schemaType.tables["ghostWind"], "accessorName"> & { readonly accessorName: "ghost_wind" };
+    /** @deprecated Use `lobbyPlayer` instead. This alias will be removed in the next major version. */
+    readonly "lobby_player": Omit<typeof tablesSchema.schemaType.tables["lobbyPlayer"], "accessorName"> & { readonly accessorName: "lobby_player" };
     /** @deprecated Use `marketAccount` instead. This alias will be removed in the next major version. */
     readonly "market_account": Omit<typeof tablesSchema.schemaType.tables["marketAccount"], "accessorName"> & { readonly accessorName: "market_account" };
     /** @deprecated Use `marketBot` instead. This alias will be removed in the next major version. */
@@ -406,6 +578,8 @@ type __SchemaWithTableAccessorAliases = Omit<typeof tablesSchema.schemaType, "ta
     readonly "market_round": Omit<typeof tablesSchema.schemaType.tables["marketRound"], "accessorName"> & { readonly accessorName: "market_round" };
     /** @deprecated Use `playerDecision` instead. This alias will be removed in the next major version. */
     readonly "player_decision": Omit<typeof tablesSchema.schemaType.tables["playerDecision"], "accessorName"> & { readonly accessorName: "player_decision" };
+    /** @deprecated Use `batteryMyPending` instead. This alias will be removed in the next major version. */
+    readonly "battery_my_pending": Omit<typeof tablesSchema.schemaType.tables["batteryMyPending"], "accessorName"> & { readonly accessorName: "battery_my_pending" };
     /** @deprecated Use `latestForecast` instead. This alias will be removed in the next major version. */
     readonly "latest_forecast": Omit<typeof tablesSchema.schemaType.tables["latestForecast"], "accessorName"> & { readonly accessorName: "latest_forecast" };
     /** @deprecated Use `marketLeaderboard` instead. This alias will be removed in the next major version. */
@@ -429,7 +603,13 @@ const REMOTE_MODULE = {
 
 const tableAccessorAliases = {
   "battery_action": "batteryAction",
+  "battery_decision": "batteryDecision",
+  "battery_player": "batteryPlayer",
+  "battery_round": "batteryRound",
+  "battery_slot": "batterySlot",
+  "game_result": "gameResult",
   "ghost_wind": "ghostWind",
+  "lobby_player": "lobbyPlayer",
   "market_account": "marketAccount",
   "market_bot": "marketBot",
   "market_bot_p": "marketBotP",
@@ -438,6 +618,7 @@ const tableAccessorAliases = {
   "market_question": "marketQuestion",
   "market_round": "marketRound",
   "player_decision": "playerDecision",
+  "battery_my_pending": "batteryMyPending",
   "latest_forecast": "latestForecast",
   "market_leaderboard": "marketLeaderboard",
 } as const;
@@ -462,8 +643,20 @@ type __DbViewBase = __DbConnectionImpl<typeof REMOTE_MODULE>["db"];
 export type DbView = __DbViewBase & {
   /** @deprecated Use `batteryAction` instead. This alias will be removed in the next major version. */
   readonly "battery_action": __DbViewBase["batteryAction"];
+  /** @deprecated Use `batteryDecision` instead. This alias will be removed in the next major version. */
+  readonly "battery_decision": __DbViewBase["batteryDecision"];
+  /** @deprecated Use `batteryPlayer` instead. This alias will be removed in the next major version. */
+  readonly "battery_player": __DbViewBase["batteryPlayer"];
+  /** @deprecated Use `batteryRound` instead. This alias will be removed in the next major version. */
+  readonly "battery_round": __DbViewBase["batteryRound"];
+  /** @deprecated Use `batterySlot` instead. This alias will be removed in the next major version. */
+  readonly "battery_slot": __DbViewBase["batterySlot"];
+  /** @deprecated Use `gameResult` instead. This alias will be removed in the next major version. */
+  readonly "game_result": __DbViewBase["gameResult"];
   /** @deprecated Use `ghostWind` instead. This alias will be removed in the next major version. */
   readonly "ghost_wind": __DbViewBase["ghostWind"];
+  /** @deprecated Use `lobbyPlayer` instead. This alias will be removed in the next major version. */
+  readonly "lobby_player": __DbViewBase["lobbyPlayer"];
   /** @deprecated Use `marketAccount` instead. This alias will be removed in the next major version. */
   readonly "market_account": __DbViewBase["marketAccount"];
   /** @deprecated Use `marketBot` instead. This alias will be removed in the next major version. */
@@ -480,6 +673,8 @@ export type DbView = __DbViewBase & {
   readonly "market_round": __DbViewBase["marketRound"];
   /** @deprecated Use `playerDecision` instead. This alias will be removed in the next major version. */
   readonly "player_decision": __DbViewBase["playerDecision"];
+  /** @deprecated Use `batteryMyPending` instead. This alias will be removed in the next major version. */
+  readonly "battery_my_pending": __DbViewBase["batteryMyPending"];
   /** @deprecated Use `latestForecast` instead. This alias will be removed in the next major version. */
   readonly "latest_forecast": __DbViewBase["latestForecast"];
   /** @deprecated Use `marketLeaderboard` instead. This alias will be removed in the next major version. */
@@ -490,8 +685,20 @@ type __TablesBase = __QueryBuilder<typeof tablesSchema.schemaType>;
 export type Tables = __TablesBase & {
   /** @deprecated Use `batteryAction` instead. This alias will be removed in the next major version. */
   readonly "battery_action": __TablesBase["batteryAction"];
+  /** @deprecated Use `batteryDecision` instead. This alias will be removed in the next major version. */
+  readonly "battery_decision": __TablesBase["batteryDecision"];
+  /** @deprecated Use `batteryPlayer` instead. This alias will be removed in the next major version. */
+  readonly "battery_player": __TablesBase["batteryPlayer"];
+  /** @deprecated Use `batteryRound` instead. This alias will be removed in the next major version. */
+  readonly "battery_round": __TablesBase["batteryRound"];
+  /** @deprecated Use `batterySlot` instead. This alias will be removed in the next major version. */
+  readonly "battery_slot": __TablesBase["batterySlot"];
+  /** @deprecated Use `gameResult` instead. This alias will be removed in the next major version. */
+  readonly "game_result": __TablesBase["gameResult"];
   /** @deprecated Use `ghostWind` instead. This alias will be removed in the next major version. */
   readonly "ghost_wind": __TablesBase["ghostWind"];
+  /** @deprecated Use `lobbyPlayer` instead. This alias will be removed in the next major version. */
+  readonly "lobby_player": __TablesBase["lobbyPlayer"];
   /** @deprecated Use `marketAccount` instead. This alias will be removed in the next major version. */
   readonly "market_account": __TablesBase["marketAccount"];
   /** @deprecated Use `marketBot` instead. This alias will be removed in the next major version. */
@@ -508,6 +715,8 @@ export type Tables = __TablesBase & {
   readonly "market_round": __TablesBase["marketRound"];
   /** @deprecated Use `playerDecision` instead. This alias will be removed in the next major version. */
   readonly "player_decision": __TablesBase["playerDecision"];
+  /** @deprecated Use `batteryMyPending` instead. This alias will be removed in the next major version. */
+  readonly "battery_my_pending": __TablesBase["batteryMyPending"];
   /** @deprecated Use `latestForecast` instead. This alias will be removed in the next major version. */
   readonly "latest_forecast": __TablesBase["latestForecast"];
   /** @deprecated Use `marketLeaderboard` instead. This alias will be removed in the next major version. */

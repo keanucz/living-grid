@@ -43,11 +43,11 @@ function useRegime(day) {
   return title
 }
 
-function useMarket() {
+function useMarket(lobbyId = null) {
   const [s, setS] = useState({ status: 'connecting' })
   const api = useRef(null)
   useEffect(() => {
-    api.current = connectMarket({ onState: (n) => setS((p) => ({ ...p, ...n })) })
+    api.current = connectMarket({ lobbyId, onState: (n) => setS((p) => ({ ...p, ...n })) })
     return () => api.current?.close()
   }, [])
   return [s, api]
@@ -204,8 +204,12 @@ function Bots({ bots, rival, onPick }) {
   )
 }
 
-function Phone() {
-  const [s, api] = useMarket()
+// The round on a phone. With a lobbyId (from the lobby view) it shows that room only and players come from
+// lobby_player, so there is no separate join step; footer is rendered under the round (rematch / leave).
+export function Phone({ lobbyId = null, footer = null }) {
+  const [s0, api] = useMarket(lobbyId)
+  const member = lobbyId != null ? s0.lobbyPlayers?.find((p) => p.id === s0.me && p.lobbyId === lobbyId) : null
+  const s = { ...s0, player: s0.player ?? (member ? { name: member.name } : null) }
   const [rivalName, pickRival] = useRival()
   const rival = s.bots?.find((b) => b.name === rivalName) ?? null
   const [busy, setBusy] = useState(false)
@@ -258,6 +262,7 @@ function Phone() {
           <Leaderboard rows={s.leaderboard ?? []} meName={s.player.name} rivalTitle={rival?.title} />
         </>
       )}
+      {footer}
       <style>{CSS}</style>
     </div>
   )

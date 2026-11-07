@@ -7,20 +7,25 @@ const hexOf = (id) => id?.toHexString?.() ?? String(id)
 
 // Snapshot of one lobby's battery round from a connected `conn` (generated bindings) for the identity `me`.
 export function readBattery(conn, lobbyId, me) {
+  // The generated row types use camelCase fields; the round and players are handed to BatteryRound with the key names it reads.
   const rows = (t) => (conn.db[t] ? [...conn.db[t].iter()] : [])
   const mine = hexOf(me)
-  const round = rows('battery_round').find((r) => r.lobby_id === lobbyId) ?? null
+  const r = rows('battery_round').find((x) => x.lobbyId === lobbyId)
+  const round = r && {
+    lobby_id: r.lobbyId, status: r.status, slot: r.slot, n_slots: r.nSlots, start_slot: r.startSlot,
+    seconds_per_slot: r.secondsPerSlot, day_revealed: r.dayRevealed,
+  }
   const players = rows('battery_player')
-    .filter((p) => p.lobby_id === lobbyId)
-    .map((p) => ({ identity: hexOf(p.identity), name: p.name, soc: p.soc_mwh, pnl: p.pnl, isAgent: p.is_agent, kind: p.kind }))
+    .filter((p) => p.lobbyId === lobbyId)
+    .map((p) => ({ identity: hexOf(p.identity), name: p.name, soc: p.socMwh, pnl: p.pnl, isAgent: p.isAgent, kind: p.kind }))
   const slots = rows('battery_slot')
-    .filter((s) => s.lobby_id === lobbyId)
+    .filter((x) => x.lobbyId === lobbyId)
     .sort((a, b) => a.slot - b.slot)
-    .map((s) => ({ slot: s.slot, price: s.price }))
-  const decisions = rows('battery_decision').filter((d) => d.lobby_id === lobbyId)
-  const pending = Object.fromEntries(rows('battery_my_pending').filter((p) => p.lobby_id === lobbyId).map((p) => [p.slot, p.action]))
-  const settled = Object.fromEntries(decisions.filter((d) => hexOf(d.identity) === mine).map((d) => [d.slot, d]))
-  return { round, players, slots, mine, pending, settled, decisions }
+    .map((x) => ({ slot: x.slot, price: x.price }))
+  const decisions = rows('battery_decision').filter((d) => d.lobbyId === lobbyId)
+  const pending = Object.fromEntries(rows('battery_my_pending').filter((x) => x.lobbyId === lobbyId && hexOf(x.identity) === mine).map((x) => [x.slot, x.action]))
+  const settled = Object.fromEntries(decisions.filter((d) => hexOf(d.identity) === mine).map((d) => [d.slot, { slot: d.slot, action: d.action, price: d.price, pnl: d.pnl, soc: d.socMwh }]))
+  return { round: round ?? null, players, slots, mine, pending, settled, decisions }
 }
 
 export function decide(conn, slot, action) {

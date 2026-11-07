@@ -12,6 +12,7 @@ import {
 
 export default __t.row({
   key: __t.string().primaryKey(),
+  lobbyId: __t.u32().name("lobby_id"),
   hour: __t.u32(),
   label: __t.string(),
   value: __t.f64(),

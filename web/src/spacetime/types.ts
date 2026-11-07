@@ -77,6 +77,29 @@ export const BatteryActionIn = __t.object("BatteryActionIn", {
 });
 export type BatteryActionIn = __Infer<typeof BatteryActionIn>;
 
+export const BatteryDay = __t.object("BatteryDay", {
+  day: __t.string(),
+  regime: __t.string(),
+  startSlot: __t.u32(),
+  nSlots: __t.u32(),
+  pricesJson: __t.string(),
+  plansJson: __t.string(),
+});
+export type BatteryDay = __Infer<typeof BatteryDay>;
+
+export const BatteryDecision = __t.object("BatteryDecision", {
+  key: __t.string(),
+  lobbyId: __t.u32(),
+  identity: __t.identity(),
+  slot: __t.u32(),
+  action: __t.string(),
+  price: __t.f64(),
+  gridMwh: __t.f64(),
+  socMwh: __t.f64(),
+  pnl: __t.f64(),
+});
+export type BatteryDecision = __Infer<typeof BatteryDecision>;
+
 export const BatteryIn = __t.object("BatteryIn", {
   zone: __t.string(),
   strategy: __t.string(),
@@ -86,6 +109,56 @@ export const BatteryIn = __t.object("BatteryIn", {
   shareOfPerfect: __t.f64(),
 });
 export type BatteryIn = __Infer<typeof BatteryIn>;
+
+export const BatteryMyPending = __t.object("BatteryMyPending", {});
+export type BatteryMyPending = __Infer<typeof BatteryMyPending>;
+
+export const BatteryPending = __t.object("BatteryPending", {
+  key: __t.string(),
+  lobbyId: __t.u32(),
+  identity: __t.identity(),
+  slot: __t.u32(),
+  action: __t.string(),
+});
+export type BatteryPending = __Infer<typeof BatteryPending>;
+
+export const BatteryPlayer = __t.object("BatteryPlayer", {
+  key: __t.string(),
+  lobbyId: __t.u32(),
+  identity: __t.identity(),
+  name: __t.string(),
+  socMwh: __t.f64(),
+  pnl: __t.f64(),
+  isAgent: __t.bool(),
+  kind: __t.string(),
+});
+export type BatteryPlayer = __Infer<typeof BatteryPlayer>;
+
+export const BatteryRound = __t.object("BatteryRound", {
+  lobbyId: __t.u32(),
+  status: __t.string(),
+  slot: __t.u32(),
+  nSlots: __t.u32(),
+  startSlot: __t.u32(),
+  secondsPerSlot: __t.u32(),
+  dayRevealed: __t.string(),
+  startedAt: __t.timestamp(),
+});
+export type BatteryRound = __Infer<typeof BatteryRound>;
+
+export const BatterySecret = __t.object("BatterySecret", {
+  lobbyId: __t.u32(),
+  day: __t.string(),
+});
+export type BatterySecret = __Infer<typeof BatterySecret>;
+
+export const BatterySlot = __t.object("BatterySlot", {
+  key: __t.string(),
+  lobbyId: __t.u32(),
+  slot: __t.u32(),
+  price: __t.f64(),
+});
+export type BatterySlot = __Infer<typeof BatterySlot>;
 
 export const Carbon = __t.object("Carbon", {
   key: __t.string(),
@@ -132,6 +205,22 @@ export const ForecastIn = __t.object("ForecastIn", {
   modelVersion: __t.string(),
 });
 export type ForecastIn = __Infer<typeof ForecastIn>;
+
+export const GameResult = __t.object("GameResult", {
+  key: __t.string(),
+  lobbyId: __t.u32(),
+  roundNo: __t.u32(),
+  identity: __t.identity(),
+  name: __t.string(),
+  isBot: __t.bool(),
+  mode: __t.string(),
+  day: __t.string(),
+  rank: __t.u32(),
+  nPlayers: __t.u32(),
+  points: __t.f64(),
+  endedAt: __t.timestamp(),
+});
+export type GameResult = __Infer<typeof GameResult>;
 
 export const GhostWind = __t.object("GhostWind", {
   key: __t.string(),
@@ -182,7 +271,51 @@ export const LeaderboardRow = __t.object("LeaderboardRow", {
 });
 export type LeaderboardRow = __Infer<typeof LeaderboardRow>;
 
+export const Lobby = __t.object("Lobby", {
+  id: __t.u32(),
+  code: __t.string(),
+  host: __t.identity(),
+  mode: __t.string(),
+  state: __t.string(),
+  secondsPerHour: __t.u32(),
+  nQuestions: __t.u32(),
+  bots: __t.bool(),
+  createdAt: __t.timestamp(),
+  stateSince: __t.timestamp(),
+  roundNo: __t.u32(),
+  countdownUntil: __t.timestamp(),
+});
+export type Lobby = __Infer<typeof Lobby>;
+
+export const LobbyDayPlayed = __t.object("LobbyDayPlayed", {
+  key: __t.string(),
+  lobbyId: __t.u32(),
+  day: __t.string(),
+});
+export type LobbyDayPlayed = __Infer<typeof LobbyDayPlayed>;
+
+export const LobbyPlayer = __t.object("LobbyPlayer", {
+  key: __t.string(),
+  lobbyId: __t.u32(),
+  identity: __t.identity(),
+  name: __t.string(),
+  avatar: __t.string(),
+  ready: __t.bool(),
+  points: __t.f64(),
+});
+export type LobbyPlayer = __Infer<typeof LobbyPlayer>;
+
+export const LobbyTick = __t.object("LobbyTick", {
+  scheduledId: __t.u64(),
+  scheduledAt: __t.scheduleAt(),
+  kind: __t.string(),
+  lobbyId: __t.u32(),
+});
+export type LobbyTick = __Infer<typeof LobbyTick>;
+
 export const MarketAccount = __t.object("MarketAccount", {
+  key: __t.string(),
+  lobbyId: __t.u32(),
   identity: __t.identity(),
   name: __t.string(),
   points: __t.f64(),
@@ -192,19 +325,15 @@ export type MarketAccount = __Infer<typeof MarketAccount>;
 
 export const MarketAnswer = __t.object("MarketAnswer", {
   questionId: __t.string(),
+  lobbyId: __t.u32(),
   outcome: __t.bool(),
   actual: __t.f64(),
 });
 export type MarketAnswer = __Infer<typeof MarketAnswer>;
 
-export const MarketAnswerIn = __t.object("MarketAnswerIn", {
-  questionId: __t.string(),
-  outcome: __t.bool(),
-  actual: __t.f64(),
-});
-export type MarketAnswerIn = __Infer<typeof MarketAnswerIn>;
-
 export const MarketBot = __t.object("MarketBot", {
+  key: __t.string(),
+  lobbyId: __t.u32(),
   name: __t.string(),
   title: __t.string(),
   method: __t.string(),
@@ -215,16 +344,9 @@ export const MarketBot = __t.object("MarketBot", {
 });
 export type MarketBot = __Infer<typeof MarketBot>;
 
-export const MarketBotIn = __t.object("MarketBotIn", {
-  name: __t.string(),
-  title: __t.string(),
-  method: __t.string(),
-  kelly: __t.f64(),
-});
-export type MarketBotIn = __Infer<typeof MarketBotIn>;
-
 export const MarketBotP = __t.object("MarketBotP", {
   key: __t.string(),
+  lobbyId: __t.u32(),
   bot: __t.string(),
   questionId: __t.string(),
   p: __t.f64(),
@@ -233,15 +355,21 @@ export const MarketBotP = __t.object("MarketBotP", {
 });
 export type MarketBotP = __Infer<typeof MarketBotP>;
 
-export const MarketBotPIn = __t.object("MarketBotPIn", {
-  bot: __t.string(),
-  p: __t.f64(),
-  note: __t.string(),
+export const MarketDayPool = __t.object("MarketDayPool", {
+  day: __t.string(),
+  regime: __t.string(),
+  startHour: __t.u32(),
+  endHour: __t.u32(),
+  questionsJson: __t.string(),
+  answersJson: __t.string(),
+  feedJson: __t.string(),
+  cluesJson: __t.string(),
 });
-export type MarketBotPIn = __Infer<typeof MarketBotPIn>;
+export type MarketDayPool = __Infer<typeof MarketDayPool>;
 
 export const MarketFeed = __t.object("MarketFeed", {
   key: __t.string(),
+  lobbyId: __t.u32(),
   hour: __t.u32(),
   label: __t.string(),
   value: __t.f64(),
@@ -249,17 +377,11 @@ export const MarketFeed = __t.object("MarketFeed", {
 });
 export type MarketFeed = __Infer<typeof MarketFeed>;
 
-export const MarketFeedIn = __t.object("MarketFeedIn", {
-  label: __t.string(),
-  value: __t.f64(),
-  unit: __t.string(),
-});
-export type MarketFeedIn = __Infer<typeof MarketFeedIn>;
-
 export const MarketLeaderboard = __t.object("MarketLeaderboard", {});
 export type MarketLeaderboard = __Infer<typeof MarketLeaderboard>;
 
 export const MarketLeaderboardRow = __t.object("MarketLeaderboardRow", {
+  lobbyId: __t.u32(),
   rank: __t.u32(),
   name: __t.string(),
   points: __t.f64(),
@@ -267,25 +389,9 @@ export const MarketLeaderboardRow = __t.object("MarketLeaderboardRow", {
 });
 export type MarketLeaderboardRow = __Infer<typeof MarketLeaderboardRow>;
 
-export const MarketLeagueQuestionIn = __t.object("MarketLeagueQuestionIn", {
-  id: __t.string(),
-  text: __t.string(),
-  kind: __t.string(),
-  targetHour: __t.u32(),
-  unit: __t.string(),
-  threshold: __t.f64(),
-  modelP: __t.f64(),
-  modelNote: __t.string(),
-  get botP() {
-    return __t.array(MarketBotPIn);
-  },
-  series: __t.string(),
-  profileJson: __t.string(),
-});
-export type MarketLeagueQuestionIn = __Infer<typeof MarketLeagueQuestionIn>;
-
 export const MarketPosition = __t.object("MarketPosition", {
   key: __t.string(),
+  lobbyId: __t.u32(),
   identity: __t.identity(),
   questionId: __t.string(),
   yes: __t.f64(),
@@ -296,6 +402,7 @@ export type MarketPosition = __Infer<typeof MarketPosition>;
 
 export const MarketProfile = __t.object("MarketProfile", {
   questionId: __t.string(),
+  lobbyId: __t.u32(),
   series: __t.string(),
   profileJson: __t.string(),
 });
@@ -303,6 +410,9 @@ export type MarketProfile = __Infer<typeof MarketProfile>;
 
 export const MarketQuestion = __t.object("MarketQuestion", {
   id: __t.string(),
+  lobbyId: __t.u32(),
+  groupId: __t.string(),
+  optionLabel: __t.string(),
   text: __t.string(),
   kind: __t.string(),
   targetHour: __t.u32(),
@@ -319,18 +429,6 @@ export const MarketQuestion = __t.object("MarketQuestion", {
   roomPClose: __t.f64(),
 });
 export type MarketQuestion = __Infer<typeof MarketQuestion>;
-
-export const MarketQuestionIn = __t.object("MarketQuestionIn", {
-  id: __t.string(),
-  text: __t.string(),
-  kind: __t.string(),
-  targetHour: __t.u32(),
-  unit: __t.string(),
-  threshold: __t.f64(),
-  modelP: __t.f64(),
-  modelNote: __t.string(),
-});
-export type MarketQuestionIn = __Infer<typeof MarketQuestionIn>;
 
 export const MarketRound = __t.object("MarketRound", {
   id: __t.u32(),

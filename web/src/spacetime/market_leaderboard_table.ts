@@ -11,6 +11,7 @@ import {
 } from "spacetimedb";
 
 export default __t.row({
+  lobbyId: __t.u32().name("lobby_id"),
   rank: __t.u32(),
   name: __t.string(),
   points: __t.f64(),

@@ -10,22 +10,8 @@ import {
   type Infer as __Infer,
 } from "spacetimedb";
 
-import {
-  MarketQuestionIn,
-  MarketAnswerIn,
-} from "./types";
-
 export default {
-  title: __t.string(),
-  b: __t.f64(),
-  startHour: __t.u32(),
-  endHour: __t.u32(),
-  secondsPerHour: __t.u32(),
-  get questions() {
-    return __t.array(MarketQuestionIn);
-  },
-  get answers() {
-    return __t.array(MarketAnswerIn);
-  },
-  day: __t.string(),
+  name: __t.string(),
+  avatar: __t.string(),
+  mode: __t.string(),
 };
