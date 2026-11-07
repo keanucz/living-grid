@@ -120,3 +120,23 @@ def test_scores_route_uses_comparison(monkeypatch):
 def test_settle_against_perfect_on_flat_prices_is_zero():
     flat = pd.DataFrame({"ts": HOURS[:24], "price": 50.0})
     assert settle(baselines.perfect_foresight(flat), flat)["pnl"].sum() == pytest.approx(0.0)
+
+
+def test_charge_in_last_settled_hour_is_not_shown_as_a_loss():
+    """#94: energy still stored when the settled window ends is valued, so a charge in the last hour costs
+    at most the round-trip loss and degradation, not the whole purchase."""
+    b = Battery()
+    price = 100.0
+    ts = HOURS[:24]
+    real = pd.DataFrame({"ts": ts, "price": price})
+    hold = pd.DataFrame({"ts": ts, "action": "hold", "grid_mwh": 0.0, "mw": 0.0, "soc_mwh": 0.0})
+    last = hold.copy()
+    last.loc[23, ["action", "grid_mwh", "mw", "soc_mwh"]] = ["charge", 1.0, -1.0, b.eta]
+    settled = {name: settle(last if name in ("median_only", "risk_aware") else hold, real, b)
+               for name in compare.STRATEGIES}
+    res = {r["strategy"]: r for r in compare.summarise("FR", settled, b)}
+    purchase = price * 1.0
+    allowed = (1 - b.round_trip) * purchase + b.degradation_per_mwh * (1.0 + b.round_trip)
+    assert float(settled["risk_aware"]["pnl"].sum()) == pytest.approx(-purchase - b.degradation_per_mwh)
+    assert -allowed - 1e-6 <= res["risk_aware"]["profit"] < 0
+    assert res["median_only"]["profit"] == res["risk_aware"]["profit"]
