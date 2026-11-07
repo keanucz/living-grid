@@ -255,3 +255,40 @@ export const market_feed = table(
     unit: t.string(),
   }
 );
+
+// Bot league: one row per bot (Brier is the mean over the questions it priced, -1 before any settles; points are
+// in market_account under the same identity), each bot's probability per question, and the Nowcaster's inputs.
+export const market_bot = table(
+  { name: 'market_bot', public: true },
+  {
+    name: t.string().primaryKey(),
+    title: t.string(),
+    method: t.string(),
+    kelly: t.f64(),
+    identity: t.identity(),
+    brier: t.f64(),
+    n: t.u32(),
+  }
+);
+
+export const market_bot_p = table(
+  { name: 'market_bot_p', public: true },
+  {
+    key: t.string().primaryKey(),
+    bot: t.string(),
+    question_id: t.string().index('btree'),
+    p: t.f64(),
+    note: t.string(),
+    updated_hour: t.u32(),
+  }
+);
+
+// Our model's hourly quantiles for a question's series: forecasts made before the day, no outcomes.
+export const market_profile = table(
+  { name: 'market_profile' },
+  {
+    question_id: t.string().primaryKey(),
+    series: t.string(),
+    profile_json: t.string(),
+  }
+);

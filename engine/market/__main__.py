@@ -14,7 +14,7 @@ import time
 from datetime import date
 
 from engine import replay
-from engine.market import botdata, lmsr, questions
+from engine.market import botdata, bots, lmsr, questions
 from engine.publisher.client import Client, from_env
 from pipeline import cache
 
@@ -34,18 +34,19 @@ def plan(day: date, start_hour: int, end_hour: int, league: bool = False) -> tup
     if r is None:
         raise SystemExit(f"no replay for {day}: run python -m engine.replay {day} first")
     b = boalf_gb()
-    bots = botdata.load(day) if league else None
-    if league and bots is None:
+    league_data = botdata.load(day) if league else None
+    if league and league_data is None:
         raise SystemExit(f"no bot quantiles for {day}: run python -m engine.market.botdata --day {day} first")
-    return r, questions.build(r, b, end_hour, start_hour, league=bots), b
+    return r, questions.build(r, b, end_hour, start_hour, league=league_data), b
 
 
 def start_args(qs: list[questions.MarketQuestion], start: int, end: int, seconds: int, day: date, league: bool = False) -> list:
-    """market_start arguments. league=True sends the bot league's fields too: only for a module that accepts them (#140)."""
-    return [questions.TITLE, lmsr.B, start, end, seconds,
+    """Arguments of market_start, or of market_start_league (one more: the bots) when league=True."""
+    args = [questions.TITLE, lmsr.B, start, end, seconds,
             [(questions.league_public if league else questions.public)(q) for q in qs],
             [{"question_id": q.id, "outcome": q.outcome, "actual": q.actual} for q in qs],
             day.isoformat()]
+    return args + [bots.specs()] if league else args
 
 
 def run(client: Client | None, day: date, start: int, end: int, seconds: int, sleep=time.sleep, league: bool = False) -> list[str]:
@@ -58,7 +59,7 @@ def run(client: Client | None, day: date, start: int, end: int, seconds: int, sl
     if client is None:
         print(json.dumps([(questions.league_public if league else questions.public)(q) for q in qs], indent=2))
         return [q.id for q in qs]
-    client.call("market_start", *start_args(qs, start, end, seconds, day, league))
+    client.call("market_start_league" if league else "market_start", *start_args(qs, start, end, seconds, day, league))
     log.info("market: round started with %d questions", len(qs))
     for hour in range(start + 1, end + 2):
         sleep(seconds)
@@ -74,7 +75,7 @@ def main() -> None:
     ap.add_argument("--end", type=int, default=18)
     ap.add_argument("--seconds", type=int, default=30)
     ap.add_argument("--dry-run", action="store_true")
-    ap.add_argument("--league", action="store_true", help="send the bot league's probabilities too (needs the module from #140)")
+    ap.add_argument("--league", action="store_true", help="send the bot league's probabilities too (needs a module with market_start_league)")
     ap.add_argument("--reset", action="store_true", help="clear the round and every account (hides a revealed day)")
     args = ap.parse_args()
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(message)s")

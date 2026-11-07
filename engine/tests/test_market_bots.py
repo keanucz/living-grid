@@ -1,3 +1,4 @@
+import json
 import math
 
 import pytest
@@ -104,7 +105,9 @@ def test_bot_probabilities_use_only_as_of_quantiles_never_the_outcome():
     assert {q.id: q.bot_p for q in qs} == {q.id: q.bot_p for q in qs2}
     assert {q.id: q.profile for q in qs} == {q.id: q.profile for q in qs2}
     pub = questions.league_public(qs[0])
-    assert "outcome" not in pub and "actual" not in pub and "bot_p" in pub and "profile" in pub
+    assert "outcome" not in pub and "actual" not in pub
+    assert {x["bot"] for x in pub["bot_p"]} == set(qs[0].bot_p) and pub["series"] == qs[0].series
+    assert len(json.loads(pub["profile_json"])) == 24
 
 
 def test_legacy_public_payload_is_unchanged_for_the_deployed_module():
@@ -284,3 +287,101 @@ def test_bot_quantiles_for_the_day_come_from_fit_asof_and_predict_the_replay_row
     gb = next(s for s in out["series"] if s["zone"] == "GB" and s["target"] == "price_da")
     assert len(gb["points"]) == 24 and gb["points"][0]["bots"]["bot_engineer"] == {"p10": 180.0, "p50": 200.0, "p90": 220.0}
     assert [b["name"] for b in out["bots"]][0] == "lgbm_q"
+
+
+def test_runner_calls_market_start_league_with_the_bots_and_ticks_with_the_feed(monkeypatch):
+    from datetime import date
+
+    from engine.market import __main__ as runner
+    from engine.tests.test_market import FakeClient
+
+    r = replay_day()
+    monkeypatch.setattr(runner.replay, "load", lambda day: r)
+    monkeypatch.setattr(runner, "boalf_gb", lambda: boalf_history())
+    monkeypatch.setattr(runner.botdata, "load", lambda day: league_for(r))
+    c = FakeClient()
+    ids = runner.run(c, date(2026, 10, 26), start=12, end=18, seconds=30, sleep=lambda s: None, league=True)
+    name, args = c.calls[0]
+    assert name == "market_start_league" and len(args) == 9
+    qs, bot_list = args[5], args[8]
+    assert [q["id"] for q in qs] == ids and all("outcome" not in q and "actual" not in q for q in qs)
+    assert [b["name"] for b in bot_list] == list(bots.ORDER) and all(b["kelly"] > 0 for b in bot_list)
+    assert [n for n, _ in c.calls[1:]] == ["market_tick"] * 7
+    # without --league the deployed reducer is called with its old payload
+    c2 = FakeClient()
+    runner.run(c2, date(2026, 10, 26), start=12, end=18, seconds=30, sleep=lambda s: None)
+    assert c2.calls[0][0] == "market_start" and len(c2.calls[0][1]) == 8
+
+
+# ---------------- The module's copy of the rules agrees with this reference ----------------
+
+
+def _ts_rules(tmp_path, cases):
+    """Run spacetime/module/src/reducers/league_math.ts on the cases with node; skipped when esbuild or node is missing."""
+    import json
+    import shutil
+    import subprocess
+    from pathlib import Path
+
+    root = Path(__file__).resolve().parents[2]
+    esbuild = root / "web" / "node_modules" / ".bin" / "esbuild"
+    node = shutil.which("node")
+    if not esbuild.exists() or not node:
+        pytest.skip("node or esbuild not installed")
+    out = tmp_path / "league_math.mjs"
+    subprocess.run([str(esbuild), str(root / "spacetime/module/src/reducers/league_math.ts"), "--bundle", "--format=esm", f"--outfile={out}", "--log-level=error"], check=True)
+    script = tmp_path / "run.mjs"
+    script.write_text(f"""import * as m from './league_math.mjs';
+const cases = {json.dumps(cases)};
+const out = cases.map(c => {{
+  if (c.fn === 'kelly') return m.kellyShares(c.p, c.price, c.bank, c.f, c.cap, c.b, c.y, c.n);
+  if (c.fn === 'full') return m.fullKellyShares(c.p, c.side, c.bank, c.y, c.n, c.b);
+  if (c.fn === 'band') return m.bandProbability(c.x, c.p10, c.p50, c.p90);
+  const prof = new Map(c.profile.map(r => [r.hour, r]));
+  return m.nowcastProbability(c.x, c.target, c.clock, prof, new Map(c.obs), c.fallback);
+}});
+console.log(JSON.stringify(out));
+""")
+    res = subprocess.run([node, str(script)], capture_output=True, text=True, check=True)
+    return json.loads(res.stdout)
+
+
+def test_module_rules_match_the_python_reference(tmp_path):
+    rng = __import__("random").Random(7)
+    cases, want = [], []
+    for _ in range(40):
+        p, bank = rng.uniform(0.02, 0.98), rng.uniform(20, 1500)
+        y, n = rng.uniform(-60, 120), rng.uniform(-60, 120)
+        f, price = rng.choice([0.1, 0.35, 0.5]), lmsr.price_yes(y, n)
+        cases.append({"fn": "kelly", "p": p, "price": price, "bank": bank, "f": f, "cap": 150, "b": lmsr.B, "y": y, "n": n})
+        want.append(list(bots.kelly_shares(p, price, bank, f, 150, lmsr.B, y, n)))
+        side = rng.choice(["yes", "no"])
+        cases.append({"fn": "full", "p": p, "side": side, "bank": bank, "y": y, "n": n, "b": lmsr.B})
+        want.append(bots.full_kelly_shares(p, side, bank, y, n))
+        p50 = rng.uniform(40, 200)
+        lo, hi = p50 - rng.uniform(5, 30), p50 + rng.uniform(5, 40)
+        x = rng.uniform(20, 260)
+        cases.append({"fn": "band", "x": x, "p10": lo, "p50": p50, "p90": hi})
+        want.append(bots.band_probability(x, lo, p50, hi))
+        prof = [{"hour": h, "p10": 80 + h, "p50": 100 + h, "p90": 125 + h} for h in range(10, 20)]
+        obs = {h: 100 + h + rng.uniform(-30, 40) for h in range(10, 20) if rng.random() < 0.7}
+        clock, target = rng.randint(11, 17), rng.randint(14, 19)
+        cases.append({"fn": "now", "x": x, "target": target, "clock": clock, "profile": prof, "obs": [[h, v] for h, v in obs.items()], "fallback": 0.42})
+        want.append(bots.nowcast_probability(x, target, clock, {r["hour"]: r for r in prof}, obs, 0.42))
+    got = _ts_rules(tmp_path, cases)
+    for c, g, w in zip(cases, got, want):
+        if isinstance(w, list):
+            assert g[0] == w[0] and g[1] == pytest.approx(w[1], rel=1e-6, abs=1e-6), c
+        else:
+            assert g == pytest.approx(w, rel=1e-6, abs=1e-6), c
+
+
+def test_module_constants_match_the_reference():
+    import re
+    from pathlib import Path
+
+    ts = (Path(__file__).resolve().parents[2] / "spacetime/module/src/reducers/league_math.ts").read_text()
+    assert re.search(r"ORDER = \[(.*?)\]", ts).group(1).replace("'", "").replace(" ", "").split(",") == list(bots.ORDER)
+    for name, attr in (("BOT_MAX_SHARES", bots.MODEL_MAX_SHARES), ("ERROR_DECAY_PER_HOUR", bots.ERROR_DECAY_PER_HOUR), ("LEAD_H", bots.LEAD_H),
+                       ("MIN_BAND_SHARE", bots.MIN_BAND_SHARE), ("P_FLOOR", bots.P_FLOOR), ("P_CEIL", bots.P_CEIL)):
+        assert float(re.search(rf"const {name} = ([\d.]+);", ts).group(1)) == attr

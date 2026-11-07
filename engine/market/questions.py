@@ -6,6 +6,7 @@ wind Britain paid to switch off up to the end of play; the model's view there is
 previous 30 days that went above the line), and the question says so.
 """
 
+import json
 from dataclasses import asdict, dataclass, field
 
 import numpy as np
@@ -153,10 +154,14 @@ def public(q: MarketQuestion) -> dict:
 
 
 def league_public(q: MarketQuestion) -> dict:
-    """public() plus the bot league's probabilities, notes, feed label and profile, for a module that trades every bot."""
-    d = asdict(q)
-    d.pop("outcome")
-    d.pop("actual")
+    """What market_start_league takes: public() plus each bot's probability and note, the feed label and Our model's profile.
+
+    bot_p becomes a list of {bot, p, note} and profile a JSON string, the shapes the module's reducer declares.
+    """
+    d = public(q)
+    d["bot_p"] = [{"bot": n, "p": p, "note": q.bot_notes.get(n, "")} for n, p in q.bot_p.items()]
+    d["series"] = q.series
+    d["profile_json"] = json.dumps(q.profile) if q.profile else ""
     return d
 
 
