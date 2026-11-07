@@ -4,6 +4,7 @@ import { PANELS } from '../../panels/registry.js'
 import { VIEWS } from '../../views/index.js'
 import { actions } from '../../store/store.js'
 import { Icon } from '../icons.jsx'
+import LayerSwitch from './LayerSwitch.jsx'
 import '../../styles/mobile.css'
 
 // Phone layout (< 700 px): map on top, a bottom sheet with tabs that reuse the desktop panels.
@@ -42,6 +43,7 @@ export default function MobileShell({ ctx, at, source }) {
       {!View && (
         <section className="m-map">
           <MapView ctx={ctx} />
+          {tab === 'map' && <LayerSwitch layers={ctx.ui.layers} />}
           {sel && st && tab === 'map' && (
             <div className="m-sel">
               <b>{sel.name}</b>

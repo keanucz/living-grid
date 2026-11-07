@@ -40,3 +40,10 @@
 .m-sheet > * { flex: none; }
 .m-sheet .zonelist { display: block; }
 .m-sheet.full .hh-top { display: none; }
+
+/* layer switch on the phone Map tab */
+.m-map { position: relative; }
+.m-layers { position: absolute; top: 8px; left: 8px; right: 8px; display: flex; gap: 6px; overflow-x: auto; z-index: 5; scrollbar-width: none; }
+.m-layers::-webkit-scrollbar { display: none; }
+.m-layers button { flex: none; height: 32px; padding: 0 12px; border-radius: 16px; font-size: 12px; font-weight: 600; color: var(--text-2); background: var(--panel-solid); border: 1px solid var(--line); }
+.m-layers button.on { color: var(--bg); background: var(--accent); border-color: var(--accent); }
