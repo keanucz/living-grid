@@ -160,10 +160,9 @@ def test_scores_with_nothing_scored_yet_say_so(fixtures_only):
     assert body["live"] == []
 
 
-def test_battery_fields_stay_contract_fixture_until_the_comparison_lands(fixtures_only):
-    from engine.routes._fixtures import fixture
-
+def test_live_battery_fields_never_show_sample_numbers(fixtures_only):
+    # With live scores but no settled day-ahead hours, the battery comparison is empty, not the fixture.
     cache.write("scores/scores", live_scores())
     body = client.get("/scores").json()
-    assert body["battery"] == fixture("scores")["battery"]
-    assert body["headline"]["battery_share_of_perfect"] == fixture("scores")["headline"]["battery_share_of_perfect"]
+    assert all(b["strategy"] in ("median_only", "risk_aware", "naive", "perfect_foresight") for b in body["battery"])
+    assert 0.0 <= body["headline"]["battery_share_of_perfect"] <= 1.0

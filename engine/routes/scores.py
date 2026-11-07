@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 from fastapi import APIRouter
 
+from engine.battery import compare
 from engine.routes._fixtures import fixture
 from engine.schemas import ScoresResponse
 from pipeline import cache
@@ -81,14 +82,19 @@ def build_scores() -> dict:
     backtest = _read(WALK_FORWARD)
     if scores.empty and not sample:
         scores = pd.DataFrame(columns=["window_start", "window_end", "zone", "target", "metric", "model", "value", "n"])
-    battery = fixture("scores")  # stays contract fixture data until #51 scores the batteries on real forecasts
+    if sample:
+        sample_body = fixture("scores")
+        battery, share = sample_body["battery"], sample_body["headline"]["battery_share_of_perfect"]
+    else:
+        out = compare.run()
+        battery, share = out["results"], out["share"]
     as_of = pd.to_datetime(scores["window_end"]).max() if len(scores) else pd.Timestamp.now(tz="UTC")
     return {
         "as_of": as_of.to_pydatetime(),
-        "headline": headline(scores, sample, battery["headline"]["battery_share_of_perfect"]),
+        "headline": headline(scores, sample, share),
         "live": live_rows(scores) if len(scores) else [],
         "backtest": backtest_rows(backtest) if len(backtest) else [],
-        "battery": battery["battery"],
+        "battery": battery,
     }
 
 
