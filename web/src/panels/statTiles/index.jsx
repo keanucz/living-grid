@@ -56,7 +56,7 @@ function StatTiles({ ctx }) {
         <span className="faint">paid to switch off</span>
       </div>
       <style>{`
-        .tiles { display: flex; gap: 10px; align-items: flex-end; margin-left: 180px; }
+        .tiles { display: flex; gap: 10px; align-items: flex-end; }
         .tile { background: var(--panel-solid); border: 1px solid var(--line); border-radius: 24px; padding: 14px 20px; min-width: 150px; display: flex; flex-direction: column; gap: 4px; box-shadow: var(--shadow); }
         .tile.big { min-width: 210px; border-color: rgba(255,138,31,.35); }
         .tile .tl { color: var(--text-2); font-size: 13px; display: flex; align-items: center; white-space: nowrap; }
