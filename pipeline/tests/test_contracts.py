@@ -80,3 +80,9 @@ def test_cache_roundtrip_and_offline(tmp_path, monkeypatch):
 
 def test_ingest_autodiscovery():
     assert isinstance(ingest.sources(), dict)
+
+
+def test_wind_metered_reads_offline_from_the_fixture(tmp_path, monkeypatch):
+    monkeypatch.setattr(cache, "DATA", tmp_path)
+    df = schemas.validate(cache.read("boalf/wind_metered"), "boalf/wind_metered")
+    assert list(df.columns) == ["ts", "bm_unit", "mwh", "source"] and set(df["source"]) <= {"B1610", "PN"}

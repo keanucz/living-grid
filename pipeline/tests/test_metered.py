@@ -139,7 +139,7 @@ def test_run_merges_and_metered_replaces_planned_but_never_the_reverse(monkeypat
 
 
 def test_recorded_snapshot_covers_26_october_and_a_recent_day():
-    df = pd.read_parquet(FX / "wind_metered.parquet")
+    df = cache.read_file(cache.FIXTURES / "boalf" / "wind_metered.parquet")
     assert list(df.columns) == metered.COLUMNS and str(df.ts.dt.tz) == "UTC"
     storm = df[df.ts.dt.date == pd.Timestamp("2026-10-26").date()]
     assert storm.bm_unit.nunique() >= 25 and len(storm) == storm.bm_unit.nunique() * 24 and set(storm.source) == {"B1610"}

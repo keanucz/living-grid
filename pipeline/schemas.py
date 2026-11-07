@@ -92,6 +92,9 @@ BOT_LEAGUE = pa.schema(
     ]
 )
 
+# Metered (B1610, else PN) hourly output per mapped Scottish wind BM unit; the metered side of ghost wind estimate 2.
+WIND_METERED = pa.schema([("ts", TS), ("bm_unit", pa.string()), ("mwh", pa.float64()), ("source", pa.string())])
+
 GAS_MARGINAL_SHARE = pa.schema(
     [("zone", pa.string()), ("hour_of_day", pa.int32()), ("month", pa.int32()), ("share", pa.float64())]
 )
@@ -159,6 +162,7 @@ SCHEMAS = {
     "features/gas_marginal_share": GAS_MARGINAL_SHARE,
     "carbon/consumption_intensity": CARBON,
     "weather": WEATHER,
+    "boalf/wind_metered": WIND_METERED,
     "carbon_intensity/regional": REGIONAL_CARBON,
     "carbon_intensity/regional_mix": REGIONAL_MIX,
     "scores/scores": SCORES,
