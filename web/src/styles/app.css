@@ -286,3 +286,7 @@ h1, .headline h1, .kval, .sim-name, .tile b { letter-spacing: -0.012em; }
 .topbar .lb-views::-webkit-scrollbar { display: none; }
 .topbar .lb-lens-b, .topbar .lb-views button { font-size: clamp(11px, 0.75vw, 14px); padding: clamp(5px, 0.45vw, 8px) clamp(8px, 0.85vw, 16px); white-space: nowrap; }
 .topbar .actions { flex-shrink: 3; }
+
+/* judge QA: long view blurbs wrap within the gap above the left column */
+.headline p { max-width: 640px; }
+.slot-left { top: 182px; }

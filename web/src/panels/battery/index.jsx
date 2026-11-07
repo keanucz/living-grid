@@ -33,7 +33,7 @@ function Battery({ ctx }) {
   return (
     <section className="panel batt fade-in">
       <div className="panel-head">
-        <span><Icon name="battery" size={16} /> 1 MW / 2 MWh battery <span className="tag" style={{ marginLeft: 6 }}>Settled on real prices</span></span>
+        <span><Icon name="battery" size={16} /> 1 MW / 2 MWh battery <span className="tag" style={{ marginLeft: 6 }} title="Per zone, over the hours settled so far on real day-ahead prices; the scoreboard pools all zones">Per zone · settled hours</span></span>
         <div className="batt-zones">
           {zones.map((k) => <button key={k} className={k === z ? 'on' : ''} onClick={() => setZone(k)}>{k}</button>)}
         </div>

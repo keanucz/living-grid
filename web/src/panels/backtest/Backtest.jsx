@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { backtestSummary, backtestTable, pct } from '../scoreboard/summary.js'
 
 const TARGETS = [
@@ -21,7 +22,8 @@ export default function Backtest({ rows, source, onClose }) {
   const shown = table.filter((r) => r.target === target)
   const all = backtestSummary(table)
   const here = backtestSummary(shown)
-  return (
+  // Portal to <body>: the panel's backdrop-filter would otherwise trap position:fixed, letting other cards cover it.
+  return createPortal(
     <div className="bt-scrim" onClick={onClose}>
       <section className="panel bt" onClick={(e) => e.stopPropagation()}>
         <div className="panel-head">
@@ -44,9 +46,9 @@ export default function Backtest({ rows, source, onClose }) {
           <thead>
             <tr>
               <th>Zone</th>
-              <th>Model error</th>
-              <th>Persistence</th>
-              <th>Yesterday</th>
+              <th>Model error ({UNIT[target]})</th>
+              <th>Persistence ({UNIT[target]})</th>
+              <th>Yesterday ({UNIT[target]})</th>
               <th>vs persistence</th>
               <th>vs yesterday</th>
               <th>Inside P10–P90</th>
@@ -98,6 +100,7 @@ export default function Backtest({ rows, source, onClose }) {
         .bt-v.loss { background: rgba(240,121,107,.2); color: var(--up); }
         .bt-foot { margin: 14px 18px 0; font-size: 14px; color: var(--text-3); line-height: 1.5; }
       `}</style>
-    </div>
+    </div>,
+    document.body,
   )
 }

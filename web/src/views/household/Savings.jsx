@@ -5,7 +5,10 @@ import { useEffect, useState } from 'react'
 const TZ = 'Europe/London'
 const t = (iso) => new Date(iso).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', timeZone: TZ })
 const day = (iso) => new Date(iso).toLocaleDateString('en-GB', { weekday: 'short', timeZone: TZ })
-const gbp = (v) => (v >= 10 ? `£${Math.round(v)}` : `£${v.toFixed(2)}`)
+const gbp = (v) => {
+  const a = Math.abs(v)
+  return `${v < 0 ? '−' : ''}£${a >= 10 ? Math.round(a) : a.toFixed(2)}`
+}
 const pence = (v) => `${Math.round(v)}p`
 
 function load(region) {
@@ -40,12 +43,17 @@ export default function Savings({ region }) {
   return (
     <section className="sv">
       <div className="sv-kicker">Compared with the price cap</div>
-      {h && hd && (
+      {h && hd && (perKwh(h.cost_gbp.p50) <= s.cap.p_kwh ? (
         <h2 className="sv-head">
           {h.label} at {t(h.start)}: <b>{pence(perKwh(h.cost_gbp.p50))}</b> a kWh, against{' '}
-          {pence(perKwh(h.cost_gbp.p50 + h.saving_vs_6pm_gbp.p50))} at 6 pm and {pence(s.cap.p_kwh)} on the price cap.
+          {pence(perKwh(h.cost_gbp.p50 + h.saving_vs_6pm_gbp.p50))} at the 6 pm peak and {pence(s.cap.p_kwh)} on the price cap.
         </h2>
-      )}
+      ) : (
+        <h2 className="sv-head">
+          Tonight Agile is dearer than the price cap: the cheapest slot is <b>{pence(perKwh(h.cost_gbp.p50))}</b> a kWh against{' '}
+          {pence(s.cap.p_kwh)} on the cap. Shifting still beats the 6 pm peak ({pence(perKwh(h.cost_gbp.p50 + h.saving_vs_6pm_gbp.p50))}).
+        </h2>
+      ))}
 
       <div className="sv-toggles" role="group" aria-label="Devices">
         {(s.devices ?? []).map((d) => (
@@ -64,11 +72,11 @@ export default function Savings({ region }) {
           </div>
           <div className="sv-n">
             <b className="num">{gbp(w.saving_vs_cap_gbp.p50)}</b>
-            <span>vs cap ({gbp(w.saving_vs_cap_gbp.p10)}–{gbp(w.saving_vs_cap_gbp.p90)})</span>
+            <span>{w.saving_vs_cap_gbp.p50 < 0 ? 'dearer than cap' : 'vs cap'} ({gbp(w.saving_vs_cap_gbp.p10)} to {gbp(w.saving_vs_cap_gbp.p90)})</span>
           </div>
           <div className="sv-n">
             <b className="num">{gbp(w.saving_vs_6pm_gbp.p50)}</b>
-            <span>vs 6 pm</span>
+            <span>vs 6 pm peak</span>
           </div>
         </div>
       ))}
@@ -76,7 +84,7 @@ export default function Savings({ region }) {
       {yr && (
         <div className="sv-year">
           <div>
-            <span className="sv-k">Over a year, vs running at 6 pm</span>
+            <span className="sv-k">Over a year, vs running at the 6 pm peak</span>
             <b className="num">{gbp(yr.low)}–{gbp(yr.high)}</b>
           </div>
           {yrCap && (
