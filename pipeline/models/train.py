@@ -45,7 +45,10 @@ MIN_ROWS = 200
 
 def target_frames(inp: build.Inputs) -> dict[str, pd.DataFrame]:
     """Wide hourly actuals (ts index, zone columns) for each target."""
-    out = {"price_da": inp.price, "load": inp.load, "wind": inp.wind}
+    # Energy-Charts load and wind for Norway cover the whole country, not NO2, so they are not NO2 targets.
+    country_level = ["NO2"]
+    out = {"price_da": inp.price, "load": inp.load.drop(columns=country_level, errors="ignore"),
+           "wind": inp.wind.drop(columns=country_level, errors="ignore")}
     try:
         sp = cache.read("actuals/elexon_system_price")
         out["gb_system_price"] = sp[sp["zone"] == "GB"].set_index("ts")["value"].sort_index().to_frame("GB")

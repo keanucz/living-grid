@@ -237,3 +237,12 @@ def test_promote_refuses_incomplete_and_existing(populated):  # noqa: F811
     assert path.exists() and quantile.current() is None
     with pytest.raises(FileNotFoundError):
         promote.promote("nothing-here")
+
+
+def test_country_level_norway_load_and_wind_are_not_training_targets(populated):  # noqa: F811
+    wides = train.target_frames(train.build.Inputs())
+    assert "NO2" in wides["price_da"] and "NO2" not in wides["load"] and "NO2" not in wides["wind"]
+    assert {"GB", "FR"} <= set(wides["load"])
+    path = train.train(["load", "wind"], trained_before=MADE_AT, trained_at=MADE_AT, version="no-no2", params=SMALL)
+    meta = json.loads((path / "meta.json").read_text())
+    assert "NO2" not in meta["zones"]["load"] and "NO2" not in meta["zones"]["wind"]

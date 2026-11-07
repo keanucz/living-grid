@@ -108,3 +108,7 @@ def test_precomputed_response_is_fast(model):
 def test_cli_fails_cleanly_without_a_model(populated):  # noqa: F811
     assert rp.main(["--event", "2026-10-26"]) == 1
     assert not rp.path(EVENT).exists()
+
+
+def test_replay_has_no_load_or_wind_series_so_country_level_norway_cannot_appear(model):
+    assert {s["target"] for s in rp.compute(EVENT, model=model)["series"]} <= {"price_da", "gb_system_price"}
