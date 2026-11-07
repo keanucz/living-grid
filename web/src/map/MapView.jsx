@@ -15,7 +15,7 @@ const LIGHTING = new LightingEffect({
 })
 
 const VIEWS = {
-  overview: { longitude: 6.5, latitude: 53.2, zoom: 4.15, pitch: 0, bearing: 0 },
+  overview: { longitude: 6.5, latitude: 54.4, zoom: 4.05, pitch: 0, bearing: 0 },
   simulate: { longitude: 4.2, latitude: 51.4, zoom: 4.35, pitch: 56, bearing: -16 },
 }
 // Phones frame the same zones in a short, narrow map.
@@ -180,7 +180,7 @@ function Overlay({ viewport, ctx }) {
 
   return (
     <div className="overlay">
-      {!sim &&
+      {!sim && ui.section !== 'unseen' &&
         data.zones.zones.map((z) => {
           const [x, y] = project(z.label_at)
           const st = ctx.stateByZone[z.id]

@@ -32,6 +32,8 @@ function SimDock({ ctx }) {
     try {
       const result = await api.intervene({ type: armed, magnitude: mag, hours: sc.hours })
       setRun({ status: 'done', result, key, type: armed })
+      // The result card renders below the menu; scroll the left column so it is not below the fold.
+      setTimeout(() => document.querySelector('.slot-left')?.scrollTo({ top: 1e5, behavior: 'smooth' }), 120)
       actions.setLiveResult(armed, result)
     } catch {
       setRun({ status: 'fallback', result: null, key, type: armed })
