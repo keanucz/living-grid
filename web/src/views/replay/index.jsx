@@ -3,6 +3,7 @@ import { area, line, curveMonotoneX } from 'd3-shape'
 import { scaleLinear, scaleUtc } from 'd3-scale'
 import { Icon } from '../../shell/icons.jsx'
 import { fmt } from '../../styles/tokens.js'
+import Movie from '../events/Movie.jsx'
 
 const EVENT = '2026-10-26'
 const W = 900
@@ -16,6 +17,7 @@ function Replay() {
   const [key, setKey] = useState('GB|price_da')
   const [i, setI] = useState(23)
   const [playing, setPlaying] = useState(false)
+  const [mode, setMode] = useState('forecast')
 
   useEffect(() => {
     const ctrl = new AbortController()
@@ -58,16 +60,24 @@ function Replay() {
       <header className="rp-top">
         <a href="#/" className="rp-back" aria-label="Back to the map"><Icon name="back" /></a>
         <div>
-          <div className="rp-kicker">Replay · out-of-sample</div>
-          <h1>{d?.title ?? 'The 26 October storm'}</h1>
-          <p>Would we have seen it coming? Forecasts from a model trained only on data before {d?.trained_before ?? EVENT}, made 12 hours ahead.</p>
+          <div className="rp-kicker">{mode === 'movies' ? 'Event movies' : 'Replay · out-of-sample'}</div>
+          <h1>{mode === 'movies' ? 'The big days in our data' : (d?.title ?? 'The 26 October storm')}</h1>
+          <p>{mode === 'movies'
+            ? 'Each movie plays an event from public data, with the moments that mattered and a plain-English script.'
+            : `Would we have seen it coming? Forecasts from a model trained only on data before ${d?.trained_before ?? EVENT}, made 12 hours ahead.`}</p>
         </div>
       </header>
 
-      {d === undefined && <p className="rp-muted">Loading the replay…</p>}
-      {d === null && <p className="rp-muted">The replay isn’t available right now.</p>}
+      <div className="rp-tabs rp-mode" role="tablist" aria-label="Replay views">
+        <button role="tab" aria-selected={mode === 'forecast'} className={mode === 'forecast' ? 'on' : ''} onClick={() => setMode('forecast')}>Forecast replay</button>
+        <button role="tab" aria-selected={mode === 'movies'} className={mode === 'movies' ? 'on' : ''} onClick={() => setMode('movies')}>Event movies</button>
+      </div>
 
-      {s && (
+      {mode === 'movies' && <Movie onOpenReplay={() => setMode('forecast')} />}
+      {mode === 'forecast' && d === undefined && <p className="rp-muted">Loading the replay…</p>}
+      {mode === 'forecast' && d === null && <p className="rp-muted">The replay isn’t available right now.</p>}
+
+      {mode === 'forecast' && s && (
         <>
           <div className="rp-controls">
             <div className="rp-tabs">
@@ -145,6 +155,7 @@ body { overflow: auto; }
 .rp-why p { margin: 4px 0 0; line-height: 1.45; }
 .rp-sum { font-size: 12px; color: var(--text-3); line-height: 1.5; margin: 0; }
 .rp-muted { color: var(--text-2); }
+.rp-mode { margin-bottom: 16px; }
 `
 
 export default { path: '/replay', title: 'Replay: 26 October storm', Component: Replay }

@@ -18,6 +18,7 @@ const proxy = {
 
 export default defineConfig({
   plugins: [react()],
-  server: { proxy },
+  // Event movies read the committed event library in ../data/events, outside the web root.
+  server: { proxy, fs: { allow: ['..'] } },
   preview: { proxy },
 })
