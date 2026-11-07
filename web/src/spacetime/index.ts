@@ -42,7 +42,10 @@ import DeleteKeysReducer from "./delete_keys_reducer";
 import JoinReducer from "./join_reducer";
 import PruneBeforeReducer from "./prune_before_reducer";
 import RemoveAdminReducer from "./remove_admin_reducer";
+import ResetGameReducer from "./reset_game_reducer";
+import SetAgentReducer from "./set_agent_reducer";
 import SetInterventionReducer from "./set_intervention_reducer";
+import SettleDecisionsReducer from "./settle_decisions_reducer";
 import UpsertActualsReducer from "./upsert_actuals_reducer";
 import UpsertBatteriesReducer from "./upsert_batteries_reducer";
 import UpsertBatteryActionsReducer from "./upsert_battery_actions_reducer";
@@ -250,7 +253,10 @@ const reducersSchema = __reducers(
   __reducerSchema("join", JoinReducer),
   __reducerSchema("prune_before", PruneBeforeReducer),
   __reducerSchema("remove_admin", RemoveAdminReducer),
+  __reducerSchema("reset_game", ResetGameReducer),
+  __reducerSchema("set_agent", SetAgentReducer),
   __reducerSchema("set_intervention", SetInterventionReducer),
+  __reducerSchema("settle_decisions", SettleDecisionsReducer),
   __reducerSchema("upsert_actuals", UpsertActualsReducer),
   __reducerSchema("upsert_batteries", UpsertBatteriesReducer),
   __reducerSchema("upsert_battery_actions", UpsertBatteryActionsReducer),

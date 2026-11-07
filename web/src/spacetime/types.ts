@@ -36,6 +36,12 @@ export const Admin = __t.object("Admin", {
 });
 export type Admin = __Infer<typeof Admin>;
 
+export const AgentDecision = __t.object("AgentDecision", {
+  slotUs: __t.i64(),
+  action: __t.string(),
+});
+export type AgentDecision = __Infer<typeof AgentDecision>;
+
 export const Battery = __t.object("Battery", {
   key: __t.string(),
   zone: __t.string(),
@@ -221,6 +227,13 @@ export const ScoreIn = __t.object("ScoreIn", {
   n: __t.u32(),
 });
 export type ScoreIn = __Infer<typeof ScoreIn>;
+
+export const Settlement = __t.object("Settlement", {
+  key: __t.string(),
+  pnl: __t.f64(),
+  final: __t.bool(),
+});
+export type Settlement = __Infer<typeof Settlement>;
 
 export const Zone = __t.object("Zone", {
   code: __t.string(),
