@@ -1,7 +1,8 @@
 """LightGBM quantile models (alpha 0.1, 0.5, 0.9) per target, with a stub fallback when none are trained.
 
 Models live in data/models/<version>/ (see pipeline.models.train). One pooled booster per target and quantile,
-with the zone as a categorical feature. Quantiles are sorted per row so p10 <= p50 <= p90.
+with the zone as a categorical feature. Quantiles are sorted per row so p10 <= p50 <= p90, then the P10-P90 band
+is scaled by the per-target conformal factor in meta.json["calibration"] when present (pipeline.models.calibrate).
 """
 
 import functools
@@ -14,6 +15,7 @@ import numpy as np
 import pandas as pd
 
 from pipeline import cache, schemas
+from pipeline.models import calibrate
 
 VERSION = "stub-0"
 QUANTILES = {"p10": 0.1, "p50": 0.5, "p90": 0.9}
@@ -36,6 +38,12 @@ def design(features: pd.DataFrame) -> pd.DataFrame:
     x = features[schemas.FEATURE_COLUMNS].astype("float64").copy()
     x.insert(0, "zone_id", zone_id(features["zone"]))
     return x[FEATURES]
+
+
+def raw_quantiles(boosters: dict, features: pd.DataFrame) -> np.ndarray:
+    """(n, 3) sorted p10, p50, p90 straight from the boosters, before calibration."""
+    x = design(features)
+    return np.sort(np.column_stack([boosters[q].predict(x, num_threads=1) for q in QUANTILES]), axis=1)
 
 
 class QuantileModel:
@@ -67,9 +75,10 @@ class QuantileModel:
 
     def _quantiles(self, target: str, features: pd.DataFrame) -> pd.DataFrame:
         if self.boosters:
-            x = design(features)
-            raw = np.column_stack([self.boosters[target][q].predict(x, num_threads=1) for q in QUANTILES])
-            p = np.sort(raw, axis=1)
+            p = raw_quantiles(self.boosters[target], features)
+            s = self.meta.get("calibration", {}).get(target, {}).get("scale")
+            if s:
+                p = calibrate.apply(p, s)
             return pd.DataFrame(p, columns=list(QUANTILES), index=features.index)
         mid = features["price_lag_24h"].astype(float)
         spread = 5.0 + 0.1 * mid.abs()

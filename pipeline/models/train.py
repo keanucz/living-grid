@@ -25,7 +25,7 @@ import pandas as pd
 
 from pipeline import cache, schemas
 from pipeline.features import build
-from pipeline.models import quantile
+from pipeline.models import calibrate, quantile
 
 log = logging.getLogger("pipeline.train")
 
@@ -74,8 +74,13 @@ def fit_target(df: pd.DataFrame, params: dict) -> dict[str, lgb.Booster]:
     return boosters
 
 
+def calibration(df: pd.DataFrame, params: dict) -> dict | None:
+    """Conformal P10-P90 scale for one target, fitted on its most recent week held out from a separate fit."""
+    return calibrate.fit(df, lambda rows: fit_target(rows, params), quantile.raw_quantiles)
+
+
 def train(targets=None, trained_before=None, version=None, since=None, params=None, out_dir=None, inputs=None,
-          trained_at=None):
+          trained_at=None, calibrate_bands=True):
     """Train and save a model; returns its directory."""
     now = pd.Timestamp.now(tz="UTC") if trained_at is None else pd.Timestamp(trained_at)
     before = now if trained_before is None else pd.Timestamp(trained_before)
@@ -100,7 +105,8 @@ def train(targets=None, trained_before=None, version=None, since=None, params=No
     tmp.mkdir(parents=True)
     try:
         meta = {"version": version, "trained_at": now.isoformat(), "trained_before": before.isoformat(),
-                "features": quantile.FEATURES, "targets": [], "zones": {}, "rows": {}, "window": {}, "params": params}
+                "features": quantile.FEATURES, "targets": [], "zones": {}, "rows": {}, "window": {}, "params": params,
+                "calibration": {}}
         for t in chosen:
             df = training_frame(hist, wides[t], before)
             if len(df) < MIN_ROWS:
@@ -113,6 +119,11 @@ def train(targets=None, trained_before=None, version=None, since=None, params=No
                 info = {"model_version": version, "target": t, "quantile": quantile.QUANTILES[q], "name": q,
                         "features": quantile.FEATURES, "train_window": window, "rows": len(df)}
                 (tmp / f"{t}_{q}.json").write_text(json.dumps(info, indent=1))
+            cal = calibration(df, params) if calibrate_bands else None
+            if cal:
+                log.info("%s: P10-P90 scale %.2f (held-out coverage %.0f%% -> %.0f%% on %d rows)", t, cal["scale"],
+                         100 * cal["coverage_before"], 100 * cal["coverage_after"], cal["n"])
+                meta["calibration"][t] = cal
             meta["targets"].append(t)
             meta["zones"][t] = sorted(df["zone"].unique())
             meta["rows"][t] = len(df)
@@ -138,11 +149,12 @@ def main(argv=None) -> int:
     ap.add_argument("--since", default=None, help="first UTC day of training rows")
     ap.add_argument("--version", default=None)
     ap.add_argument("--out-dir", default=None, help="default data/models, or LG_MODELS_DIR")
+    ap.add_argument("--no-calibrate", action="store_true", help="skip the conformal P10-P90 calibration")
     args = ap.parse_args(argv)
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
     try:
         path = train(args.targets.split(","), args.trained_before, args.version, args.since,
-                     out_dir=Path(args.out_dir) if args.out_dir else None)
+                     out_dir=Path(args.out_dir) if args.out_dir else None, calibrate_bands=not args.no_calibrate)
     except (ValueError, FileNotFoundError, FileExistsError) as e:
         log.error("%s", e)
         return 1

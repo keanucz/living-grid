@@ -10,7 +10,8 @@ The model (lgbm_q) and both baselines are scored on exactly the same rows, so a 
   yesterday    the same hour a whole number of days earlier
 Writes data/backtest/walk_forward.parquet: fold, zone, target, model, mae, coverage_p10_p90, n. Baselines have no
 band, so their coverage is null. Prices are GBP/MWh for GB and EUR/MWh elsewhere, so compare within a zone.
-Losses to a baseline are printed as plainly as wins.
+Losses to a baseline are printed as plainly as wins. The model's P10-P90 band is conformally calibrated inside
+each fold using only that fold's training rows (pipeline.models.calibrate); --no-calibrate scores the raw band.
 """
 
 import argparse
@@ -23,7 +24,7 @@ import pyarrow as pa
 
 from pipeline import cache, schemas
 from pipeline.features import build
-from pipeline.models import quantile, train
+from pipeline.models import calibrate, quantile, train
 
 log = logging.getLogger("pipeline.backtest")
 
@@ -57,9 +58,9 @@ def baselines(wide: pd.DataFrame, zone: str, ts: pd.DatetimeIndex, lead_h: int) 
     )
 
 
-def _fold_rows(fold, target, test, boosters, wide, lead_h) -> list[dict]:
-    x = quantile.design(test)
-    q = np.sort(np.column_stack([boosters[n].predict(x, num_threads=1) for n in quantile.QUANTILES]), axis=1)
+def _fold_rows(fold, target, test, boosters, wide, lead_h, scale=None) -> list[dict]:
+    raw = quantile.raw_quantiles(boosters, test)
+    q = calibrate.apply(raw, scale) if scale else raw
     rows = []
     for zone, g in test.reset_index(drop=True).groupby("zone"):
         base = baselines(wide, zone, pd.DatetimeIndex(g["ts"]), lead_h)
@@ -69,9 +70,10 @@ def _fold_rows(fold, target, test, boosters, wide, lead_h) -> list[dict]:
             continue
         qz = q[g.index.to_numpy()][ok]
         n = int(ok.sum())
-        covered = float(((y[ok] >= qz[:, 0]) & (y[ok] <= qz[:, 2])).mean())
+        covered = calibrate.coverage(y[ok], qz)
         rows.append({"fold": fold, "zone": zone, "target": target, "model": MODEL,
-                     "mae": float(np.abs(y[ok] - qz[:, 1]).mean()), "coverage_p10_p90": covered, "n": n})
+                     "mae": float(np.abs(y[ok] - qz[:, 1]).mean()), "coverage_p10_p90": covered, "n": n,
+                     "coverage_raw": calibrate.coverage(y[ok], raw[g.index.to_numpy()][ok])})
         for b in BASELINES:
             rows.append({"fold": fold, "zone": zone, "target": target, "model": b,
                          "mae": float(np.abs(y[ok] - base[b].to_numpy()[ok]).mean()), "coverage_p10_p90": np.nan, "n": n})
@@ -79,7 +81,7 @@ def _fold_rows(fold, target, test, boosters, wide, lead_h) -> list[dict]:
 
 
 def run(n_folds=6, test_days=7, purge_h=48, targets=None, lead_h=build.HISTORY_LEAD_H, params=None, inputs=None,
-        min_train_rows=MIN_TRAIN_ROWS) -> pd.DataFrame:
+        min_train_rows=MIN_TRAIN_ROWS, calibrate_bands=True) -> pd.DataFrame:
     inp = inputs or build.Inputs()
     hist = build.build_history(lead_h=lead_h, inputs=inp)
     if hist.empty:
@@ -101,7 +103,16 @@ def run(n_folds=6, test_days=7, purge_h=48, targets=None, lead_h=build.HISTORY_L
                 log.warning("fold %d of %s skipped: %d training rows, %d test rows", k, t, len(tr), len(te))
                 continue
             log.info("fold %d %s: train %d rows to %s, test %d rows from %s", k, t, len(tr), train_end, len(te), test_start)
-            rows += _fold_rows(k, t, te, train.fit_target(tr, params), wides[t], lead_h)
+            cal = train.calibration(tr, params) if calibrate_bands else None
+            if cal:
+                log.info("fold %d %s: P10-P90 scale %.2f fitted on %d held-out training rows", k, t, cal["scale"], cal["n"])
+            rows += _fold_rows(k, t, te, train.fit_target(tr, params), wides[t], lead_h, cal["scale"] if cal else None)
+    raw = pd.DataFrame([r for r in rows if r["model"] == MODEL])
+    if len(raw):
+        for t, g in raw.groupby("target"):
+            log.info("%s P10-P90 coverage: uncalibrated %.1f%%, calibrated %.1f%% (n=%d)", t,
+                     100 * np.average(g["coverage_raw"], weights=g["n"]),
+                     100 * np.average(g["coverage_p10_p90"], weights=g["n"]), g["n"].sum())
     out = pd.DataFrame(rows, columns=schemas.WALK_FORWARD.names)
     if out.empty:
         raise ValueError("no fold had enough data; run the backfill or lower --folds / --test-days")
@@ -159,10 +170,12 @@ def main(argv=None) -> int:
     ap.add_argument("--test-days", type=int, default=7)
     ap.add_argument("--purge-hours", type=int, default=48)
     ap.add_argument("--targets", default="all", help="comma-separated or 'all': " + ", ".join(schemas.TARGETS))
+    ap.add_argument("--no-calibrate", action="store_true", help="score the raw quantile bands (before conformal scaling)")
     args = ap.parse_args(argv)
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
     try:
-        df = check(run(args.folds, args.test_days, args.purge_hours, args.targets.split(",")))
+        df = check(run(args.folds, args.test_days, args.purge_hours, args.targets.split(","),
+                       calibrate_bands=not args.no_calibrate))
     except (ValueError, FileNotFoundError) as e:
         log.error("%s", e)
         return 1

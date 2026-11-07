@@ -35,9 +35,19 @@ def test_no_fold_trains_on_data_at_or_after_its_test_start(populated, monkeypatc
     out = backtest.run(targets=["price_da"], **KW)
     hist_ts = train.build.build_history()["ts"]
     folds = backtest.make_folds(hist_ts.min(), hist_ts.max(), KW["n_folds"], KW["test_days"], KW["purge_h"])
-    assert len(seen) == out["fold"].nunique() == 3
-    for latest_train, (train_end, test_start, _) in zip(seen, folds, strict=True):
-        assert latest_train < train_end <= test_start - pd.Timedelta(hours=24) < test_start
+    # Two fits per fold: the conformal calibration fit (on the fold's earlier training rows), then the main fit.
+    assert len(seen) == 2 * out["fold"].nunique() == 6
+    for k, (train_end, test_start, _) in enumerate(folds):
+        calib_fit, main_fit = seen[2 * k], seen[2 * k + 1]
+        assert calib_fit < main_fit < train_end <= test_start - pd.Timedelta(hours=24) < test_start
+
+
+def test_uncalibrated_backtest_fits_once_per_fold(populated, monkeypatch):  # noqa: F811
+    seen = []
+    real = train.fit_target
+    monkeypatch.setattr(train, "fit_target", lambda df, params: seen.append(1) or real(df, params))
+    out = backtest.run(targets=["price_da"], calibrate_bands=False, **KW)
+    assert len(seen) == out["fold"].nunique()
 
 
 def test_output_matches_contract_and_compares_models_on_same_rows(populated):  # noqa: F811
