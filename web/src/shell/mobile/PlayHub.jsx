@@ -8,9 +8,9 @@ const GAMES = [
     blurb: 'Run a battery for real GB prices: charge, hold or sell each half-hour. Can you beat our forecast?',
   },
   {
-    href: '#/market', icon: 'chart', kicker: 'With friends · rounds',
+    href: '#/play', icon: 'chart', kicker: 'With friends · quick play or a room code',
     title: 'Predict the grid',
-    blurb: 'A real past day with its date hidden, replayed hour by hour. Bet YES or NO with play points against the room and our bots.',
+    blurb: 'A real past day with its date hidden, replayed hour by hour. Join a quick game, or start a room and share the code.',
   },
 ]
 
