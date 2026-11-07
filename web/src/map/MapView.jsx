@@ -1,10 +1,18 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { DeckGL, GeoJsonLayer, FlyToInterpolator } from 'deck.gl'
+import { DeckGL, GeoJsonLayer, FlyToInterpolator, LightingEffect, AmbientLight, PointLight, DirectionalLight } from 'deck.gl'
 import { LAYERS } from '../layers/registry.js'
 import { actions, useStore } from '../store/store.js'
 import { COLORS, fmt } from '../styles/tokens.js'
 import { Icon, ASSET_ICON } from '../shell/icons.jsx'
-import { towerHeight } from '../layers/price/index.js'
+import { towerHeight, GLASS } from '../layers/price/index.js'
+
+// Soft ambient plus a high point light over the North Sea: flat country slabs pick up a moving
+// specular sheen as the map pans, which reads as glass/epoxy rather than flat paint.
+const LIGHTING = new LightingEffect({
+  ambient: new AmbientLight({ color: [255, 255, 255], intensity: 1.0 }),
+  sheen: new PointLight({ color: [255, 250, 240], intensity: 0.9, position: [4, 56, 1600000] }),
+  key: new DirectionalLight({ color: [255, 255, 255], intensity: 0.25, direction: [-2, -3, -6] }),
+})
 
 const VIEWS = {
   overview: { longitude: 6.5, latitude: 53.2, zoom: 4.15, pitch: 0, bearing: 0 },
@@ -65,6 +73,9 @@ export default function MapView({ ctx }) {
         stroked: true,
         getFillColor: COLORS.land,
         getLineColor: COLORS.border,
+        extruded: true,
+        getElevation: 800,
+        material: { ambient: 0.85, diffuse: 0.2, shininess: 80, specularColor: [34, 34, 32] },
         getLineWidth: 0.8,
         lineWidthUnits: 'pixels',
       }),
@@ -83,6 +94,7 @@ export default function MapView({ ctx }) {
       onViewStateChange={({ viewState: v }) => setViewState(v)}
       controller={{ dragRotate: ui.mode === 'simulate', touchRotate: ui.mode === 'simulate' }}
       layers={layers}
+      effects={[LIGHTING]}
       onClick={(info) => info.object?.properties?.zone && actions.selectZone(info.object.properties.zone)}
       getTooltip={(info) => tooltip(info, ctx)}
       getCursor={({ isHovering }) => (isHovering ? 'pointer' : 'grab')}
