@@ -32,3 +32,20 @@ export const leaderboard = spacetimedb.anonymousView(
       .sort((a, b) => b.score - a.score)
       .map((p, i) => ({ rank: i + 1, name: p.name, zone: p.zone, score: p.score }))
 );
+
+const MarketLeaderboardRow = t.row('MarketLeaderboardRow', {
+  rank: t.u32(),
+  name: t.string(),
+  points: t.f64(),
+  is_model: t.bool(),
+});
+
+// Points after settled questions (open positions are not valued).
+export const market_leaderboard = spacetimedb.anonymousView(
+  { name: 'market_leaderboard', public: true },
+  t.array(MarketLeaderboardRow),
+  ctx =>
+    [...ctx.db.market_account.iter()]
+      .sort((a, b) => b.points - a.points)
+      .map((a, i) => ({ rank: i + 1, name: a.name, points: a.points, is_model: a.is_model }))
+);

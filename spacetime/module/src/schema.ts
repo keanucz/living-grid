@@ -1,11 +1,13 @@
 import { CaseConversionPolicy, schema } from 'spacetimedb/server';
 import {
   admin, actual, battery, battery_action, carbon, forecast, ghost_wind, intervention, player, player_decision, score, zone,
+  market_round, market_question, market_answer, market_secret, market_account, market_position, market_feed,
 } from './tables';
 
 // Wire names are exactly as written here (snake_case), matching the parquet contracts.
 const spacetimedb = schema(
-  { admin, zone, actual, forecast, score, intervention, ghost_wind, carbon, battery, battery_action, player, player_decision },
+  { admin, zone, actual, forecast, score, intervention, ghost_wind, carbon, battery, battery_action, player, player_decision,
+    market_round, market_question, market_answer, market_secret, market_account, market_position, market_feed },
   { CASE_CONVERSION_POLICY: CaseConversionPolicy.None }
 );
 export default spacetimedb;

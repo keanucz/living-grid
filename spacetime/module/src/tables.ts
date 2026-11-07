@@ -163,3 +163,95 @@ export const admin = table(
     added_at: t.timestamp(),
   }
 );
+
+// Mystery-day prediction market (points only). One round at a time; engine/market drives the clock.
+export const market_round = table(
+  { name: 'market_round', public: true },
+  {
+    id: t.u32().primaryKey(),
+    status: t.string(), // running | done
+    title: t.string(),
+    day_revealed: t.string(), // empty until the round is over
+    clock_hour: t.u32(),
+    start_hour: t.u32(),
+    end_hour: t.u32(),
+    seconds_per_hour: t.u32(),
+    b: t.f64(),
+    room_brier: t.f64(), // mean over settled questions; -1 before any settle
+    model_brier: t.f64(),
+    n_settled: t.u32(),
+    started_at: t.timestamp(),
+  }
+);
+
+export const market_question = table(
+  { name: 'market_question', public: true },
+  {
+    id: t.string().primaryKey(),
+    text: t.string(),
+    kind: t.string(),
+    target_hour: t.u32(),
+    unit: t.string(),
+    threshold: t.f64(),
+    q_yes: t.f64(),
+    q_no: t.f64(),
+    price_yes: t.f64(),
+    model_p: t.f64(),
+    model_note: t.string(),
+    status: t.string(), // open | settled
+    outcome: t.string(), // '' until settled, then yes | no
+    actual: t.f64(),
+    room_p_close: t.f64(),
+  }
+);
+
+// Outcomes stay private until their question settles.
+export const market_answer = table(
+  { name: 'market_answer' },
+  {
+    question_id: t.string().primaryKey(),
+    outcome: t.bool(),
+    actual: t.f64(),
+  }
+);
+
+export const market_secret = table(
+  { name: 'market_secret' },
+  {
+    round: t.u32().primaryKey(),
+    day: t.string(),
+  }
+);
+
+export const market_account = table(
+  { name: 'market_account', public: true },
+  {
+    identity: t.identity().primaryKey(),
+    name: t.string(),
+    points: t.f64(),
+    is_model: t.bool(),
+  }
+);
+
+export const market_position = table(
+  { name: 'market_position', public: true },
+  {
+    key: t.string().primaryKey(),
+    identity: t.identity().index('btree'),
+    question_id: t.string().index('btree'),
+    yes: t.f64(),
+    no: t.f64(),
+    spent: t.f64(),
+  }
+);
+
+export const market_feed = table(
+  { name: 'market_feed', public: true },
+  {
+    key: t.string().primaryKey(),
+    hour: t.u32(),
+    label: t.string(),
+    value: t.f64(),
+    unit: t.string(),
+  }
+);
