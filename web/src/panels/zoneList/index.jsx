@@ -8,7 +8,8 @@ import { fmt, priceColor } from '../../styles/tokens.js'
 const MIX_COLOR = { wind: 'var(--wind)', solar: '#facc15', nuclear: 'var(--nuclear)', gas: 'var(--gas)', hydro: 'var(--hydro)', coal: '#8b6f5a', biomass: '#84a35b', imports: '#5d5d58' }
 
 function Spark({ series }) {
-  const pts = series.filter((r) => r.actual != null)
+  const pts = (series ?? []).filter((r) => r.actual != null)
+  if (pts.length < 2) return <svg width="72" height="24" aria-hidden="true" />
   const x = scaleLinear().domain([0, pts.length - 1]).range([0, 72])
   const vals = pts.map((r) => r.actual)
   const y = scaleLinear().domain([Math.min(...vals), Math.max(...vals)]).range([22, 2])
@@ -22,36 +23,39 @@ function Spark({ series }) {
 
 function Row({ z, st, on }) {
   const c = priceColor(st.price_eur)
+  const hasChange = st.change_24h_eur != null
   const up = st.change_24h_eur >= 0
+  const mix = Object.entries(st.mix ?? {})
   return (
     <div className={`zrow ${on ? 'on' : ''}`} onClick={() => actions.selectZone(z.id)}>
       <div className="zrow-main">
         <div className="zav" style={{ background: `rgb(${c[0]},${c[1]},${c[2]})` }}>{z.id.replace('-LU', '')}</div>
         <div className="zname">
           <div>{z.name}</div>
-          <div className="faint num">{fmt.gw(st.demand_mw)} demand</div>
+          <div className="faint num">{st.demand_mw != null ? `${fmt.gw(st.demand_mw)} demand` : st.price_kind ?? ''}</div>
         </div>
         <div className="zspark" style={{ color: on ? 'var(--accent)' : 'var(--text-3)' }}><Spark series={st.series} /></div>
         <div className="zprice">
           <div className="num">{fmt.price(st.price, st.currency)}</div>
-          <div className={`pill-delta ${up ? 'up' : 'down'}`}>{up ? '▲' : '▼'} {Math.abs(st.change_24h_eur).toFixed(1)}</div>
+          {hasChange && <div className={`pill-delta ${up ? 'up' : 'down'}`}>{up ? '▲' : '▼'} {Math.abs(st.change_24h_eur).toFixed(1)}</div>}
         </div>
       </div>
       {on && (
         <div className="zdetail fade-in">
-          <div className="mixbar">
-            {Object.entries(st.mix).map(([k, v]) => (
+          {mix.length > 0 && <div className="mixbar">
+            {mix.map(([k, v]) => (
               <span key={k} title={`${k} ${(v * 100).toFixed(0)}%`} style={{ flex: v, background: MIX_COLOR[k] ?? '#777' }} />
             ))}
-          </div>
+          </div>}
           <div className="mixlegend">
-            {Object.entries(st.mix).slice(0, 4).map(([k, v]) => (
-              <span key={k}><i style={{ background: MIX_COLOR[k] }} />{k} {(v * 100).toFixed(0)}%</span>
+            {mix.slice(0, 4).map(([k, v]) => (
+              <span key={k}><i style={{ background: MIX_COLOR[k] ?? '#777' }} />{k} {(v * 100).toFixed(0)}%</span>
             ))}
+            {mix.length === 0 && <span className="faint">No generation mix for this hour</span>}
           </div>
           <div className="zfacts">
-            <div><span className="faint">Net {st.net_import_mw >= 0 ? 'import' : 'export'}</span><b className="num">{fmt.gw(Math.abs(st.net_import_mw))}</b></div>
-            <div><span className="faint">Carbon</span><b className="num">{st.carbon.consumption_gco2_kwh} g/kWh</b></div>
+            <div><span className="faint">Net {st.net_import_mw >= 0 ? 'import' : 'export'}</span><b className="num">{st.net_import_mw != null ? fmt.gw(Math.abs(st.net_import_mw)) : '—'}</b></div>
+            <div><span className="faint">Carbon</span><b className="num">{st.carbon?.consumption_gco2_kwh != null ? `${Math.round(st.carbon.consumption_gco2_kwh)} g/kWh` : '—'}</b></div>
           </div>
         </div>
       )}

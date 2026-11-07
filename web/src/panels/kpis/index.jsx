@@ -4,19 +4,25 @@ import { fmt } from '../../styles/tokens.js'
 function Kpis({ ctx }) {
   const zs = ctx.data.state?.zones
   if (!zs) return null
-  const totalDemand = zs.reduce((a, z) => a + z.demand_mw, 0)
-  const avg = zs.reduce((a, z) => a + z.price_eur * z.demand_mw, 0) / totalDemand
-  const avgChange = zs.reduce((a, z) => a + z.change_24h_eur * z.demand_mw, 0) / totalDemand
+  // Demand-weighted where load is known, plain mean otherwise.
+  const w = (z) => (z.demand_mw > 0 ? z.demand_mw : 1)
+  const wavg = (get) => {
+    const rows = zs.filter((z) => get(z) != null)
+    const tw = rows.reduce((a, z) => a + w(z), 0)
+    return tw ? rows.reduce((a, z) => a + get(z) * w(z), 0) / tw : null
+  }
+  const avg = wavg((z) => z.price_eur)
+  const avgChange = wavg((z) => z.change_24h_eur)
   const cheapest = [...zs].sort((a, b) => a.price_eur - b.price_eur)[0]
   const gb = zs.find((z) => z.zone === 'GB')
-  const carbon = zs.reduce((a, z) => a + z.carbon.consumption_gco2_kwh * z.demand_mw, 0) / totalDemand
+  const carbon = wavg((z) => z.carbon?.consumption_gco2_kwh)
   const flowing = (ctx.data.state.flows ?? []).reduce((a, f) => a + Math.abs(f.mw), 0)
 
   const items = [
-    { label: 'Average price', value: `€${avg.toFixed(1)}`, delta: avgChange, unit: '/MWh' },
+    { label: 'Average price', value: avg != null ? `€${avg.toFixed(1)}` : '—', delta: avgChange, note: 'per MWh' },
     { label: 'Cheapest', value: `${cheapest.zone} €${cheapest.price_eur.toFixed(0)}`, note: ctx.zoneById[cheapest.zone]?.name ?? '' },
-    { label: 'GB importing', value: fmt.gw(gb?.net_import_mw ?? 0), note: `${fmt.gw(flowing)} crossing borders` },
-    { label: 'Carbon', value: `${carbon.toFixed(0)} g`, note: 'per kWh consumed' },
+    { label: (gb?.net_import_mw ?? 0) >= 0 ? 'GB importing' : 'GB exporting', value: gb?.net_import_mw != null ? fmt.gw(Math.abs(gb.net_import_mw)) : '—', note: `${fmt.gw(flowing)} crossing borders` },
+    { label: 'Carbon', value: carbon != null ? `${carbon.toFixed(0)} g` : '—', note: 'per kWh consumed' },
   ]
   return (
     <section className="panel kpis fade-in">
