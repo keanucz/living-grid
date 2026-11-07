@@ -11,7 +11,7 @@ client = TestClient(app)
 GETS = {
     "/zones": ("zones", s.ZonesResponse),
     "/state?at=2026-11-07T12:00:00Z": ("state", s.StateResponse),
-    "/explain?zone=GB&ts=2026-11-07T18:00:00Z": ("explain", s.ExplainResponse),
+    "/explain?zone=GB&ts=2026-11-08T08:00:00Z": ("explain", s.ExplainResponse),
     "/unseen/ghost-wind?from=2026-11-06T12:00:00Z&to=2026-11-07T12:00:00Z": ("ghost_wind", s.GhostWindResponse),
     "/unseen/carbon?at=2026-11-07T12:00:00Z": ("carbon", s.CarbonResponse),
     "/scenarios": ("scenarios", s.ScenariosResponse),
