@@ -46,6 +46,7 @@ def start_args(qs: list[questions.MarketQuestion], start: int, end: int, seconds
 
 def run(client: Client | None, day: date, start: int, end: int, seconds: int, sleep=time.sleep) -> list[str]:
     r, qs, b = plan(day, end)
+    qs = [q for q in qs if q.target_hour > start]  # the module refuses trades on a question whose hour has passed
     if not qs:
         raise SystemExit("no questions could be built for that day")
     if client is None:
