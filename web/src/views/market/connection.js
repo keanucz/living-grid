@@ -4,7 +4,7 @@ import { DbConnection } from '../../spacetime/index.ts'
 // player here. Subscribes to the public market tables; outcomes live in private tables the client cannot read.
 const DB = 'living-grid'
 const TOKEN_KEY = 'lg-game-token'
-const TABLES = ['player', 'market_round', 'market_question', 'market_account', 'market_position', 'market_feed', 'market_leaderboard']
+const TABLES = ['player', 'market_round', 'market_question', 'market_account', 'market_position', 'market_feed', 'market_leaderboard', 'market_bot', 'market_bot_p']
 
 const tokenStore = {
   get: () => {
@@ -47,9 +47,17 @@ function read(conn, me) {
   for (const p of rows('market_position')) if (p.identity.toHexString() === hex) positions[p.questionId] = p
   const account = rows('market_account').find((a) => a.identity.toHexString() === hex) ?? null
   const player = rows('player').find((p) => p.identity.toHexString() === hex) ?? null
+  const accounts = new Map(rows('market_account').map((a) => [a.identity.toHexString(), a.points]))
+  const bots = rows('market_bot')
+    .map((b) => ({ name: b.name, title: b.title, method: b.method, kelly: b.kelly, brier: b.n ? b.brier : null, n: b.n, points: accounts.get(b.identity.toHexString()) ?? null }))
+    .sort((a, b) => (b.points ?? 0) - (a.points ?? 0))
+  const botP = {}
+  for (const p of rows('market_bot_p')) (botP[p.questionId] ??= {})[p.bot] = { p: p.p, note: p.note, hour: p.updatedHour }
   return {
     player,
     account,
+    bots,
+    botP,
     round: rows('market_round')[0] ?? null,
     questions: rows('market_question').sort((a, b) => a.targetHour - b.targetHour || a.id.localeCompare(b.id)),
     positions,

@@ -204,6 +204,42 @@ export const MarketAnswerIn = __t.object("MarketAnswerIn", {
 });
 export type MarketAnswerIn = __Infer<typeof MarketAnswerIn>;
 
+export const MarketBot = __t.object("MarketBot", {
+  name: __t.string(),
+  title: __t.string(),
+  method: __t.string(),
+  kelly: __t.f64(),
+  identity: __t.identity(),
+  brier: __t.f64(),
+  n: __t.u32(),
+});
+export type MarketBot = __Infer<typeof MarketBot>;
+
+export const MarketBotIn = __t.object("MarketBotIn", {
+  name: __t.string(),
+  title: __t.string(),
+  method: __t.string(),
+  kelly: __t.f64(),
+});
+export type MarketBotIn = __Infer<typeof MarketBotIn>;
+
+export const MarketBotP = __t.object("MarketBotP", {
+  key: __t.string(),
+  bot: __t.string(),
+  questionId: __t.string(),
+  p: __t.f64(),
+  note: __t.string(),
+  updatedHour: __t.u32(),
+});
+export type MarketBotP = __Infer<typeof MarketBotP>;
+
+export const MarketBotPIn = __t.object("MarketBotPIn", {
+  bot: __t.string(),
+  p: __t.f64(),
+  note: __t.string(),
+});
+export type MarketBotPIn = __Infer<typeof MarketBotPIn>;
+
 export const MarketFeed = __t.object("MarketFeed", {
   key: __t.string(),
   hour: __t.u32(),
@@ -231,6 +267,23 @@ export const MarketLeaderboardRow = __t.object("MarketLeaderboardRow", {
 });
 export type MarketLeaderboardRow = __Infer<typeof MarketLeaderboardRow>;
 
+export const MarketLeagueQuestionIn = __t.object("MarketLeagueQuestionIn", {
+  id: __t.string(),
+  text: __t.string(),
+  kind: __t.string(),
+  targetHour: __t.u32(),
+  unit: __t.string(),
+  threshold: __t.f64(),
+  modelP: __t.f64(),
+  modelNote: __t.string(),
+  get botP() {
+    return __t.array(MarketBotPIn);
+  },
+  series: __t.string(),
+  profileJson: __t.string(),
+});
+export type MarketLeagueQuestionIn = __Infer<typeof MarketLeagueQuestionIn>;
+
 export const MarketPosition = __t.object("MarketPosition", {
   key: __t.string(),
   identity: __t.identity(),
@@ -240,6 +293,13 @@ export const MarketPosition = __t.object("MarketPosition", {
   spent: __t.f64(),
 });
 export type MarketPosition = __Infer<typeof MarketPosition>;
+
+export const MarketProfile = __t.object("MarketProfile", {
+  questionId: __t.string(),
+  series: __t.string(),
+  profileJson: __t.string(),
+});
+export type MarketProfile = __Infer<typeof MarketProfile>;
 
 export const MarketQuestion = __t.object("MarketQuestion", {
   id: __t.string(),

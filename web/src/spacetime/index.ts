@@ -44,6 +44,7 @@ import MarketBuyReducer from "./market_buy_reducer";
 import MarketResetReducer from "./market_reset_reducer";
 import MarketSellReducer from "./market_sell_reducer";
 import MarketStartReducer from "./market_start_reducer";
+import MarketStartLeagueReducer from "./market_start_league_reducer";
 import MarketTickReducer from "./market_tick_reducer";
 import PruneBeforeReducer from "./prune_before_reducer";
 import RemoveAdminReducer from "./remove_admin_reducer";
@@ -73,6 +74,8 @@ import InterventionRow from "./intervention_table";
 import LatestForecastRow from "./latest_forecast_table";
 import LeaderboardRow from "./leaderboard_table";
 import MarketAccountRow from "./market_account_table";
+import MarketBotRow from "./market_bot_table";
+import MarketBotPRow from "./market_bot_p_table";
 import MarketFeedRow from "./market_feed_table";
 import MarketLeaderboardRow from "./market_leaderboard_table";
 import MarketPositionRow from "./market_position_table";
@@ -199,6 +202,31 @@ const tablesSchema = __schema({
       { name: 'market_account_identity_key', constraint: 'unique', columns: ['identity'] },
     ],
   }, MarketAccountRow),
+  marketBot: __table({
+    name: 'market_bot',
+    indexes: [
+      { accessor: 'name', name: 'market_bot_name_idx_btree', algorithm: 'btree', columns: [
+        'name',
+      ] },
+    ],
+    constraints: [
+      { name: 'market_bot_name_key', constraint: 'unique', columns: ['name'] },
+    ],
+  }, MarketBotRow),
+  marketBotP: __table({
+    name: 'market_bot_p',
+    indexes: [
+      { accessor: 'key', name: 'market_bot_p_key_idx_btree', algorithm: 'btree', columns: [
+        'key',
+      ] },
+      { accessor: 'question_id', name: 'market_bot_p_question_id_idx_btree', algorithm: 'btree', columns: [
+        'questionId',
+      ] },
+    ],
+    constraints: [
+      { name: 'market_bot_p_key_key', constraint: 'unique', columns: ['key'] },
+    ],
+  }, MarketBotPRow),
   marketFeed: __table({
     name: 'market_feed',
     indexes: [
@@ -334,6 +362,7 @@ const reducersSchema = __reducers(
   __reducerSchema("market_reset", MarketResetReducer),
   __reducerSchema("market_sell", MarketSellReducer),
   __reducerSchema("market_start", MarketStartReducer),
+  __reducerSchema("market_start_league", MarketStartLeagueReducer),
   __reducerSchema("market_tick", MarketTickReducer),
   __reducerSchema("prune_before", PruneBeforeReducer),
   __reducerSchema("remove_admin", RemoveAdminReducer),
@@ -363,6 +392,10 @@ type __SchemaWithTableAccessorAliases = Omit<typeof tablesSchema.schemaType, "ta
     readonly "ghost_wind": Omit<typeof tablesSchema.schemaType.tables["ghostWind"], "accessorName"> & { readonly accessorName: "ghost_wind" };
     /** @deprecated Use `marketAccount` instead. This alias will be removed in the next major version. */
     readonly "market_account": Omit<typeof tablesSchema.schemaType.tables["marketAccount"], "accessorName"> & { readonly accessorName: "market_account" };
+    /** @deprecated Use `marketBot` instead. This alias will be removed in the next major version. */
+    readonly "market_bot": Omit<typeof tablesSchema.schemaType.tables["marketBot"], "accessorName"> & { readonly accessorName: "market_bot" };
+    /** @deprecated Use `marketBotP` instead. This alias will be removed in the next major version. */
+    readonly "market_bot_p": Omit<typeof tablesSchema.schemaType.tables["marketBotP"], "accessorName"> & { readonly accessorName: "market_bot_p" };
     /** @deprecated Use `marketFeed` instead. This alias will be removed in the next major version. */
     readonly "market_feed": Omit<typeof tablesSchema.schemaType.tables["marketFeed"], "accessorName"> & { readonly accessorName: "market_feed" };
     /** @deprecated Use `marketPosition` instead. This alias will be removed in the next major version. */
@@ -398,6 +431,8 @@ const tableAccessorAliases = {
   "battery_action": "batteryAction",
   "ghost_wind": "ghostWind",
   "market_account": "marketAccount",
+  "market_bot": "marketBot",
+  "market_bot_p": "marketBotP",
   "market_feed": "marketFeed",
   "market_position": "marketPosition",
   "market_question": "marketQuestion",
@@ -431,6 +466,10 @@ export type DbView = __DbViewBase & {
   readonly "ghost_wind": __DbViewBase["ghostWind"];
   /** @deprecated Use `marketAccount` instead. This alias will be removed in the next major version. */
   readonly "market_account": __DbViewBase["marketAccount"];
+  /** @deprecated Use `marketBot` instead. This alias will be removed in the next major version. */
+  readonly "market_bot": __DbViewBase["marketBot"];
+  /** @deprecated Use `marketBotP` instead. This alias will be removed in the next major version. */
+  readonly "market_bot_p": __DbViewBase["marketBotP"];
   /** @deprecated Use `marketFeed` instead. This alias will be removed in the next major version. */
   readonly "market_feed": __DbViewBase["marketFeed"];
   /** @deprecated Use `marketPosition` instead. This alias will be removed in the next major version. */
@@ -455,6 +494,10 @@ export type Tables = __TablesBase & {
   readonly "ghost_wind": __TablesBase["ghostWind"];
   /** @deprecated Use `marketAccount` instead. This alias will be removed in the next major version. */
   readonly "market_account": __TablesBase["marketAccount"];
+  /** @deprecated Use `marketBot` instead. This alias will be removed in the next major version. */
+  readonly "market_bot": __TablesBase["marketBot"];
+  /** @deprecated Use `marketBotP` instead. This alias will be removed in the next major version. */
+  readonly "market_bot_p": __TablesBase["marketBotP"];
   /** @deprecated Use `marketFeed` instead. This alias will be removed in the next major version. */
   readonly "market_feed": __TablesBase["marketFeed"];
   /** @deprecated Use `marketPosition` instead. This alias will be removed in the next major version. */

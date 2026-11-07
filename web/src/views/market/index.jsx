@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Icon } from '../../shell/icons.jsx'
 import { connectMarket, tradeCost } from './connection.js'
+import { BotLeagueCard } from '../../panels/botLeague/Card.jsx'
 
 // Mystery-day prediction market. Phone: #/market. Big screen: #/market?screen=1 (leaderboard, room vs model).
 // A real past day with its date hidden; points only, no money. Prices are the room's probability (LMSR).
@@ -10,6 +11,37 @@ const hour = (h) => `${String(h).padStart(2, '0')}:00`
 const pct = (p) => `${Math.round(p * 100)}%`
 const pts = (v) => `${v < 0 ? '−' : ''}${Math.abs(v).toFixed(Math.abs(v) < 100 ? 1 : 0)}`
 const isScreen = () => /[?&]screen(=1|=true|&|$)/.test(location.hash)
+
+const RIVAL_KEY = 'lg-market-rival'
+function useRival() {
+  const [rival, setRival] = useState(() => {
+    try {
+      return localStorage.getItem(RIVAL_KEY) || ''
+    } catch {
+      return ''
+    }
+  })
+  const pick = (name) => {
+    setRival(name)
+    try {
+      localStorage.setItem(RIVAL_KEY, name)
+    } catch {
+      /* private window: the pick lasts until reload */
+    }
+  }
+  return [rival, pick]
+}
+
+function useRegime(day) {
+  const [title, setTitle] = useState(null)
+  useEffect(() => {
+    if (!day) return
+    let live = true
+    fetch(`/api/replay?event=${day}`).then((r) => (r.ok ? r.json() : null)).then((d) => live && setTitle(d?.title ?? null)).catch(() => {})
+    return () => (live = false)
+  }, [day])
+  return title
+}
 
 function useMarket() {
   const [s, setS] = useState({ status: 'connecting' })
@@ -34,7 +66,7 @@ function Join({ onJoin, busy }) {
   )
 }
 
-function Question({ q, round, pos, points, busy, onTrade }) {
+function Question({ q, round, pos, points, busy, onTrade, rival, rivalP }) {
   const [size, setSize] = useState(25)
   const open = q.status === 'open' && round.status === 'running' && round.clockHour < q.targetHour
   const settled = q.status === 'settled'
@@ -57,6 +89,9 @@ function Question({ q, round, pos, points, busy, onTrade }) {
         <div className="mk-probnums"><b className="yes">YES {pct(q.priceYes)}</b><b className="no">NO {pct(1 - q.priceYes)}</b></div>
       </div>
 
+      {rival && rivalP && (
+        <div className="mk-rivalp">🤖 {rival.title} says <b>{pct(rivalP.p)}</b> YES{rivalP.note ? <span className="mk-faint"> · {rivalP.note}</span> : null}</div>
+      )}
       {open && (
         <>
           <div className="mk-sizes" role="group" aria-label="Number of shares">
@@ -113,13 +148,13 @@ function Calibration({ round, big }) {
   )
 }
 
-function Leaderboard({ rows, meName, n = 8 }) {
+function Leaderboard({ rows, meName, rivalTitle, n = 8 }) {
   return (
     <section className="mk-card">
       <div className="mk-h">Points</div>
       {rows.slice(0, n).map((r) => (
-        <div key={r.rank + r.name} className={`mk-lb ${r.isModel ? 'model' : ''} ${r.name === meName ? 'me' : ''}`}>
-          <span className="num">{r.rank}</span><span>{r.name}{r.isModel && ' 🤖'}</span><b className="num">{pts(r.points)}</b>
+        <div key={r.rank + r.name} className={`mk-lb ${r.isModel ? 'model' : ''} ${r.name === meName ? 'me' : ''} ${r.name === rivalTitle ? 'rival' : ''}`}>
+          <span className="num">{r.rank}</span><span>{r.name}{r.isModel && ' 🤖'}{r.name === rivalTitle && <small> · your rival</small>}</span><b className="num">{pts(r.points)}</b>
         </div>
       ))}
       {!rows.length && <p className="mk-muted">Nobody has traded yet.</p>}
@@ -142,12 +177,37 @@ function Header({ round }) {
 }
 
 function Reveal({ round }) {
+  const regime = useRegime(round.status === 'done' ? round.dayRevealed : null)
   if (round.status !== 'done') return null
-  return <div className="mk-reveal">Round over. The mystery day was <b>{round.dayRevealed || 'a real past day'}</b>: real prices, played back at speed.</div>
+  return (
+    <div className="mk-reveal">
+      Round over. The mystery day was <b>{round.dayRevealed || 'a real past day'}</b>{regime ? <> — {regime}</> : null}: real prices, played back at speed.
+    </div>
+  )
+}
+
+// Meet the bots: name, one-line method, how it stakes, and its score so far; tap to make one your rival.
+function Bots({ bots, rival, onPick }) {
+  if (!bots?.length) return null
+  const style = (k) => (k >= 0.45 ? 'bold stakes' : k >= 0.25 ? 'steady stakes' : 'small stakes')
+  return (
+    <section className="mk-card">
+      <div className="mk-h">The bots{rival ? '' : ' — pick a rival to beat'}</div>
+      {bots.map((b) => (
+        <button key={b.name} className={`mk-bot ${rival === b.name ? 'on' : ''}`} onClick={() => onPick(rival === b.name ? '' : b.name)} aria-pressed={rival === b.name}>
+          <span className="mk-bot-t">🤖 {b.title}{rival === b.name && <small> · your rival</small>}</span>
+          <span className="mk-bot-m">{b.method}</span>
+          <span className="mk-bot-s">{style(b.kelly)}{b.brier != null ? ` · Brier ${b.brier.toFixed(3)} over ${b.n}` : ''}</span>
+        </button>
+      ))}
+    </section>
+  )
 }
 
 function Phone() {
   const [s, api] = useMarket()
+  const [rivalName, pickRival] = useRival()
+  const rival = s.bots?.find((b) => b.name === rivalName) ?? null
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState(null)
   const call = (fn) => {
@@ -174,10 +234,17 @@ function Phone() {
       {s.player && round && (
         <>
           <section className="mk-me">
-            <div><div className="mk-muted">{s.player.name}</div><div className="mk-score num">{pts(points)} pts</div></div>
+            <div>
+              <div className="mk-muted">{s.player.name}</div><div className="mk-score num">{pts(points)} pts</div>
+              {rival && rival.points != null && (
+                <div className="mk-muted">vs {rival.title}: <b className={points >= rival.points ? 'yes' : 'no'}>{points >= rival.points ? 'ahead by' : 'behind by'} {pts(Math.abs(points - rival.points))}</b></div>
+              )}
+            </div>
             <span className="mk-tag">{s.leaderboard?.find((r) => r.name === s.player.name) ? `#${s.leaderboard.find((r) => r.name === s.player.name).rank}` : 'Not traded yet'}</span>
           </section>
-          {s.questions.map((q) => <Question key={q.id} q={q} round={round} pos={s.positions?.[q.id]} points={points} busy={busy} onTrade={trade} />)}
+          {round.status === 'done' && <BotLeagueCard round={round} bots={s.bots ?? []} rivalName={rival?.title} />}
+          <Bots bots={s.bots} rival={rivalName} onPick={pickRival} />
+          {s.questions.map((q) => <Question key={q.id} q={q} round={round} pos={s.positions?.[q.id]} points={points} busy={busy} onTrade={trade} rival={rival} rivalP={rival ? s.botP?.[q.id]?.[rival.name] : null} />)}
           {s.feed?.length > 0 && (
             <section className="mk-card">
               <div className="mk-h">What happened</div>
@@ -186,8 +253,9 @@ function Phone() {
               ))}
             </section>
           )}
-          <Calibration round={round} />
-          <Leaderboard rows={s.leaderboard ?? []} meName={s.player.name} />
+          {round.status !== 'done' && s.bots?.length > 0 && <BotLeagueCard round={round} bots={s.bots} rivalName={rival?.title} />}
+          {!s.bots?.length && <Calibration round={round} />}
+          <Leaderboard rows={s.leaderboard ?? []} meName={s.player.name} rivalTitle={rival?.title} />
         </>
       )}
       <style>{CSS}</style>
@@ -209,7 +277,7 @@ function Screen() {
         <div className="mk-cols">
           <Leaderboard rows={s.leaderboard ?? []} n={10} />
           <div>
-            <Calibration round={round} big />
+            {s.bots?.length ? <BotLeagueCard round={round} bots={s.bots} big /> : <Calibration round={round} big />}
             <section className="mk-card">
               <div className="mk-h">Questions</div>
               {s.questions.map((q) => (
@@ -281,6 +349,12 @@ body { overflow: auto; }
 .mk-cal.big .mk-calrow { font-size: 18px; grid-template-columns: 120px 1fr 80px; }
 .mk-lb { display: grid; grid-template-columns: 28px 1fr auto; gap: 8px; padding: 5px 0; font-size: 14px; border-top: 1px solid var(--line); }
 .mk-lb.model { color: var(--hydro); } .mk-lb.me { color: var(--accent); font-weight: 600; }
+.mk-bot { display: grid; gap: 2px; width: 100%; text-align: left; padding: 8px 10px; margin-top: 6px; border-radius: 12px; border: 1px solid var(--line-2); background: var(--card); color: var(--text); font: inherit; }
+.mk-bot.on { border-color: var(--accent); background: var(--accent-dim); }
+.mk-bot-t { font-weight: 600; font-size: 14px; } .mk-bot-t small { color: var(--accent); font-weight: 400; }
+.mk-bot-m { font-size: 12px; color: var(--text-2); } .mk-bot-s { font-size: 11px; color: var(--text-3); }
+.mk-rivalp { margin-top: 8px; font-size: 13px; color: var(--text-2); } .mk-rivalp b { color: var(--text); }
+.mk-lb.rival { background: var(--accent-dim); border-radius: 8px; } .mk-lb small { color: var(--accent); }
 .mk-row { display: flex; justify-content: space-between; gap: 12px; font-size: 13px; padding: 4px 0; }
 `
 
