@@ -34,11 +34,13 @@ import {
 } from "spacetimedb";
 
 // Import all reducer arg schemas
+import AddAdminReducer from "./add_admin_reducer";
 import ClaimZoneReducer from "./claim_zone_reducer";
 import ClearInterventionReducer from "./clear_intervention_reducer";
 import DecideReducer from "./decide_reducer";
 import JoinReducer from "./join_reducer";
 import PruneBeforeReducer from "./prune_before_reducer";
+import RemoveAdminReducer from "./remove_admin_reducer";
 import SetInterventionReducer from "./set_intervention_reducer";
 import UpsertActualsReducer from "./upsert_actuals_reducer";
 import UpsertBatteriesReducer from "./upsert_batteries_reducer";
@@ -239,11 +241,13 @@ const tablesSchema = __schema({
 
 /** The schema information for all reducers in this module. This is defined the same way as the reducers would have been defined in the server, except the body of the reducer is omitted in code generation. */
 const reducersSchema = __reducers(
+  __reducerSchema("add_admin", AddAdminReducer),
   __reducerSchema("claim_zone", ClaimZoneReducer),
   __reducerSchema("clear_intervention", ClearInterventionReducer),
   __reducerSchema("decide", DecideReducer),
   __reducerSchema("join", JoinReducer),
   __reducerSchema("prune_before", PruneBeforeReducer),
+  __reducerSchema("remove_admin", RemoveAdminReducer),
   __reducerSchema("set_intervention", SetInterventionReducer),
   __reducerSchema("upsert_actuals", UpsertActualsReducer),
   __reducerSchema("upsert_batteries", UpsertBatteriesReducer),

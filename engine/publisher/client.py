@@ -2,6 +2,7 @@
 
 import logging
 import os
+from pathlib import Path
 
 import httpx
 
@@ -42,12 +43,28 @@ class Client:
         self.http.close()
 
 
+def token_from_env() -> str | None:
+    """LG_STDB_TOKEN, else the contents of the file named by LG_STDB_TOKEN_FILE (keep it mode 600)."""
+    if tok := os.environ.get("LG_STDB_TOKEN", "").strip():
+        return tok
+    if path := os.environ.get("LG_STDB_TOKEN_FILE", "").strip():
+        return Path(path).expanduser().read_text().strip() or None
+    return None
+
+
 def from_env() -> Client | None:
-    """A client configured from LG_STDB_URL / LG_STDB_DB / LG_STDB_TOKEN, or None when offline or unset."""
+    """A client configured from LG_STDB_URL / LG_STDB_DB and LG_STDB_TOKEN(_FILE), or None when offline or unset.
+
+    Publish reducers only accept admin identities, so without a token there is nothing useful to send.
+    """
     from pipeline.cache import offline
 
     url = os.environ.get("LG_STDB_URL", "")
     if offline() or not url:
         log.info("publisher disabled (%s)", "LG_OFFLINE set" if offline() else "LG_STDB_URL not set")
         return None
-    return Client(url, os.environ.get("LG_STDB_DB", DEFAULT_DB), os.environ.get("LG_STDB_TOKEN") or None)
+    token = token_from_env()
+    if not token:
+        log.warning("publisher disabled: set LG_STDB_TOKEN or LG_STDB_TOKEN_FILE to an admin identity's token")
+        return None
+    return Client(url, os.environ.get("LG_STDB_DB", DEFAULT_DB), token)

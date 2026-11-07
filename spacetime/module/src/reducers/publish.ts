@@ -1,8 +1,9 @@
 import { t, SenderError } from 'spacetimedb/server';
 import { Timestamp } from 'spacetimedb';
 import spacetimedb from '../schema';
+import { requireAdmin } from '../auth';
 
-// Publish reducers, called by the Python publisher over HTTP. Each takes a batch of rows and
+// Publish reducers, called by the Python publisher over HTTP. Every one starts with requireAdmin. Each takes a batch of rows and
 // upserts by natural key, so resending is harmless. Timestamps arrive as integer microseconds
 // since the Unix epoch (UTC) to keep the JSON plain.
 
@@ -27,6 +28,7 @@ const ZoneIn = t.object('ZoneIn', {
 });
 
 export const upsert_zones = spacetimedb.reducer({ rows: t.array(ZoneIn) }, (ctx, { rows }) => {
+  requireAdmin(ctx);
   for (const r of rows) {
     const row = { ...r, updated_at: ctx.timestamp };
     if (ctx.db.zone.code.find(r.code)) ctx.db.zone.code.update(row);
@@ -43,6 +45,7 @@ const ActualIn = t.object('ActualIn', {
 });
 
 export const upsert_actuals = spacetimedb.reducer({ rows: t.array(ActualIn) }, (ctx, { rows }) => {
+  requireAdmin(ctx);
   for (const { ts_us, ...r } of rows) {
     upsert(ctx.db.actual, { ...r, key: `${r.zone}|${r.series}|${ts_us}`, ts: ts(ts_us) });
   }
@@ -61,6 +64,7 @@ const ForecastIn = t.object('ForecastIn', {
 });
 
 export const upsert_forecasts = spacetimedb.reducer({ rows: t.array(ForecastIn) }, (ctx, { rows }) => {
+  requireAdmin(ctx);
   for (const { made_at_us, ts_us, ...r } of rows) {
     if (!(r.p10 <= r.p50 && r.p50 <= r.p90)) throw new SenderError('forecast quantiles must satisfy p10 <= p50 <= p90');
     upsert(ctx.db.forecast, {
@@ -85,6 +89,7 @@ const ScoreIn = t.object('ScoreIn', {
 
 // Scores are current-window metrics: one row per (zone, target, metric, model).
 export const upsert_scores = spacetimedb.reducer({ rows: t.array(ScoreIn) }, (ctx, { rows }) => {
+  requireAdmin(ctx);
   for (const { window_start_us, window_end_us, ...r } of rows) {
     upsert(ctx.db.score, {
       ...r,
@@ -104,6 +109,7 @@ const GhostWindIn = t.object('GhostWindIn', {
 });
 
 export const upsert_ghost_wind = spacetimedb.reducer({ rows: t.array(GhostWindIn) }, (ctx, { rows }) => {
+  requireAdmin(ctx);
   for (const { ts_us, ...r } of rows) {
     upsert(ctx.db.ghost_wind, { ...r, key: `${r.region}|${r.method}|${ts_us}`, ts: ts(ts_us) });
   }
@@ -118,6 +124,7 @@ const CarbonIn = t.object('CarbonIn', {
 });
 
 export const upsert_carbon = spacetimedb.reducer({ rows: t.array(CarbonIn) }, (ctx, { rows }) => {
+  requireAdmin(ctx);
   for (const { ts_us, ...r } of rows) {
     upsert(ctx.db.carbon, { ...r, key: `${r.zone}|${ts_us}`, ts: ts(ts_us) });
   }
@@ -133,6 +140,7 @@ const BatteryIn = t.object('BatteryIn', {
 });
 
 export const upsert_batteries = spacetimedb.reducer({ rows: t.array(BatteryIn) }, (ctx, { rows }) => {
+  requireAdmin(ctx);
   for (const r of rows) {
     upsert(ctx.db.battery, { ...r, key: `${r.zone}|${r.strategy}`, updated_at: ctx.timestamp });
   }
@@ -149,6 +157,7 @@ const BatteryActionIn = t.object('BatteryActionIn', {
 });
 
 export const upsert_battery_actions = spacetimedb.reducer({ rows: t.array(BatteryActionIn) }, (ctx, { rows }) => {
+  requireAdmin(ctx);
   for (const { ts_us, ...r } of rows) {
     upsert(ctx.db.battery_action, { ...r, key: `${r.zone}|${r.strategy}|${ts_us}`, ts: ts(ts_us) });
   }
@@ -169,6 +178,7 @@ export const set_intervention = spacetimedb.reducer(
     result_json: t.string(),
   },
   (ctx, args) => {
+    requireAdmin(ctx);
     const slot = args.slot || 'main';
     const prev = ctx.db.intervention.slot.find(slot);
     const row = { ...args, slot, seq: (prev?.seq ?? 0) + 1, triggered_at: ctx.timestamp };
@@ -178,11 +188,13 @@ export const set_intervention = spacetimedb.reducer(
 );
 
 export const clear_intervention = spacetimedb.reducer({ slot: t.string() }, (ctx, { slot }) => {
+  requireAdmin(ctx);
   ctx.db.intervention.slot.delete(slot || 'main');
 });
 
 // Drop time-series rows older than the cutoff so subscriptions stay small.
 export const prune_before = spacetimedb.reducer({ before_us: t.i64() }, (ctx, { before_us }) => {
+  requireAdmin(ctx);
   const old = (x: Timestamp) => x.microsSinceUnixEpoch < before_us;
   for (const r of [...ctx.db.actual.iter()]) if (old(r.ts)) ctx.db.actual.key.delete(r.key);
   for (const r of [...ctx.db.forecast.iter()]) if (old(r.ts)) ctx.db.forecast.key.delete(r.key);

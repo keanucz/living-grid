@@ -6,11 +6,13 @@
 import { type Infer as __Infer } from "spacetimedb";
 
 // Import all reducer arg schemas
+import AddAdminReducer from "../add_admin_reducer";
 import ClaimZoneReducer from "../claim_zone_reducer";
 import ClearInterventionReducer from "../clear_intervention_reducer";
 import DecideReducer from "../decide_reducer";
 import JoinReducer from "../join_reducer";
 import PruneBeforeReducer from "../prune_before_reducer";
+import RemoveAdminReducer from "../remove_admin_reducer";
 import SetInterventionReducer from "../set_intervention_reducer";
 import UpsertActualsReducer from "../upsert_actuals_reducer";
 import UpsertBatteriesReducer from "../upsert_batteries_reducer";
@@ -21,11 +23,13 @@ import UpsertGhostWindReducer from "../upsert_ghost_wind_reducer";
 import UpsertScoresReducer from "../upsert_scores_reducer";
 import UpsertZonesReducer from "../upsert_zones_reducer";
 
+export type AddAdminParams = __Infer<typeof AddAdminReducer>;
 export type ClaimZoneParams = __Infer<typeof ClaimZoneReducer>;
 export type ClearInterventionParams = __Infer<typeof ClearInterventionReducer>;
 export type DecideParams = __Infer<typeof DecideReducer>;
 export type JoinParams = __Infer<typeof JoinReducer>;
 export type PruneBeforeParams = __Infer<typeof PruneBeforeReducer>;
+export type RemoveAdminParams = __Infer<typeof RemoveAdminReducer>;
 export type SetInterventionParams = __Infer<typeof SetInterventionReducer>;
 export type UpsertActualsParams = __Infer<typeof UpsertActualsReducer>;
 export type UpsertBatteriesParams = __Infer<typeof UpsertBatteriesReducer>;

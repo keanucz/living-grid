@@ -96,3 +96,21 @@ Views: `latest_forecast` (newest `forecast` row per zone, target and ts) and `le
 ## Known gaps
 
 - The publish reducers are not restricted to the publisher's identity; any client could call them. Fine for the demo; tighten if time allows.
+
+## Access control
+
+Publish reducers (`upsert_*`, `set_intervention`, `clear_intervention`, `prune_before`) and `add_admin` /
+`remove_admin` reject any caller that is not an admin (`module/src/auth.ts`). Game reducers stay open.
+
+- Admins are the identity that first published the module (seeded in `init`), the live database owner
+  (`BOOTSTRAP_ADMINS`, because a migrate does not re-run `init`), and anyone added with `add_admin`.
+- The Python publisher needs a token for an admin identity: `LG_STDB_TOKEN`, or `LG_STDB_TOKEN_FILE` pointing
+  at a mode-600 file. Without one, `engine.publisher.from_env()` returns None and logs a warning.
+- Give each service its own identity rather than the owner token:
+
+```
+curl -s -X POST http://127.0.0.1:3000/v1/identity > id.json        # {"identity": ..., "token": ...}
+spacetime call --server http://127.0.0.1:3000 living-grid add_admin '"<identity hex>"' '"engine publisher"'
+```
+
+`./smoke.sh` checks that anonymous calls get 530 and a promoted identity gets 200.

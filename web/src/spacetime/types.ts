@@ -29,6 +29,13 @@ export const ActualIn = __t.object("ActualIn", {
 });
 export type ActualIn = __Infer<typeof ActualIn>;
 
+export const Admin = __t.object("Admin", {
+  identity: __t.identity(),
+  note: __t.string(),
+  addedAt: __t.timestamp(),
+});
+export type Admin = __Infer<typeof Admin>;
+
 export const Battery = __t.object("Battery", {
   key: __t.string(),
   zone: __t.string(),

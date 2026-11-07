@@ -127,3 +127,29 @@ def fixture_log() -> pd.DataFrame:
     from pipeline import cache
 
     return cache.read("forecasts/log")
+
+
+def test_online_without_token_is_disabled(monkeypatch):
+    monkeypatch.delenv("LG_OFFLINE", raising=False)
+    monkeypatch.delenv("LG_STDB_TOKEN", raising=False)
+    monkeypatch.delenv("LG_STDB_TOKEN_FILE", raising=False)
+    monkeypatch.setenv("LG_STDB_URL", "http://stdb.test")
+    assert P.from_env() is None, "anonymous identities are rejected by the publish reducers"
+
+
+def test_token_from_env_and_file(monkeypatch, tmp_path):
+    monkeypatch.delenv("LG_OFFLINE", raising=False)
+    monkeypatch.setenv("LG_STDB_URL", "http://stdb.test")
+    monkeypatch.delenv("LG_STDB_TOKEN", raising=False)
+    f = tmp_path / "tok"
+    f.write_text("from-file\n")
+    monkeypatch.setenv("LG_STDB_TOKEN_FILE", str(f))
+    assert P.from_env().token == "from-file"
+    monkeypatch.setenv("LG_STDB_TOKEN", "from-env")
+    assert P.from_env().token == "from-env"
+
+
+def test_rejected_publish_surfaces_the_auth_error():
+    rec = Recorder(fail_with=530)
+    with pytest.raises(P.ReducerError, match="530"):
+        P.publish_intervention(client(rec), fixture("intervene"))

@@ -153,3 +153,13 @@ export const player_decision = table(
     decided_at: t.timestamp(),
   }
 );
+
+// Identities allowed to call the publish reducers. Private: never sent to subscribers.
+export const admin = table(
+  { name: 'admin' },
+  {
+    identity: t.identity().primaryKey(),
+    note: t.string(),
+    added_at: t.timestamp(),
+  }
+);
