@@ -1,0 +1,511 @@
+#!/usr/bin/env python3
+"""hub: a task board and merge queue for many agents sharing one git repo."""
+import argparse
+import fnmatch
+import json
+import os
+import re
+import sqlite3
+import subprocess
+import sys
+import time
+from pathlib import Path
+
+try:
+    import tomllib
+except ImportError:
+    sys.exit("hub needs Python 3.11+")
+
+SCHEMA = """
+create table if not exists tasks(
+  id integer primary key,
+  title text not null,
+  detail text not null default '',
+  paths text not null default '',
+  status text not null default 'open',
+  agent text,
+  branch text,
+  note text not null default '',
+  handoff text not null default '',
+  updated real
+);
+create table if not exists events(
+  id integer primary key, ts real, task integer, agent text, kind text, msg text
+);
+"""
+ACTIVE = ("claimed", "ready", "merging", "bounced")
+
+
+def run(*args, check=True, env=None):
+    r = subprocess.run(args, text=True, capture_output=True, env=env)
+    if check and r.returncode:
+        sys.exit(f"$ {' '.join(args)}\n{r.stdout}{r.stderr}".rstrip())
+    return r
+
+
+def git(*args, **kw):
+    return run("git", *args, **kw)
+
+
+def out(*args):
+    return git(*args).stdout.strip()
+
+
+def toplevel():
+    return Path(out("rev-parse", "--show-toplevel"))
+
+
+def config():
+    cfg = {"main": "main", "remote": "origin", "check": "true", "squash": True,
+           "poll": 5, "check_timeout": 900}
+    p = toplevel() / "hub.toml"
+    if p.exists():
+        cfg.update(tomllib.loads(p.read_text()).get("hub", {}))
+    if os.environ.get("HUB_CHECK"):
+        cfg["check"] = os.environ["HUB_CHECK"]
+    return cfg
+
+
+def db():
+    path = (os.environ.get("HUB_DB")
+            or git("config", "--get", "hub.db", check=False).stdout.strip()
+            or str(Path(out("rev-parse", "--git-common-dir")).resolve() / "hub.db"))
+    con = sqlite3.connect(path, timeout=30, isolation_level=None)
+    con.row_factory = sqlite3.Row
+    con.executescript(SCHEMA)
+    try:
+        con.execute("alter table tasks add column handoff text not null default ''")
+    except sqlite3.OperationalError:
+        pass
+    return con
+
+
+def me():
+    return os.environ.get("HUB_AGENT") or toplevel().name
+
+
+def log(con, task, kind, msg=""):
+    con.execute("insert into events(ts,task,agent,kind,msg) values(?,?,?,?,?)",
+                (time.time(), task, me(), kind, msg))
+
+
+def set_task(con, tid, **fields):
+    fields["updated"] = time.time()
+    cols = ", ".join(f"{k}=?" for k in fields)
+    con.execute(f"update tasks set {cols} where id=?", (*fields.values(), tid))
+
+
+def prefix(pattern):
+    return re.split(r"[*?\[]", pattern, maxsplit=1)[0]
+
+
+def overlap(a, b):
+    pa, pb = [prefix(p) for p in a.split()], [prefix(p) for p in b.split()]
+    return any(x.startswith(y) or y.startswith(x) for x in pa for y in pb)
+
+
+def clashes(con, tid, agent, paths):
+    marks = ",".join("?" * len(ACTIVE))
+    rows = con.execute(f"select * from tasks where status in ({marks}) and id != ? and agent != ?",
+                       (*ACTIVE, tid, agent))
+    return [r for r in rows if overlap(r["paths"], paths)]
+
+
+def within(rel, paths):
+    rel = rel.removeprefix("./")
+    for p in paths.split():
+        p = p.removeprefix("./")
+        if re.search(r"[*?\[]", p):
+            if fnmatch.fnmatch(rel, p):
+                return True
+        elif p.endswith("/") and rel.startswith(p):
+            return True
+        elif rel == p or rel.startswith(p + "/"):
+            return True
+    return False
+
+
+def branch():
+    return out("branch", "--show-current")
+
+
+def current_task(con):
+    return con.execute("select * from tasks where branch=?", (branch(),)).fetchone()
+
+
+def mid_operation():
+    return any(Path(out("rev-parse", "--git-path", p)).exists()
+               for p in ("rebase-merge", "rebase-apply", "MERGE_HEAD"))
+
+
+def fmt(t):
+    who = f" @{t['agent']}" if t["agent"] else ""
+    paths = f"  [{t['paths']}]" if t["paths"] else ""
+    return f"#{t['id']:<3} {t['status']:<8}{who:<14} {t['title']}{paths}"
+
+
+def cmd_add(a):
+    con = db()
+    cur = con.execute("insert into tasks(title,detail,paths,updated) values(?,?,?,?)",
+                      (a.title, a.detail, " ".join(a.paths), time.time()))
+    log(con, cur.lastrowid, "add", a.title)
+    print(cur.lastrowid)
+
+
+def cmd_list(a):
+    con = db()
+    q = "select * from tasks" + ("" if a.all else " where status != 'merged'") + " order by id"
+    rows = con.execute(q).fetchall()
+    print("\n".join(fmt(t) for t in rows) or "no tasks")
+
+
+def cmd_show(a):
+    t = db().execute("select * from tasks where id=?", (a.id,)).fetchone()
+    if not t:
+        sys.exit(f"no task #{a.id}")
+    print(fmt(t))
+    for k in ("detail", "branch", "handoff", "note"):
+        if t[k]:
+            print(f"\n{k}:\n{t[k]}")
+
+
+def cmd_claim(a):
+    con, cfg, agent = db(), config(), me()
+    if branch().startswith("agent/"):
+        cmd_save(argparse.Namespace(quiet=True))
+    if git("status", "--porcelain").stdout.strip():
+        sys.exit("working tree is dirty; commit or stash first")
+    con.execute("begin immediate")
+    t = con.execute("select * from tasks where id=?", (a.id,)).fetchone()
+    if not t:
+        sys.exit(f"no task #{a.id}")
+    if t["status"] != "open" and t["agent"] != agent:
+        sys.exit(f"#{a.id} is {t['status']} by {t['agent']}")
+    found = clashes(con, a.id, agent, t["paths"])
+    if found and not a.force:
+        print("path claims overlap with:\n" + "\n".join(fmt(r) for r in found), file=sys.stderr)
+        sys.exit("pick another task, narrow the paths, or pass --force")
+    slug = re.sub(r"[^a-z0-9]+", "-", t["title"].lower()).strip("-")[:40]
+    br = t["branch"] or f"agent/{agent}/{t['id']}-{slug}"
+    git("fetch", "-q", cfg["remote"])
+    if git("rev-parse", "--verify", "-q", br, check=False).returncode == 0:
+        git("switch", "-q", br)
+    else:
+        git("switch", "-q", "-c", br, f"{cfg['remote']}/{cfg['main']}")
+    set_task(con, t["id"], status="claimed", agent=agent, branch=br)
+    log(con, t["id"], "claim")
+    con.execute("commit")
+    print(f"claimed #{t['id']} on {br}")
+
+
+def cmd_save(a):
+    br = branch()
+    if not br.startswith("agent/") or mid_operation():
+        return
+    if git("status", "--porcelain").stdout.strip():
+        git("add", "-A")
+        git("commit", "-q", "--no-verify", "-m", f"wip({me()}): autosave")
+    p = git("push", "-q", "--force-with-lease", "-u", config()["remote"], br, check=False)
+    if p.returncode and not a.quiet:
+        print(f"push failed:\n{p.stderr}", file=sys.stderr)
+
+
+def cmd_sync(a):
+    cfg = config()
+    cmd_save(argparse.Namespace(quiet=True))
+    git("fetch", "-q", cfg["remote"])
+    r = git("rebase", f"{cfg['remote']}/{cfg['main']}", check=False)
+    if r.returncode:
+        files = out("diff", "--name-only", "--diff-filter=U")
+        sys.exit(f"rebase stopped on conflicts in:\n{files}\n\n"
+                 "resolve them, `git add` the files, `git rebase --continue`, then `bin/hub save`")
+    cmd_save(argparse.Namespace(quiet=False))
+    print(f"up to date with {cfg['main']}")
+
+
+def cmd_ready(a):
+    con, cfg = db(), config()
+    t = current_task(con)
+    if not t:
+        sys.exit("not on a claimed task branch")
+    cmd_save(argparse.Namespace(quiet=False))
+    ahead = int(out("rev-list", "--count", f"{cfg['remote']}/{cfg['main']}..HEAD"))
+    if not ahead:
+        sys.exit("nothing to merge: branch has no commits beyond main")
+    set_task(con, t["id"], status="ready", note="", handoff=a.message or t["handoff"])
+    log(con, t["id"], "ready", a.message)
+    print(f"#{t['id']} queued for merge; check with `bin/hub inbox` or `bin/hub wait`")
+
+
+def cmd_inbox(a):
+    rows = db().execute("select * from tasks where agent=? and status != 'merged' order by id",
+                        (me(),)).fetchall()
+    for t in rows:
+        print(fmt(t))
+        if t["note"]:
+            print("  " + t["note"].replace("\n", "\n  "))
+    if not rows:
+        print("nothing outstanding")
+
+
+def cmd_wait(a):
+    con = db()
+    tid = a.id or (current_task(con) or {"id": None})["id"]
+    if not tid:
+        sys.exit("no task given and not on a task branch")
+    deadline = time.time() + a.timeout
+    while time.time() < deadline:
+        t = con.execute("select * from tasks where id=?", (tid,)).fetchone()
+        if t["status"] in ("merged", "bounced"):
+            print(fmt(t) + (f"\n{t['note']}" if t["note"] else ""))
+            sys.exit(0 if t["status"] == "merged" else 1)
+        time.sleep(2)
+    sys.exit(f"#{tid} still {t['status']} after {a.timeout}s")
+
+
+def cmd_release(a):
+    con = db()
+    t = con.execute("select * from tasks where id=?", (a.id,)).fetchone()
+    if not t:
+        sys.exit(f"no task #{a.id}")
+    set_task(con, a.id, status="open", agent=None)
+    log(con, a.id, "release")
+    print(f"#{a.id} is open again")
+
+
+def cmd_widen(a):
+    con = db()
+    con.execute("begin immediate")
+    t = current_task(con)
+    if not t:
+        sys.exit("not on a claimed task branch")
+    new = " ".join(p.removeprefix("./") for p in a.paths)
+    found = clashes(con, t["id"], t["agent"], new)
+    if found and not a.force:
+        print("those paths are claimed by:\n" + "\n".join(fmt(r) for r in found), file=sys.stderr)
+        sys.exit("coordinate via a new task (`bin/hub add`) instead, or pass --force for a trivial touch")
+    set_task(con, t["id"], paths=f"{t['paths']} {new}".strip())
+    log(con, t["id"], "widen", new)
+    con.execute("commit")
+    print(f"#{t['id']} now covers: {t['paths']} {new}".strip())
+
+
+DANGEROUS = [
+    (r"\bgit\s+push\b", "branches are pushed by `bin/hub save` and main belongs to the merge queue"),
+    (r"\bgit\s+reset\s+(\S+\s+)*--hard\b", "it throws work away; use `git stash` or `git restore <file>`"),
+    (r"\bgit\s+(checkout|restore)\s+(\S+\s+)*(--\s+)?\.(\s|$)", "it discards every uncommitted change"),
+    (r"\bgit\s+clean\s+(\S+\s+)*-\w*f", "it deletes untracked files"),
+    (r"\bgit\s+(switch|checkout)\s+(-\w+\s+)*main\b", "agents never work on main"),
+    (r"\bgit\s+branch\s+(\S+\s+)*-D\b", "force-deleting branches can lose other agents' work"),
+    (r"--no-verify\b", "it skips the hooks that keep the repo consistent"),
+    (r"\brm\s+(?=(?:[^;&|]*\s)?-\w*[rR])[^;&|]*\s(/|~|\$HOME|\.\.?|\*)/?(?=\s|$|[;&|])",
+     "recursive delete of a root, home directory or the whole worktree"),
+    (r"\bdrop\s+(table|database|schema)\b", "destructive schema change; ask a human first"),
+    (r"\bchmod\s+(-\w+\s+)*777\b", "world-writable permissions"),
+]
+
+
+class Blocked(Exception):
+    pass
+
+
+def guard(ev):
+    tool, inp = ev.get("tool_name", ""), ev.get("tool_input") or {}
+    if tool == "Bash":
+        cmd = inp.get("command", "")
+        for pat, why in DANGEROUS:
+            if re.search(pat, cmd, re.I):
+                raise Blocked(f"hub guard blocked `{cmd}`: {why}.")
+        return
+    path = inp.get("file_path") or inp.get("notebook_path")
+    if not path:
+        return
+    top = toplevel().resolve()
+    p = Path(path)
+    if not p.is_absolute():
+        p = Path(ev.get("cwd") or os.getcwd()) / p
+    try:
+        rel = p.resolve().relative_to(top).as_posix()
+    except ValueError:
+        return
+    if rel.startswith(".git/"):
+        raise Blocked("never edit files inside .git directly")
+    t = current_task(db())
+    if not t:
+        raise Blocked("claim a task with `bin/hub claim <id>` before editing files; see `bin/hub list`")
+    if t["paths"] and not within(rel, t["paths"]):
+        raise Blocked(f"{rel} is outside task #{t['id']}'s claimed paths ({t['paths']}). "
+                      f"If the change really belongs in this task, run `bin/hub widen {rel}` first, "
+                      "which checks that no other agent has claimed it. Otherwise add a follow-up "
+                      "task with `bin/hub add`.")
+
+
+def cmd_guard(a):
+    try:
+        guard(json.load(sys.stdin))
+    except Blocked as e:
+        print(e, file=sys.stderr)
+        sys.exit(2)
+    except (Exception, SystemExit):
+        pass
+
+
+def cmd_log(a):
+    rows = db().execute("select * from events order by id desc limit ?", (a.n,)).fetchall()
+    for e in reversed(rows):
+        ts = time.strftime("%H:%M:%S", time.localtime(e["ts"]))
+        print(f"{ts} #{e['task']} {e['agent']} {e['kind']} {(e['msg'] or '').splitlines()[0] if e['msg'] else ''}")
+
+
+def cmd_spawn(a):
+    cfg = config()
+    path = Path(a.dir or toplevel().parent / "agents" / a.name).resolve()
+    git("fetch", "-q", cfg["remote"])
+    git("worktree", "add", "-q", "--detach", str(path), f"{cfg['remote']}/{cfg['main']}")
+    print(f"worktree ready: {path}\nstart an agent there with:  cd {path} && claude")
+
+
+def bounce(con, t, msg):
+    set_task(con, t["id"], status="bounced", note=msg)
+    log(con, t["id"], "bounce", msg)
+    print(f"bounced #{t['id']}: {msg.splitlines()[0]}")
+    return True
+
+
+def integrate_once(con, cfg):
+    t = con.execute("select * from tasks where status='ready' order by updated limit 1").fetchone()
+    if not t:
+        return False
+    R, M, br = cfg["remote"], cfg["main"], t["branch"]
+    set_task(con, t["id"], status="merging")
+    git("merge", "--abort", check=False)
+    git("rebase", "--abort", check=False)
+    git("reset", "-q", "--hard")
+    git("clean", "-fdq")
+    git("fetch", "-q", "--prune", R)
+    if git("rev-parse", "--verify", "-q", f"{R}/{br}", check=False).returncode:
+        return bounce(con, t, "branch not found on the remote; run `bin/hub save` then `bin/hub ready`")
+
+    if cfg["squash"]:
+        git("checkout", "-q", "-B", "hub-integrate", f"{R}/{M}")
+        r = git("merge", "--squash", f"{R}/{br}", check=False)
+    else:
+        git("checkout", "-q", "-B", "hub-integrate", f"{R}/{br}")
+        r = git("rebase", f"{R}/{M}", check=False)
+    if r.returncode:
+        files = out("diff", "--name-only", "--diff-filter=U") or (r.stdout + r.stderr).strip()
+        git("merge", "--abort", check=False)
+        git("rebase", "--abort", check=False)
+        git("reset", "-q", "--hard")
+        return bounce(con, t, f"conflicts with {M} in:\n{files}\n"
+                              "run `bin/hub sync`, resolve, then `bin/hub ready`")
+
+    if cfg["squash"]:
+        if git("diff", "--cached", "--quiet", check=False).returncode == 0:
+            set_task(con, t["id"], status="merged", note="no changes against main")
+            log(con, t["id"], "merged", "empty")
+            return True
+        git("commit", "-q", "--author", f"{t['agent']} <{t['agent']}@hub>",
+            "-m", f"{t['title']} (#{t['id']})", "-m", f"Agent: {t['agent']}\nBranch: {br}")
+
+    try:
+        c = subprocess.run(cfg["check"], shell=True, text=True, capture_output=True,
+                           timeout=cfg["check_timeout"])
+    except subprocess.TimeoutExpired:
+        return bounce(con, t, f"check timed out after {cfg['check_timeout']}s")
+    if c.returncode:
+        return bounce(con, t, f"check failed (`{cfg['check']}`):\n{(c.stdout + c.stderr)[-3000:]}\n"
+                              "run `bin/hub sync` and `./scripts/check.sh`; the build-fixer subagent can help")
+
+    p = git("push", "-q", R, f"HEAD:{M}", check=False, env={**os.environ, "HUB_INTEGRATOR": "1"})
+    if p.returncode:
+        set_task(con, t["id"], status="ready")
+        log(con, t["id"], "push-failed", p.stderr)
+        print(f"push failed, requeued #{t['id']}:\n{p.stderr}", file=sys.stderr)
+        time.sleep(cfg["poll"])
+        return True
+    set_task(con, t["id"], status="merged", note="")
+    log(con, t["id"], "merged", out("rev-parse", "--short", "HEAD"))
+    print(f"merged #{t['id']} {t['title']}")
+    return True
+
+
+def cmd_integrate(a):
+    con, cfg = db(), config()
+    con.execute("update tasks set status='ready' where status='merging'")
+    while True:
+        did = integrate_once(con, cfg)
+        if a.once:
+            break
+        if not did:
+            time.sleep(cfg["poll"])
+
+
+def main():
+    ap = argparse.ArgumentParser(prog="hub")
+    sub = ap.add_subparsers(dest="cmd", required=True)
+
+    p = sub.add_parser("add", help="add a task")
+    p.add_argument("title")
+    p.add_argument("-d", "--detail", default="")
+    p.add_argument("-p", "--paths", nargs="*", default=[], help="paths/globs the task expects to touch")
+    p.set_defaults(fn=cmd_add)
+
+    p = sub.add_parser("list", aliases=["ls"], help="show the board")
+    p.add_argument("-a", "--all", action="store_true")
+    p.set_defaults(fn=cmd_list)
+
+    p = sub.add_parser("show", help="task details and latest note")
+    p.add_argument("id", type=int)
+    p.set_defaults(fn=cmd_show)
+
+    p = sub.add_parser("claim", help="claim a task and switch to its branch")
+    p.add_argument("id", type=int)
+    p.add_argument("--force", action="store_true")
+    p.set_defaults(fn=cmd_claim)
+
+    p = sub.add_parser("save", help="commit everything and push the task branch")
+    p.add_argument("-q", "--quiet", action="store_true")
+    p.set_defaults(fn=cmd_save)
+
+    sub.add_parser("sync", help="rebase the task branch onto latest main").set_defaults(fn=cmd_sync)
+    p = sub.add_parser("ready", help="queue the current task for merging")
+    p.add_argument("-m", "--message", default="", help="handoff: what changed, how it was verified, caveats")
+    p.set_defaults(fn=cmd_ready)
+
+    p = sub.add_parser("widen", help="add paths to the current task's claim")
+    p.add_argument("paths", nargs="+")
+    p.add_argument("--force", action="store_true")
+    p.set_defaults(fn=cmd_widen)
+
+    sub.add_parser("guard", help="PreToolUse hook: path freeze and destructive-command guard").set_defaults(fn=cmd_guard)
+    sub.add_parser("inbox", help="your outstanding tasks and bounce notes").set_defaults(fn=cmd_inbox)
+
+    p = sub.add_parser("wait", help="block until a task is merged or bounced")
+    p.add_argument("id", type=int, nargs="?")
+    p.add_argument("-t", "--timeout", type=int, default=600)
+    p.set_defaults(fn=cmd_wait)
+
+    p = sub.add_parser("release", help="give a task back to the board")
+    p.add_argument("id", type=int)
+    p.set_defaults(fn=cmd_release)
+
+    p = sub.add_parser("log", help="recent events")
+    p.add_argument("-n", type=int, default=30)
+    p.set_defaults(fn=cmd_log)
+
+    p = sub.add_parser("spawn", help="create a worktree for a new agent")
+    p.add_argument("name")
+    p.add_argument("--dir")
+    p.set_defaults(fn=cmd_spawn)
+
+    p = sub.add_parser("integrate", help="run the merge queue")
+    p.add_argument("--once", action="store_true")
+    p.set_defaults(fn=cmd_integrate)
+
+    a = ap.parse_args()
+    a.fn(a)
+
+
+if __name__ == "__main__":
+    main()

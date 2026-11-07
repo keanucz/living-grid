@@ -1,0 +1,9 @@
+[hub]
+main = "main"
+remote = "origin"
+# Runs on the squashed candidate before it reaches main. Keep it under a couple of minutes.
+check = "./scripts/check.sh"
+check_timeout = 900
+# true: one squashed commit per task on main. false: rebase and keep the agent's commits.
+squash = true
+poll = 5

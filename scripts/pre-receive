@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+# Installed into the bare repo on the VPS. Only the integrator may move main, and only forwards.
+set -euo pipefail
+main="${HUB_MAIN:-main}"
+zero=0000000000000000000000000000000000000000
+
+while read -r old new ref; do
+  case "$ref" in
+    "refs/heads/$main")
+      if [ "${HUB_INTEGRATOR:-}" != "1" ] && [ "$old" != "$zero" ]; then
+        echo "hub: $main is owned by the merge queue. Push to your agent/ branch and run 'bin/hub ready'." >&2
+        exit 1
+      fi
+      if [ "$old" != "$zero" ] && [ "$new" != "$zero" ] && ! git merge-base --is-ancestor "$old" "$new"; then
+        echo "hub: refusing non-fast-forward update to $main" >&2
+        exit 1
+      fi
+      ;;
+  esac
+done

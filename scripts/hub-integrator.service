@@ -1,0 +1,17 @@
+[Unit]
+Description=hackhub merge queue
+After=network.target
+
+[Service]
+WorkingDirectory=@ROOT@/integrator
+Environment=HUB_AGENT=integrator
+Environment=PYTHONUNBUFFERED=1
+UMask=0002
+User=hub
+Group=hack
+ExecStart=@ROOT@/integrator/bin/hub integrate
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
