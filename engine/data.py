@@ -56,9 +56,16 @@ def _read(path: Path) -> pd.DataFrame:
 
 
 def actuals() -> pd.DataFrame:
+    """Every cached actual with its source. Shared and memoised on file mtimes: callers filter, never mutate."""
+    files = tuple((stem, p, p.stat().st_mtime) for stem, p in sorted(_files("actuals").items()))
+    return _concat_actuals(files)
+
+
+@lru_cache(maxsize=4)
+def _concat_actuals(files: tuple[tuple[str, Path, float], ...]) -> pd.DataFrame:
     parts = []
-    for stem, p in sorted(_files("actuals").items()):
-        df = _read(p)
+    for stem, p, mtime in files:
+        df = _read_parquet(p, mtime)
         if len(df):
             parts.append(df.assign(source=source_of(stem)))
     if not parts:
@@ -156,10 +163,12 @@ def carbon_at(at: pd.Timestamp) -> dict[str, dict]:
 def zone_series(at: pd.Timestamp) -> tuple[dict[str, float], dict[str, dict[str, float]]]:
     """(load MW per zone, generation mix MW per zone) as of `at`; Elexon preferred for GB."""
     a = actuals()
-    a = a[(a["series"] == "load") | a["series"].str.startswith("gen_")].copy()
-    a = a[[(src, z) not in COUNTRY_LEVEL for src, z in zip(a["source"], a["zone"], strict=True)]]
+    a = a[(a["ts"] <= at) & (a["ts"] > at - METERED_TOLERANCE)]
+    a = a[(a["series"] == "load") | a["series"].str.startswith("gen_")]
+    country = pd.MultiIndex.from_arrays([a["source"].astype(str), a["zone"].astype(str)]).isin(list(COUNTRY_LEVEL))
+    a = a[~country].copy()
     a["rank"] = (a["source"] == "elexon") & (a["zone"] == "GB")
-    a = a[(a["ts"] <= at) & (a["ts"] > at - METERED_TOLERANCE)].sort_values(["ts", "rank"])
+    a = a.sort_values(["ts", "rank"])
     last = a.groupby(["zone", "series"], as_index=False).last()
     load, mix = {}, {}
     for r in last.itertuples():
@@ -176,6 +185,7 @@ ZONE_ALIASES = {"IE": "SEM", "NI": "SEM", "DK": "DK1"}
 def pair_flows(at: pd.Timestamp) -> dict[tuple[str, str], float]:
     """Net MW per zone pair, keyed (a, b) with a < b, positive a -> b. One reporting zone per pair."""
     a = actuals()
+    a = a[(a["ts"] <= at) & (a["ts"] > at - AS_OF_TOLERANCE)]
     a = a[a["series"].str.match(r"^flow_[A-Za-z0-9-]+_[A-Za-z0-9-]+$") & ~a["series"].str.startswith("flow_net_")]
     by_reporter: dict[tuple[str, str], dict[str, float]] = {}
     for r in _as_of(a, at).itertuples():
