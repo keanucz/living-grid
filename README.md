@@ -1,6 +1,6 @@
 # The Living Grid
 
-A live map of the electricity market in six European zones that forecasts prices with uncertainty bands, lets you trigger events like a Strait of Hormuz closure or a tripped Norway cable, and scores every forecast against what actually happened.
+A live map of the electricity market in six European zones. It forecasts prices with uncertainty bands, lets you trigger events such as closing the Strait of Hormuz or tripping the Norway cable, and scores every forecast against what actually happened.
 
 Built in 24 hours at HackTheBurgh XIII (7 to 8 November 2026) for the HRT track, "Best Use of Data for Predictions and Decision Making", and the G-Research track, "Making the Unseen Seen".
 
@@ -8,14 +8,14 @@ Built in 24 hours at HackTheBurgh XIII (7 to 8 November 2026) for the HRT track,
 
 ## What you can do with it
 
-Open the site and you land on a map of GB, France, Germany-Luxembourg, the Netherlands, Belgium and southern Norway (NO2), coloured by this hour's day-ahead price. Arcs between zones show electricity moving through the interconnectors. On the evening of 7 November the map showed £268/MWh in GB, €322 across the four coupled continental zones and €205 in NO2.
+The site opens with a map of GB, France, Germany-Luxembourg, the Netherlands, Belgium and southern Norway (NO2), coloured by this hour's day-ahead price. Arcs between zones show electricity moving through the interconnectors. On the evening of 7 November the map showed £268/MWh in GB, €322 across the four coupled continental zones and €205 in NO2.
 
 From there:
 
 - **Overview** shows prices, demand, generation mix, carbon intensity and flows for the current hour.
 - **Forecast** draws a translucent "ghost" of where prices are heading, with P10 to P90 bands that widen the further ahead you look.
 - **Simulate** runs an event and shows what it costs, in pounds or euros, zone by zone.
-- **Scoreboard** compares our forecasts with simple guesses, using only forecasts logged before their outcome was known.
+- **Scoreboard** compares our forecasts with simple guesses. Only forecasts logged before their outcome was known count.
 - **Batteries** runs a 1 MW / 2 MWh battery in each zone on our forecasts and compares it with a naive rule and with perfect foresight.
 - **Replay** plays back the storm of 26 October 2026 with a model that saw no data from that day onwards.
 - **Household** suggests the cheapest window tonight to charge a car or run the dishwasher.
@@ -72,7 +72,7 @@ flowchart TD
     D --> E["Scoreboard: our error vs persistence,<br/>share of outcomes inside P10 to P90,<br/>number of forecasts scored"]
 ```
 
-The final Monday forecast freezes at 09:15 UTC on Sunday, before the GB auction closes at 09:50 and the continental one at 11:00 UTC. The reveal view then shows the frozen forecast meeting the real auction result during the 12:30 demo.
+The final Monday forecast freezes at 09:15 UTC on Sunday, before the GB auction closes (09:50 UTC) and the continental auction closes (11:00 UTC). During the 12:30 demo, the reveal view shows the frozen forecast next to the real auction result.
 
 ## Results so far
 
@@ -140,7 +140,7 @@ cd web && npm install && npm run dev       # front end on :5173
 ./scripts/check.sh                         # tests, then the web build (the merge gate)
 ```
 
-`LG_OFFLINE=1` runs the whole app from cached files and committed fixtures with no network; the demo has to survive the venue Wi-Fi dropping.
+`LG_OFFLINE=1` runs the whole app from cached files and committed fixtures, with no network. The demo has to keep working if the venue Wi-Fi drops.
 
 ## How we built it
 
