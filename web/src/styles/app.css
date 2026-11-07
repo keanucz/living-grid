@@ -216,3 +216,34 @@ h1, .headline h1, .kval, .sim-name, .tile b { letter-spacing: -0.012em; }
 
 .flash { animation: lgflash 1.2s ease; }
 @keyframes lgflash { 0%, 60% { box-shadow: 0 0 0 2px var(--accent), var(--shadow); } 100% { box-shadow: var(--shadow); } }
+
+/* ---------- pass 3: monochrome UI like pollar.news; only the country price fills carry colour ---------- */
+:root {
+  --accent: #fafafa; --accent-dim: rgba(255, 255, 255, 0.08); --accent-ink: #0a0a0a;
+  --hot: #fafafa; --hot-dim: rgba(255, 255, 255, 0.08);
+  --up: #d4d4d4; --down: #a3a3a3; --violet: #a3a3a3;
+  --wind: #d4d4d4; --nuclear: #d4d4d4; --gas: #d4d4d4; --hydro: #d4d4d4;
+}
+.btn.primary, .rp-play, .tabs button.on.sim { background: #fafafa; color: #0a0a0a; }
+.pin { background: #fafafa !important; color: #0a0a0a; border-color: #0a0a0a; }
+.callout .ic { background: #0a0a0a; }
+.dot { background: #fafafa; box-shadow: 0 0 8px rgba(255,255,255,.6); }
+.segs button.on { background: #fafafa; box-shadow: none; }
+.ev.on { background: rgba(255,255,255,.06); border-color: var(--line-2); color: var(--text); }
+.ev.on .ev-ic { background: #fafafa; color: #0a0a0a; }
+.tag.accent, .tag.hot { background: rgba(255,255,255,.08); color: var(--text); }
+.actions .chip .swatch { background: var(--text-2) !important; }
+.actions .chip.off .swatch { background: transparent !important; border: 1px solid var(--text-3); }
+.headline .kicker { font: 500 10px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--text-3); margin-bottom: 6px; }
+.headline p { max-width: 520px; }
+/* white sidebar */
+.rail { background: #fafafa; border-right: 1px solid #e5e5e5; }
+.rail .logo { background: #0a0a0a; color: #fafafa; }
+.rail button { color: #737373; }
+.rail button:hover { color: #0a0a0a; background: #ededed; }
+.rail button.on { color: #fafafa; background: #0a0a0a; }
+.rail-sep { width: 24px; height: 1px; background: #e5e5e5; margin: 8px 0; }
+.map-label.on { background: #fafafa; border-color: #fafafa; color: #0a0a0a; }
+.map-label.on b { color: #0a0a0a; }
+.zrow.on { background: rgba(255,255,255,.05); border-color: var(--line-2); }
+.zspark { color: var(--text-2) !important; }

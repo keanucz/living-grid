@@ -9,12 +9,13 @@ import { api, useApi, overlayState, currentHour } from './api/client.js'
 import { actions, setState, useStore } from './store/store.js'
 import { PRICE_LEGEND } from './styles/tokens.js'
 import { matchView } from './views/index.js'
+import { sectionById } from './shell/sections.js'
 import MobileShell from './shell/mobile/MobileShell.jsx'
 import { useNarrow } from './shell/mobile/useNarrow.js'
 import { normaliseResult } from './api/normalise.js'
 
 const ASSET_FOR = { hormuz: 'gas', nuclear_outage: 'nuclear', scottish_storm: 'wind', interconnector_trip: 'hydro' }
-const SLOTS = ['left', 'bottomRight', 'bottom']
+const SLOTS = ['left', 'bottomRight', 'bottom', 'right']
 
 setState({ layers: Object.fromEntries(LAYERS.map((l) => [l.id, l.defaultOn !== false])) })
 
@@ -80,6 +81,8 @@ function MapApp() {
   }, [geo, zones.data, state.data, scenarios.data, assets.data, ui])
 
   const visibleLayers = LAYERS.filter((l) => l.modes.includes(ui.mode))
+  const section = sectionById[ui.section] ?? sectionById.overview
+  const inSection = (p) => (section.panels ? section.panels.includes(p.id) : p.modes.includes(ui.mode))
   if (narrow) return <MobileShell ctx={ctx} at={state.data?.at} source={state.source} />
 
   return (
@@ -89,10 +92,11 @@ function MapApp() {
         <MapView ctx={ctx} />
         <TopBar at={state.data?.at} source={state.source} />
 
-        {ui.mode === 'overview' && (
+        {section.title && (
           <div className="headline">
-            <h1>Europe’s power grid</h1>
-            <p>Day-ahead prices and the electricity flowing between countries, right now</p>
+            <div className="kicker">{section.label}</div>
+            <h1>{section.title}</h1>
+            <p>{section.blurb}</p>
           </div>
         )}
 
@@ -108,7 +112,7 @@ function MapApp() {
 
         {SLOTS.map((slot) => (
           <div key={slot} className={`slot slot-${slot}`}>
-            {PANELS.filter((p) => p.slot === slot && p.modes.includes(ui.mode)).map((p) => (
+            {PANELS.filter((p) => p.slot === slot && inSection(p)).map((p) => (
               <p.Component key={p.id} ctx={ctx} />
             ))}
           </div>
