@@ -1,0 +1,8 @@
+{
+  "cached": true,
+  "note": "Cached example, shown only when the live API is unreachable. Not today's commitment.",
+  "wallet": null,
+  "cluster": "devnet",
+  "explorer_address": null,
+  "records": []
+}

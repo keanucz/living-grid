@@ -3,6 +3,7 @@ import { area, line, curveMonotoneX } from 'd3-shape'
 import { scaleLinear } from 'd3-scale'
 import { Icon } from '../../shell/icons.jsx'
 import sample from './sample.json'
+import { Verify } from '../../panels/verify/index.jsx'
 
 const NAMES = { GB: 'Great Britain', FR: 'France', 'DE-LU': 'Germany–Lux.', NL: 'Netherlands', BE: 'Belgium', NO2: 'Southern Norway' }
 const FREEZE = '2026-11-07T23:59:00Z'
@@ -138,6 +139,7 @@ function Reveal() {
         </div>
       )}
       <div className="rv-legend"><span><i className="b" />Frozen P10–P90</span><span><i className="m" />Frozen P50</span><span><i className="d" />Result inside band</span><span><i className="h" />Outside band</span></div>
+      <Verify />
       <style>{CSS}</style>
     </div>
   )
