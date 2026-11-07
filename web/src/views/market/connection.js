@@ -150,6 +150,7 @@ export function connectMarket({ onState, withToken = true, lobbyId = null }) {
     // Optional, present once the module has them (quick play, #176): the capability check hides the buttons until then.
     can: (reducer) => !!conn.reducers[reducer],
     quickPlay: (name, avatar) => call('quickPlay', { name, avatar }),
+    react: (emoji) => call('react', { emoji }), // present once the module has reactions
     lobbyVote: (choice) => call('lobbyVote', { choice }), // 'start' | 'wait'
     lobbyRematch: () => call('lobbyRematch', {}),
     join: (name) => conn.reducers.join({ name }),

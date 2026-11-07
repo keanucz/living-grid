@@ -2,6 +2,10 @@ import { useEffect, useRef, useState } from 'react'
 import { Icon } from '../../shell/icons.jsx'
 import { connectMarket, tradeCost } from './connection.js'
 import { BotLeagueCard } from '../../panels/botLeague/Card.jsx'
+import { ReactionBar } from '../../panels/reactions/index.jsx'
+import { DayChart } from './round/DayChart.jsx'
+import { Stats } from './round/Stats.jsx'
+import { net } from './round/streaks.js'
 
 // Mystery-day prediction market. Phone: #/market. Big screen: #/market?screen=1 (leaderboard, room vs model).
 // A real past day with its date hidden; points only, no money. Prices are the room's probability (LMSR).
@@ -41,6 +45,25 @@ function useRegime(day) {
     return () => (live = false)
   }, [day])
   return title
+}
+
+// A short buzz when a question I traded settles (longer for a loss), where the device has a vibration motor.
+// The first snapshot only records what was already settled, so joining mid-round does not buzz.
+function useSettleBuzz(questions, positions) {
+  const seen = useRef(null)
+  useEffect(() => {
+    const settled = (questions ?? []).filter((q) => q.status === 'settled')
+    if (seen.current === null) {
+      seen.current = new Set(settled.map((q) => q.id))
+      return
+    }
+    for (const q of settled) {
+      if (seen.current.has(q.id)) continue
+      seen.current.add(q.id)
+      const pos = positions?.[q.id]
+      if (pos && pos.yes + pos.no > 0) navigator.vibrate?.(net(q, pos) > 0 ? [30, 40, 30] : [80])
+    }
+  }, [questions, positions])
 }
 
 function useMarket(lobbyId = null) {
@@ -222,6 +245,7 @@ export function Phone({ lobbyId = null, footer = null }) {
       .catch((e) => setError(e?.message || 'That did not go through. Try again.'))
       .finally(() => setBusy(false))
   }
+  useSettleBuzz(s.questions, s.positions)
   const round = s.round
   const points = s.account?.points ?? START_POINTS
   const trade = (kind, id, side, shares) => call(() => (kind === 'buy' ? api.current.buy(id, side, shares) : api.current.sell(id, side, shares)))
@@ -246,6 +270,9 @@ export function Phone({ lobbyId = null, footer = null }) {
             </div>
             <span className="mk-tag">{s.leaderboard?.find((r) => r.name === s.player.name) ? `#${s.leaderboard.find((r) => r.name === s.player.name).rank}` : 'Not traded yet'}</span>
           </section>
+          <DayChart round={round} feed={s.feed ?? []} questions={s.questions} botP={s.botP} bots={s.bots} />
+          <Stats questions={s.questions} positions={s.positions} bots={s.bots} points={points} roundDone={round.status === 'done'} />
+          <ReactionBar react={api.current?.can?.('react') ? (e) => api.current.react(e) : null} disabled={round.status === 'done'} />
           {round.status === 'done' && <BotLeagueCard round={round} bots={s.bots ?? []} rivalName={rival?.title} />}
           <Bots bots={s.bots} rival={rivalName} onPick={pickRival} />
           {s.questions.map((q) => <Question key={q.id} q={q} round={round} pos={s.positions?.[q.id]} points={points} busy={busy} onTrade={trade} rival={rival} rivalP={rival ? s.botP?.[q.id]?.[rival.name] : null} />)}
