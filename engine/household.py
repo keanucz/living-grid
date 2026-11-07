@@ -2,8 +2,10 @@
 
 Prices are Octopus Agile in pence per kWh including VAT. Published rates (data/octopus/agile.parquet, region letter)
 are used where they exist; beyond them the price is rebuilt from our GB day-ahead forecast with the published Agile
-formula min(D x W + P, 95) x 1.05, where W is the wholesale price in p/kWh, P applies 16:00 to 19:00 UK time, and D and P
-come from the verified reference fact for the region. That is an approximation of Agile, labelled as a forecast.
+formula min(D x W + P, 95) x VAT, where W is the wholesale price in p/kWh, P applies 16:00 to 19:00 UK time, and D and P
+come from the verified reference fact for the region. VAT on domestic electricity in Great Britain is 0% from
+1 October 2026 to 31 March 2027 (SI 2026/987; HMRC Revenue and Customs Brief 10 (2026)) and 5% otherwise.
+That is an approximation of Agile, labelled as a forecast.
 Agile is a retail tariff, so it includes network charges and is not a congestion signal.
 Saving is against starting at the beginning of tonight (now, or 17:00 UK if earlier). The range comes from the
 forecast's own P10 to P90 band applied to the window and to the baseline together (perfectly correlated), so
@@ -24,6 +26,10 @@ from pipeline import cache, static
 UK = ZoneInfo("Europe/London")
 SLOT = pd.Timedelta(minutes=30)
 VAT = 1.05
+# Temporary zero rate on GB domestic electricity, supplies 1 Oct 2026 to 31 Mar 2027 (UK local dates):
+# https://www.legislation.gov.uk/uksi/2026/987/made and HMRC Revenue and Customs Brief 10 (2026).
+ZERO_VAT_FROM = pd.Timestamp("2026-10-01", tz=UK)
+ZERO_VAT_UNTIL = pd.Timestamp("2027-04-01", tz=UK)
 CAP_BEFORE_VAT = 95.0
 PEAK_START, PEAK_END = 16, 19
 EVENING_START, MORNING_END = 17, 7
@@ -68,11 +74,17 @@ def tasks() -> list[dict]:
     ]
 
 
+def vat_factor(ts: pd.DatetimeIndex) -> np.ndarray:
+    """1.0 during the temporary zero rate on GB domestic electricity, otherwise 1.05."""
+    local = pd.DatetimeIndex(ts).tz_convert(UK)
+    return np.where((local >= ZERO_VAT_FROM) & (local < ZERO_VAT_UNTIL), 1.0, VAT)
+
+
 def agile_from_wholesale(gbp_per_mwh: np.ndarray, ts: pd.DatetimeIndex, d: float, p: float) -> np.ndarray:
     w = np.asarray(gbp_per_mwh, dtype=float) / 10
     local_hour = ts.tz_convert(UK).hour + ts.tz_convert(UK).minute / 60
     peak = (local_hour >= PEAK_START) & (local_hour < PEAK_END)
-    return np.minimum(d * w + np.where(peak, p, 0.0), CAP_BEFORE_VAT) * VAT
+    return np.minimum(d * w + np.where(peak, p, 0.0), CAP_BEFORE_VAT) * vat_factor(ts)
 
 
 def published(region: str, start: pd.Timestamp, end: pd.Timestamp) -> pd.Series:

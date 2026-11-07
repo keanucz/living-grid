@@ -47,7 +47,7 @@ def test_formula_values_come_from_the_verified_reference_and_cover_all_regions()
 def test_agile_from_wholesale_applies_peak_adder_cap_and_vat():
     ts = pd.DatetimeIndex(["2026-11-07T12:00Z", "2026-11-07T16:30Z", "2026-11-07T19:00Z", "2026-11-07T17:00Z"])
     got = hh.agile_from_wholesale(np.array([100.0, 100.0, 100.0, 5000.0]), ts, 2.1, 13.0)
-    assert got == pytest.approx([2.1 * 10 * 1.05, (2.1 * 10 + 13) * 1.05, 2.1 * 10 * 1.05, 95 * 1.05])
+    assert got == pytest.approx([2.1 * 10, (2.1 * 10 + 13), 2.1 * 10, 95])  # no VAT on GB domestic electricity, 1 Oct 2026 to 31 Mar 2027 (SI 2026/987)
     assert hh.agile_from_wholesale(np.array([-50.0]), ts[:1], 2.1, 13.0)[0] < 0
 
 
@@ -72,7 +72,7 @@ def test_published_prices_win_and_forecast_fills_beyond():
     pub = next(p for p in body.prices if p.ts == pd.Timestamp("2026-11-07T21:00Z"))
     assert pub.p_kwh == 12.0 and pub.p10 is None and pub.p90 is None
     fc = next(p for p in body.prices if p.ts == pd.Timestamp("2026-11-08T02:00Z"))
-    assert fc.p_kwh == pytest.approx(2.1 * 10 * 1.05) and fc.p10 < fc.p_kwh < fc.p90
+    assert fc.p_kwh == pytest.approx(2.1 * 10) and fc.p10 < fc.p_kwh < fc.p90
 
 
 def test_dishwasher_window_is_the_cheapest_hour_with_published_prices_only():
@@ -109,7 +109,7 @@ def test_latest_forecast_run_wins_per_hour():
     write_forecast(range(24, 34), lambda h: 100.0, made_at=NOW - pd.Timedelta(hours=1))
     cache.write("forecasts/log", pd.concat([first, pd.read_parquet(cache.path("forecasts/log"))], ignore_index=True))
     t = hh.price_table("N", NOW, pd.Timestamp("2026-11-08T02:00Z"), pd.Timestamp("2026-11-08T03:00Z"))
-    assert t["p50"].iloc[0] == pytest.approx(2.1 * 10 * 1.05)
+    assert t["p50"].iloc[0] == pytest.approx(2.1 * 10)
 
 
 def test_regions_get_their_own_published_rates_and_formula():
