@@ -11,6 +11,18 @@ const ACTIONS = [
 ]
 const AGENT_LABEL = { risk_aware: 'Plans for the worst case', median_only: 'Plans on the middle forecast' }
 const CAPACITY_MWH = 2
+const POWERS = [25, 50, 100]
+
+// 'charge' | 'hold' | 'discharge', optionally sized ('charge:50') and, for selling, an offer ('offer:discharge:180:50'):
+// an offer only trades if the settlement price is at or above your limit (the module's action grammar).
+export const composeAction = (base, pct, limit) => {
+  if (base === 'hold') return 'hold'
+  const size = pct < 100 ? `:${pct}` : ''
+  const price = String(limit).trim()
+  if (base === 'discharge' && price !== '' && Number.isFinite(Number(price))) return `offer:discharge:${Number(price)}${size}`
+  return `${base}${size}`
+}
+const baseOf = (a) => (a?.startsWith('offer:') ? 'discharge' : a?.split(':')[0])
 
 function useCountdown(round) {
   const [left, setLeft] = useState(null)
@@ -67,13 +79,16 @@ export default function BatteryRound({ data, onDecide }) {
   const left = useCountdown(round)
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
+  const [pct, setPct] = useState(100)
+  const [limit, setLimit] = useState('')
   if (!round) return <p className="bt-muted">Waiting for the round to start…</p>
 
   const done = round.status === 'done'
   const me = players.find((p) => p.identity === mine)
   const slot = Math.min(round.slot, round.n_slots - 1)
   const chosen = pending[slot]
-  const pick = (action) => {
+  const pick = (base) => {
+    const action = composeAction(base, pct, limit)
     setBusy(true)
     setError('')
     Promise.resolve(onDecide(slot, action))
@@ -115,13 +130,23 @@ export default function BatteryRound({ data, onDecide }) {
           <div className="bt-h">What does your battery do at {slotTime(round, slot)}?</div>
           <div className="bt-actions">
             {ACTIONS.map((a) => (
-              <button key={a.id} className={`bt-act ${chosen === a.id ? 'on' : ''}`} disabled={busy} onClick={() => pick(a.id)}>
+              <button key={a.id} className={`bt-act ${baseOf(chosen) === a.id ? 'on' : ''}`} disabled={busy} onClick={() => pick(a.id)}>
                 <b>{a.label}</b>
                 <span>{a.hint}</span>
               </button>
             ))}
           </div>
-          <div className="bt-muted">{chosen ? `Locked in: ${chosen}. You can change it until the clock runs out.` : 'No choice yet: your battery holds if you do nothing.'}</div>
+          <div className="bt-extras">
+            <div className="bt-powers" role="group" aria-label="Share of full power">
+              {POWERS.map((n) => <button key={n} className={n === pct ? 'on' : ''} onClick={() => setPct(n)}>{n}%</button>)}
+              <span className="bt-muted">of full power</span>
+            </div>
+            <label className="bt-offer">
+              <span className="bt-muted">Offer: sell only if the price is at least</span>
+              <input inputMode="decimal" value={limit} onChange={(e) => setLimit(e.target.value.replace(/[^\d.\-]/g, ''))} placeholder="£/MWh, optional" />
+            </label>
+          </div>
+          <div className="bt-muted">{chosen ? `Locked in: ${chosen.replace('offer:discharge:', 'offer to sell at ').replace(':', ' at ')}. You can change it until the clock runs out.` : 'No choice yet: your battery holds if you do nothing.'}</div>
           {error && <p className="bt-error">{error}</p>}
         </section>
       )}
@@ -166,6 +191,12 @@ const CSS = `
 .bt-act span { font-size: 11px; color: var(--text-3); }
 .bt-act.on { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
 .bt-act.on span { color: inherit; opacity: .8; }
+.bt-extras { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; }
+.bt-powers { display: flex; align-items: center; gap: 6px; }
+.bt-powers button { min-width: 52px; height: 34px; border-radius: 10px; border: 1px solid var(--line-2); background: var(--card); color: var(--text); font: inherit; }
+.bt-powers button.on { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
+.bt-offer { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.bt-offer input { width: 130px; height: 36px; border-radius: 10px; border: 1px solid var(--line-2); background: var(--card); color: var(--text); padding: 0 10px; font: inherit; }
 .bt-chart { width: 100%; height: 70px; }
 .bt-row { display: grid; grid-template-columns: 22px 1fr 56px 74px; align-items: center; gap: 8px; padding: 7px 0; border-top: 1px solid var(--line); font-size: 14px; }
 .bt-row:first-of-type { border-top: 0; }

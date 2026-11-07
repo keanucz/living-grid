@@ -33,7 +33,7 @@ class MarketQuestion:
     threshold: float
     model_p: float
     model_note: str
-    outcome: bool
+    outcome: bool | str  # a bool for yes/no, else the winning option id
     actual: float
     # League fields (empty without bot quantiles for the day): each bot's P(yes) and one line on how it got there;
     # series is the feed label the Nowcaster watches and profile Our model's as-of quantiles by hour.
@@ -41,6 +41,9 @@ class MarketQuestion:
     bot_notes: dict[str, str] = field(default_factory=dict)
     series: str = ""
     profile: list[dict] = field(default_factory=list)
+    # A choice question (engine.market.question_types): several options, one wins. Each is {id, label, p}, p being
+    # our model's probability from forecasts made before the day.
+    choices: list[dict] = field(default_factory=list)
 
 LEGACY_FIELDS = ("id", "text", "kind", "target_hour", "unit", "threshold", "model_p", "model_note")
 
@@ -140,11 +143,17 @@ def wind_question(day: pd.Timestamp, boalf: pd.DataFrame, end_hour: int, history
 
 
 def build(replay: dict, boalf: pd.DataFrame | None = None, end_hour: int = 18, start_hour: int = 12,
-          league: dict | None = None) -> list[MarketQuestion]:
+          league: dict | None = None, choices: bool = False, net_import: pd.DataFrame | None = None) -> list[MarketQuestion]:
+    """The day's yes/no questions; with choices=True also the choice questions of engine.market.question_types."""
     day = pd.Timestamp(replay["event"], tz="UTC")
     qs = price_questions(replay, start=start_hour, end=end_hour, league=league)
     w = wind_question(day, boalf, end_hour) if boalf is not None else None
-    return sorted(qs + ([w] if w else []), key=lambda q: (q.target_hour, q.id))
+    extra = []
+    if choices:
+        from engine.market import question_types
+
+        extra = question_types.choice_questions(replay, boalf, net_import, start_hour, end_hour)
+    return sorted(qs + ([w] if w else []) + extra, key=lambda x: (x.target_hour, x.id))
 
 
 def public(q: MarketQuestion) -> dict:
@@ -162,6 +171,8 @@ def league_public(q: MarketQuestion) -> dict:
     d["bot_p"] = [{"bot": n, "p": p, "note": q.bot_notes.get(n, "")} for n, p in q.bot_p.items()]
     d["series"] = q.series
     d["profile_json"] = json.dumps(q.profile) if q.profile else ""
+    if q.choices:
+        d["choices"] = q.choices
     return d
 
 
