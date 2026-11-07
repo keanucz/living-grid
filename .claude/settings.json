@@ -38,6 +38,15 @@
             "command": "cd \"$CLAUDE_PROJECT_DIR\" && echo \"You are agent $(basename \"$CLAUDE_PROJECT_DIR\") in a shared multi-agent repo. Follow the hub skill. Board:\" && bin/hub list && echo && echo 'Your inbox:' && bin/hub inbox"
           }
         ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "missing=\"\"; [ -n \"$PARALLEL_API_KEY\" ] || missing=\"$missing PARALLEL_API_KEY\"; [ -n \"$HIVEMIND_TOKEN\" ] || missing=\"$missing HIVEMIND_TOKEN\"; if [ -n \"$missing\" ]; then echo \"LIVING GRID SETUP NEEDED: missing$missing. Tell your human to run coord/setup.sh <keanu|stefan|manu> once, open a new shell, then restart Claude Code here. Until then the parallel MCP (web research) and the hivemind bus will not work.\"; else echo \"Living Grid env OK: hivemind as $HIVEMIND_AGENT, Parallel key present. Use the parallel MCP (web_search, web_fetch) for all web research.\"; fi",
+            "timeout": 10
+          }
+        ]
       }
     ],
     "Stop": [
@@ -59,6 +68,33 @@
           }
         ]
       }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if python3 -c '' 2>/dev/null; then py=python3; else py=python; fi; $py \"$CLAUDE_PROJECT_DIR/coord/bus.py\" inbox --hook",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if python3 -c '' 2>/dev/null; then py=python3; else py=python; fi; $py \"$CLAUDE_PROJECT_DIR/coord/bus.py\" inbox --hook",
+            "timeout": 10
+          }
+        ]
+      }
     ]
-  }
+  },
+  "enabledMcpjsonServers": [
+    "parallel",
+    "hivemind"
+  ]
 }

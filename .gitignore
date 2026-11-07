@@ -7,3 +7,12 @@ build/
 dist/
 .venv/
 hub.db
+
+# hivemind secrets and state
+coord/.topic
+coord/.tokens
+coord/.agent
+coord/.phones
+coord/.bus_last_*
+coord/.bus_polled_*
+coord/__pycache__/

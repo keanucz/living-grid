@@ -1,0 +1,17 @@
+{
+  "mcpServers": {
+    "hivemind": {
+      "command": "python3",
+      "args": [
+        "coord/bus_channel.py"
+      ]
+    },
+    "parallel": {
+      "type": "http",
+      "url": "https://search.parallel.ai/mcp",
+      "headers": {
+        "x-api-key": "${PARALLEL_API_KEY}"
+      }
+    }
+  }
+}
