@@ -1,4 +1,8 @@
-"""Read what the loop publishes: static zones plus recent rows from the parquet cache (or fixtures)."""
+"""Read what the loop publishes: static zones plus recent rows from the parquet cache.
+
+Committed fixtures are read only under LG_OFFLINE=1: online, a missing live file means nothing is published
+for that table (and it is logged), never sample rows.
+"""
 
 import logging
 
@@ -24,9 +28,13 @@ def zones() -> pd.DataFrame:
     return pd.DataFrame(out)
 
 
+def _bases():
+    return (cache.DATA, cache.FIXTURES) if cache.offline() else (cache.DATA,)
+
+
 def _names(prefix: str) -> list[str]:
     names = set()
-    for base in (cache.DATA, cache.FIXTURES):
+    for base in _bases():
         d = base / prefix
         if d.is_dir():
             names |= {f"{prefix}/{p.stem}" for p in d.glob("*.parquet")}
@@ -34,10 +42,12 @@ def _names(prefix: str) -> list[str]:
 
 
 def _read(name: str) -> pd.DataFrame | None:
-    try:
-        return cache.read(name)
-    except FileNotFoundError:
-        return None
+    for base in _bases():
+        p = base / f"{name}.parquet"
+        if p.exists():
+            return pd.read_parquet(p)
+    log.info("no live %s: nothing published for it", name)
+    return None
 
 
 def _since(df: pd.DataFrame | None, col: str, cutoff: pd.Timestamp) -> pd.DataFrame | None:
