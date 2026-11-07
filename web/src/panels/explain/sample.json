@@ -1,0 +1,41 @@
+{
+ "sentence": "GB price up £18: wind down 40% (+£12), less from Norway (+£5)",
+ "contributions": [
+  {
+   "group": "wind",
+   "value": 12.0
+  },
+  {
+   "group": "imports",
+   "value": 5.0
+  },
+  {
+   "group": "demand",
+   "value": 2.5
+  },
+  {
+   "group": "gas",
+   "value": 1.0
+  },
+  {
+   "group": "solar",
+   "value": -0.5
+  },
+  {
+   "group": "carbon",
+   "value": 0.0
+  },
+  {
+   "group": "time_of_day",
+   "value": -2.0
+  }
+ ],
+ "kind": "forecast",
+ "zone": "GB",
+ "ts": "2026-11-07T18:00:00Z",
+ "target": "gb_system_price",
+ "base": 78.0,
+ "prediction": 96.0,
+ "delta": 18.0,
+ "unit": "GBP/MWh"
+}
