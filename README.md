@@ -118,6 +118,29 @@ The bands are too narrow. Across the backtest 63% of outcomes landed between P10
 
 The storm caught the model out. NESO puts GB constraint costs that day at £36.5m. Recalibrating the bands is in progress.
 
+### Bot league: which technique wins, and when
+
+Four rival forecasters run on exactly the same backtest rows as ours, each trained only on data from before the week it forecasts: **Yesterday** and **Last week** (same hour a day or a week earlier, with a band from their own past errors), **The Engineer** (merit order: price from residual load, gas and carbon) and **The Committee** (a weighted blend of the others, then calibrated). Storm days are the windiest 15% of days by GB wind output: 6 of the 43 days, 26 October among them. Run on 7 November at 20:57 UTC (`python -m pipeline.bot_league`, results in `data/backtest/bot_league.json`).
+
+Day-ahead prices (MAE in £ or €/MWh; pinball loss scores the whole P10 to P90 band; lower is better):
+
+| Model | MAE, calm | MAE, storm | Pinball, all | Inside P10 to P90 |
+|---|---|---|---|---|
+| The Committee | **29.9** | 46.0 | **11.5** | 83% |
+| Our model | 30.5 | **43.2** | 11.6 | 78% |
+| Yesterday | 32.0 | 64.5 | 12.8 | 81% |
+| The Engineer | 79.1 | 46.6 | 19.6 | 74% |
+| Last week | 62.0 | 83.0 | 21.8 | 71% |
+| Persistence (no band) | 40.6 | 59.0 | | |
+
+- **On day-ahead prices it's a tie.** The Committee edges us on pinball loss, but a Diebold-Mariano test on the hourly errors can't tell us apart (p = 0.94). We beat persistence clearly (p < 0.001).
+- **On GB system price we come out on top:** the best Brier score in every regime, and the lowest pinball loss overall and in storms (level with the Committee on calm days). The Committee's MAE is slightly lower overall (42.5 against 43.1), and the difference isn't significant (p = 0.61).
+- **The Engineer is the storm specialist.** It is worst of the four on calm days (79.1) and nearly level with us in storms (46.6 against 43.2, no significant difference), because that's when wind and gas really do set the price.
+- **Yesterday is fine until the weather turns.** On calm days we can't beat it significantly (p = 0.62); in storms its error doubles and its band catches only 57% of outcomes.
+- **Yes/no questions:** asked "will the price be above its average of the past week?" every hour, our model has the best Brier score in storms (0.129 on day-ahead prices) and the Committee in calm weather (0.146 against our 0.155). A forecast with no band is always sure of itself, and it shows: the same-hour-yesterday guess scores 0.222 on its own and 0.168 once the Yesterday bot adds a band from its past errors.
+
+Every band is still too narrow in storms: the best catch 66% to 72% of outcomes, against the 80% target.
+
 ### Events you can trigger
 
 | Event | What it changes |
