@@ -27,9 +27,9 @@ from datetime import datetime, timezone
 
 import numpy as np
 import pandas as pd
-from scipy import stats
 
-from pipeline import cache
+from pipeline import cache, evaluation
+from pipeline.evaluation import DM_LAGS, STORM_QUANTILE, storm_days
 from pipeline.backtest import BASELINES, MIN_TRAIN_ROWS, MODEL, baselines, make_folds
 from pipeline.features import build
 from pipeline.models import bots as league
@@ -43,10 +43,6 @@ NAME = "backtest/bot_league"
 ROWS = "backtest/bot_league_rows"
 REPLAY_DIR = "replay"
 THREADS = 2
-DM_LAGS = 48
-STORM_QUANTILE = 0.85
-SIGNIFICANCE = 0.05
-MIN_DM_ROWS = 48
 QUESTION_STEP = 10.0
 LINE_DAYS = 7
 POINT_MODELS = BASELINES
@@ -143,15 +139,6 @@ def replay_days() -> list[str]:
     return sorted(p.stem for p in folder.glob("*.json")) if folder.exists() else []
 
 
-def storm_days(wind: pd.DataFrame, q: float = STORM_QUANTILE) -> set:
-    """UTC dates whose mean GB wind generation is in the top (1 - q) of days (same rule as pipeline.evaluation)."""
-    w = wind[(wind["zone"] == "GB") & (wind["series"] == "gen_wind")]
-    if w.empty:
-        return set()
-    daily = w.groupby(w["ts"].dt.date)["value"].mean()
-    return set(daily[daily >= daily.quantile(q)].index)
-
-
 def add_questions(rows: pd.DataFrame) -> pd.DataFrame:
     """The yes/no line per row (its `line`, rounded), each model's P(above) and the outcome.
 
@@ -209,24 +196,10 @@ def table(rows: pd.DataFrame) -> list[dict]:
 
 
 def diebold_mariano(loss_ours: np.ndarray, loss_other: np.ndarray, horizon: int = 1, lags: int = DM_LAGS) -> dict:
-    """DM test on a loss series. Positive mean_gain: our loss is lower than the other model's."""
-    d = np.asarray(loss_other, float) - np.asarray(loss_ours, float)
-    d = d[np.isfinite(d)]
-    n = len(d)
-    mean = float(d.mean()) if n else 0.0
-    empty = {"n": n, "mean_gain": mean, "dm_stat": None, "p_value": None, "significant": False}
-    if n < MIN_DM_ROWS:
-        return empty
-    c = d - mean
-    lrv = float(c @ c) / n
-    for k in range(1, min(lags, n - 1) + 1):
-        lrv += 2 * (1 - k / (lags + 1)) * float(c[k:] @ c[:-k]) / n
-    if lrv <= 0:
-        return empty
-    hln = np.sqrt(max(n + 1 - 2 * horizon + horizon * (horizon - 1) / n, 1e-9) / n)
-    stat = float(mean / np.sqrt(lrv / n) * hln)
-    p = float(2 * stats.t.sf(abs(stat), df=n - 1))
-    return {"n": n, "mean_gain": mean, "dm_stat": stat, "p_value": p, "significant": bool(p < SIGNIFICANCE)}
+    """DM test on absolute-error losses (pipeline.evaluation). Positive mean_gain: our loss is lower than the other's."""
+    ours, other = np.asarray(loss_ours, float), np.asarray(loss_other, float)
+    ok = np.isfinite(ours) & np.isfinite(other)
+    return evaluation.diebold_mariano(ours[ok], other[ok], horizon, lags)
 
 
 def dm_vs_ours(rows: pd.DataFrame) -> list[dict]:
