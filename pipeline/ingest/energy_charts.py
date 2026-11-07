@@ -162,7 +162,7 @@ def _store(df: pd.DataFrame) -> None:
         part = part.drop(columns="group")
         name = _cache_name(group)
         if cache.exists(name):
-            part = pd.concat([pd.read_parquet(cache.path(name)), part], ignore_index=True)
+            part = cache.concat([cache.read_file(cache.path(name)), part], ignore_index=True)
         part = part.drop_duplicates(["ts", "zone", "series"], keep="last").sort_values(["ts", "zone", "series"])
         cache.write(name, schemas.validate(part, "actuals"))
 

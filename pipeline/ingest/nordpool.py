@@ -74,7 +74,7 @@ def write(df: pd.DataFrame) -> list[str]:
         return []
     name = "actuals/nordpool_price_da"
     if cache.exists(name):
-        df = pd.concat([pd.read_parquet(cache.path(name)), df], ignore_index=True)
+        df = cache.concat([cache.read_file(cache.path(name)), df], ignore_index=True)
     df = df.drop_duplicates(["ts", "zone"], keep="last").sort_values(["ts", "zone"])
     cache.write(name, schemas.validate(df, name))
     return [name]

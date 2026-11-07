@@ -68,12 +68,12 @@ def fetch_delivery(delivery: str, client: httpx.Client) -> pd.DataFrame:
     df = pd.DataFrame(rows)
     df["ts"] = pd.to_datetime(df["ts"], utc=True).dt.floor("h")
     df = df.groupby(["ts", "zone", "unit"], as_index=False)["value"].mean()
-    return df[(df["ts"] >= start) & (df["ts"] < end)].reset_index(drop=True)
+    return cache.normalise_ts(df[(df["ts"] >= start) & (df["ts"] < end)].reset_index(drop=True))
 
 
 def _observations() -> pd.DataFrame:
     if cache.exists(NAME):
-        return pd.read_parquet(cache.path(NAME))
+        return cache.read_file(cache.path(NAME))
     return pd.DataFrame(
         {
             "seen_at": pd.Series(dtype="datetime64[ns, UTC]"),
@@ -107,7 +107,7 @@ def poll_once(delivery: str | None = None, client: httpx.Client | None = None, n
     fresh = merged[merged["value_prev"].isna() | ((merged["value"] - merged["value_prev"]).abs() > 1e-9)]
     new = fresh.assign(seen_at=seen_at)[COLUMNS]
     if len(new):
-        cache.write(NAME, pd.concat([obs, new], ignore_index=True).sort_values(["seen_at", "zone", "ts"]).reset_index(drop=True))
+        cache.write(NAME, cache.concat([obs, new], ignore_index=True).sort_values(["seen_at", "zone", "ts"]).reset_index(drop=True))
         nordpool.write(got.assign(series="price_da")[schemas.ACTUALS.names])
     zones = got.groupby("zone")["ts"].nunique().to_dict()
     complete = all(zones.get(z, 0) >= hours for z in EXPECTED_ZONES)

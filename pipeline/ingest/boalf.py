@@ -116,12 +116,12 @@ def run(start, end, client: httpx.Client | None = None) -> list[str]:
     total = _total(bids, start, end)
     merged = bids
     if cache.exists(BIDS):
-        merged = pd.concat([pd.read_parquet(cache.path(BIDS)), bids], ignore_index=True)
+        merged = cache.concat([cache.read_file(cache.path(BIDS)), bids], ignore_index=True)
     merged = merged.drop_duplicates(["ts", "bm_unit"], keep="last").sort_values(["ts", "bm_unit"])
     cache.write(BIDS, merged.reset_index(drop=True))
     name = "actuals/elexon_boalf_mwh"
     if cache.exists(name):
-        total = pd.concat([pd.read_parquet(cache.path(name)), total], ignore_index=True)
+        total = cache.concat([cache.read_file(cache.path(name)), total], ignore_index=True)
         total = total.drop_duplicates(["ts", "zone"], keep="last").sort_values("ts")
     cache.write(name, schemas.validate(total, name))
     return [UNITS, BIDS, name]

@@ -107,7 +107,7 @@ def _read_flows_elexon() -> pd.DataFrame:
     parts = []
     base = cache.DATA / "actuals"
     for p in sorted(base.glob("elexon_flow_GB_*.parquet")):
-        parts.append(pd.read_parquet(p)[["ts", "zone", "series", "value"]])
+        parts.append(cache.read_file(p)[["ts", "zone", "series", "value"]])
     return pd.concat(parts, ignore_index=True) if parts else pd.DataFrame(columns=["ts", "zone", "series", "value"])
 
 
@@ -184,8 +184,8 @@ def _at(series: pd.Series | None, times: pd.DatetimeIndex, tol: str = "6h") -> n
     s = series.dropna()
     if s.empty:
         return nan
-    left = pd.DataFrame({"t": times, "i": np.arange(len(times))}).sort_values("t")
-    right = pd.DataFrame({"t": s.index, "v": s.values}).sort_values("t")
+    left = cache.normalise_ts(pd.DataFrame({"t": times, "i": np.arange(len(times))})).sort_values("t")
+    right = cache.normalise_ts(pd.DataFrame({"t": s.index, "v": s.values})).sort_values("t")
     m = pd.merge_asof(left, right, on="t", tolerance=pd.Timedelta(tol), direction="backward")
     out = nan.copy()
     out[m["i"].to_numpy()] = m["v"].to_numpy()

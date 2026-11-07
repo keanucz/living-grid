@@ -118,7 +118,7 @@ def fetch(start, end, client: httpx.Client | None = None) -> pd.DataFrame:
 
 def _merge(name: str, new: pd.DataFrame, key: list[str]) -> None:
     if cache.exists(name):
-        new = pd.concat([pd.read_parquet(cache.path(name)), new], ignore_index=True)
+        new = cache.concat([cache.read_file(cache.path(name)), new], ignore_index=True)
     cache.write(name, new.drop_duplicates(key, keep="last").sort_values(key).reset_index(drop=True))
 
 

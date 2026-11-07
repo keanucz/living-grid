@@ -136,7 +136,7 @@ def write(df: pd.DataFrame) -> list[str]:
     for series, g in df.groupby("series"):
         name = f"actuals/elexon_{series}"
         if cache.exists(name):
-            g = pd.concat([pd.read_parquet(cache.path(name)), g], ignore_index=True)
+            g = cache.concat([cache.read_file(cache.path(name)), g], ignore_index=True)
         g = g.drop_duplicates(["ts", "zone"], keep="last").sort_values("ts")
         cache.write(name, schemas.validate(g, name))
         names.append(name)

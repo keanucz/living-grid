@@ -93,7 +93,7 @@ def write(df: pd.DataFrame) -> list[str]:
     if df.empty:
         return []
     if cache.exists(NAME):
-        df = pd.concat([pd.read_parquet(cache.path(NAME)), df], ignore_index=True)
+        df = cache.concat([cache.read_file(cache.path(NAME)), df], ignore_index=True)
     cache.write(NAME, df.drop_duplicates(["ts", "region"], keep="last").sort_values(["ts", "region"]).reset_index(drop=True))
     return [NAME]
 

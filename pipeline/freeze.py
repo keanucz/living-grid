@@ -88,7 +88,7 @@ def schedule() -> list[pd.Timestamp]:
 def _read_log() -> pd.DataFrame:
     if not cache.exists("forecasts/log"):
         raise FileNotFoundError("no forecast log at data/forecasts/log.parquet: nothing to freeze")
-    return pd.read_parquet(cache.path("forecasts/log"))
+    return cache.read_file(cache.path("forecasts/log"))
 
 
 def freeze(now=None, delivery: str | None = None) -> FreezeResult:
@@ -103,7 +103,7 @@ def freeze(now=None, delivery: str | None = None) -> FreezeResult:
     ]
     rows = rows.sort_values("made_at").groupby(["zone", "target", "ts"], as_index=False).last()
     rows["frozen_at"] = frozen_at
-    rows = schemas.validate(rows[schemas.FROZEN_MONDAY.names], NAME)
+    rows = cache.normalise_ts(schemas.validate(rows[schemas.FROZEN_MONDAY.names], NAME))
     hours = int((end - start) / pd.Timedelta(hours=1))
     per_zone = {z: int((rows["zone"] == z).sum()) for z in schemas.ZONES}
     result = FreezeResult(
@@ -117,10 +117,10 @@ def freeze(now=None, delivery: str | None = None) -> FreezeResult:
         log.warning("freeze at %s found no price_da forecasts for the delivery day; nothing written", frozen_at)
         return result
     if cache.exists(NAME):
-        old = pd.read_parquet(cache.path(NAME))
+        old = cache.read_file(cache.path(NAME))
         if (old["frozen_at"] == frozen_at).any():
             raise ValueError(f"a freeze at {frozen_at} already exists; earlier freezes are never replaced")
-        rows = pd.concat([old, rows], ignore_index=True)
+        rows = cache.concat([old, rows], ignore_index=True)
     cache.write(NAME, rows.sort_values(KEY).reset_index(drop=True))
     if not result.complete:
         log.warning("partial freeze at %s: missing zones %s, short zones %s", frozen_at, result.missing_zones, result.short_zones)

@@ -49,8 +49,8 @@ def test_validate_rejects_bad_rows(no_offline):
         markets.validate(df.assign(value=-1.0))
     with pytest.raises(ValueError):
         markets.validate(df.assign(series="bogus"))
-    with pytest.raises(ValueError):
-        markets.validate(df.assign(ts=df["ts"].dt.tz_localize(None)))
+    naive = markets.validate(df.assign(ts=df["ts"].dt.tz_localize(None)))
+    assert str(naive["ts"].dt.tz) == "UTC" and (naive["ts"].to_numpy() == df["ts"].to_numpy()).all()
 
 
 def test_offline_refuses_network(monkeypatch):

@@ -118,11 +118,11 @@ def fetch(start, end, client: httpx.Client | None = None) -> pd.DataFrame:
 def write(df: pd.DataFrame, kind: str) -> str:
     name = f"weather/{kind}"
     if kind == "historical_forecast" and cache.exists(name):
-        df = pd.concat([pd.read_parquet(cache.path(name)), df], ignore_index=True)
+        df = cache.concat([cache.read_file(cache.path(name)), df], ignore_index=True)
         df = df.drop_duplicates(["ts", "zone", "point", "variable"], keep="last")
     elif kind == "live_forecast" and cache.exists(name):
         # Keep every run: the as-issued history is what lets scoring show past forecasts.
-        df = pd.concat([pd.read_parquet(cache.path(name)), df], ignore_index=True)
+        df = cache.concat([cache.read_file(cache.path(name)), df], ignore_index=True)
         df = df.drop_duplicates(["ts", "issued_at", "zone", "point", "variable"], keep="last")
     cache.write(name, schemas.validate(df.sort_values(["ts", "zone", "point", "variable"]), name))
     return name

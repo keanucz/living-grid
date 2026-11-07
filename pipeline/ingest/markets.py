@@ -33,6 +33,7 @@ def _yahoo(ticker: str, start: pd.Timestamp, end: pd.Timestamp) -> pd.Series:
 
 
 def validate(df: pd.DataFrame) -> pd.DataFrame:
+    df = cache.normalise_ts(df)
     missing = [c for c in COLUMNS if c not in df.columns]
     if missing:
         raise ValueError(f"{NAME}: missing columns {missing}")
@@ -71,7 +72,7 @@ def write(df: pd.DataFrame) -> list[str]:
     if df.empty:
         return []
     if cache.exists(NAME):
-        df = pd.concat([pd.read_parquet(cache.path(NAME)), df], ignore_index=True)
+        df = cache.concat([cache.read_file(cache.path(NAME)), df], ignore_index=True)
     df = df.drop_duplicates(["ts", "series"], keep="last").sort_values(["series", "ts"])
     cache.write(NAME, validate(df))
     return [NAME]
