@@ -39,6 +39,15 @@ class Client:
         if r.status_code != 200:
             raise ReducerError(f"{reducer}: HTTP {r.status_code}: {r.text[:500]}")
 
+    def sql(self, query: str) -> list[list]:
+        """Rows of a read-only SQL query (public tables are readable by any identity)."""
+        r = self.http.post(
+            f"/v1/database/{self.db}/sql", content=query, headers={"Authorization": f"Bearer {self._token()}"}
+        )
+        if r.status_code != 200:
+            raise ReducerError(f"sql: HTTP {r.status_code}: {r.text[:500]}")
+        return [row for stmt in r.json() for row in stmt.get("rows", [])]
+
     def close(self) -> None:
         self.http.close()
 

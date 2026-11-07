@@ -38,6 +38,7 @@ import AddAdminReducer from "./add_admin_reducer";
 import ClaimZoneReducer from "./claim_zone_reducer";
 import ClearInterventionReducer from "./clear_intervention_reducer";
 import DecideReducer from "./decide_reducer";
+import DeleteKeysReducer from "./delete_keys_reducer";
 import JoinReducer from "./join_reducer";
 import PruneBeforeReducer from "./prune_before_reducer";
 import RemoveAdminReducer from "./remove_admin_reducer";
@@ -245,6 +246,7 @@ const reducersSchema = __reducers(
   __reducerSchema("claim_zone", ClaimZoneReducer),
   __reducerSchema("clear_intervention", ClearInterventionReducer),
   __reducerSchema("decide", DecideReducer),
+  __reducerSchema("delete_keys", DeleteKeysReducer),
   __reducerSchema("join", JoinReducer),
   __reducerSchema("prune_before", PruneBeforeReducer),
   __reducerSchema("remove_admin", RemoveAdminReducer),

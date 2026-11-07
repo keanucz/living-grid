@@ -202,3 +202,23 @@ export const prune_before = spacetimedb.reducer({ before_us: t.i64() }, (ctx, { 
   for (const r of [...ctx.db.carbon.iter()]) if (old(r.ts)) ctx.db.carbon.key.delete(r.key);
   for (const r of [...ctx.db.battery_action.iter()]) if (old(r.ts)) ctx.db.battery_action.key.delete(r.key);
 });
+
+// Delete rows by primary key from a publisher-owned table, so the publisher can reconcile the
+// database with its live sources (e.g. remove sample rows pushed before #84). Admin only.
+const DELETABLE: Record<string, (ctx: any, key: string) => void> = {
+  zone: (ctx, k) => ctx.db.zone.code.delete(k),
+  actual: (ctx, k) => ctx.db.actual.key.delete(k),
+  forecast: (ctx, k) => ctx.db.forecast.key.delete(k),
+  score: (ctx, k) => ctx.db.score.key.delete(k),
+  ghost_wind: (ctx, k) => ctx.db.ghost_wind.key.delete(k),
+  carbon: (ctx, k) => ctx.db.carbon.key.delete(k),
+  battery: (ctx, k) => ctx.db.battery.key.delete(k),
+  battery_action: (ctx, k) => ctx.db.battery_action.key.delete(k),
+};
+
+export const delete_keys = spacetimedb.reducer({ table: t.string(), keys: t.array(t.string()) }, (ctx, { table, keys }) => {
+  requireAdmin(ctx);
+  const del = DELETABLE[table];
+  if (!del) throw new SenderError(`delete_keys: table ${table} is not publisher-owned`);
+  for (const k of keys) del(ctx, k);
+});

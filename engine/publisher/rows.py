@@ -100,3 +100,17 @@ def intervention_args(result: dict, slot: str = "main", triggered_by: str = "eng
         str((result.get("explanation") or {}).get("sentence", "")),
         json.dumps(result, default=str, separators=(",", ":")),
     ]
+
+
+# Primary keys exactly as the publish reducers build them (spacetime/module/src/reducers/publish.ts),
+# by publisher kind: (table, key column, key of one mapped row).
+KEYS = {
+    "zones": ("zone", "code", lambda r: r["code"]),
+    "actuals": ("actual", "key", lambda r: f"{r['zone']}|{r['series']}|{r['ts_us']}"),
+    "forecasts": ("forecast", "key", lambda r: f"{r['zone']}|{r['target']}|{r['ts_us']}|{r['made_at_us']}"),
+    "scores": ("score", "key", lambda r: f"{r['zone']}|{r['target']}|{r['metric']}|{r['model']}"),
+    "carbon": ("carbon", "key", lambda r: f"{r['zone']}|{r['ts_us']}"),
+    "ghost_wind": ("ghost_wind", "key", lambda r: f"{r['region']}|{r['method']}|{r['ts_us']}"),
+    "batteries": ("battery", "key", lambda r: f"{r['zone']}|{r['strategy']}"),
+    "battery_actions": ("battery_action", "key", lambda r: f"{r['zone']}|{r['strategy']}|{r['ts_us']}"),
+}

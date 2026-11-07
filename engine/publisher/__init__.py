@@ -17,9 +17,10 @@ from engine.publisher.client import Client, ReducerError, from_env
 log = logging.getLogger("engine.publisher")
 
 BATCH = 2000
+DELETE_BATCH = 500
 
 __all__ = [
-    "Client", "ReducerError", "from_env", "Publisher",
+    "Client", "ReducerError", "from_env", "Publisher", "reconcile",
     "publish_zones", "publish_actuals", "publish_forecasts", "publish_scores", "publish_carbon",
     "publish_ghost_wind", "publish_batteries", "publish_battery_actions", "publish_intervention", "prune_before",
 ]
@@ -100,3 +101,26 @@ class Publisher:
         if self.client is not None:
             self.sent[kind].update(keys)
         return n
+
+
+def reconcile(client: Client | None, expected: dict[str, pd.DataFrame | None]) -> dict[str, int]:
+    """Delete rows the database holds that the live sources would not produce (e.g. old sample rows).
+
+    `expected` maps a publisher kind to the frame its source gives now; None or empty means the table should be
+    empty. Kinds not in `expected` are left alone. Returns rows deleted per kind.
+    """
+    if client is None:
+        return {}
+    deleted = {}
+    for kind, df in expected.items():
+        table, col, key = R.KEYS[kind]
+        _, mapper = Publisher.REDUCERS[kind]
+        want = {key(r) for r in mapper(df)} if df is not None and len(df) else set()
+        have = {row[0] for row in client.sql(f"SELECT {col} FROM {table}")}
+        stray = sorted(have - want)
+        for i in range(0, len(stray), DELETE_BATCH):
+            client.call("delete_keys", table, stray[i : i + DELETE_BATCH])
+        if stray:
+            log.info("reconcile %s: deleted %d rows not in the live data (kept %d)", table, len(stray), len(have) - len(stray))
+        deleted[kind] = len(stray)
+    return deleted

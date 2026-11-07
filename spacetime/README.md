@@ -114,3 +114,11 @@ spacetime call --server http://127.0.0.1:3000 living-grid add_admin '"<identity 
 ```
 
 `./smoke.sh` checks that anonymous calls get 530 and a promoted identity gets 200.
+
+## Reconcile on start
+
+`delete_keys(table, keys)` (admin only) deletes rows by primary key from a publisher-owned table: zone, actual,
+forecast, score, ghost_wind, carbon, battery, battery_action. On start, `python -m engine.publisher` reads each of those
+tables (`SELECT key FROM ...`), rebuilds the keys its live sources would produce over the window `prune_before` keeps,
+and deletes the rest. A table whose live source is missing is emptied, so sample rows never outlive a restart.
+Key formats live in `engine/publisher/rows.py` (`KEYS`) and must match the reducers; a test checks them.
