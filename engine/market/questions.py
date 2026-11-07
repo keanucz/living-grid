@@ -53,10 +53,19 @@ def _point(series: dict, hour: int) -> dict | None:
     return None
 
 
-def price_questions(replay: dict, asks=PRICE_QUESTIONS) -> list[MarketQuestion]:
+def fit_hour(hour: int, start: int, end: int) -> int:
+    """A question's hour inside the round, (start, end]: kept when it already fits, otherwise wrapped in.
+    Before start the module refuses the opening trade; after end the clock never reaches it to settle."""
+    if start < hour <= end:
+        return hour
+    return start + 1 + (hour - start - 1) % (end - start)
+
+
+def price_questions(replay: dict, asks=PRICE_QUESTIONS, start: int = 12, end: int = 18) -> list[MarketQuestion]:
     by = {(s["zone"], s["target"]): s for s in replay["series"]}
     out = []
-    for zone, target, hour in asks:
+    for zone, target, asked in asks:
+        hour = fit_hour(asked, start, end)
         s = by.get((zone, target))
         p = _point(s, hour) if s else None
         if not p or p.get("actual") is None or p.get("p50") is None:
@@ -97,9 +106,9 @@ def wind_question(day: pd.Timestamp, boalf: pd.DataFrame, end_hour: int, history
     )
 
 
-def build(replay: dict, boalf: pd.DataFrame | None = None, end_hour: int = 18) -> list[MarketQuestion]:
+def build(replay: dict, boalf: pd.DataFrame | None = None, end_hour: int = 18, start_hour: int = 12) -> list[MarketQuestion]:
     day = pd.Timestamp(replay["event"], tz="UTC")
-    qs = price_questions(replay)
+    qs = price_questions(replay, start=start_hour, end=end_hour)
     w = wind_question(day, boalf, end_hour) if boalf is not None else None
     return sorted(qs + ([w] if w else []), key=lambda q: (q.target_hour, q.id))
 

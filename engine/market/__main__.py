@@ -29,12 +29,12 @@ def boalf_gb():
     return b[b["zone"] == "GB"][["ts", "value"]]
 
 
-def plan(day: date, end_hour: int) -> tuple[dict, list[questions.MarketQuestion], object]:
+def plan(day: date, start_hour: int, end_hour: int) -> tuple[dict, list[questions.MarketQuestion], object]:
     r = replay.load(day)
     if r is None:
         raise SystemExit(f"no replay for {day}: run python -m engine.replay {day} first")
     b = boalf_gb()
-    return r, questions.build(r, b, end_hour), b
+    return r, questions.build(r, b, end_hour, start_hour), b
 
 
 def start_args(qs: list[questions.MarketQuestion], start: int, end: int, seconds: int, day: date) -> list:
@@ -45,7 +45,9 @@ def start_args(qs: list[questions.MarketQuestion], start: int, end: int, seconds
 
 
 def run(client: Client | None, day: date, start: int, end: int, seconds: int, sleep=time.sleep) -> list[str]:
-    r, qs, b = plan(day, end)
+    if end <= start:
+        raise SystemExit(f"--end ({end}) must be after --start ({start})")
+    r, qs, b = plan(day, start, end)
     qs = [q for q in qs if q.target_hour > start]  # the module refuses trades on a question whose hour has passed
     if not qs:
         raise SystemExit("no questions could be built for that day")
@@ -68,8 +70,13 @@ def main() -> None:
     ap.add_argument("--end", type=int, default=18)
     ap.add_argument("--seconds", type=int, default=30)
     ap.add_argument("--dry-run", action="store_true")
+    ap.add_argument("--reset", action="store_true", help="clear the round and every account (hides a revealed day)")
     args = ap.parse_args()
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(message)s")
+    if args.reset:
+        from_env().call("market_reset")
+        log.info("market: round cleared")
+        return
     run(None if args.dry_run else from_env(), args.day, args.start, args.end, args.seconds)
 
 
