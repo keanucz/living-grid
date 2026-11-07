@@ -9,6 +9,7 @@ const PAGES = [
   { icon: 'phone', label: 'Household: cheapest hours', href: '#/household' },
   { icon: 'play', label: 'Mystery-day market', href: '#/market' },
   { icon: 'battery', label: 'Room game: battery', href: '#/game' },
+  { icon: 'plug', label: 'Infrastructure: where the grid is full', href: '#/infrastructure' },
 ]
 
 export default function Rail() {
