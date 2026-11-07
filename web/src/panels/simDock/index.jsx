@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react'
+import { api } from '../../api/client.js'
+import { ResultCard, RESULT_CSS, duration } from './Result.jsx'
 import { Icon } from '../../shell/icons.jsx'
 import { actions } from '../../store/store.js'
-import { fmt } from '../../styles/tokens.js'
 
-// Rough placeholder for the world-events menu; task #11 replaces it with the real /intervene flow.
+// World events menu: Run posts to /intervene and shows the live result; if the API is unreachable it falls back
+// to the pre-computed /scenarios result. The map keeps reading the scenario shape from the store, as before.
 const EVENTS = [
   { id: 'hormuz', icon: 'ship', max: 100, step: 10 },
   { id: 'interconnector_trip', icon: 'plug', max: 1400, step: 140 },
@@ -11,7 +13,6 @@ const EVENTS = [
   { id: 'scottish_storm', icon: 'storm', max: 70, step: 7 },
 ]
 
-const duration = (h) => (h >= 168 ? `${Math.round(h / 168)} wk` : h >= 48 ? `${Math.round(h / 24)} days` : `${h} h`)
 const magLabel = (v, unit) => (unit.startsWith('MW') ? `${(v / 1000).toFixed(1)} GW` : `+${v}%`)
 
 function SimDock({ ctx }) {
@@ -21,6 +22,19 @@ function SimDock({ ctx }) {
   const sc = all?.[armed]
   const [mag, setMag] = useState(sc?.magnitude ?? 0)
   useEffect(() => setMag(sc?.magnitude ?? 0), [armed, sc?.magnitude])
+  const [run, setRun] = useState({ status: 'idle', result: null, key: 0, type: null })
+  useEffect(() => setRun((r) => (r.type === armed ? r : { status: 'idle', result: null, key: r.key, type: null })), [armed])
+  const runIt = async () => {
+    const key = Date.now()
+    actions.runScenario(armed, mag)
+    setRun({ status: 'running', result: null, key, type: armed })
+    try {
+      const result = await api.intervene({ type: armed, magnitude: mag, hours: sc.hours })
+      setRun({ status: 'done', result, key, type: armed })
+    } catch {
+      setRun({ status: 'fallback', result: null, key, type: armed })
+    }
+  }
   if (!all || !sc) return null
 
   const filled = Math.round((mag / ev.max) * 10)
@@ -75,28 +89,26 @@ function SimDock({ ctx }) {
           )
         })}
         <div className="sim-actions">
-          <button className="btn ghost" onClick={actions.clearScenario}><Icon name="reset" size={16} /> Reset</button>
-          <button className="btn primary" onClick={() => actions.runScenario(armed, mag)}><Icon name="play" size={14} fill="currentColor" /> {ran ? 'Run again' : 'Run scenario'}</button>
+          <button className="btn ghost" onClick={() => { actions.clearScenario(); setRun({ status: 'idle', result: null, key: run.key, type: null }) }}><Icon name="reset" size={16} /> Reset</button>
+          <button className="btn primary" onClick={runIt} disabled={run.status === 'running'}><Icon name="play" size={14} fill="currentColor" /> {run.status === 'running' ? 'Running…' : ran ? 'Run again' : 'Run scenario'}</button>
         </div>
       </section>
 
-      {ctx.scenario && (
-        <section className="sim-card fade-in" key={ctx.ui.scenario.ranAt}>
-          <div className="sim-row"><span className="sim-title">Why prices moved</span><span style={{ flex: 1 }} /><span className="tag">Modelled</span></div>
-          <p className="why">{ctx.scenario.explanation}</p>
-          <div className="wl">
-            <div><span className="faint">Winners</span>{ctx.scenario.winners.map((w) => <span key={w} className="tag accent">{w}</span>)}</div>
-            <div><span className="faint">Losers</span>{ctx.scenario.losers.map((w) => <span key={w} className="tag hot">{w}</span>)}</div>
-          </div>
-          <div className="faint" style={{ fontSize: 11, marginTop: 10 }}>Gas and carbon pass-through approximates market coupling. Total {fmt.money(ctx.scenario.cost_gbp * ctx.scenario.scale)} over {duration(ctx.scenario.hours)}.</div>
-        </section>
+      {(run.status === 'done' || run.status === 'fallback') && (
+        <ResultCard result={run.result} scenario={sc} runKey={run.key} />
       )}
+      {run.status === 'idle' && ctx.scenario && ran && (
+        <ResultCard result={null} scenario={sc} runKey={ctx.ui.scenario.ranAt} />
+      )}
+      <div className="faint" style={{ fontSize: 11, padding: '0 6px' }}>Gas and carbon pass-through approximates market coupling. The map shows the pre-computed shape scaled to your magnitude; the figures above come from the live model.</div>
       <style>{CSS}</style>
     </>
   )
 }
 
 const CSS = `
+${RESULT_CSS}
+.btn:disabled { opacity: .6; cursor: progress; }
 .sim-card { background: var(--panel-solid); border: 1px solid var(--line); border-radius: 28px; padding: 18px; box-shadow: var(--shadow); }
 .sim-card.dark { background: #0d0d0d; }
 .sim-row { display: flex; align-items: center; gap: 10px; }
