@@ -9,6 +9,7 @@ import { api, useApi } from './api/client.js'
 import { actions, setState, useStore } from './store/store.js'
 import { PRICE_LEGEND } from './styles/tokens.js'
 import { matchView } from './views/index.js'
+import { normaliseResult } from './api/normalise.js'
 
 const ASSET_FOR = { hormuz: 'gas', nuclear_outage: 'nuclear', scottish_storm: 'wind', interconnector_trip: 'hydro' }
 const SLOTS = ['left', 'bottomRight', 'bottom']
@@ -55,9 +56,12 @@ function MapApp() {
     const zoneById = Object.fromEntries((zones.data?.zones ?? []).map((z) => [z.id, z]))
     const stateByZone = Object.fromEntries((state.data?.zones ?? []).map((z) => [z.zone, z]))
     const base = scenarios.data?.[ui.scenario?.id]
+    const live = ui.scenario && ui.liveResult && ui.liveResult.id === ui.scenario.id ? normaliseResult(ui.liveResult.result) : null
     const scenario = base && {
       ...base,
-      scale: ui.scenario.magnitude / base.magnitude,
+      ...(live ?? {}),
+      // A live /intervene result is already at the chosen magnitude; the precomputed one is scaled.
+      scale: live ? 1 : ui.scenario.magnitude / base.magnitude,
       assetType: ASSET_FOR[base.type],
     }
     const priceOf = (id) => {

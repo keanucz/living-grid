@@ -51,12 +51,13 @@ function Battery({ ctx }) {
                 <b className="batt-mid" />
               </div>
               <span className="batt-v num">{r.profit < 0 ? '−' : ''}{cur}{Math.abs(r.profit).toFixed(0)}</span>
-              <span className="batt-s num faint">{s.id === 'perfect_foresight' ? 'ceiling' : `${Math.round(r.share_of_perfect * 100)}%`}</span>
+              <span className="batt-s num faint">{s.id === 'perfect_foresight' ? 'ceiling' : r.share_of_perfect == null ? '—' : `${Math.round(r.share_of_perfect * 100)}%`}</span>
             </div>
           )
         })}
         <p className="batt-h">
-          {ra && <>Risk-aware earned <b>{Math.round(ra.share_of_perfect * 100)}%</b> of perfect foresight{mo ? <> vs <b>{Math.round(mo.share_of_perfect * 100)}%</b> for median-only</> : null}.</>}
+          {ra?.share_of_perfect == null && <>Too few settled hours, or prices too flat here, to compare against perfect foresight yet.</>}
+          {ra?.share_of_perfect != null && <>Risk-aware earned <b>{Math.round(ra.share_of_perfect * 100)}%</b> of perfect foresight{mo?.share_of_perfect != null ? <> vs <b>{Math.round(mo.share_of_perfect * 100)}%</b> for median-only</> : null}.</>}
           {lossGap != null && <> Its worst hour cost {cur}{Math.abs(lossGap).toFixed(0)} {lossGap >= 0 ? 'less' : 'more'} than median-only’s.</>}
         </p>
       </div>

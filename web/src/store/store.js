@@ -37,6 +37,7 @@ export const actions = {
   toggleLayer: (id) => setState((s) => ({ layers: { ...s.layers, [id]: !s.layers[id] } })),
   armScenario: (scenarioArmed) => setState({ scenarioArmed }),
   runScenario: (id, magnitude) => setState({ scenario: { id, magnitude, ranAt: Date.now() } }),
-  clearScenario: () => setState({ scenario: null }),
+  clearScenario: () => setState({ scenario: null, liveResult: null }),
+  setLiveResult: (id, result) => setState({ liveResult: result ? { id, result } : null }),
   setAt: (at) => setState({ at }),
 }

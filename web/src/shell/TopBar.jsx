@@ -3,14 +3,28 @@ import { actions, useStore } from '../store/store.js'
 
 const TABS = [
   { id: 'overview', label: 'Overview' },
-  { id: 'forecast', label: 'Forecast', soon: true },
+  { id: 'forecast', label: 'Forecast' },
   { id: 'simulate', label: 'Simulate' },
 ]
 
-export default function TopBar({ at, source }) {
+export default function TopBar({ at: stateAt, source }) {
   const mode = useStore((s) => s.mode)
-  const when = at
-    ? new Date(at).toLocaleString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', timeZone: 'UTC' })
+  const at = useStore((s) => s.at)
+  // Forecast = the overview map scrubbed ahead (ghost layer + scrubber), not a separate mode.
+  const ahead = at && Date.parse(at) > Date.now()
+  const tab = mode === 'overview' ? (ahead ? 'forecast' : 'overview') : mode
+  const pick = (id) => {
+    if (id === 'forecast') {
+      const d = new Date(Date.now() + 6 * 3600e3)
+      d.setUTCMinutes(0, 0, 0)
+      actions.setMode('overview')
+      return actions.setAt(d.toISOString().replace('.000Z', 'Z'))
+    }
+    if (id === 'overview') actions.setAt(null)
+    actions.setMode(id)
+  }
+  const when = stateAt
+    ? new Date(stateAt).toLocaleString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', timeZone: 'UTC' })
     : '…'
   return (
     <header className="topbar">
@@ -18,9 +32,9 @@ export default function TopBar({ at, source }) {
       <div className="tabs">
         {TABS.map((t) => (
           <button key={t.id} disabled={t.soon} title={t.soon ? 'Coming soon' : undefined}
-            className={`${mode === t.id ? 'on' : ''} ${t.id === 'simulate' ? 'sim' : ''}`}
+            className={`${tab === t.id ? 'on' : ''} ${t.id === 'simulate' ? 'sim' : ''}`}
             style={t.soon ? { opacity: 0.45, cursor: 'default' } : undefined}
-            onClick={() => !t.soon && actions.setMode(t.id)}>
+            onClick={() => !t.soon && pick(t.id)}>
             {t.label}
           </button>
         ))}

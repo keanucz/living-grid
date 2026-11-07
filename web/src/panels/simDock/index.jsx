@@ -27,10 +27,12 @@ function SimDock({ ctx }) {
   const runIt = async () => {
     const key = Date.now()
     actions.runScenario(armed, mag)
+    actions.setLiveResult(null, null)
     setRun({ status: 'running', result: null, key, type: armed })
     try {
       const result = await api.intervene({ type: armed, magnitude: mag, hours: sc.hours })
       setRun({ status: 'done', result, key, type: armed })
+      actions.setLiveResult(armed, result)
     } catch {
       setRun({ status: 'fallback', result: null, key, type: armed })
     }

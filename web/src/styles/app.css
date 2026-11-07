@@ -175,9 +175,9 @@ h1, .headline h1, .kval, .sim-name, .tile b { letter-spacing: -0.012em; }
 .headline h1 { font-weight: 500; font-size: 30px; }
 .num, .kval, .zprice, .tile b { font-feature-settings: 'tnum' 1; }
 /* metadata in mono: tags, labels, timestamps, scales, notes */
-.tag, .chip, .klabel, .knote, .faint, .muted, .map-label, .ztick, .rp-tick, .segs-scale, .legend, .zlegend, .gwnote,
-.scrub-scale, .scrub-note, .hh-kicker, .rp-kicker, .rv-kicker, .hh-meta, .rp-legend, .rv-legend, .batt-s, .hh-note, .rp-sum,
-.zname .faint, .mixlegend, .rp-stat span, .rv-sum span, .hh-axis {
+.tag, .chip, .klabel, .knote, .map-label, .ztick, .rp-tick, .segs-scale, .legend, .zlegend,
+.scrub-scale, .hh-kicker, .rp-kicker, .rv-kicker, .rp-legend, .rv-legend, .batt-s,
+.zname .faint, .mixlegend, .rp-stat span, .rv-sum span, .hh-axis, .score-label, .segs-scale, .sim-tiles span {
   font-family: var(--mono); letter-spacing: 0; font-size: 11px;
 }
 .tag { border-radius: 2px; padding: 2px 6px; font-weight: 500; text-transform: uppercase; letter-spacing: .04em; font-size: 10px; }
@@ -198,3 +198,21 @@ h1, .headline h1, .kval, .sim-name, .tile b { letter-spacing: -0.012em; }
 .map-label b { font-family: var(--font); font-size: 12px; }
 .pill-delta { font-family: var(--mono); font-weight: 500; font-size: 11px; }
 .btn.primary { box-shadow: none; }
+
+/* pass 2: one number style everywhere; colour only for direction */
+.score-val { font-size: 26px !important; font-weight: 600 !important; letter-spacing: -0.012em; margin: 6px 0 4px !important; }
+.score-label { text-transform: uppercase; letter-spacing: .05em; font-size: 10px !important; color: var(--text-3); min-height: 28px !important; }
+.score-note, .knote, .gwnote, .scrub-note { font-size: 11px !important; line-height: 1.4; color: var(--text-3); }
+.sim-tiles span { text-transform: uppercase; letter-spacing: .05em; font-size: 10px; }
+.sim-name, .sim-title { letter-spacing: -0.012em; font-weight: 500; }
+/* left column: never clip, scroll instead; zone list capped */
+.slot-left { overflow-y: auto; scrollbar-width: none; padding-bottom: 4px; }
+.slot-left::-webkit-scrollbar { display: none; }
+.slot-left > * { flex: none; }
+.zonelist { max-height: 380px; }
+/* right column: consistent width */
+.slot-bottomRight { width: 520px; }
+.slot-bottomRight > .panel, .slot-bottomRight > a.panel { width: 100% !important; }
+
+.flash { animation: lgflash 1.2s ease; }
+@keyframes lgflash { 0%, 60% { box-shadow: 0 0 0 2px var(--accent), var(--shadow); } 100% { box-shadow: var(--shadow); } }

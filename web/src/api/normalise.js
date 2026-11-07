@@ -145,3 +145,21 @@ export function normaliseScenarios(c) {
   }
   return out
 }
+
+// One POST /intervene result -> the scenario fields the map and impact card read (already at the chosen magnitude).
+export function normaliseResult(r) {
+  if (!r?.zones?.length) return null
+  const delta = Object.fromEntries(r.zones.map((z) => [z.zone, toEur(z.avg_delta ?? 0, z.currency === 'GBP' ? 'GBP' : 'EUR')]))
+  return {
+    price_delta_eur: delta,
+    cost_gbp: r.cost_total_gbp?.p50 ?? r.zones.reduce((a, z) => a + (z.cost_gbp ?? 0), 0),
+    cost_band_gbp: r.cost_total_gbp ?? null,
+    hours: r.applied_hours ?? r.request?.hours,
+    explanation: r.explanation?.sentence ?? '',
+    winners: (r.winners ?? []).map((w) => w.who),
+    losers: (r.losers ?? []).map((w) => w.who),
+    battery: r.battery ?? [],
+    ghost_wind_mwh: r.ghost_wind?.delta_mwh ?? null,
+    live: true,
+  }
+}
