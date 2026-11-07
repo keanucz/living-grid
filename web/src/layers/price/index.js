@@ -1,7 +1,34 @@
-import { ColumnLayer, GeoJsonLayer } from 'deck.gl'
+import { ColumnLayer, GeoJsonLayer, PathLayer } from 'deck.gl'
 import { priceColor, COLORS } from '../../styles/tokens.js'
 
 export const GLASS = { ambient: 0.72, diffuse: 0.32, shininess: 120, specularColor: [70, 70, 66] }
+
+// Extruded polygons get no stroke in deck.gl, so outlines are drawn as paths on the slab's top face.
+const outlineCache = new WeakMap()
+export function outlines(features, z) {
+  const key = outlineCache.get(features)?.[z]
+  if (key) return key
+  const paths = []
+  for (const f of features) {
+    const g = f.geometry
+    const polys = g.type === 'Polygon' ? [g.coordinates] : g.coordinates
+    for (const poly of polys)
+      for (const ring of poly) {
+        // Split where a ring wraps the antimeridian, or the jump draws a line across the map.
+        let cur = []
+        for (const [x, y] of ring) {
+          if (cur.length && Math.abs(x - cur[cur.length - 1][0]) > 30) {
+            if (cur.length > 1) paths.push({ zone: f.properties.zone, path: cur })
+            cur = []
+          }
+          cur.push([x, y, z])
+        }
+        if (cur.length > 1) paths.push({ zone: f.properties.zone, path: cur })
+      }
+  }
+  outlineCache.set(features, { ...(outlineCache.get(features) ?? {}), [z]: paths })
+  return paths
+}
 
 export const towerHeight = (eur) => 20000 + Math.max(0, eur ?? 0) * 700
 
@@ -21,7 +48,7 @@ export default {
         id: 'price-zones',
         data: zoneFeatures,
         filled: true,
-        stroked: true,
+        stroked: false,
         // Thin glossy slab: the scene's point light slides a specular highlight across it (epoxy look).
         extruded: true,
         getElevation: sim ? 6000 : 2500,
@@ -44,6 +71,16 @@ export default {
           getLineColor: [ui.selectedZone],
           getLineWidth: [ui.selectedZone],
         },
+      }),
+      new PathLayer({
+        id: 'price-zone-borders',
+        data: outlines(zoneFeatures, (sim ? 6000 : 2500) + 60),
+        getPath: (d) => d.path,
+        getColor: (d) => (d.zone === ui.selectedZone ? [...COLORS.accent, 255] : [236, 236, 228, 210]),
+        getWidth: (d) => (d.zone === ui.selectedZone ? 2.2 : 1.3),
+        widthUnits: 'pixels',
+        jointRounded: true,
+        updateTriggers: { getColor: [ui.selectedZone], getWidth: [ui.selectedZone] },
       }),
       sim &&
         new ColumnLayer({

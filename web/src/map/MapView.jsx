@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { DeckGL, GeoJsonLayer, FlyToInterpolator, LightingEffect, AmbientLight, PointLight, DirectionalLight } from 'deck.gl'
+import { DeckGL, GeoJsonLayer, PathLayer, FlyToInterpolator, LightingEffect, AmbientLight, PointLight, DirectionalLight } from 'deck.gl'
 import { LAYERS } from '../layers/registry.js'
 import { actions, useStore } from '../store/store.js'
 import { COLORS, fmt } from '../styles/tokens.js'
 import { Icon, ASSET_ICON } from '../shell/icons.jsx'
-import { towerHeight, GLASS } from '../layers/price/index.js'
+import { towerHeight, GLASS, outlines } from '../layers/price/index.js'
 
 // Soft ambient plus a high point light over the North Sea: flat country slabs pick up a moving
 // specular sheen as the map pans, which reads as glass/epoxy rather than flat paint.
@@ -65,7 +65,7 @@ export default function MapView({ ctx }) {
 
   const base = useMemo(
     () =>
-      ctx.data.geo &&
+      ctx.data.geo && [
       new GeoJsonLayer({
         id: 'base-land',
         data: ctx.data.geo,
@@ -79,12 +79,21 @@ export default function MapView({ ctx }) {
         getLineWidth: 0.8,
         lineWidthUnits: 'pixels',
       }),
+      new PathLayer({
+        id: 'base-borders',
+        data: outlines(ctx.data.geo.features, 860),
+        getPath: (d) => d.path,
+        getColor: [96, 96, 91, 255],
+        getWidth: 1,
+        widthUnits: 'pixels',
+      }),
+    ],
     [ctx.data.geo],
   )
 
   const layerCtx = { ...ctx, time }
   const layers = [
-    base,
+    ...(base ?? []),
     ...LAYERS.filter((l) => l.modes.includes(ui.mode) && ui.layers[l.id] !== false).flatMap((l) => l.build(layerCtx)),
   ].filter(Boolean)
 
