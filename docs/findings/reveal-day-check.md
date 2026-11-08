@@ -2,6 +2,8 @@
 
 Task #337, read-only. Checked Sunday 8 November 2026, 07:50 to 08:05 UTC. UK time is UTC this weekend.
 
+**Update: everything is scheduled (verified by Keanu as root, 07:55 UTC).** Stefan's crontab has the 09:15 freeze, and `pipeline.reveal_poll --once` at 09:45, 09:50 and 09:55, then every 5 minutes from 10:00 to 12:55. The gaps below were jobs this account could not see, not missing jobs. No action is needed; the verdict below is superseded.
+
 ## Verdict
 
 | Step | Due | Code | Scheduled? |
