@@ -4,7 +4,7 @@ import raw from '../data/snapshot.json'
 // came from, so a scene can show its source and nothing is typed by hand. A figure the snapshot lacks is null, and the
 // scene shows a dash and says so, rather than inventing a number.
 type Item = { url: string; status: number; fetched_at: string; body?: any; error?: string }
-const snapshot = raw as unknown as { generated_at: string; api: string; items: Record<string, Item>; hub: any; weather_v2?: any }
+const snapshot = raw as unknown as { generated_at: string; api: string; items: Record<string, Item>; hub: any; weather_v2?: any; backtest?: any }
 
 export type Fig = { v: number | null; unit: string; src: string; at: string }
 
@@ -51,6 +51,15 @@ export const F = {
   weatherWindCutPct: (): Fig => ({ v: typeof snapshot.weather_v2?.wind_mae_change_pct === 'number' ? -snapshot.weather_v2.wind_mae_change_pct : null, unit: '%', src: snapshot.weather_v2?.source ?? 'weather_v2', at: snapshot.generated_at }),
   weatherPriceZones: (): string | null => (snapshot.weather_v2?.price_zones ? `${snapshot.weather_v2.price_zones_better} of ${snapshot.weather_v2.price_zones}` : null),
   batteryHours: (): number | null => body('scores')?.headline?.battery_hours ?? null,
+  six: () => {
+    const b = snapshot.backtest
+    const m = b?.models
+    if (!m || b.error) return null
+    const mm = (k: string): Fig => ({ v: m[k]?.mae ?? null, unit: '', src: 'backtest files', at: snapshot.generated_at })
+    const names: Record<string, string> = { lgbm_q: 'Ours', persistence: 'Stays put', bot_yesterday: 'Yesterday', bot_committee: 'Committee', bot_engineer: 'Engineer', bot_last_week: 'Last week' }
+    const items = Object.keys(names).filter((k) => m[k]).map((k) => ({ key: k, label: names[k], fig: mm(k), cov: m[k].coverage as number | null }))
+    return { items, weeks: b.folds * b.test_days / 7, lowest: b.lowest_error === 'lgbm_q', calibrated: b.best_calibrated === 'lgbm_q', sig: b.dm_persistence_significant as number, zones: b.dm_persistence_zones as number, src: b.source as string }
+  },
   weatherFolds: (): number | null => snapshot.weather_v2?.folds ?? null,
   weatherWindow: (): string | null => snapshot.weather_v2?.window ?? null,
   hubMerged: (): Fig => ({ v: snapshot.hub?.merged_tasks ?? null, unit: 'tasks', src: 'hub.db', at: snapshot.hub?.fetched_at ?? snapshot.generated_at }),

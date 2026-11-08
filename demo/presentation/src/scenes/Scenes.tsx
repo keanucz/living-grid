@@ -186,16 +186,21 @@ export const Product: React.FC = () => {
 export const Proof: React.FC = () => {
   const m = F.maeModel(), pr = F.maePersistence(), imp = F.maeImprovementPct(), cov = F.coverage(), n = F.forecastsScored(), hrs = X.backtestHours()
   const share = F.batteryShare()
-  const wp = F.weatherPriceCutPct(), ww = F.weatherWindCutPct()
+  const wp = F.weatherPriceCutPct(), ww = F.weatherWindCutPct(), six = F.six()
   const rev = X.revealGb(), c = X.latestCommit(), cc = X.commitmentCount()
   return (
     <Beats beats={[
       {
-        seconds: 22, kicker: 'Proof', sources: [m, pr, imp, hrs, cov, n, share, wp, ww], render: () => (
+        seconds: 22, kicker: 'Proof', sources: [m, pr, imp, hrs, cov, n, share, wp, ww, ...(six ? [six.items[0].fig] : [])], render: () => (
           <>
             <Title size={76}>Scored in public. It wins, and it ties.</Title>
-            <Bars format={(v) => fmt.n(v, 1)} items={[{ label: 'Our model, error per MWh', fig: m, strong: true }, { label: 'Assume it stays put', fig: pr }]} />
-            <Line delay={20} size={30} color={COLORS.text2}>{`${fmt.pct(imp.v)} smaller error. Backtest of ${fmt.n(hrs.v)} hours, six zones, pooled £ and €.`}</Line>
+            <div style={{ display: 'flex', gap: 50, alignItems: 'flex-start' }}>
+              <div>
+                <Bars compact width={860} format={(v) => fmt.n(v, 1)} items={six ? six.items.map((i) => ({ label: i.label, fig: i.fig, strong: i.key === 'lgbm_q' })) : [{ label: 'Our model', fig: m, strong: true }, { label: 'Stays put', fig: pr }]} />
+                <div style={{ fontSize: 28, color: COLORS.text3, marginTop: 8 }}>{`Error per MWh, pooled £ and €, ${fmt.n(hrs.v)} hours`}</div>
+              </div>
+              <Line delay={20} size={30} color={COLORS.text2}>{six ? `Six ways to forecast, tested on the same ${fmt.n(six.weeks)} weeks: ours has the ${six.lowest ? 'lowest' : 'a higher'} error (${fmt.n(m.v, 1)} per MWh vs ${fmt.n(pr.v, 1)} for persistence) and the ${six.calibrated ? 'best-calibrated' : 'a less well calibrated'} range (${fmt.pct(cov.v, 1)} inside its ${X.coverageTarget}% band); significantly better than persistence in ${six.sig} of ${six.zones} zones.` : `${fmt.pct(imp.v)} smaller error than assuming the price stays put.`}</Line>
+            </div>
             <Row gap={90}>
               <Big fig={cov} format={(v) => fmt.pct(v, 1)} label={`Outcomes inside our forecast band. Aim: ${X.coverageTarget}% (8 in 10)`} delay={40} size={100} />
               <Big fig={n} format={(v) => fmt.n(v)} label="Scored live, logged first" delay={52} size={100} />
@@ -252,7 +257,7 @@ export const Close: React.FC = () => {
       seconds: 18, kicker: 'Check it yourself', sources: [m], render: () => (
         <div style={{ display: 'flex', gap: 80, alignItems: 'center', marginTop: 20 }}>
           <div style={{ flex: 1 }}>
-            <Title size={92}>A weather forecast for Europe’s power grid.</Title>
+            <Title size={92}>Your daily weather report for power</Title>
             <Line delay={14} size={40}>{`What it costs now, what happens next, and proof we got it right. Can you beat our forecast? Call the grid on a real day with its date hidden. Our average error to beat: ${fmt.n(m.v, 1)} per MWh, six zones, pooled £ and €.`}</Line>
             <Line delay={28} size={40} color={COLORS.text}>{QR_URL.replace('https://', '')}</Line>
             <div style={{ fontFamily: FONT, color: COLORS.text3, fontSize: 28, marginTop: 36 }}>{`${wallet ? `Frozen forecasts are hashed on Solana (${wallet.slice(0, 6)}…${wallet.slice(-4)}). ` : ''}Built at HackTheBurgh XIII. Public data only.`}</div>

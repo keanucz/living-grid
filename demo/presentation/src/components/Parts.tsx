@@ -34,21 +34,21 @@ export const Big: React.FC<{ fig: Fig; format: (v: number | null) => string; lab
 export const Row: React.FC<{ children: React.ReactNode; gap?: number }> = ({ children, gap = 96 }) => <div style={{ display: 'flex', gap, alignItems: 'flex-end', marginTop: 56 }}>{children}</div>
 
 /** Two bars side by side (for example our error against persistence), drawn from two figures. */
-export const Bars: React.FC<{ items: { label: string; fig: Fig; strong?: boolean }[]; format: (v: number | null) => string; delay?: number }> = ({ items, format, delay = 8 }) => {
+export const Bars: React.FC<{ items: { label: string; fig: Fig; strong?: boolean }[]; format: (v: number | null) => string; delay?: number; width?: number; compact?: boolean }> = ({ items, format, delay = 8, width = 1100, compact = false }) => {
   const frame = useCurrentFrame()
   const { fps } = useVideoConfig()
   const max = Math.max(...items.map((i) => i.fig.v ?? 0), 1)
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 22, marginTop: 40, width: 1100 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: compact ? 6 : 22, marginTop: compact ? 24 : 40, width }}>
       {items.map((it, i) => {
         const t = spring({ frame: frame - delay - i * 6, fps, config: { damping: 200 }, durationInFrames: 40 })
         return (
-          <div key={it.label} style={{ display: 'grid', gridTemplateColumns: '460px 1fr 170px', alignItems: 'center', gap: 20 }}>
-            <div style={{ fontSize: 32, color: COLORS.text2 }}>{it.label}</div>
-            <div style={{ height: 44, background: COLORS.card, borderRadius: 4 }}>
+          <div key={it.label} style={{ display: 'grid', gridTemplateColumns: compact ? '230px 1fr 90px' : '460px 1fr 170px', alignItems: 'center', gap: 20 }}>
+            <div style={{ fontSize: compact ? 28 : 32, color: COLORS.text2 }}>{it.label}</div>
+            <div style={{ height: compact ? 26 : 44, background: COLORS.card, borderRadius: 4 }}>
               <div style={{ height: '100%', width: `${((it.fig.v ?? 0) / max) * 100 * t}%`, background: it.strong ? COLORS.accent : COLORS.text3, borderRadius: 4 }} />
             </div>
-            <div style={{ fontFamily: FONT, fontSize: 44, fontVariantNumeric: 'tabular-nums' }}>{format(it.fig.v)}</div>
+            <div style={{ fontFamily: FONT, fontSize: compact ? 28 : 44, fontVariantNumeric: 'tabular-nums' }}>{format(it.fig.v)}</div>
           </div>
         )
       })}

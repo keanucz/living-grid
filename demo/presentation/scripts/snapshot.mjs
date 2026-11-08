@@ -3,6 +3,7 @@
 // which publishes to the shared SpacetimeDB). Usage:
 //   node scripts/snapshot.mjs [--api https://htb.stefvuck.dev/api]
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { spawnSync } from 'node:child_process'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -71,6 +72,18 @@ function weatherV2() {
   }
 }
 
+function backtestFacts() {
+  // Six ways to forecast day-ahead prices, pooled over the backtest. Read from the backtest files by a small Python helper.
+  const dir = process.env.LG_BACKTEST_DIR ?? '/srv/hack/runner/data/backtest'
+  const r = spawnSync('uv', ['run', 'python', new URL('./backtest_facts.py', import.meta.url).pathname, dir], { encoding: 'utf8', cwd: new URL('../../..', import.meta.url).pathname })
+  try {
+    if (r.status !== 0) throw new Error((r.stderr || 'helper failed').trim().split('\n').pop())
+    return JSON.parse(r.stdout)
+  } catch (e) {
+    return { source: dir, error: String(e.message ?? e).slice(0, 160) }
+  }
+}
+
 const items = {}
 const failed = []
 for (const [name, path] of Object.entries(ENDPOINTS)) {
@@ -83,7 +96,7 @@ for (const [name, path] of Object.entries(ENDPOINTS)) {
   console.log(`${items[name].error ? 'FAIL' : 'ok  '} ${name.padEnd(15)} ${path}`)
 }
 const hub = await hubFacts()
-const snapshot = { generated_at: new Date().toISOString(), api: API, items, hub, weather_v2: weatherV2() }
+const snapshot = { generated_at: new Date().toISOString(), api: API, items, hub, weather_v2: weatherV2(), backtest: backtestFacts() }
 mkdirSync(dirname(out), { recursive: true })
 writeFileSync(out, JSON.stringify(snapshot))
 console.log(`wrote ${out}${failed.length ? `\nMISSING: ${failed.join(', ')}` : ''}`)
