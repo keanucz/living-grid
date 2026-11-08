@@ -128,11 +128,28 @@ export const ClipFrame: React.FC<{ step: string | null; title: string; width?: n
   )
 }
 
+const SHOT: Record<string, string> = { hidden: 'hidden-grid', hormuz: 'whatif-hormuz', history: 'history-26oct' }
+
 /** A real screenshot of the app, public/shots/<scene>.png, with a slow pan and zoom. Falls back to the clip frame. */
+/** A full-bleed screenshot (1920x1080) behind the whole slide, with a slow pan and zoom. */
+export const ShotFull: React.FC<{ scene: string }> = ({ scene }) => {
+  const frame = useCurrentFrame()
+  const { durationInFrames } = useVideoConfig()
+  const path = `shots/${SHOT[scene] ?? scene}.png`
+  if (!hasStatic(path)) return null
+  const k = interpolate(frame, [0, durationInFrames], [0, 1], { extrapolateRight: 'clamp' })
+  return (
+    <div style={{ position: 'absolute', left: -120, top: -70, width: 1920, height: 1080, overflow: 'hidden', background: COLORS.bg }}>
+      <img src={staticFile(path)} style={{ width: '100%', height: '100%', objectFit: 'cover', transform: `scale(${1.0 + 0.08 * k}) translate(${-20 * k}px, ${-10 * k}px)`, transformOrigin: '40% 40%' }} />
+      <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(10,10,10,0.88) 0%, rgba(10,10,10,0.15) 30%, rgba(10,10,10,0.15) 62%, rgba(10,10,10,0.92) 100%)' }} />
+    </div>
+  )
+}
+
 export const ShotFrame: React.FC<{ scene: string; step: string | null; title: string; width?: number; badge?: React.ReactNode; from?: [number, number]; to?: [number, number] }> = ({ scene, step, title, width = 1000, badge, from = [0, 0], to = [-40, -24] }) => {
   const frame = useCurrentFrame()
   const { durationInFrames } = useVideoConfig()
-  const path = `shots/${scene}.png`
+  const path = `shots/${SHOT[scene] ?? scene}.png`
   if (!hasStatic(path)) return <ClipFrame step={step} title={title} width={width}>{badge}</ClipFrame>
   const height = (width * 9) / 16
   const k = interpolate(frame, [0, durationInFrames], [0, 1], { extrapolateRight: 'clamp' })

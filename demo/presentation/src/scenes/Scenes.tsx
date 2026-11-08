@@ -4,7 +4,7 @@ import { F, fmt, wallet } from '../data'
 import type { Fig } from '../data'
 import { COLORS, FONT, MONO } from '../theme'
 import { Bars, Big, Line, LineChart, Row, Title } from '../components/Parts'
-import { Beats, Caption, EuropeMap, QR, QR_URL, Rise, ShotFrame } from '../components/Extra'
+import { Beats, Caption, EuropeMap, QR, QR_URL, Rise, ShotFrame, ShotFull } from '../components/Extra'
 import * as X from '../figs'
 
 // The deck, about three minutes. Every number comes from the snapshot (src/data.ts and src/figs.ts); the words are plain
@@ -99,7 +99,7 @@ export const Built: React.FC = () => {
                 ))}
                 <Row gap={80}>
                   <Big fig={z} format={(v) => fmt.n(v)} label="Zones" delay={70} size={90} />
-                  <Big fig={l} format={(v) => fmt.n(v)} label="Interconnectors" delay={78} size={90} />
+                  <Big fig={l} format={(v) => fmt.n(v)} label="Cables drawn" delay={78} size={90} />
                 </Row>
               </div>
               <EuropeMap prices={X.zonePriceList()} width={640} height={660} dim />
@@ -122,15 +122,20 @@ export const Built: React.FC = () => {
 
 // 4. The product, from real screenshots of the app (65 s, five segments of 13 s, one number each)
 const Segment: React.FC<{ scene: string; title: string; lines: string[]; clip: string; badge: React.ReactNode }> = ({ scene, title, lines, clip, badge }) => (
-  <div style={{ display: 'flex', gap: 50, alignItems: 'center', marginTop: 20 }}>
-    <div style={{ width: 600 }}>
-      <Title size={72}>{title}</Title>
-      {lines.map((t, i) => <Rise key={t} delay={14 + i * 12}><div style={{ fontSize: 34, color: COLORS.text2, marginTop: 22, lineHeight: 1.35 }}>{t}</div></Rise>)}
+  <div>
+    <ShotFull scene={scene} />
+    <div style={{ position: 'relative' }}>
+      <Title size={80}>{title}</Title>
     </div>
-    <ShotFrame scene={scene} step={CLIPS[clip]} title={title} width={1000} badge={badge} />
+    <div style={{ position: 'absolute', left: 120, right: 120, bottom: 90, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: 60 }}>
+      <div style={{ maxWidth: 1000 }}>
+        {lines.map((t, i) => <Rise key={t} delay={14 + i * 12}><div style={{ fontSize: 36, color: COLORS.text, marginTop: 12, lineHeight: 1.3, textShadow: '0 2px 12px #000' }}>{t}</div></Rise>)}
+      </div>
+      <div style={{ flex: 'none' }}>{badge}</div>
+    </div>
   </div>
 )
-const Badge: React.FC<{ fig: Fig; format: (v: number | null) => string; label: string }> = ({ fig, format, label }) => <Big fig={fig} format={format} label={label} size={84} />
+const Badge: React.FC<{ fig: Fig; format: (v: number | null) => string; label: string }> = ({ fig, format, label }) => <Big fig={fig} format={format} label={label} size={120} />
 
 export const Product: React.FC = () => {
   const cost = X.hormuzCost(), lo = X.hormuzCostLow(), hi = X.hormuzCostHigh()
@@ -144,31 +149,31 @@ export const Product: React.FC = () => {
   return (
     <Beats beats={[
       {
-        seconds: 13, kicker: 'The product · Hidden grid', sources: [bill, gap.used], render: () => (
+        seconds: 13.6, kicker: 'The product · Hidden grid', sources: [bill, gap.used], render: () => (
           <Segment scene="hidden" title="See the hidden grid" clip="hidden" lines={['Wind paid to switch off, and the bill.', 'Carbon that arrives by cable.']}
             badge={<Badge fig={bill} format={(v) => fmt.bigGbp(v)} label="Constraint bill, 26 Oct" />} />
         ),
       },
       {
-        seconds: 13, kicker: 'The product · What if', sources: [cost, lo, hi], render: () => (
-          <Segment scene="hormuz" title="Close the Strait of Hormuz" clip="hormuz" lines={[sentence ?? 'Gas goes up; so does power.', `Likely range ${fmt.bigGbp(lo.v)} to ${fmt.bigGbp(hi.v)}.`]}
-            badge={<Badge fig={cost} format={(v) => fmt.bigGbp(v)} label="Extra cost to consumers" />} />
+        seconds: 13.6, kicker: 'The product · What if', sources: [cost, lo, hi], render: () => (
+          <Segment scene="hormuz" title="Close the Strait of Hormuz" clip="hormuz" lines={[sentence ?? 'Gas goes up; so does power.', `Likely range ${fmt.bigGbp2(lo.v)} to ${fmt.bigGbp2(hi.v)}.`]}
+            badge={<Badge fig={cost} format={(v) => fmt.bigGbp2(v)} label="Extra cost to consumers" />} />
         ),
       },
       {
-        seconds: 13, kicker: 'The product · History', sources: [peak], render: () => (
+        seconds: 13.6, kicker: 'The product · History', sources: [peak], render: () => (
           <Segment scene="history" title="Replay 26 October" clip="history" lines={['The map plays the day.', 'The forecasts come from a model that had not seen it.']}
             badge={<Badge fig={peak} format={(v) => fmt.gbp(v)} label="GB peak, per MWh" />} />
         ),
       },
       {
-        seconds: 13, kicker: 'The product · Tonight', sources: [], render: () => (
+        seconds: 13.6, kicker: 'The product · Tonight', sources: [], render: () => (
           <Segment scene="tonight" title="Cheapest hours tonight" clip="tonight" lines={first ? [`${first.label}: ${first.start} to ${first.end}.`, 'Wholesale price, before network costs and charges.'] : ['The cheapest hours for your car and dishwasher.']}
             badge={first ? <div style={{ fontSize: 56, fontWeight: 500 }}>{`${first.start} to ${first.end}`}</div> : null} />
         ),
       },
       {
-        seconds: 13, kicker: 'The product · Data centres', sources: [dcg, flex], render: () => (
+        seconds: 13.6, kicker: 'The product · Data centres', sources: [dcg, flex], render: () => (
           <Segment scene="datacentre" title="Where to put a data centre" clip="datacentre" lines={[`A ${fmt.n(dcg.v)}-GPU site.`, 'Energy cost and carbon by country. Estimates, not quotes.']}
             badge={<Badge fig={flex} format={(v) => `${fmt.n(v)}%`} label="of the work can move within the day" />} />
         ),
@@ -194,9 +199,9 @@ export const Proof: React.FC = () => {
             <Row gap={90}>
               <Big fig={cov} format={(v) => fmt.pct(v, 1)} label={`Inside our likely range. Aim: ${X.coverageTarget}%`} delay={40} size={100} />
               <Big fig={n} format={(v) => fmt.n(v)} label="Scored live, each logged first (separate from the backtest)" delay={52} size={100} />
-              <Big fig={share} format={(v) => fmt.pct(v)} label="Battery profit vs perfect foresight, 5 zones" delay={64} size={100} />
+              <Big fig={share} format={(v) => fmt.pct(v)} label={`Battery profit vs perfect foresight, 5 zones, ${fmt.n(F.batteryHours())} hours`} delay={64} size={100} />
             </Row>
-            <Line delay={80} size={30} color={COLORS.text2}>{`Next: adding gusts, cloud, rain and ensemble weather cut day-ahead price error ${fmt.n(wp.v, 1)}% and wind error ${fmt.n(ww.v, 1)}% (${F.weatherFolds() ?? '–'}-fold backtest, ${F.weatherWindow() ?? '–'}; not live yet).`}</Line>
+            <Line delay={80} size={30} color={COLORS.text2}>{`Next: adding gusts, cloud, rain and alert weather cut day-ahead price error ${fmt.n(wp.v, 1)}% and wind error ${fmt.n(ww.v, 1)}% (${F.weatherFolds() ?? '–'}-fold backtest, ${F.weatherWindow() ?? '–'}; price better in ${F.weatherPriceZones() ?? '–'} zones; narrower ranges; not live yet).`}</Line>
             <Caption delay={90}>Against a strong day-ahead rival it is a tie. We say so.</Caption>
           </>
         ),
@@ -226,7 +231,7 @@ export const How: React.FC = () => {
   const t = F.hubMerged(), a = F.hubAgents()
   return (
     <Beats beats={[{
-      seconds: 8, kicker: 'How we built it', sources: [t, a], render: () => (
+      seconds: 5, kicker: 'How we built it', sources: [t, a], render: () => (
         <>
           <Title size={88}>Three people and a lot of Claudes.</Title>
           <Row gap={120}>

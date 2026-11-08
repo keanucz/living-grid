@@ -49,6 +49,8 @@ export const F = {
   stormConstraintGbp: () => fig('replay', (b) => b.constraint_cost_gbp, '£'),
   weatherPriceCutPct: (): Fig => ({ v: typeof snapshot.weather_v2?.price_da_mae_change_pct === 'number' ? -snapshot.weather_v2.price_da_mae_change_pct : null, unit: '%', src: snapshot.weather_v2?.source ?? 'weather_v2', at: snapshot.generated_at }),
   weatherWindCutPct: (): Fig => ({ v: typeof snapshot.weather_v2?.wind_mae_change_pct === 'number' ? -snapshot.weather_v2.wind_mae_change_pct : null, unit: '%', src: snapshot.weather_v2?.source ?? 'weather_v2', at: snapshot.generated_at }),
+  weatherPriceZones: (): string | null => (snapshot.weather_v2?.price_zones ? `${snapshot.weather_v2.price_zones_better} of ${snapshot.weather_v2.price_zones}` : null),
+  batteryHours: (): number | null => body('scores')?.headline?.battery_hours ?? null,
   weatherFolds: (): number | null => snapshot.weather_v2?.folds ?? null,
   weatherWindow: (): string | null => snapshot.weather_v2?.window ?? null,
   hubMerged: (): Fig => ({ v: snapshot.hub?.merged_tasks ?? null, unit: 'tasks', src: 'hub.db', at: snapshot.hub?.fetched_at ?? snapshot.generated_at }),
@@ -72,6 +74,7 @@ export const fmt = {
   n: (v: number | null, d = 0) => (v == null ? '–' : v.toLocaleString('en-GB', { maximumFractionDigits: d, minimumFractionDigits: d })),
   gbp: (v: number | null) => (v == null ? '–' : `£${fmt.n(Math.round(v))}`),
   /** £143m, £1.8bn: for large bills */
+  bigGbp2: (v: number | null) => (v == null ? '–' : `£${(v / 1e9).toFixed(2)}bn`),
   bigGbp: (v: number | null) => (v == null ? '–' : Math.abs(v) >= 1e9 ? `£${(v / 1e9).toFixed(1)}bn` : `£${(v / 1e6).toFixed(Math.abs(v) >= 1e8 ? 0 : 1)}m`),
   pct: (v: number | null, d = 0) => (v == null ? '–' : `${v.toFixed(d)}%`),
 }

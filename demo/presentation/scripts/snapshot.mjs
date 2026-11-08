@@ -60,9 +60,10 @@ function weatherV2() {
   try {
     const md = readFileSync(new URL(`../../../${file}`, import.meta.url), 'utf8')
     const row = (t) => Number(new RegExp(`^\\|\\s*${t}\\s*\\|\\s*(-?[\\d.]+)%`, 'm').exec(md)?.[1])
+    const zr = /^\|\s*price_da\s*\|[^\n]*?\|\s*(\d+) of (\d+)\s*\|/m.exec(md)
     const win = /(\w+)\s+weekly test folds, (\d+ \w+ to \d+ \w+ \d{4})/.exec(md)
     const folds = { Six: 6, Five: 5, Four: 4, Eight: 8 }[win?.[1]] ?? null
-    const out = { source: file, price_da_mae_change_pct: row('price_da'), wind_mae_change_pct: row('wind'), folds, window: win?.[2] ?? null, live: false }
+    const out = { source: file, price_da_mae_change_pct: row('price_da'), wind_mae_change_pct: row('wind'), folds, window: win?.[2] ?? null, price_zones_better: zr ? Number(zr[1]) : null, price_zones: zr ? Number(zr[2]) : null, live: false }
     if (![out.price_da_mae_change_pct, out.wind_mae_change_pct, out.folds].every(Number.isFinite) || !out.window) throw new Error('summary table not found')
     return out
   } catch (e) {

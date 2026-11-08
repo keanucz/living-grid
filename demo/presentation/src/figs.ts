@@ -33,7 +33,7 @@ export function zonePriceList(): ZonePrice[] {
 
 export const stateSrc = (): Fig => figOf('state', () => 0)
 export const zoneCount = () => figOf('zones', (b) => b.zones.length)
-export const linkCount = () => figOf('zones', (b) => b.interconnectors.length)
+export const linkCount = () => figOf('zones', (b) => b.interconnectors.filter((i: any) => i.in_v1).length)
 
 /** The 26 October GB day-ahead price: lowest and highest actual hour. */
 export const stormLow = () => figOf('replay', (b) => Math.min(...replayActuals(b)), '£/MWh')
