@@ -1,5 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { back, next, skip, startFromHash, stepsOf } from './engine.js'
+import { getJSON, peek, prefetch } from './liveCache.js'
 import { useTour } from './state.js'
 
 const OFFLINE = import.meta.env.VITE_LG_OFFLINE === '1'
@@ -84,6 +85,8 @@ function useBox(id) {
   return box
 }
 
+// Live figures for the step's caption. Requests are shared per API path and prefetched when the tour starts
+// (liveCache.js); a figure that is already in hand shows at once, and one that arrives later replaces its fallback.
 function useLive(step) {
   const [vals, setVals] = useState({})
   useEffect(() => {
@@ -91,17 +94,18 @@ function useLive(step) {
     if (!step?.live || OFFLINE) return
     let on = true
     for (const [k, spec] of Object.entries(step.live)) {
-      const ctrl = new AbortController()
-      const timer = setTimeout(() => ctrl.abort(), 4000)
-      fetch(`/api${spec.path}`, { signal: ctrl.signal })
-        .then((r) => (r.ok ? r.json() : Promise.reject()))
-        .then((j) => on && setVals((v) => ({ ...v, [k]: spec.get(j) })))
+      getJSON(spec.path)
+        .then((j) => { const v = spec.get(j); if (on) setVals((x) => ({ ...x, [k]: v })) })
         .catch(() => {})
-        .finally(() => clearTimeout(timer))
     }
     return () => { on = false }
   }, [step])
-  return vals
+  const ready = {}
+  for (const [k, spec] of Object.entries(step?.live ?? {})) {
+    const j = peek(spec.path)
+    if (j) { try { ready[k] = spec.get(j) } catch { /* shape changed: keep the fallback */ } }
+  }
+  return { ...ready, ...vals }
 }
 
 // Where the caption card goes: beside the ring on the side with the most free room, so it never covers its target.
@@ -148,6 +152,7 @@ function caption(step, vals) {
 export default function Tour() {
   const tour = useTour()
   useEffect(() => { startFromHash() }, [])
+  useEffect(() => { if (tour?.name && !OFFLINE) prefetch(stepsOf(tour.name)) }, [tour?.name])
   const steps = tour ? stepsOf(tour.name) : []
   const step = steps[tour?.i]
   const target = step && (step.target ?? step.panel)
