@@ -67,6 +67,7 @@ function Scoreboard() {
           {s.basis === 'live'
             ? <>From {s.basisN.toLocaleString('en-GB')} day-ahead hours scored live, each forecast logged before its outcome.</>
             : <>From the <Term id="backtest">backtest</Term>: {s.basisN.toLocaleString('en-GB')} hours of past weeks the model never saw, until enough live forecasts are scored.</>}
+          {' '}Checked daily, sealed on Solana before the result.
         </p>
       )}
     </>

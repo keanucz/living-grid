@@ -231,13 +231,14 @@ export default function Intro() {
         {mode === 'deck' && t < 3.1 && <DeckGL views={view} viewState={{ pylon: pose(Math.min(t, 3.1)) }} controller={false} layers={layers} style={{ position: 'absolute', inset: 0 }} />}
       </div>
       {captions.map(([text, o]) => <div key={text} className="intro-caption" style={{ opacity: Math.min(1, o) }}>{text}</div>)}
-      <div className="intro-title" style={{ opacity: title }}>This is the living grid of Europe</div>
+      <div className="intro-title" style={{ opacity: title }}>This is the living grid of Europe<small>A weather forecast for Europe’s power grid.</small></div>
       <button className="intro-skip" onClick={() => finish(true)}>Skip</button>
       <style>{`
         .intro { position: fixed; inset: 0; z-index: 70; cursor: pointer; }
         .intro-veil { position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 100%, #10150c 0%, #070807 70%); }
         .intro-title { position: absolute; left: 0; right: 0; top: 14%; text-align: center; padding: 0 24px; font-size: clamp(26px, 5vw, 54px);
           font-weight: 500; letter-spacing: -0.02em; color: #f2f5ea; text-shadow: 0 2px 30px rgba(0,0,0,.8); pointer-events: none; }
+        .intro-title small { display: block; margin-top: 10px; font-size: .42em; font-weight: 400; letter-spacing: 0; color: #c9d1bd; }
         .intro-caption { position: absolute; left: 0; right: 0; top: 18%; text-align: center; font-size: clamp(20px, 3.2vw, 32px); font-weight: 500;
           letter-spacing: -0.01em; color: #f2f5ea; text-shadow: 0 2px 24px rgba(0,0,0,.85); pointer-events: none; }
         .intro-skip { position: absolute; right: 18px; bottom: 18px; font-size: 13px; color: var(--text); padding: 8px 14px; border-radius: 10px; border: 1px solid var(--line-2); background: var(--panel-solid); }

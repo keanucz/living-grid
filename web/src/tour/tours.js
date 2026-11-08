@@ -38,23 +38,23 @@ export const TOURS = {
     title: 'The 3-minute tour',
     steps: [
       { id: 'prices', section: 'now', at: 'now', target: 'zoneList', duration: 9, camera: null,
-        say: "Electricity is invisible, so we drew it. Each country is coloured by its price for this hour, set in yesterday's auction. Britain is {gb}; southern Norway is {no2}.", live: pick('gb', 'no2') },
+        say: "This is the current conditions map for Europe's power grid. Each country is coloured by its price for this hour, set in yesterday's auction. Britain is {gb}; southern Norway is {no2}.", live: pick('gb', 'no2') },
       { id: 'flows', section: 'now', layers: { flows: true }, target: 'layers', duration: 8,
         say: "The lines between countries are power flowing through the cables that link them, many under the sea. Thicker lines are bigger cables. The Layers button switches the other views on and off." },
       { id: 'forecast', section: 'forecast', target: 'zoneChart', duration: 9,
-        say: "The faint block shows our forecast for the next few hours. The fainter it is, the less sure we are." },
+        say: "This is the outlook. The faint block shows our forecast for the next few hours. The fainter it is, the less sure we are." },
       { id: 'history', section: 'forecast', at: '2026-10-26T12:00:00Z', target: 'scrubber', duration: 12,
         say: "The time bar goes back to January 2024. Drag it, pick a date or press play. Orange ticks are big events: this one is the storm on 26 October. Press Live to jump back." },
       { id: 'explain', section: 'forecast', at: '+6', target: 'explain', duration: 8,
-        say: "Each forecast comes with its reasons in plain words: what pushed the price up and what pulled it down." },
+        say: "Each forecast says why, in plain words: what pushed the price up and what pulled it down." },
       { id: 'ghostwind', section: 'hidden', at: 'now', target: 'stories', duration: 10, camera: { longitude: -4.0, latitude: 57.0, zoom: 5.0 },
-        say: "When the lines to the south are full, Scottish wind farms get paid to stop generating. The grid's published bills for that come to {bill}. The numbers here are estimates, and we say so.", live: pick('bill') },
+        say: "This is the radar for what you cannot see. When the lines to the south are full, Scottish wind farms get paid to stop generating. The grid's published bills for that come to {bill}. The numbers here are estimates, and we say so.", live: pick('bill') },
       { id: 'hormuz', section: 'whatif', event: { id: 'hormuz' }, target: 'simDock', duration: 12,
-        say: "Close the Strait of Hormuz and watch dearer gas push up electricity prices across Europe. The bill comes out in pounds." },
+        say: "A warning, tested early: close the Strait of Hormuz and watch dearer gas push up electricity prices across Europe. The bill comes out in pounds." },
       { id: 'proof', section: 'proof', at: 'now', target: 'scoreboard', duration: 10,
-        say: "We've scored {scored} live forecasts so far, each saved before the real price was known. On past weeks it never saw, the model was off by {model} per MWh on average. Guessing that the price stays put was off by {baseline}. Where we lose, we show it.", live: pick('scored', 'model', 'baseline') },
+        say: "Was the forecast right? We've scored {scored} live forecasts so far, each sealed on Solana before the real price was known. On past weeks it never saw, the model was off by {model} per MWh on average. Guessing that the price stays put was off by {baseline}. Where we lose, we show it.", live: pick('scored', 'model', 'baseline') },
       { id: 'play', section: 'play', target: 'tab-play', duration: 7,
-        say: "Think you can read the grid better than our model? Play a real day from the past, with the date hidden." },
+        say: "Think you can beat the forecaster? Play a real day from the past, with the date hidden." },
     ],
   },
   // A short tour used to test the engine on desktop and phone.
@@ -74,13 +74,13 @@ export const TOURS = {
 const byId = Object.fromEntries(TOURS.main.steps.map((s) => [s.id, s]))
 const MORE = {
   carbon: { id: 'carbon', section: 'hidden', layers: { carbon: true, ghostWind: false }, target: 'stories', duration: 10, camera: null,
-    say: "Carbon crosses borders too. A country can look clean at home while running on dirty imports. This view shows the carbon in each country's electricity use, worked out with standard emission figures." },
+    say: "On the radar too: carbon crosses borders. A country can look clean at home while running on dirty imports. This view shows the carbon in each country's electricity use, worked out with standard emission figures." },
   battery: { id: 'battery', section: 'whatif', target: 'simDock', duration: 9,
     say: "Every country has a test battery that reacts to the gas shock. One plans with our likely range, the other with our best guess only. The battery card shows how close each gets to perfect hindsight." },
   replay: { id: 'replay', page: '#/replay', target: 'map', duration: 10,
     say: "This replays 26 October with a model trained only on data from before that day, so asking whether we'd have seen it coming is a fair test." },
   reveal: { id: 'reveal', page: '#/reveal', target: 'map', duration: 9,
-    say: "Monday's forecast was saved before the auction. As the real prices arrive, they appear next to it." },
+    say: "Monday's forecast was sealed before the auction. As the real prices arrive, they appear next to it." },
 }
 const compose = (title, ids) => ({ title, steps: ids.map((i) => byId[i] ?? MORE[i]) })
 TOURS['g-research'] = compose('G-Research order', ['prices', 'ghostwind', 'carbon', 'explain', 'hormuz', 'proof'])

@@ -60,12 +60,12 @@ export default function Welcome() {
     <div className="wel" role="dialog" aria-modal="true" aria-labelledby="wel-h">
       <div className="wel-box fade-in">
         <div className="wel-kicker"><span className="wel-logo"><Icon name="bolt" size={16} stroke={2.4} /></span>The Living Grid</div>
-        <h1 id="wel-h">Where to?</h1>
-        <p className="wel-what">A map of Europe’s electricity market. We forecast tomorrow’s price in six countries, show what normally stays hidden, and prove how good our forecasts are.</p>
+        <h1 id="wel-h">A weather forecast for Europe’s power grid</h1>
+        <p className="wel-what">What it costs now, what happens next, and proof we got it right. Pick a door, or take the tour.</p>
         <button className="wel-tour" onClick={takeTour}>
           <span className="wel-ic"><Icon name="play" size={20} /></span>
           <span><b>{resume ? `Resume the tour (step ${resume.i + 1})` : 'Take the 3-minute tour'}</b>
-            <small>Prices, the forecast, the hidden grid, a world event and the proof, with the app set up for you</small></span>
+            <small>Conditions, the outlook, the radar, a warning and the proof, with the app set up for you</small></span>
         </button>
         <div className="wel-doors">
           {SECTIONS.map((s, i) => (

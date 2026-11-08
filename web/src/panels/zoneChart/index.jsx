@@ -20,6 +20,8 @@ function ZoneChart({ ctx }) {
     return () => ((live = false), clearInterval(id))
   }, [zone])
   if (!z) return null
+  const madeAt = (s?.forecast ?? []).reduce((m, r) => (r.made_at > m ? r.made_at : m), '')
+  const stamp = madeAt ? new Date(madeAt).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' }) : null
 
   const now = Date.now()
   const x = scaleUtc().domain([now - 24 * 3600e3, now + 24 * 3600e3]).range([PAD.l, W - PAD.r])
@@ -71,6 +73,7 @@ function ZoneChart({ ctx }) {
         <span><i className="dash" /><Term id="best-guess">Best guess</Term></span>
         <span><i className="band" /><Term id="likely-range">Likely range</Term></span>
         <p className="zghost">The faint block on the map is our forecast; the fainter it is, the less sure we are.</p>
+        {stamp && <p className="zghost">Forecast issued {stamp} UTC, checked daily, sealed on Solana.</p>}
         {!s && <span className="faint">loading…</span>}
         {s && !act.length && !fc.length && <span className="faint">No history yet</span>}
       </div>
