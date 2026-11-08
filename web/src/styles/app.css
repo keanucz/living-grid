@@ -192,11 +192,13 @@ h1, .headline h1, .kval, .sim-name, .tile b { letter-spacing: -0.012em; }
 /* left column: never clip, scroll instead; zone list capped */
 .slot-left { overflow-y: auto; scrollbar-width: none; padding-bottom: 4px; }
 .slot-left::-webkit-scrollbar { display: none; }
-.slot-left > * { flex: none; }
+/* Panels sit inside display:contents tour wrappers ([data-tour], #239), so match them through the wrapper too. */
+.slot-left > *, .slot-left > [data-tour] > * { flex: none; }
 .zonelist { max-height: 380px; }
 /* right column: consistent width */
 .slot-bottomRight { width: 520px; }
-.slot-bottomRight > .panel, .slot-bottomRight > a.panel { width: 100% !important; }
+.slot-bottomRight > .panel, .slot-bottomRight > a.panel,
+.slot-bottomRight > [data-tour] > .panel, .slot-bottomRight > [data-tour] > a.panel { width: 100% !important; }
 
 .flash { animation: lgflash 1.2s ease; }
 @keyframes lgflash { 0%, 60% { box-shadow: 0 0 0 2px var(--accent), var(--shadow); } 100% { box-shadow: var(--shadow); } }
