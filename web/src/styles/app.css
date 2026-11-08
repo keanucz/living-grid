@@ -146,9 +146,13 @@ input { font: inherit; color: inherit; }
 }
 .round-btn:hover { background: var(--card-2); }
 
-.legend { position: absolute; left: 50%; transform: translateX(-50%); bottom: 28px; z-index: 3; padding: 10px 14px; display: flex; gap: 12px; align-items: center; font-size: 12px; }
-.legend .bar { width: 220px; height: 8px; border-radius: 4px; }
-.legend .ticks { display: flex; justify-content: space-between; width: 220px; color: var(--text-3); font-size: 11px; margin-top: 4px; }
+.legend { position: absolute; left: var(--legend-left); bottom: 28px; z-index: 3; padding: 8px 12px; display: flex; flex-direction: column; gap: 6px; font-size: 12px; width: var(--legend-w); box-sizing: border-box; }
+/* #305: the legend docks in the gap right of the left column (28 + 330 + 16 px), never centred over the panels */
+:root { --legend-left: 374px; --legend-w: 224px; }
+.legend-title { display: flex; flex-direction: column; gap: 2px; }
+.legend-title .muted { font-size: 11px; }
+.legend .bar { width: 100%; height: 8px; border-radius: 4px; }
+.legend .ticks { display: flex; justify-content: space-between; width: 100%; color: var(--text-3); font-size: 11px; margin-top: 4px; }
 .mode-simulate .legend { display: none; }
 
 .fade-in { animation: fadeIn .35s ease both; }
@@ -228,8 +232,12 @@ h1, .headline h1, .kval, .sim-name, .tile b { letter-spacing: -0.012em; }
 .zrow.on { background: rgba(255,255,255,.05); border-color: var(--line-2); }
 .zspark { color: var(--text-2) !important; }
 
-/* #157: scrubber sits above the legend, clear of the layer chips and the Forecast blurb */
-.app.mode-overview .slot-bottom { top: auto !important; bottom: 88px !important; left: 50% !important; right: auto !important; transform: translateX(-50%) !important; }
+/* #157, #305: the time bar sits at the bottom right, clear of the left column and of the legend beside it */
+.app.mode-overview .slot-bottom { top: auto !important; bottom: 28px !important; left: auto !important; right: 28px !important; transform: none !important;
+  max-width: calc(100% - var(--legend-left) - var(--legend-w) - 16px - 28px) !important; }
+.app.mode-overview .slot-bottom .scrubber { width: min(640px, calc(100vw - var(--legend-left) - var(--legend-w) - 16px - 28px)); }
+/* Too narrow for the gap beside the left column (the bottom-right cards are 520 px wide): the legend goes top right. */
+@media (max-width: 1150px) { .legend { left: auto; right: 28px; bottom: auto; top: 76px; } }
 /* top bar on one line: brand, views (left), ...; layer chips as a separate group on the right before Live/date */
 .topbar { gap: 16px; }
 .topbar .tabs, .topbar .lb, .topbar .lens-bar { margin: 0 !important; }

@@ -143,10 +143,10 @@ function MapApp() {
           </div>
         ))}
 
-        <div className="legend panel" style={{ flexDirection: 'column', alignItems: 'stretch', gap: 6 }}>
-          <span style={{ display: 'flex', flexDirection: 'column', gap: 2, width: 220 }}>
+        <div className="legend panel">
+          <span className="legend-title">
             <span><Term id="wholesale">Wholesale price</Term>, € per <Term id="mwh">MWh</Term></span>
-            <span className="muted" style={{ fontSize: 11 }}>Britain converted from £</span>
+            <span className="muted">Britain converted from £</span>
           </span>
           <div>
             <div className="bar" style={{ background: `linear-gradient(90deg, ${PRICE_LEGEND.map((s) => s.c).join(',')})` }} />
