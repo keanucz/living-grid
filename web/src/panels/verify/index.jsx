@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import sample from './sample.json'
+import Explain from '../../ui/Explain.jsx'
 
 // Not auto-registered as a panel (no default export): the reveal view mounts <Verify /> directly.
 
@@ -86,78 +87,99 @@ export function Verify() {
     if (rec && !data?.cached) run(tamper)
   }, [rec?.id, tamper]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  return (
-    <section className="vf" aria-label="Verify the frozen forecast on chain">
-      <header>
-        <div className="vf-k">Proof</div>
-        <h2>Was the forecast changed after the fact?</h2>
-        <p>
-          We hash each frozen forecast with SHA-256 and post the hash to Solana {data?.cluster ?? 'devnet'} from one published wallet. This page hashes the file in your browser and reads the memo
-          straight from the chain. A hash shows <i>that</i> forecast existed unchanged; the wallet’s full history below shows we did not post others.
-        </p>
-      </header>
+  const verdict = busy
+    ? 'Checking…'
+    : result?.error
+      ? result.error
+      : result
+        ? result.match
+          ? '✓ Match: this file is exactly what was committed'
+          : '✗ Mismatch: this is not the file that was committed'
+        : null
 
+  const answer = (
+    <>
       {data === null && <p className="faint">Loading…</p>}
       {data?.cached && <p className="vf-warn">The proof service is not reachable, so there is nothing cached to check. {data.note}</p>}
-
       {data && !data.cached && !rec && (
         <p className="faint">No commitment has been posted on chain yet. The first one follows the 23:59 UTC freeze on Saturday.</p>
       )}
-
       {rec && (
         <div className={`vf-card ${result?.match ? 'ok' : result && !result.error ? 'bad' : ''}`}>
+          <div className="vf-verdict" role="status">{verdict}</div>
+          <div className="vf-actions">
+            <button className="btn" onClick={() => run(tamper)} disabled={busy}>Verify</button>
+            <button className="btn" onClick={() => setTamper((t) => !t)} disabled={busy}>{tamper ? 'Use the real file' : 'Alter one digit and re-check'}</button>
+          </div>
+        </div>
+      )}
+    </>
+  )
+
+  const experts = (
+    <div className="vf-x">
+      <p>
+        We hash each frozen forecast with SHA-256 and post the hash to Solana {data?.cluster ?? 'devnet'} from one published wallet. This page hashes the file in your browser and reads the memo
+        straight from the chain. A hash shows <i>that</i> forecast existed unchanged; the wallet’s full history below shows we did not post others.
+      </p>
+      {rec && (
+        <div className="vf-rows">
           <div className="vf-row">
             <span>Forecast</span>
             <b>{rec.kind === 'freeze' ? 'Frozen Monday forecast' : 'Hourly run'} · {rec.label} · {rec.rows} rows</b>
           </div>
           <div className="vf-row"><span>Hash in your browser</span><code>{result?.browser ?? (busy ? 'hashing…' : '—')}</code></div>
           <div className="vf-row"><span>Hash on chain (memo)</span><code>{result?.onChain ?? (busy ? 'reading…' : '—')}</code></div>
-          <div className="vf-verdict" role="status">
-            {busy && 'Checking…'}
-            {!busy && result?.error && result.error}
-            {!busy && result && !result.error && (result.match ? '✓ Match: this file is exactly what was committed' : '✗ Mismatch: this is not the file that was committed')}
-          </div>
           <div className="vf-actions">
-            <button className="btn" onClick={() => run(tamper)} disabled={busy}>Verify</button>
-            <button className="btn" onClick={() => setTamper((t) => !t)} disabled={busy}>{tamper ? 'Use the real file' : 'Alter one digit and re-check'}</button>
             <a href={explorerTx(rec.signature, data.cluster)} target="_blank" rel="noreferrer">View transaction ↗</a>
             <a href={`/api/commitments/file/${rec.id}`} target="_blank" rel="noreferrer">Download the hashed file</a>
           </div>
         </div>
       )}
-
       {data?.wallet && (
         <div className="vf-list">
           <div className="vf-row">
             <span>Published wallet</span>
             <a href={data.explorer_address} target="_blank" rel="noreferrer"><code>{data.wallet}</code> ↗</a>
           </div>
-          <table>
-            <thead><tr><th>Memo</th><th>Time (UTC)</th><th>Transaction</th></tr></thead>
-            <tbody>
-              {txs.map((t) => (
-                <tr key={t.signature}>
-                  <td><code>{(t.memo ?? '').replace(/^\[\d+\] /, '')}</code></td>
-                  <td>{t.blockTime ? new Date(t.blockTime * 1000).toISOString().slice(5, 16).replace('T', ' ') : '—'}</td>
-                  <td><a href={explorerTx(t.signature, data.cluster)} target="_blank" rel="noreferrer">{short(t.signature, 6)}</a></td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <div className="vf-scroll">
+            <table>
+              <thead><tr><th>Memo</th><th>Time (UTC)</th><th>Transaction</th></tr></thead>
+              <tbody>
+                {txs.map((t) => (
+                  <tr key={t.signature}>
+                    <td><code>{(t.memo ?? '').replace(/^\[\d+\] /, '')}</code></td>
+                    <td>{t.blockTime ? new Date(t.blockTime * 1000).toISOString().slice(5, 16).replace('T', ' ') : '—'}</td>
+                    <td><a href={explorerTx(t.signature, data.cluster)} target="_blank" rel="noreferrer">{short(t.signature, 6)}</a></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
           {!txs.length && <p className="faint">No transactions found for this wallet yet.</p>}
         </div>
       )}
+    </div>
+  )
+
+  return (
+    <div className="vf">
+      <Explain question="Was the forecast changed after the fact?" answer={answer} experts={experts} />
       <style>{CSS}</style>
-    </section>
+    </div>
   )
 }
 
 const CSS = `
-.vf { margin-top: 28px; background: var(--panel-solid); border: 1px solid var(--line); border-radius: 24px; padding: 20px; }
+.vf { margin-top: 28px; }
+.vf .ex { border-radius: 24px; padding: 20px 20px 10px; }
+.vf-x p { margin: 0 0 12px; max-width: 720px; }
+.vf-rows { display: grid; gap: 8px; }
+.vf-scroll { overflow-x: auto; }
 .vf-k { font-size: 12px; color: var(--accent); font-weight: 600; }
 .vf h2 { margin: 4px 0 6px; font-size: 22px; letter-spacing: -0.02em; }
 .vf header p { margin: 0 0 14px; color: var(--text-2); max-width: 720px; }
-.vf-card { border: 1px solid var(--line); border-radius: 16px; padding: 14px; display: grid; gap: 8px; }
+.vf-card { border: 1px solid var(--line); border-radius: 16px; padding: 14px; display: grid; gap: 10px; font-size: 15px; }
 .vf-card.ok { border-color: rgba(197,240,107,.5); }
 .vf-card.bad { border-color: var(--hot); }
 .vf-row { display: flex; gap: 12px; align-items: baseline; flex-wrap: wrap; font-size: 13px; }
@@ -174,5 +196,5 @@ const CSS = `
 .vf th { text-align: left; color: var(--text-3); font-weight: 500; padding: 4px 8px 4px 0; }
 .vf td { padding: 4px 8px 4px 0; border-top: 1px solid var(--line); }
 .vf-warn { color: var(--hot); font-size: 13px; }
-@media (max-width: 700px) { .vf { padding: 14px; border-radius: 18px; } .vf-row > span { min-width: 0; } }
+@media (max-width: 700px) { .vf .ex { padding: 14px 14px 8px; border-radius: 18px; } .vf-row > span { min-width: 0; } }
 `

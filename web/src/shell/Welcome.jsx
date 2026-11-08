@@ -61,6 +61,7 @@ export default function Welcome() {
       <div className="wel-box fade-in">
         <div className="wel-kicker"><span className="wel-logo"><Icon name="bolt" size={16} stroke={2.4} /></span>The Living Grid</div>
         <h1 id="wel-h">Where to?</h1>
+        <p className="wel-what">A map of Europe’s electricity market. We forecast tomorrow’s price in six countries, show what normally stays hidden, and prove how good our forecasts are.</p>
         <button className="wel-tour" onClick={takeTour}>
           <span className="wel-ic"><Icon name="play" size={20} /></span>
           <span><b>{resume ? `Resume the tour (step ${resume.i + 1})` : 'Take the 3-minute tour'}</b>
@@ -70,7 +71,8 @@ export default function Welcome() {
           {SECTIONS.map((s, i) => (
             <button key={s.id} className="wel-door" onClick={() => choose(s.id)} autoFocus={i === 0}>
               <span className="wel-ic"><Icon name={s.icon} size={20} /></span>
-              <span className="wel-t">{s.label}</span>
+              <span className="wel-n">{s.label}</span>
+              <span className="wel-t">{s.question}</span>
               <span className="wel-l">{s.door}</span>
             </button>
           ))}
@@ -88,7 +90,8 @@ const CSS = `
 .wel-box { width: min(980px, 100%); }
 .wel-kicker { display: flex; align-items: center; gap: 10px; color: var(--text-2); font-weight: 500; }
 .wel-logo { width: 28px; height: 28px; border-radius: 8px; display: grid; place-items: center; background: var(--accent); color: var(--accent-ink); }
-.wel h1 { font-size: 40px; font-weight: 500; letter-spacing: -0.025em; margin: 14px 0 24px; }
+.wel h1 { font-size: 40px; font-weight: 500; letter-spacing: -0.025em; margin: 14px 0 10px; }
+.wel-what { margin: 0 0 22px; max-width: 720px; font-size: 18px; line-height: 1.45; color: var(--text); }
 .wel-tour { display: flex; align-items: center; gap: 14px; width: 100%; text-align: left; padding: 14px 18px; margin-bottom: 12px; border-radius: 14px;
   background: var(--accent-dim); border: 1px solid var(--accent); }
 .wel-tour b { display: block; font-size: 17px; font-weight: 600; }
@@ -100,9 +103,10 @@ const CSS = `
   transition: border-color .15s, transform .15s, background .15s; }
 .wel-door:hover, .wel-door:focus-visible { border-color: var(--accent); background: #1b1d17; transform: translateY(-2px); outline: none; }
 .wel-ic { width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; background: var(--accent-dim); color: var(--accent); }
+.wel-n { font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--accent); }
 .wel-t { font-size: 19px; font-weight: 600; letter-spacing: -0.015em; }
 .wel-l { color: var(--text-2); line-height: 1.4; font-size: 13px; }
 .wel-skip { margin-top: 20px; color: var(--text-2); padding: 8px 0; text-decoration: underline; text-underline-offset: 3px; }
 .wel-skip:hover { color: var(--text); }
-@media (max-width: 760px) { .wel-doors { grid-template-columns: 1fr; } .wel-door { min-height: 0; } .wel h1 { font-size: 30px; } }
+@media (max-width: 760px) { .wel-doors { grid-template-columns: 1fr; } .wel-door { min-height: 0; } .wel h1 { font-size: 30px; } .wel-what { font-size: 16px; } }
 `

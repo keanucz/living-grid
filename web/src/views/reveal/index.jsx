@@ -1,12 +1,22 @@
-import { useEffect, useRef, useState } from 'react'
+import { Fragment, useEffect, useRef, useState } from 'react'
 import { area, line, curveMonotoneX } from 'd3-shape'
 import { scaleLinear } from 'd3-scale'
 import { Icon } from '../../shell/icons.jsx'
 import sample from './sample.json'
 import { Verify } from '../../panels/verify/index.jsx'
+import Term from '../../ui/Term.jsx'
 
 const NAMES = { GB: 'Great Britain', FR: 'France', 'DE-LU': 'Germany–Lux.', NL: 'Netherlands', BE: 'Belgium', NO2: 'Southern Norway' }
 const FREEZE = '2026-11-07T23:59:00Z'
+const SYM = { GBP: '£', EUR: '€' }
+
+// Mean absolute error of the published zones, one figure per currency (GB is in pounds, the continent in euros).
+function errorsByCurrency(zones = []) {
+  const by = {}
+  for (const z of zones) if (z.published && z.mae != null) (by[z.currency] ??= []).push(z.mae)
+  return Object.entries(by).map(([c, v]) => ({ c, mae: v.reduce((a, b) => a + b, 0) / v.length, n: v.length }))
+}
+
 const W = 320
 const H = 120
 
@@ -109,19 +119,28 @@ function Reveal() {
         <div style={{ flex: 1 }}>
           <div className="rv-kicker">Day-ahead reveal</div>
           <h1>Monday’s forecast, frozen before the auction</h1>
-          <p>We froze a forecast for every zone before Sunday’s day-ahead auction. As each result is published, it lands on the frozen band.</p>
+          <p className="rv-lead">
+            We locked in Monday’s forecast before the <Term id="day-ahead">auction</Term> and published a <Term id="fingerprint">fingerprint</Term> of it on a public blockchain, so anyone can check we didn’t change it. As the real prices arrive, you can see how close we were.
+          </p>
         </div>
         {data && (
           <div className="rv-sum">
             <div><span>Frozen</span><b className="num">{frozen} UTC</b></div>
             <div><span>Zones in</span><b className="num">{data.zones_published} of {data.zones.length}</b></div>
-            <div><span>Mean error</span><b className="num">{data.mean_abs_error != null ? data.mean_abs_error.toFixed(1) : '—'}</b></div>
-            <div><span>Inside band</span><b className="num">{data.zones_published > 0 ? (data.zones_inside_band ?? 0) : '—'}</b></div>
+            <div>
+              <span>Mean error</span>
+              <b className="num">
+                {errorsByCurrency(data.zones).length
+                  ? errorsByCurrency(data.zones).map((e, i) => <Fragment key={e.c}>{i > 0 && ' · '}{SYM[e.c] ?? ''}{e.mae.toFixed(1)}<small className="rv-unit">/MWh</small></Fragment>)
+                  : '—'}
+              </b>
+            </div>
+            <div><span>Inside our likely range</span><b className="num">{data.zones_published > 0 ? `${data.zones_inside_band ?? 0} of ${data.zones_published} zones` : '—'}</b></div>
           </div>
         )}
       </header>
 
-      {preview && <div className="rv-banner">Sample data (engine contract fixture) — not today’s forecast. <button onClick={() => setPreview(false)}>Back to live</button></div>}
+      {preview && <div className="rv-banner">Sample data (engine contract fixture), not today’s forecast. <button onClick={() => setPreview(false)}>Back to live</button></div>}
 
       {!data && d?.pending && (
         <section className="rv-wait">
@@ -153,8 +172,11 @@ body { overflow: auto; }
 .rv-kicker { font-size: 12px; color: var(--accent); font-weight: 600; }
 .rv h1 { margin: 4px 0 6px; font-size: 30px; letter-spacing: -0.02em; }
 .rv-top p { margin: 0; color: var(--text-2); max-width: 680px; }
+.rv-top .rv-lead { color: var(--text); font-size: 19px; line-height: 1.45; max-width: 720px; }
+.rv-sum .rv-unit { font-size: 12px; color: var(--text-3); font-weight: 400; margin-left: 1px; }
+@media (max-width: 700px) { .rv-sum { grid-template-columns: repeat(2, auto); } .rv-top .rv-lead { font-size: 17px; } }
 .rv-sum { display: grid; grid-template-columns: repeat(4, auto); gap: 18px; background: var(--panel-solid); border: 1px solid var(--line); border-radius: 20px; padding: 14px 18px; }
-.rv-sum span { display: block; font-size: 12px; color: var(--text-3); }
+.rv-sum > div > span { display: block; font-size: 12px; color: var(--text-3); }
 .rv-sum b { font-size: 22px; font-weight: 600; }
 .rv-banner { background: var(--hot-dim); color: var(--hot); border-radius: 12px; padding: 10px 14px; margin-bottom: 14px; font-size: 13px; }
 .rv-banner button, .rv-wait button { margin-left: 8px; color: var(--text); text-decoration: underline; }
