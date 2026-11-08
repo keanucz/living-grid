@@ -5,6 +5,7 @@ import { Icon } from '../../shell/icons.jsx'
 import { api, useApi } from '../../api/client.js'
 import { fmt } from '../../styles/tokens.js'
 import Term from '../../ui/Term.jsx'
+import { seriesLabel } from './labels.js'
 import { Disclosure } from '../../ui/Explain.jsx'
 import { useStore } from '../../store/store.js'
 import Movie from '../events/Movie.jsx'
@@ -39,7 +40,6 @@ const DEFAULT_DAY = ['2026-10-26T00:00:00Z', '2026-10-26T23:00:00Z']
 const W = 900
 const H = 300
 const P = { l: 52, r: 16, t: 16, b: 30 }
-const TARGET_LABEL = { gb_system_price: 'GB system price', price_da: 'Day-ahead price' }
 const hhmm = (iso) => new Date(iso).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' })
 const day = (iso) => new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' })
 
@@ -216,10 +216,11 @@ function Replay() {
 
               {isStorm && s && (
                 <section className="rp-chart">
+                  <p className="rp-series-cap">Pick a price to chart: each country’s <Term id="day-ahead">day-ahead price</Term>, or Britain’s system price, which is set on the day itself.</p>
                   <div className="rp-tabs rp-series">
                     {replay.series.map((q) => {
                       const k = `${q.zone}|${q.target}`
-                      return <button key={k} className={k === `${s.zone}|${s.target}` ? 'on' : ''} onClick={() => setKey(k)}>{q.zone} <span>{TARGET_LABEL[q.target] ?? q.target}</span></button>
+                      return <button key={k} className={k === `${s.zone}|${s.target}` ? 'on' : ''} onClick={() => setKey(k)}>{seriesLabel(q)}</button>
                     })}
                   </div>
                   <svg viewBox={`0 0 ${W} ${H}`} width="100%" role="img" aria-label="Actual price against forecast band through the day">
@@ -313,6 +314,7 @@ body { overflow: auto; }
 .rp-controls { margin: 0; }
 .rp-slider { width: 100%; accent-color: var(--hot); margin: 0; }
 .rp-series { margin-bottom: 8px; }
+.rp-series-cap { margin: 0 0 8px; font-size: 12.5px; color: var(--text-2); }
 .rp-zones { width: 100%; border-collapse: collapse; font-size: 13px; } .rp-zones th { text-align: left; font-weight: 500; color: var(--text-3); font-size: 11px; padding: 0 0 4px; } .rp-zones td { padding: 5px 0; border-top: 1px solid var(--line); } .rp-zones td.num { text-align: left; }
 .rp-zones i { font-style: normal; font-weight: 700; margin-left: 4px; } .rp-zones i.in { color: #8fd16a; } .rp-zones i.out { color: var(--hot); }
 .rp-foot { font-size: 11px; color: var(--text-3); line-height: 1.45; margin: 0; }
@@ -321,7 +323,7 @@ body { overflow: auto; }
 .rp-stat b { font-size: 20px; }
 .rp-evs { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 10px; }
 .rp-ev { background: var(--panel-solid); border: 1px solid var(--line); border-radius: 16px; padding: 10px 12px; } .rp-ev-h { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-2); } .rp-ev-h b { color: var(--text); }
-@media (max-width: 900px) { .rp-series button { padding: 6px 10px; font-size: 12px; } .rp-series button span { display: none; } .rp-map { height: 300px; } .rp { padding: 16px 14px 90px; } .rp h1 { font-size: 22px; } .rp-time { width: 100%; margin: 0; } }
+@media (max-width: 900px) { .rp-series button { padding: 6px 10px; font-size: 12px; } .rp-map { height: 300px; } .rp { padding: 16px 14px 90px; } .rp h1 { font-size: 22px; } .rp-time { width: 100%; margin: 0; } }
 `
 
 export default { path: '/replay', title: 'Replay', Component: Replay }
