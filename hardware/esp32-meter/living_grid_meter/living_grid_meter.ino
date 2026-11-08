@@ -7,8 +7,8 @@
 //      Cost, not kWh, and a comparison with today's average, so nobody has to do maths.
 //   2. NEXT 24 HOURS: a clock ring of half-hour prices with "now" and the cheapest window marked.
 //   3. SAVE: what to run when, with the saving, for the car, the dishwasher and the heating.
-// Tap the screen or press BOOT for the next screen, PWR for the previous one (short press; holding PWR for 6 s
-// powers the board off). Two paddles on the right edge show where the buttons are and flash when pressed.
+// Tap the screen or press BOOT (upper side button) for the next screen, PWR (lower) for the previous one (short press;
+// holding PWR for 6 s powers the board off). Paddles on the right edge show where the buttons are and flash when pressed.
 // It moves on by itself after 12 s when nobody touches it.
 // Over USB serial, '1' '2' '3' pick a screen and 'S' dumps the frame (raw RGB565) for checking the design.
 
@@ -43,8 +43,9 @@ const uint32_t AUTO_NEXT_MS = 12000;   // move to the next screen after this lon
 const uint32_t IDLE_MS = 45000;        // ... once nobody has touched it for this long
 const int BOOT_BUTTON = 0;
 const int PWR_EXIO = 4;              // PWR is read through the IO expander, high = pressed (Waveshare FAQ)
-// Paddle centres on the right edge, next to the side buttons. Swap if the board is held the other way up.
-const int PADDLE_PWR_Y = 150, PADDLE_BOOT_Y = 262, PADDLE_H = 64;
+// Paddle centres on the right edge, next to the side buttons: BOOT is the upper button, PWR the lower (checked on
+// the board). BOOT is "next" because it is pressed most and, unlike PWR, cannot power the board off if held.
+const int PADDLE_BOOT_Y = 150, PADDLE_PWR_Y = 262, PADDLE_H = 64;
 const uint32_t FLASH_MS = 260;
 const int SCREENS = 3;
 // Price levels as Tibber defines them (developer.tibber.com/docs/reference, PriceLevel): cheap at or below 90% of
@@ -253,18 +254,18 @@ void drawHeader(const char *title) {
   textR(&FreeSansBold12pt7b, 1, QUIET, 344, 44, updated);
 }
 
-void drawPaddle(int idx, int cy, bool up) {
+void drawPaddle(int idx, int cy, bool next) {
   bool lit = millis() < flashUntil[idx];
   uint16_t c = lit ? BRAND : DIM;
   gfx->fillRoundRect(LCD_WIDTH - 7, cy - PADDLE_H / 2, 5, PADDLE_H, 2, c);
-  int x = LCD_WIDTH - 17;  // a chevron pointing back (up) or on (down)
-  if (up) gfx->fillTriangle(x - 5, cy + 3, x + 5, cy + 3, x, cy - 4, c);
-  else gfx->fillTriangle(x - 5, cy - 3, x + 5, cy - 3, x, cy + 4, c);
+  int x = LCD_WIDTH - 17;  // a chevron pointing on (right) or back (left)
+  if (next) gfx->fillTriangle(x - 3, cy - 6, x - 3, cy + 6, x + 4, cy, c);
+  else gfx->fillTriangle(x + 4, cy - 6, x + 4, cy + 6, x - 3, cy, c);
 }
 
 void drawFooter() {
-  if (haveExpander) drawPaddle(0, PADDLE_PWR_Y, true);
-  drawPaddle(1, PADDLE_BOOT_Y, false);
+  drawPaddle(1, PADDLE_BOOT_Y, true);
+  if (haveExpander) drawPaddle(0, PADDLE_PWR_Y, false);
   for (int i = 0; i < SCREENS; i++) {
     int x = 184 + (i - 1) * 22;
     if (i == screen) gfx->fillRoundRect(x - 9, 431, 18, 7, 3, INK); else gfx->fillCircle(x, 434, 3, DIM);
