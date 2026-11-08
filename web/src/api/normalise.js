@@ -92,7 +92,9 @@ export function normaliseState(c, zones) {
           price_kind: z.price.kind,
           change_24h_eur: null,
           demand_mw: z.load_mw ?? null,
-          net_import_mw: flows.length ? netImport[z.zone] ?? 0 : null,
+          // /state carries only Britain's interconnectors, so a net figure is complete for GB alone; other zones'
+          // cross-border flows (FR-DE, NL-BE, ...) are not in the payload, so leave theirs empty rather than partial.
+          net_import_mw: flows.length && z.zone === 'GB' ? netImport[z.zone] ?? 0 : null,
           mix: groupMix(z.mix_mw),
           metered_as_of: z.metered_as_of ?? null,
           carbon: z.carbon ?? null,

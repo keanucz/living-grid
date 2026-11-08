@@ -165,7 +165,7 @@ function zoneCard(id, ctx) {
   const p = ctx.priceOf(id)
   const shown = st.currency === 'GBP' ? p / 1.15 : p
   const mix = Object.entries(st.mix ?? {}).slice(0, 3).map(([k, v]) => `${k} ${(v * 100).toFixed(0)}%`).join(' · ')
-  const net = st.net_import_mw == null ? '' : `<br/>Net ${st.net_import_mw >= 0 ? 'import' : 'export'} ${(Math.abs(st.net_import_mw) / 1000).toFixed(1)} GW`
+  const net = st.net_import_mw == null ? '' : `<br/>Britain's cables: net ${st.net_import_mw >= 0 ? 'import' : 'export'} ${(Math.abs(st.net_import_mw) / 1000).toFixed(1)} GW`
   const fc = st.forecast?.p50 != null ? `<br/><span style="opacity:.6">Forecast P50 ${st.forecast.p50.toFixed(0)} (${st.forecast.p10.toFixed(0)}–${st.forecast.p90.toFixed(0)}), +${st.forecast.horizon_h} h</span>` : ''
   const lag = st.metered_as_of ? `<br/><span style="opacity:.6">Load and mix metered, about a day behind</span>` : ''
   const tag = ctx.scenario ? ' <span style="color:#ff8a1f">modelled</span>' : ''
