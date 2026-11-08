@@ -1,6 +1,6 @@
 # The Living Grid
 
-**A weather forecast for Europe's power grid.**
+**Your daily weather report for power.**
 
 What it costs now, what happens next, and proof we got it right.
 
