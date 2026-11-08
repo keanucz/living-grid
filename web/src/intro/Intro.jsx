@@ -12,7 +12,7 @@ import { ARRIVE_AT, CAPTIONS, CROSSFADE, EDINBURGH_VIEW, IS_PHONE, OVERVIEW, SIT
 // straight to the welcome.
 // Timeline (s): 0 to 1.8 rise · 1.8 to 2.6 pitch forward along the line · 2.6 to 3.0 cross-fade into the map ·
 // 3.0 to 3.6 north-up on Edinburgh · hold to 4.8 · zoom out 4.8 to 7.8 · camera settles · title 0.5 s in, 1.5 s hold ·
-// 0.4 s cross-fade to the welcome. About 10 s on a normal machine.
+// 0.4 s title fade-out, then the welcome (and the app UI) fade in: never both at once. About 10 s on a normal machine.
 const END = 1.2 // the plain (reduced motion) version
 const LATEST = 40 // s of intro time: a page this stalled lands on the overview and hands over regardless
 const LIME = [197, 240, 107]
@@ -31,11 +31,42 @@ function webgl() {
 }
 const reduced = () => typeof matchMedia !== 'undefined' && matchMedia('(prefers-reduced-motion: reduce)').matches
 
+// While the intro runs the app's own UI (top bar, headline, panels, legend; on the phone the top bar, layer chips,
+// sheet and tabs) is hidden, so the map is clean; it fades back in with the welcome. The rule is added to <head> once
+// so the fade-in still applies after the intro has gone.
+const HIDE_CSS = `
+:root[data-intro] .app .topbar, :root[data-intro] .app .headline, :root[data-intro] .app .slot, :root[data-intro] .app .legend,
+:root[data-intro] .m-top, :root[data-intro] .m-layers, :root[data-intro] .m-sel, :root[data-intro] .m-sheet, :root[data-intro] .m-tabs {
+  opacity: 0 !important; pointer-events: none !important; }
+@media (prefers-reduced-motion: no-preference) {
+  :root:not([data-intro]) :is(.app .topbar, .app .headline, .app .slot, .app .legend, .m-top, .m-layers, .m-sel, .m-sheet, .m-tabs) { transition: opacity .5s ease; } }
+`
+function hideApp(on) {
+  if (typeof document === 'undefined') return
+  if (!document.getElementById('lg-intro-hide')) {
+    const el = document.createElement('style')
+    el.id = 'lg-intro-hide'
+    el.textContent = HIDE_CSS
+    document.head.appendChild(el)
+  }
+  if (on) document.documentElement.dataset.intro = '1'
+  else delete document.documentElement.dataset.intro
+}
+
 function wanted(force) {
   const h = location.hash
   if (h.startsWith('#tour=')) return false
   if (matchView(h) || redirectOf(h)) return false
   return force || h === '#intro' || !seen()
+}
+
+// The app decides on the welcome when its module loads (main.jsx imports it before this one). When the intro will
+// play, take that decision now, before anything renders, and hide the app's UI, so neither shows for a frame.
+let startWelcome = null
+if (typeof window !== 'undefined' && wanted(false)) {
+  startWelcome = !!getState().welcome
+  setState({ welcome: false })
+  hideApp(true)
 }
 
 const camera = (detail) => dispatchEvent(new CustomEvent('lg-camera', { detail }))
@@ -59,7 +90,7 @@ export default function Intro() {
   const done = useRef(false)
   const flown = useRef(false)
   const sent = useRef(0) // map moves already sent: 1 = Edinburgh, 2 = the zoom-out
-  const [beat, setBeat] = useState({ zoomFrac: 0, title: 0, handoff: false }) // how far out the zoom is (0 to 1), and the title's opacity
+  const [beat, setBeat] = useState({ zoomFrac: 0, title: 0 }) // how far out the zoom is (0 to 1), and the title's opacity
   const welcome = useRef(false) // the welcome waits for the intro, then appears as it would have
   const world = useMemo(() => (mode === 'deck' ? line(IS_PHONE ? 9 : 14) : null), [mode])
 
@@ -86,6 +117,7 @@ export default function Intro() {
     if (done.current) return
     done.current = true
     markSeen()
+    hideApp(false) // the app's UI fades back in with the welcome
     setState({ intro: false, welcome: welcome.current })
     if (location.hash === '#intro') history.replaceState(null, '', `${location.pathname}${location.search}#/`)
     // Skipped, or ended before the zoom-out was sent: land on the overview rather than wherever the camera was.
@@ -96,13 +128,14 @@ export default function Intro() {
   // A layout effect, so the welcome (set on load by the app) is hidden before the first paint instead of flashing.
   useLayoutEffect(() => {
     if (!mode) return
-    welcome.current = !!getState().welcome
+    welcome.current = startWelcome ?? !!getState().welcome
+    startWelcome = null
     setState({ intro: 'pylon', welcome: false })
+    hideApp(true)
     sent.current = mode === 'deck' ? 0 : 2
     const startMap = mode === 'deck' ? setTimeout(() => camera({ ...SITE, duration: 0 }), 60) : null
     let settledAt = null // intro time when the camera stopped on the overview
-    let handedOver = false
-    let welcomeShown = false
+    let titleGone = false // a frame has been drawn with the title fully faded
     // Intro time advances with the frames, at most 0.25 s a frame, so a page that stalls while the map loads plays the
     // whole intro late rather than skipping it. The map part waits at the cross-fade until the map has loaded
     // (MapView's onLoad), since a camera set while deck is starting up is lost.
@@ -146,16 +179,14 @@ export default function Intro() {
         const since = s - settledAt
         const out = since - TITLE_IN - TITLE_HOLD
         title = clamp01(since / TITLE_IN) * (1 - clamp01(out / CROSSFADE))
-        // Hand over in two ticks: first drop the intro under the welcome's layer, then bring the welcome in (it renders
-        // at once, so in the other order the title would sit on top of it for a frame).
-        if (handedOver && !welcomeShown) {
-          welcomeShown = true
-          setState({ welcome: welcome.current }) // the welcome fades in as the title fades out
+        // One after the other, never both: the title fades out fully, a frame is drawn without it, then finish() brings
+        // the welcome (and the app's UI) in.
+        if (out >= CROSSFADE) {
+          if (titleGone) return finish(false)
+          titleGone = true
         }
-        if (out >= 0 && !handedOver) handedOver = true
-        if (out >= CROSSFADE) return finish(false)
       }
-      setBeat({ zoomFrac: sent.current === 2 ? frac : 0, title, handoff: handedOver })
+      setBeat({ zoomFrac: sent.current === 2 ? frac : 0, title })
       raf = requestAnimationFrame(tick)
     }
     raf = requestAnimationFrame(tick)
@@ -194,7 +225,7 @@ export default function Intro() {
     : []
 
   return (
-    <div className={`intro ${beat.handoff ? 'handoff' : ''}`} data-tour="intro" role="presentation" onPointerDown={() => finish(true)}>
+    <div className="intro" data-tour="intro" role="presentation" onPointerDown={() => finish(true)}>
       {/* The pylon shot and its dark ground fade out at the cross-fade; the title and Skip stay above the map after it. */}
       <div className="intro-veil" style={{ opacity: veil }}>
         {mode === 'deck' && t < 3.1 && <DeckGL views={view} viewState={{ pylon: pose(Math.min(t, 3.1)) }} controller={false} layers={layers} style={{ position: 'absolute', inset: 0 }} />}
@@ -204,7 +235,6 @@ export default function Intro() {
       <button className="intro-skip" onClick={() => finish(true)}>Skip</button>
       <style>{`
         .intro { position: fixed; inset: 0; z-index: 70; cursor: pointer; }
-        .intro.handoff { z-index: 45; } /* under the welcome (50): it fades in over the fading title */
         .intro-veil { position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 100%, #10150c 0%, #070807 70%); }
         .intro-title { position: absolute; left: 0; right: 0; top: 14%; text-align: center; padding: 0 24px; font-size: clamp(26px, 5vw, 54px);
           font-weight: 500; letter-spacing: -0.02em; color: #f2f5ea; text-shadow: 0 2px 30px rgba(0,0,0,.8); pointer-events: none; }
