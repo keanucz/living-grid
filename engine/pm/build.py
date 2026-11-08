@@ -12,6 +12,7 @@ league data when it exists; without it only Our model trades. Sends pm_day_put (
 """
 
 import argparse
+import hashlib
 import json
 import logging
 import re
@@ -29,6 +30,9 @@ log = logging.getLogger("engine.pm.build")
 OUR_MODEL = market_bots.OUR_MODEL
 BOTS = ("bot_yesterday", "bot_engineer", "lgbm_q", "bot_committee")
 ID = re.compile(r"^(?P<zone>.+)-(?P<target>price_da|gb_system_price)-(?P<hour>\d+)$")
+# A market whose opening price is this close to 0 or 100 is already decided: it is not offered (#236, #286).
+OPEN_MIN, OPEN_MAX = 3, 97
+WIND_HISTORY_DAYS = 30
 
 
 def cents(p: float) -> int:
@@ -69,42 +73,106 @@ def price_path(x: q.MarketQuestion, replay: dict, start: int) -> tuple[dict[str,
     return prices, reasons
 
 
-def wind_path(x: q.MarketQuestion, boalf: pd.DataFrame, day: pd.Timestamp, start: int) -> tuple[dict[str, int], dict[str, str]]:
-    s = boalf.set_index(pd.to_datetime(boalf["ts"], utc=True))["value"].sort_index()
-    window = x.target_hour + 1
+def _sha(text: str) -> int:
+    return int(hashlib.sha256(text.encode()).hexdigest()[:8], 16)
+
+
+def directions(day: str, ids: list[str]) -> dict[str, str]:
+    """About half of a day's price markets ask "below": in hash order, alternating, starting from a coin flip per day.
+    A one-sided bias in our median then cannot be harvested by pressing YES on everything (#236). Stable per day."""
+    order = sorted(ids, key=lambda m: _sha(f"{day}|{m}"))
+    first = _sha(day) % 2
+    return {m: ("above", "below")[(k + first) % 2] for k, m in enumerate(order)}
+
+
+def price_market(x: q.MarketQuestion, replay: dict, start: int, direction: str = "above") -> dict:
+    """One price market. "below" is the mirror of "above": the same line, the YES price 100 - p, every belief 1 - p."""
+    prices, reasons = price_path(x, replay, start)
+    beliefs = {n: float(np.clip(p, 0.03, 0.97)) for n, p in x.bot_p.items() if n in BOTS} or {OUR_MODEL: float(np.clip(x.model_p, 0.03, 0.97))}
+    yes = bool(x.outcome)
+    text = x.text
+    if direction == "below":
+        text = text.replace(" be above ", " be below ")
+        prices = {h: 100 - c for h, c in prices.items()}
+        beliefs = {n: 1 - p for n, p in beliefs.items()}
+        yes = not yes
+    return {
+        "id": x.id, "text": text, "kind": x.kind, "direction": direction, "unit": x.unit, "close_hour": x.target_hour,
+        "model_note": x.model_note, "outcome": "yes" if yes else "no",
+        "actual_text": f"{'Yes' if yes else 'No'}: it was {x.actual:.1f} {x.unit}, against the line at {x.threshold:g}.",
+        "prices": prices, "reasons": reasons, "bots": beliefs,
+    }
+
+
+def _hourly(boalf: pd.DataFrame) -> pd.Series:
+    return boalf.set_index(pd.to_datetime(boalf["ts"], utc=True))["value"].sort_index()
+
+
+def _gwh(s: pd.Series, day: pd.Timestamp, hour: int) -> float:
+    """GWh switched off from midnight up to the start of `hour`."""
+    return float(s[day : day + pd.Timedelta(hours=hour) - pd.Timedelta(seconds=1)].sum() / 1000)
+
+
+def wind_market(day: pd.Timestamp, boalf: pd.DataFrame, start: int, end: int, history_days: int = WIND_HISTORY_DAYS) -> dict | None:
+    """Will Britain pay wind farms to switch off more than Y GWh between midnight and `end`?
+
+    Wind switched off only adds up, so the line is set above what is already off at the opening hour: the GWh so far
+    plus the median of what followed on past days. The price at every hour is history conditioned on the clock: the
+    share of past days on which at least the missing amount followed from that hour to `end`; once the line is passed
+    the market is settled and the price is 99. The note states that same basis, so the opening price is what it says."""
+    if boalf is None or boalf.empty:
+        return None
+    s = _hourly(boalf)
+    past = [day - pd.Timedelta(days=i) for i in range(1, history_days + 1)]
+    past = [d for d in past if len(s[d : d + pd.Timedelta(hours=end - 1)]) >= end]
+    if len(past) < 10 or len(s[day : day + pd.Timedelta(hours=end - 1)]) < end:
+        return None
+    totals = np.array([_gwh(s, d, end) for d in past])
+    later = lambda h: totals - np.array([_gwh(s, d, h) for d in past])  # noqa: E731 - what followed from hour h to end
+    now = _gwh(s, day, start)
+    y = q.nice(now + float(np.median(later(start))), 5.0)
+    while y <= now:
+        y += 5.0
+    actual = _gwh(s, day, end)
     prices, reasons = {}, {}
-    for h in range(start, x.target_hour):
-        so_far = s[day : day + pd.Timedelta(hours=h) - pd.Timedelta(seconds=1)].sum() / 1000
-        w = h / window
-        proj = so_far / h * window if h else 0.0
-        p_proj = 1 / (1 + np.exp(-(proj - x.threshold) / max(1.0, 0.25 * x.threshold)))
-        p = (1 - w) * x.model_p + w * p_proj
-        prices[str(h)] = cents(p)
-        reasons[str(h)] = (f"Opening price from history: {x.model_note}" if h == start else
-                           f"{so_far:.1f} GWh switched off so far; at this pace the day ends near {proj:.0f} GWh against the {x.threshold:.0f} GWh line.")
-    return prices, reasons
+    note = ""
+    for h in range(start, end - 1):
+        so_far = _gwh(s, day, h)
+        need = y - so_far
+        if need < 0:
+            prices[str(h)] = 99
+            reasons[str(h)] = f"{so_far:.1f} GWh switched off so far, past the {y:.0f} GWh line: this one is settled."
+            continue
+        rest = later(h)
+        k = int((rest > need).sum())
+        prices[str(h)] = cents(k / len(rest))
+        line = (f"{so_far:.1f} GWh already switched off by {h:02d}:00, and on {k} of the previous {len(rest)} days "
+                f"at least {need:.1f} GWh more followed by {end:02d}:00")
+        if h == start:
+            note = f"History only, not a forecast: {line}"
+            reasons[str(h)] = f"Opening price: {note}"
+        else:
+            reasons[str(h)] = f"{line[0].upper()}{line[1:]}."
+    return {
+        "id": f"GB-wind-off-{end:02d}", "kind": "ghost_wind", "direction": "above", "unit": "GWh", "close_hour": end - 1,
+        "text": f"Will Britain pay wind farms to switch off more than {y:.0f} GWh between midnight and {end:02d}:00?",
+        "model_note": note, "outcome": "yes" if actual > y else "no",
+        "actual_text": f"{'Yes' if actual > y else 'No'}: it was {actual:.1f} GWh, against the line at {y:g}.",
+        "prices": prices, "reasons": reasons, "bots": {OUR_MODEL: float(np.clip(prices[str(start)] / 100, 0.03, 0.97))},
+    }
 
 
 def markets(replay: dict, boalf: pd.DataFrame | None = None, league: dict | None = None, start: int = 12, end: int = 18) -> list[dict]:
     day = pd.Timestamp(replay["event"], tz="UTC")
-    out = []
-    for x in q.build(replay, boalf, end_hour=end, start_hour=start, league=league):
-        if not (start < x.target_hour <= end):
-            continue
-        if ID.match(x.id):
-            prices, reasons = price_path(x, replay, start)
-        elif x.kind == "ghost_wind" and boalf is not None:
-            prices, reasons = wind_path(x, boalf, day, start)
-        else:
-            continue
-        beliefs = {n: float(np.clip(p, 0.03, 0.97)) for n, p in x.bot_p.items() if n in BOTS} or {OUR_MODEL: float(np.clip(x.model_p, 0.03, 0.97))}
-        out.append({
-            "id": x.id, "text": x.text, "kind": x.kind, "unit": x.unit, "close_hour": x.target_hour, "model_note": x.model_note,
-            "outcome": "yes" if x.outcome else "no",
-            "actual_text": f"{'Yes' if x.outcome else 'No'}: it was {x.actual:.1f} {x.unit}, against the line at {x.threshold:g}.",
-            "prices": prices, "reasons": reasons, "bots": beliefs,
-        })
-    return out
+    qs = [x for x in q.build(replay, None, end_hour=end, start_hour=start, league=league) if start < x.target_hour <= end and ID.match(x.id)]
+    dirs = directions(replay["event"], [x.id for x in qs])
+    out = [price_market(x, replay, start, dirs[x.id]) for x in qs]
+    w = wind_market(day, boalf, start, end) if boalf is not None else None
+    if w and start < w["close_hour"] <= end:
+        out.append(w)
+    # Nothing that is already decided at the open: a 3 or a 97 there is a free trade, not a question.
+    out = [m for m in out if OPEN_MIN < m["prices"][str(start)] < OPEN_MAX]
+    return sorted(out, key=lambda m: (m["close_hour"], m["id"]))
 
 
 def validate(ms: list[dict], start: int, end: int) -> None:

@@ -144,3 +144,38 @@ def test_weather_source_markets_are_added_when_provided():
     d, b = make()
     ms = lib.build(DAY, replay_doc(), d, b, weather=W())
     assert any(m.id == "SCO-gust-50" for m in ms)
+
+
+# ---------- #286: the note says what the opening price is based on; a cumulative line is not already crossed ----------
+
+
+def ghost_market(boalf):
+    return lib.history_market("GB-ghost-18", "Will Britain pay generators to turn down more than {x} GWh by 18:00?", "ghost_wind", "GB", "GWh",
+                              lib.cumulative(boalf, 17), D0, 12, 18, 1.0, "test", scale=1e-3, cumulative=True)
+
+
+def test_history_note_states_the_opening_price_and_its_conditioned_basis():
+    _, b = make()
+    m = ghost_market(b)
+    assert m is not None
+    assert f"{round(100 * m.open_p)}%" in m.model_note and "weighted by how close they were to today at 11:00" in m.model_note
+    assert "of the previous" not in m.model_note, "the unconditioned count is not what the price is based on"
+
+
+def test_a_cumulative_line_is_set_above_what_is_already_in_at_the_open():
+    _, b = make()
+    b = b.copy()
+    b[(b.index >= D0) & (b.index < D0 + pd.Timedelta(hours=12))] = 6000.0  # 72 GWh by 12:00, far above a normal day's total
+    m = ghost_market(b)
+    so_far = b[D0: D0 + pd.Timedelta(hours=11)].sum() / 1000
+    assert m.threshold > so_far, (m.threshold, so_far)
+    assert m.model_note.startswith(f"History only, not a forecast: {so_far:g} GWh by 11:00")
+
+
+def test_a_cumulative_market_is_settled_once_the_line_is_passed():
+    _, b = make()
+    b = b.copy()
+    b[(b.index >= D0 + pd.Timedelta(hours=12))] = 20000.0  # a huge afternoon: the line goes within the hour
+    m = ghost_market(b)
+    passed = [r for r in m.history if (b[D0: D0 + pd.Timedelta(hours=r["hour"] - 1)].sum() / 1000) > m.threshold]
+    assert passed and all(r["p"] == lib.clip(1.0) for r in passed)

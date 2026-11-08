@@ -144,7 +144,10 @@ def weighted_median(v: np.ndarray, w: np.ndarray) -> float:
 
 
 def history_market(mid: str, text: str, kind: str, zone: str, unit: str, read: Reading, day: pd.Timestamp, start: int, target_hour: int,
-                   step: float, source: str, above: bool = True, scale: float = 1.0, note: str = "") -> Market | None:
+                   step: float, source: str, above: bool = True, scale: float = 1.0, note: str = "", cumulative: bool = False) -> Market | None:
+    """A history-only market. The line is the weighted median of past days given today's reading at the opening hour;
+    for a cumulative amount (wind switched off so far) it is set above what is already in, so the market is not
+    settled at the open (#286). The note states the opening price and its conditioned basis."""
     try:
         ys, fs, today = analog_rows(read, day, start)
     except ValueError:
@@ -155,15 +158,27 @@ def history_market(mid: str, text: str, kind: str, zone: str, unit: str, read: R
     x = nice(weighted_median(vals, analog_weights(fs, today)), step)  # the median given what is known at the opening hour
     if kind != "weather" and x == 0 and above:
         x = step
-    m = Market(mid, text.format(x=f"{x:g}"), kind, zone, unit, x, "above" if above else "below", target_hour,
-               "history only", source, note or f"History only, not a forecast: {int((vals > x).sum())} of the previous {len(vals)} days went above {x:g} {unit}")
+    now = None if today is None else today * scale
+    if cumulative and above and now is not None:
+        while x <= now:
+            x += step
+    m = Market(mid, text.format(x=f"{x:g}"), kind, zone, unit, x, "above" if above else "below", target_hour, "history only", source, note)
     scaled = Reading(lambda d: None if read.settle(d) is None else read.settle(d) * scale, lambda d, h: None if read.so_far(d, h) is None else read.so_far(d, h) * scale)
     for h in range(start, target_hour + 1):
         try:
             p, n = analog_probability(scaled, day, h, x, above)
         except ValueError:
             return None
-        m.history.append({"hour": h, "p": clip(p), "basis": f"{n} past days, weighted by how close they were at {h - 1:02d}:00" if h > start else f"base rate over {n} past days"})
+        if cumulative and above:
+            got = scaled.so_far(day, h)
+            if got is not None and got > x:
+                p = 1.0  # past the line already: settled
+        m.history.append({"hour": h, "p": clip(p), "basis": f"{n} past days, weighted by how close they were at {h - 1:02d}:00"})
+    if not note:
+        n0 = len(vals)
+        so_far = f"{now:g} {unit} by {start - 1:02d}:00; " if cumulative and now is not None else ""
+        m.model_note = (f"History only, not a forecast: {so_far}{n0} past days, weighted by how close they were to today at "
+                  f"{start - 1:02d}:00, put the chance of going {'above' if above else 'below'} {x:g} {unit} at {round(100 * m.history[0]['p'])}%")
     return m
 
 
@@ -269,7 +284,7 @@ def build(day: date, replay: dict, data: Hourly, boalf: pd.Series | None, start:
                            "Elexon interconnector flows, imports positive", scale=1e-3))
     if boalf is not None and len(boalf):
         add(history_market("GB-ghost-18", "Will Britain pay generators to turn down more than {x} GWh by 18:00?", "ghost_wind", "GB", "GWh", cumulative(boalf, end - 1), d0, start, end, 1.0,
-                           "Elexon BOALF accepted bids, summed", scale=1e-3))
+                           "Elexon BOALF accepted bids, summed", scale=1e-3, cumulative=True))
     if weather is not None:
         out.extend(weather.markets(d0, start, end))
     mk = [m for m in out if OPEN_RANGE[0] <= m.open_p <= OPEN_RANGE[1]]
