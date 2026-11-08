@@ -16,15 +16,18 @@ export const OVERVIEW = PHONE
   : { longitude: 6.5, latitude: 54.4, zoom: 4.05, pitch: 0, bearing: 0 }
 export const IS_PHONE = PHONE
 
-// After the cross-fade (#308): north-up on Edinburgh, hold, then zoom out to Scotland, the UK and the six countries.
-// [at seconds, camera, fly duration ms]; the phone sits a little further out at each stage.
+// After the cross-fade (#308, #317): north-up on Edinburgh, hold, then one smooth eased zoom-out to the six countries,
+// with captions fading in as the zoom passes Scotland and then the UK.
 export const EDINBURGH = { longitude: -3.19, latitude: 55.95 }
-export const MAP_STAGES = [
-  [3.0, { ...EDINBURGH, zoom: 7.5, pitch: 0, bearing: 0 }, 600],
-  [4.6, { longitude: -4.2, latitude: 57.0, zoom: PHONE ? 5.0 : 5.8, pitch: 0, bearing: 0 }, 700],
-  [5.3, { longitude: -2.6, latitude: 54.6, zoom: PHONE ? 4.1 : 4.9, pitch: 0, bearing: 0 }, 700],
-  [6.0, OVERVIEW, 800],
-]
+export const EDINBURGH_VIEW = { ...EDINBURGH, zoom: 7.5, pitch: 0, bearing: 0 }
+export const ARRIVE_AT = 3.0 // s: turn north-up on Edinburgh (0.6 s move)
+export const ZOOM_OUT_AT = 4.8 // s: after about 1.2 s on the dot
+export const ZOOM_OUT_MS = 3000
+// Each caption peaks at this share of the way out (by zoom) from Edinburgh to the overview.
+export const CAPTIONS = [['Scotland', 0.4], ['United Kingdom', 0.75]]
+export const TITLE_IN = 0.5 // s, once the camera has stopped
+export const TITLE_HOLD = 1.5
+export const CROSSFADE = 0.4 // title out while the welcome comes in
 
 const KEY = 'lg-intro-seen'
 export function seen() {

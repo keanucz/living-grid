@@ -1,16 +1,20 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { DeckGL, FirstPersonView, LineLayer, ScatterplotLayer, COORDINATE_SYSTEM } from 'deck.gl'
 import { getState, setState } from '../store/store.js'
 import { matchView, redirectOf } from '../views/index.js'
 import { line, pointOn } from './pylon.js'
-import { IS_PHONE, MAP_STAGES, OVERVIEW, SITE, markSeen, seen } from './route.js'
+import { ARRIVE_AT, CAPTIONS, CROSSFADE, EDINBURGH_VIEW, IS_PHONE, OVERVIEW, SITE, TITLE_HOLD, TITLE_IN, ZOOM_OUT_AT, ZOOM_OUT_MS, markSeen, seen } from './route.js'
 
 // First visit only: look up at a pylon, rise to the cross-arms, follow the conductors, then match-cut into the map at the
-// same place. Then (#308) the map turns north-up on a dot labelled Edinburgh, holds, and zooms out to Scotland, the UK
-// and the six countries, with the title fading in at the end. About 7 s; any click or key skips.
+// same place. Then (#308, #317) the map turns north-up on a dot labelled Edinburgh, holds, and makes one smooth eased
+// zoom-out to the six countries, with "Scotland" and "United Kingdom" fading in as the zoom passes them. Only once the
+// camera has stopped does the title come in; it holds, then fades out while the welcome fades in. Any click or key skips
+// straight to the welcome.
 // Timeline (s): 0 to 1.8 rise · 1.8 to 2.6 pitch forward along the line · 2.6 to 3.0 cross-fade into the map ·
-// 3.0 to 3.6 north-up on Edinburgh · hold to 4.6 · Scotland, the UK, the six countries to 6.8 · title 6.2 to the end.
-const END = 7.3
+// 3.0 to 3.6 north-up on Edinburgh · hold to 4.8 · zoom out 4.8 to 7.8 · camera settles · title 0.5 s in, 1.5 s hold ·
+// 0.4 s cross-fade to the welcome. About 10 s on a normal machine.
+const END = 1.2 // the plain (reduced motion) version
+const LATEST = 40 // s of intro time: a page this stalled lands on the overview and hands over regardless
 const LIME = [197, 240, 107]
 const ease = (x) => (x < 0.5 ? 4 * x ** 3 : 1 - (-2 * x + 2) ** 3 / 2)
 const lerp = (a, b, u) => a + (b - a) * u
@@ -54,7 +58,8 @@ export default function Intro() {
   const [t, setT] = useState(0)
   const done = useRef(false)
   const flown = useRef(false)
-  const sent = useRef(0) // map stages already sent
+  const sent = useRef(0) // map moves already sent: 1 = Edinburgh, 2 = the zoom-out
+  const [beat, setBeat] = useState({ zoomFrac: 0, title: 0, handoff: false }) // how far out the zoom is (0 to 1), and the title's opacity
   const welcome = useRef(false) // the welcome waits for the intro, then appears as it would have
   const world = useMemo(() => (mode === 'deck' ? line(IS_PHONE ? 9 : 14) : null), [mode])
 
@@ -83,18 +88,21 @@ export default function Intro() {
     markSeen()
     setState({ intro: false, welcome: welcome.current })
     if (location.hash === '#intro') history.replaceState(null, '', `${location.pathname}${location.search}#/`)
-    // Skipped, or ended before the last stage was sent: land on the overview rather than wherever the camera was.
-    if (skipped || sent.current < MAP_STAGES.length) camera({ ...OVERVIEW, duration: skipped ? 700 : 1200 })
+    // Skipped, or ended before the zoom-out was sent: land on the overview rather than wherever the camera was.
+    if (skipped || sent.current < 2) camera({ ...OVERVIEW, duration: skipped ? 700 : 1200 })
     setMode(null)
   }
 
-  useEffect(() => {
+  // A layout effect, so the welcome (set on load by the app) is hidden before the first paint instead of flashing.
+  useLayoutEffect(() => {
     if (!mode) return
     welcome.current = !!getState().welcome
     setState({ intro: 'pylon', welcome: false })
-    sent.current = mode === 'deck' ? 0 : MAP_STAGES.length
+    sent.current = mode === 'deck' ? 0 : 2
     const startMap = mode === 'deck' ? setTimeout(() => camera({ ...SITE, duration: 0 }), 60) : null
-    const length = mode === 'plain' ? 1.2 : END
+    let settledAt = null // intro time when the camera stopped on the overview
+    let handedOver = false
+    let welcomeShown = false
     // Intro time advances with the frames, at most 0.25 s a frame, so a page that stalls while the map loads plays the
     // whole intro late rather than skipping it. The map part waits at the cross-fade until the map has loaded
     // (MapView's onLoad), since a camera set while deck is starting up is lost.
@@ -111,11 +119,43 @@ export default function Intro() {
         flown.current = true
         setState({ intro: 'map' })
       }
-      while (mode === 'deck' && sent.current < MAP_STAGES.length && MAP_STAGES[sent.current][0] <= s) {
-        const [, cam, duration] = MAP_STAGES[sent.current++]
-        camera({ ...cam, duration })
+      if (mode === 'plain') {
+        if (s >= END) return finish(false)
+        raf = requestAnimationFrame(tick)
+        return
       }
-      if (s >= length) return finish(false)
+      if (sent.current === 0 && s >= ARRIVE_AT) {
+        sent.current = 1
+        camera({ ...EDINBURGH_VIEW, duration: 600 })
+      }
+      if (sent.current === 1 && s >= ZOOM_OUT_AT) {
+        sent.current = 2
+        camera({ ...OVERVIEW, duration: ZOOM_OUT_MS, interp: 'linear' })
+      }
+      const v = window.lgViewState
+      const frac = v ? clamp01((EDINBURGH_VIEW.zoom - v.zoom) / (EDINBURGH_VIEW.zoom - OVERVIEW.zoom)) : 0
+      if (sent.current === 2 && settledAt === null) {
+        const there = v && Math.abs(v.zoom - OVERVIEW.zoom) < 0.02 && Math.abs(v.longitude - OVERVIEW.longitude) < 0.05 && Math.abs(v.latitude - OVERVIEW.latitude) < 0.05
+        if (there || s > LATEST) {
+          settledAt = s
+          setState({ intro: 'title' }) // the Edinburgh dot goes, so the title stands alone
+        }
+      }
+      let title = 0
+      if (settledAt !== null) {
+        const since = s - settledAt
+        const out = since - TITLE_IN - TITLE_HOLD
+        title = clamp01(since / TITLE_IN) * (1 - clamp01(out / CROSSFADE))
+        // Hand over in two ticks: first drop the intro under the welcome's layer, then bring the welcome in (it renders
+        // at once, so in the other order the title would sit on top of it for a frame).
+        if (handedOver && !welcomeShown) {
+          welcomeShown = true
+          setState({ welcome: welcome.current }) // the welcome fades in as the title fades out
+        }
+        if (out >= 0 && !handedOver) handedOver = true
+        if (out >= CROSSFADE) return finish(false)
+      }
+      setBeat({ zoomFrac: sent.current === 2 ? frac : 0, title, handoff: handedOver })
       raf = requestAnimationFrame(tick)
     }
     raf = requestAnimationFrame(tick)
@@ -131,7 +171,9 @@ export default function Intro() {
 
   if (!mode) return null
   const veil = mode === 'plain' ? 1 - clamp01((t - 0.7) / 0.5) : 1 - clamp01((t - 2.6) / 0.4)
-  const title = mode === 'plain' ? clamp01(t / 0.3) * (1 - clamp01((t - 0.9) / 0.3)) : clamp01((t - 6.2) / 0.5) * (1 - clamp01((t - (END - 0.3)) / 0.3))
+  const title = mode === 'plain' ? clamp01(t / 0.3) * (1 - clamp01((t - 0.9) / 0.3)) : beat.title
+  // Each caption rises and falls around its share of the way out; gone by the time the camera stops.
+  const captions = CAPTIONS.map(([text, peak]) => [text, beat.title > 0 ? 0 : clamp01(1 - Math.abs(beat.zoomFrac - peak) / 0.22) * 1.4])
 
   const layers = world
     ? [
@@ -152,18 +194,22 @@ export default function Intro() {
     : []
 
   return (
-    <div className="intro" data-tour="intro" role="presentation" onPointerDown={() => finish(true)}>
+    <div className={`intro ${beat.handoff ? 'handoff' : ''}`} data-tour="intro" role="presentation" onPointerDown={() => finish(true)}>
       {/* The pylon shot and its dark ground fade out at the cross-fade; the title and Skip stay above the map after it. */}
       <div className="intro-veil" style={{ opacity: veil }}>
         {mode === 'deck' && t < 3.1 && <DeckGL views={view} viewState={{ pylon: pose(Math.min(t, 3.1)) }} controller={false} layers={layers} style={{ position: 'absolute', inset: 0 }} />}
       </div>
+      {captions.map(([text, o]) => <div key={text} className="intro-caption" style={{ opacity: Math.min(1, o) }}>{text}</div>)}
       <div className="intro-title" style={{ opacity: title }}>This is the living grid of Europe</div>
       <button className="intro-skip" onClick={() => finish(true)}>Skip</button>
       <style>{`
         .intro { position: fixed; inset: 0; z-index: 70; cursor: pointer; }
+        .intro.handoff { z-index: 45; } /* under the welcome (50): it fades in over the fading title */
         .intro-veil { position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 100%, #10150c 0%, #070807 70%); }
         .intro-title { position: absolute; left: 0; right: 0; top: 14%; text-align: center; padding: 0 24px; font-size: clamp(26px, 5vw, 54px);
           font-weight: 500; letter-spacing: -0.02em; color: #f2f5ea; text-shadow: 0 2px 30px rgba(0,0,0,.8); pointer-events: none; }
+        .intro-caption { position: absolute; left: 0; right: 0; top: 18%; text-align: center; font-size: clamp(20px, 3.2vw, 32px); font-weight: 500;
+          letter-spacing: -0.01em; color: #f2f5ea; text-shadow: 0 2px 24px rgba(0,0,0,.85); pointer-events: none; }
         .intro-skip { position: absolute; right: 18px; bottom: 18px; font-size: 13px; color: var(--text); padding: 8px 14px; border-radius: 10px; border: 1px solid var(--line-2); background: var(--panel-solid); }
       `}</style>
     </div>

@@ -3,7 +3,7 @@ import { EDINBURGH, ROUTE } from '../../intro/route.js'
 
 // The intro on the real map, hidden from the Layers menu (no chip). During the pylon shot (ui.intro === 'pylon') the
 // conductors continue on the map as the line's route with current pulses along it, for the match cut. After it
-// (ui.intro === 'map', #308) a clear dot on Edinburgh, labelled, while the map zooms out.
+// (ui.intro === 'map', #308) a clear dot on Edinburgh, labelled, while the map zooms out; gone once the title shows.
 const LIME = [197, 240, 107]
 const along = (t) => {
   const n = ROUTE.length - 1
@@ -36,7 +36,7 @@ export default {
         label('intro-here-you', 'You are here', 13, -20, [...LIME, 255]),
       ]
     }
-    if (!ui.intro) return []
+    if (ui.intro !== 'pylon') return [] // 'title' (#317): nothing on the map under the title
     const path = [{ path: ROUTE.map(([x, y]) => [x, y, 4000]) }]
     const pulses = Array.from({ length: 9 }, (_, k) => ({ p: along(((time * 0.22 + k / 9) % 1)) }))
     return [

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { DeckGL, GeoJsonLayer, PathLayer, FlyToInterpolator, LightingEffect, AmbientLight, PointLight, DirectionalLight } from 'deck.gl'
+import { DeckGL, GeoJsonLayer, PathLayer, FlyToInterpolator, LinearInterpolator, LightingEffect, AmbientLight, PointLight, DirectionalLight } from 'deck.gl'
 import { LAYERS } from '../layers/registry.js'
 import { actions, useStore } from '../store/store.js'
 import { COLORS, fmt } from '../styles/tokens.js'
@@ -44,6 +44,8 @@ function clampView(v) {
     latitude: clamp(v.latitude, ...LIMITS.lat),
   }
 }
+
+const EASE_IN_OUT = (x) => (x < 0.5 ? 4 * x ** 3 : 1 - (-2 * x + 2) ** 3 / 2)
 
 // ?still freezes animation (screenshots, slow software GL).
 const STILL = new URLSearchParams(location.search).has('still')
@@ -119,11 +121,14 @@ export default function MapView({ ctx }) {
         return
       }
       const d = e.detail ?? {}
-      const { duration = 2200, from, to: target, ...plain } = d
+      const { duration = 2200, from, to: target, interp: _interp, ...plain } = d
       const to = resolve(target ?? plain)
       if (!to) return
-      const fly = () =>
-        setViewState((v) => clampView({ ...v, ...to, transitionDuration: duration, transitionInterpolator: new FlyToInterpolator({ speed: 1.2 }) }))
+      // interp 'linear': one steady eased zoom (the intro's zoom-out); a fly-to arcs out and back in on long moves.
+      const interp = d.interp === 'linear'
+        ? { transitionInterpolator: new LinearInterpolator(['longitude', 'latitude', 'zoom', 'pitch', 'bearing']), transitionEasing: EASE_IN_OUT }
+        : { transitionInterpolator: new FlyToInterpolator({ speed: 1.2 }) }
+      const fly = () => setViewState((v) => clampView({ ...v, ...to, transitionDuration: duration, ...interp }))
       const start = resolve(from)
       if (start) {
         setViewState((v) => clampView({ ...v, ...start, transitionDuration: 0 }))
