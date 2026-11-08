@@ -1,17 +1,15 @@
 import { BitmapLayer } from 'deck.gl'
 import { STEP, getField } from '../wind/grid.js'
 
-// Sunshine as a pale yellow-white glow: the modelled shortwave radiation (W/m2) on the 0.5 degree grid, smoothed and drawn as one
+// Sunshine as a translucent sky-blue tint over the price colours (stronger sun, deeper blue; transparent where dark): the modelled shortwave radiation (W/m2) on the 0.5 degree grid, smoothed and drawn as one
 // image under the other layers, clipped to our six zones so the grid's rectangle and the sea never show.
 // Follows the scrubber hour; at night there is nothing to show. Modelled, not measured.
-// Light adds to the map instead of covering it, so the sun reads as a glow whatever the price fill underneath.
-const ADD = { depthTest: false, blend: true, blendColorOperation: 'add', blendColorSrcFactor: 'src-alpha', blendColorDstFactor: 'one', blendAlphaOperation: 'add', blendAlphaSrcFactor: 'one', blendAlphaDstFactor: 'one' }
 const W = 300 // pixels across; rows follow the map's projection so the image lines up
 export const SUN_STOPS = [
-  [0, [255, 240, 190]],
-  [300, [255, 246, 215]],
-  [600, [255, 250, 235]],
-  [900, [255, 255, 250]],
+  [0, [170, 215, 255]],
+  [300, [110, 190, 255]],
+  [600, [50, 165, 255]],
+  [900, [0, 140, 255]],
 ]
 export function sunColor(w) {
   const t = Math.max(0, Math.min(900, w))
@@ -109,7 +107,7 @@ function render(f, zones) {
         img.data[o] = R
         img.data[o + 1] = G
         img.data[o + 2] = B
-        img.data[o + 3] = Math.round(255 * Math.min(0.5, (w / 900) ** 0.7 * 0.6) * Math.min(1, cover * 1.6))
+        img.data[o + 3] = Math.round(255 * Math.min(0.45, (w / 900) ** 0.7 * 0.55) * Math.min(1, cover * 1.6))
         any = true
       }
     }
@@ -122,7 +120,7 @@ function render(f, zones) {
 export default {
   id: 'solar',
   label: 'Sun',
-  swatch: '#fff6d6',
+  swatch: '#4aa8ff',
   order: 45,
   modes: ['overview'],
   defaultOn: false,
@@ -133,6 +131,6 @@ export default {
     if (!images.has(f) || images.get(f).zones !== zones) images.set(f, render(f, zones))
     const im = images.get(f)
     if (!im.any) return []
-    return [new BitmapLayer({ id: 'solar-shade', image: im.canvas, bounds: im.bounds, opacity: 1, parameters: ADD, pickable: false })]
+    return [new BitmapLayer({ id: 'solar-shade', image: im.canvas, bounds: im.bounds, opacity: 1, parameters: { depthTest: false }, pickable: false })]
   },
 }

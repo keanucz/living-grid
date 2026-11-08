@@ -62,13 +62,6 @@ const BAR = { ambient: 0.42, diffuse: 0.78, shininess: 40, specularColor: [90, 9
 // Kept for the map callout, which anchors to the top of the focus zone.
 export const towerHeight = slabHeight
 
-// Desaturate towards the colour's own brightness, keeping a trace of the price scale.
-const mute = ([r, g, b, a]) => {
-  const l = 0.3 * r + 0.59 * g + 0.11 * b
-  const k = 0.05
-  return [r, g, b].map((v) => Math.round((l + (v - l) * k) * 0.7)).concat(a)
-}
-
 export default {
   id: 'price',
   label: 'Price',
@@ -83,8 +76,6 @@ export default {
     // bigger rise"); heights still show the new price.
     const change = sim && scenario ? (zone) => (scenario.price_delta_eur?.[zone] ?? 0) * (scenario.scale ?? 1) : null
     const changeMax = change ? Math.max(10, ...Object.keys(scenario.price_delta_eur ?? {}).map((z) => Math.abs(change(z)))) : 0
-    // While the Sun layer is on, the price fill goes grey (labels keep the numbers) so the sunshine is not lost in orange.
-    const muted = !sim && ui.layers?.solar === true
     const zoneFeatures = data.geo.features.filter((f) => f.properties.zone)
     if (sim) setRange((data.state?.zones ?? []).map((z) => z.price_eur))
     return [
@@ -101,9 +92,7 @@ export default {
           if (change) return changeColor(change(f.properties.zone), changeMax)
           const p = priceOf(f.properties.zone)
           const on = f.properties.zone === ui.selectedZone
-          if (p == null) return COLORS.land
-          const c = priceColor(p, sim ? 255 : on ? 240 : 218)
-          return muted ? mute(c) : c
+          return p == null ? COLORS.land : priceColor(p, sim ? 255 : on ? 240 : 218)
         },
         getLineColor: (f) => (f.properties.zone === ui.selectedZone ? [...COLORS.accent, 220] : [255, 255, 255, 46]),
         getLineWidth: (f) => (f.properties.zone === ui.selectedZone ? 2 : 1),
@@ -112,7 +101,7 @@ export default {
         // No autoHighlight: on some GPUs the hover-highlight pass hid this whole layer except while dragging.
         // No attribute transitions here: on some GPUs an extruded polygon layer with transitions does not draw at all.
         updateTriggers: {
-          getFillColor: [ui.selectedZone, ui.scenario?.ranAt, sim, ui.liveResult, !!change, muted],
+          getFillColor: [ui.selectedZone, ui.scenario?.ranAt, sim, ui.liveResult, !!change],
           getElevation: [sim, ui.scenario?.ranAt, data.state],
           getLineColor: [ui.selectedZone],
           getLineWidth: [ui.selectedZone],
