@@ -109,7 +109,7 @@ export const Built: React.FC = () => {
         seconds: 11, kicker: 'What we built', sources: [p10, p50, p90], render: () => (
           <>
             <Title size={84}>Then forecast, and say how sure we are.</Title>
-            <LineChart width={1300} height={380} series={gbpSeries()} unit="GB price on 26 October: actual, our forecast (dashed) and its P10 to P90 band, made with data from before the day" draw={90} />
+            <LineChart width={1300} height={380} series={gbpSeries()} unit="GB price on 26 October: actual, our forecast (dashed) and its likely range (P10 to P90), made with data from before the day" draw={90} />
             <Caption>{`Next hour in Great Britain: ${fmt.gbp(p50.v)}, probably between ${fmt.gbp(p10.v)} and ${fmt.gbp(p90.v)}.`}</Caption>
           </>
         ),
@@ -183,8 +183,8 @@ export const Proof: React.FC = () => {
         seconds: 9, kicker: 'Proof', sources: [m, pr, imp, hrs], render: () => (
           <>
             <Title size={80}>Scored against simple guesses.</Title>
-            <Bars format={(v) => fmt.n(v, 1)} items={[{ label: 'Our model, error', fig: m, strong: true }, { label: 'Persistence, error', fig: pr }]} />
-            <Caption>{`${fmt.pct(imp.v)} smaller average error than repeating the last value, over ${fmt.n(hrs.v)} hours of testing. A significance test agrees: it is not luck. Against a strong day-ahead rival it is a tie, and we say so.`}</Caption>
+            <Bars format={(v) => fmt.n(v, 1)} items={[{ label: 'Our model, error (per MWh)', fig: m, strong: true }, { label: 'Assume it stays put, error', fig: pr }]} />
+            <Caption>{`${fmt.pct(imp.v)} smaller average error than assuming the price stays where it was, over ${fmt.n(hrs.v)} hours of testing. A significance test agrees: it is not luck. Against a strong day-ahead rival it is a tie, and we say so.`}</Caption>
           </>
         ),
       },
@@ -193,7 +193,7 @@ export const Proof: React.FC = () => {
           <>
             <Title size={80}>Honest about the range.</Title>
             <Row gap={110}>
-              <Big fig={cov} format={(v) => fmt.pct(v)} label={`Outcomes inside our band (aim: ${X.coverageTarget}%)`} delay={6} size={130} />
+              <Big fig={cov} format={(v) => fmt.pct(v)} label={`Outcomes inside our likely range (aim: ${X.coverageTarget}%, 8 times out of 10)`} delay={6} size={130} />
               <Big fig={n} format={(v) => fmt.n(v)} label="Forecasts scored live, each logged first" delay={18} size={110} />
               <Big fig={share} format={(v) => fmt.pct(v)} label="Battery profit vs perfect foresight" delay={30} size={110} />
             </Row>
@@ -212,7 +212,7 @@ export const Proof: React.FC = () => {
                 <div>{c ? `Latest hash: ${c.sha.slice(0, 12)}…` : ''}</div>
               </div>
             </div>
-            <Caption>Each frozen forecast is fingerprinted on a public chain, then compared with the real auction result.</Caption>
+            <Caption>Each frozen forecast is fingerprinted on a public chain, so anyone can check we did not change it, then compared with the real auction result.</Caption>
           </>
         ),
       },
@@ -229,7 +229,7 @@ export const Play: React.FC = () => {
         <>
           <Title size={120}>Can you beat our model?</Title>
           <Line delay={16} size={44}>Call the grid on a real day with its date hidden. Buy and sell Yes or No on questions such as “will GB wind be switched off?”, against our forecasters.</Line>
-          <Row><Big fig={m} format={(v) => fmt.n(v, 1)} label="Our average error to beat (£ per MWh, backtest)" delay={30} size={110} /></Row>
+          <Row><Big fig={m} format={(v) => fmt.n(v, 1)} label="Our average error to beat (per MWh, pooled over 6 zones, backtest)" delay={30} size={110} /></Row>
         </>
       ),
     }]} />
