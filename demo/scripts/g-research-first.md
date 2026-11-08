@@ -34,17 +34,17 @@ Three minutes. Spoken lines are in plain text; **clicks are in bold**. Times are
 
 **Click Simulate. Click Strait of Hormuz. Click Run.**
 
-"Now close the Strait of Hormuz. Gas goes up 40% for two weeks, and the shock travels through those same cables. France, Belgium and southern Norway rise most, because gas sets their price more often."
+"Now close the Strait of Hormuz. Gas goes up 40% for two weeks, and the shock travels through those same cables. The Netherlands, Germany and Belgium rise most, because gas sets their price more often; southern Norway, on hydro, barely moves."
 
-*Pound figure counts up to about £143M.*
+*Pound figure counts up to about £1.75bn.*
 
-"About £143 million on consumers, somewhere between £86 million and £200 million. The model has never seen a shock like this, so this part is a merit-order estimate, and the screen says so."
+"About £1.75 billion on consumers, somewhere between £1.05 billion and £2.46 billion. The model has never seen a shock like this, so this part is a merit-order estimate, and the screen says so."
 
 ## 2:35 Proof (25 s)
 
 **Click Overview. Point at the How right are we? card.**
 
-"Why trust any of it? Every forecast is logged before its outcome exists and scored against simple guesses. In our backtest we are 28% more accurate than persistence. Our bands are still too narrow, 63% against a target of 80%, and we show that too."
+"Why trust any of it? Every forecast is logged before its outcome exists and scored against simple guesses. In our backtest we are 36% more accurate than persistence. Our bands catch 78.5% of outcomes against a target of 80%, and in the 26 October storm only 46%, and we show that too."
 
 ## 3:00 Close
 
