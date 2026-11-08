@@ -75,8 +75,37 @@ def _move(pct: int, word: str) -> str | None:
     return f"{word} {'up' if pct > 0 else 'down'} {abs(pct)}%"
 
 
-def describe(group: str, before: pd.Series, after: pd.Series) -> str:
-    """What changed in the inputs behind a group, in a few words."""
+def _demand(before: pd.Series, after: pd.Series, contribution: float | None) -> str:
+    """Word the demand group by a change that points the same way as its price effect.
+
+    The group holds the load forecast, residual load (load left after wind and sun), temperature and two lagged prices,
+    so its contribution can come from any of them. Naming only the load forecast read as a contradiction ('demand down
+    20% (+£10)'). Candidates are tried in order and the first whose direction agrees with the contribution's sign is used:
+    more demand, more residual load, colder weather and higher earlier prices all push a price up. With no contribution
+    given the first change found is described, as before.
+    """
+    up = None if contribution is None or contribution == 0 else contribution > 0
+    agrees = lambda moved_up: up is None or moved_up == up  # noqa: E731
+
+    p = _pct(before["load_fc_mw"], after["load_fc_mw"])
+    if p and agrees(p > 0):
+        return _move(p, "demand")
+    d = after["residual_load_mw"] - before["residual_load_mw"]
+    if abs(d) >= 100 and agrees(d > 0):
+        return f"demand left after wind and sun {'up' if d > 0 else 'down'} {abs(d) / 1000:.1f} GW"
+    t = round(after["temperature_c"] - before["temperature_c"])
+    if t and agrees(t < 0):
+        return f"{'warmer' if t > 0 else 'colder'} by {abs(t)}°C"
+    for col, label in (("price_lag_24h", "yesterday’s prices"), ("price_lag_168h", "last week’s prices")):
+        q = _pct(before[col], after[col])
+        if q and agrees(q > 0):
+            return f"{label} {'higher' if q > 0 else 'lower'}"
+    return "demand and recent prices"
+
+
+def describe(group: str, before: pd.Series, after: pd.Series, contribution: float | None = None) -> str:
+    """What changed in the inputs behind a group, in a few words. `contribution` (the group's price effect) lets the
+    demand group pick wording that agrees with its sign."""
     if group == "wind":
         if before["wind_gen_fc_mw"] >= 100:
             p = _pct(before["wind_gen_fc_mw"], after["wind_gen_fc_mw"])
@@ -90,13 +119,7 @@ def describe(group: str, before: pd.Series, after: pd.Series) -> str:
         p = _pct(b, a)
         return (p is not None and _move(p, "sunshine")) or "solar"
     if group == "demand":
-        p = _pct(before["load_fc_mw"], after["load_fc_mw"])
-        if p:
-            return _move(p, "demand")
-        d = round(after["temperature_c"] - before["temperature_c"])
-        if d:
-            return f"{'warmer' if d > 0 else 'colder'} by {abs(d)}°C"
-        return "demand"
+        return _demand(before, after, contribution)
     if group == "gas":
         p = _pct(before["gas_ttf_eur_mwh"], after["gas_ttf_eur_mwh"])
         if p:
@@ -135,7 +158,7 @@ def sentence(zone: str, deltas: pd.Series, before: pd.Series, after: pd.Series, 
     shown = [(g, v) for g, v in ranked if round(abs(v)) >= 1 and abs(v) >= MIN_DRIVER][:MAX_DRIVERS]
     if not shown:
         return head
-    parts = [f"{describe(g, before, after)} ({_money(v, cur)})" for g, v in shown]
+    parts = [f"{describe(g, before, after, v)} ({_money(v, cur)})" for g, v in shown]
     return f"{head}: {', '.join(parts)}"
 
 
