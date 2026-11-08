@@ -99,24 +99,26 @@ The memo reads `lg1|<freeze or run>|<UTC time>|<sha256>`. The hashed bytes are t
 
 ### Results
 
-Walk-forward backtest, six folds of seven days with a 48-hour purge, run on 7 November 2026 at 16:35 UTC:
+Walk-forward backtest, six folds of seven days with a 48-hour purge, run on 7 November 2026 at about 23:45 UTC on main at `2919ad8`, with the split-conformal band calibration (#92) fitted per fold on held-out training rows. Source: `data/backtest/walk_forward.parquet`.
 
 | Model | Day-ahead price error (MAE) |
 |---|---|
-| Our LightGBM quantile model | **31.6** |
-| Same hour yesterday | 36.8 |
-| Last known price when the forecast was made (persistence) | 43.7 |
+| Our LightGBM quantile model | **33.0** |
+| Same hour yesterday | 36.6 |
+| Last known price when the forecast was made (persistence) | 43.3 |
 
-That's 28% better than persistence on day-ahead prices. We lose to persistence on NO2 prices and French wind, and the backtest says so.
+That's 24% better than persistence on day-ahead prices, pooled over all six zones (6,039 hours). Per zone the model beats persistence everywhere except NO2 (ratio 1.12) and beats yesterday in four of six zones. It loses to yesterday in France and to both baselines in NO2. Across all 17 zone-and-target pairs it beats both baselines in 13; the losses are NL load against yesterday (an Energy-Charts data break on 10 October), FR price against yesterday, NO2 price against both, and FR wind against persistence. The backtest says so.
 
-The bands are too narrow. Across the backtest 63% of outcomes landed between P10 and P90, where a calibrated model would catch 80%. Two single-day replays show where:
+The bands are closer to honest but still a little narrow. After calibration 79.9% of day-ahead price outcomes landed between P10 and P90 (target 80%; 64.0% before). By target: day-ahead price 79.9%, load 80.2%, wind 77.1%, GB system price 73.6%.
+
+Two single-day replays, generated separately from the backtest, show where the misses cluster:
 
 | Day | Hours inside the band |
 |---|---|
 | 2 November 2026 (calm) | 136 of 168 (81%) |
 | 26 October 2026 (storm) | 83 of 168 (49%) |
 
-The storm caught the model out. NESO puts GB constraint costs that day at £36.5m. Recalibrating the bands is in progress.
+The storm caught the model out. NESO puts GB constraint costs that day at £36.5m.
 
 ### Bot league: which technique wins, and when
 
@@ -172,7 +174,7 @@ Every constant in the engine (interconnector capacities, plant efficiencies, emi
 
 ### Known limits
 
-- The P10 to P90 bands are too narrow (see above).
+- The P10 to P90 bands are still slightly narrow for GB system price and wind (see above).
 - Energy-Charts reports load and wind for all of Norway, not just price zone NO2 (load averages about 15 GW against roughly 5 GW for NO2). So the load and wind forecasts cover five zones (GB, FR, DE-LU, NL, BE) and leave NO2 out, rather than log Norway-wide numbers under an NO2 label. Day-ahead prices cover all six zones, and each hourly run logs 816 forecasts instead of 912.
 - Ghost wind (wind paid to switch off) is worked out two ways: from accepted balancing bids, and from the gap between weather-implied and metered output. Both are labelled as estimates.
 - Carbon in imported power uses standard emission factors per fuel, not plant-level data.
