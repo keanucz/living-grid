@@ -386,9 +386,17 @@ void drawRingScreen() {
 Plan heatingPlan() {
   Plan plan = {false, -1, 1e9, 0};
   int late = -1;
+  // Search the coming night only (from 17:00 to the 07:00 deadline), so the plan also works during the day.
+  auto night = [](int m) { return m >= 17 * 60 || m < READY_BY * 60; };
+  bool inNight = false;
   for (int i = 0; i + HEAT_SLOTS <= nSlots; i++) {
-    int last = slots[i + HEAT_SLOTS - 1].minute;  // the window must end by 07:00 tonight
-    if (last >= READY_BY * 60 && last < 18 * 60) break;
+    bool ok = true;
+    for (int k = 0; k < HEAT_SLOTS && ok; k++) ok = night(slots[i + k].minute);
+    if (!ok) {
+      if (inNight) break;  // past 07:00: only the first night counts
+      continue;
+    }
+    inNight = true;
     float sum = 0;
     for (int k = 0; k < HEAT_SLOTS; k++) sum += slots[i + k].p;
     if (sum < plan.cost_p) { plan.cost_p = sum; plan.start = i; }
@@ -410,11 +418,12 @@ void drawTaskCard(int y, const char *task, const char *label, const char *when, 
   gfx->fillRoundRect(10, y, 328, 96, 16, CARD);  // stops short of the button paddles
   gfx->fillRoundRect(20, y + 14, 68, 68, 14, rgb(28, 60, 40));
   drawTaskIcon(task, 30, y + 22, GOOD, rgb(28, 60, 40));
-  text(&FreeSansBold12pt7b, 1, INK, 100, y + 36, label);
-  text(&FreeSans12pt7b, 1, QUIET, 100, y + 66, when);
-  char buf[16];
+  text(&FreeSansBold12pt7b, 1, INK, 100, y + 31, label);
+  text(&FreeSans12pt7b, 1, QUIET, 100, y + 59, when);
+  char buf[20];
+  // The GFX fonts stop at '~' (no pound sign), so savings stay in pence like every price on the meter.
   snprintf(buf, sizeof buf, saving_p >= 0.5f ? "save %.0fp" : "no saving", saving_p);
-  textR(&FreeSansBold12pt7b, 1, GOOD, 328, y + 66, buf);
+  text(&FreeSansBold12pt7b, 1, GOOD, 100, y + 87, buf);
 }
 
 void drawSaveScreen() {
@@ -430,6 +439,11 @@ void drawSaveScreen() {
     snprintf(when, sizeof when, "%s-%s", slots[heat.start].hhmm, slots[min(heat.start + HEAT_SLOTS, nSlots - 1)].hhmm);
     drawTaskCard(y, "heating", "Pre-heat the house", when, heat.late_p > 0 ? heat.late_p - heat.cost_p : 0);
     y += 108;
+  }
+  if (y == 70) {  // nothing to plan: the API returns tonight's windows from 07:00
+    textC(&FreeSansBold12pt7b, 1, INK, 184, 200, "Tonight's plan");
+    textC(&FreeSans12pt7b, 1, QUIET, 184, 236, "appears at 07:00");
+    return;
   }
   textC(&FreeSans12pt7b, 1, QUIET, 184, min(y + 16, 414), "vs running it at the usual time");
 }
