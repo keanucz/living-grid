@@ -113,7 +113,7 @@ export function PmGame({ model, onTrade, onAgain, onLeave, busy, error, banner, 
           {!done && onLeave && <button className="pm-cancel" onClick={onLeave}>Leave</button>}
         </>
       )}
-      {toast && (
+      {toast && !done && (
         <div className="pm-toast" role="status">
           <span>{toast.text}</span>{toast.pnl != null && <b className={`num ${toast.pnl > 0 ? 'up' : toast.pnl < 0 ? 'down' : ''}`}>{signedPts(toast.pnl)}</b>}
         </div>
