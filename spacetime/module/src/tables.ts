@@ -632,3 +632,116 @@ export const beat_tick = table(
   { name: 'beat_tick' },
   { scheduled_id: t.u64().primaryKey().autoInc(), scheduled_at: t.scheduleAt(), kind: t.string(), game_id: t.u32() }
 );
+
+// ---------------------------------------------------------------------------------------------------------------
+// Solo markets ("Polymarket style"): yes/no markets on a mystery day. The model is the market maker: the YES price in
+// cents is the model's probability, with a small spread, and it moves each game hour as the Nowcaster updates on the
+// hours already played. You buy and sell YES or NO at the current quote; each share pays 1 point if right. The day,
+// the outcomes and the future prices stay in private tables until each market closes (pm_math.ts, pm_core.ts).
+export const pm_day = table(
+  { name: 'pm_day' },
+  {
+    day: t.string().primaryKey(),
+    regime: t.string(), // calm | windy
+    start_hour: t.u32(),
+    end_hour: t.u32(),
+    markets_json: t.string(), // PmMarket[] (engine/pm/build.py): text, close_hour, outcome, price path by hour, bots' probabilities
+  }
+);
+
+export const pm_game = table(
+  { name: 'pm_game', public: true },
+  {
+    id: t.u32().primaryKey().autoInc(),
+    owner: t.identity().index('btree'),
+    state: t.string(), // running | done
+    clock_hour: t.u32(),
+    start_hour: t.u32(),
+    end_hour: t.u32(),
+    seconds_per_hour: t.u32(),
+    opened_at: t.timestamp(), // the last tick: the next one comes seconds_per_hour later
+    day_revealed: t.string(), // empty until the game is over
+    started_at: t.timestamp(),
+  }
+);
+
+export const pm_secret = table({ name: 'pm_secret' }, { game_id: t.u32().primaryKey(), day: t.string() });
+
+export const pm_market = table(
+  { name: 'pm_market', public: true },
+  {
+    key: t.string().primaryKey(), // '<game_id>|<market id>'
+    game_id: t.u32().index('btree'),
+    market_id: t.string(),
+    text: t.string(),
+    kind: t.string(),
+    unit: t.string(),
+    close_hour: t.u32(),
+    model_note: t.string(),
+    status: t.string(), // open | closed
+    price_yes: t.u32(), // cents, 1 to 99: the model's probability now
+    note: t.string(), // why the price last moved
+    outcome: t.string(), // '' until closed, then yes | no
+    actual_text: t.string(), // what happened; empty until closed
+  }
+);
+
+export const pm_price = table(
+  { name: 'pm_price' , public: true },
+  {
+    key: t.string().primaryKey(), // '<game_id>|<market id>|<hour>'
+    game_id: t.u32().index('btree'),
+    market_id: t.string(),
+    hour: t.u32(),
+    price_yes: t.u32(),
+  }
+);
+
+export const pm_account = table(
+  { name: 'pm_account', public: true },
+  {
+    key: t.string().primaryKey(), // '<game_id>|<identity hex>'
+    game_id: t.u32().index('btree'),
+    identity: t.identity().index('btree'),
+    name: t.string(),
+    is_bot: t.bool(),
+    points: t.f64(), // cash
+    equity: t.f64(), // cash plus open positions at the model's price
+  }
+);
+
+export const pm_position = table(
+  { name: 'pm_position', public: true },
+  {
+    key: t.string().primaryKey(), // '<game_id>|<identity hex>|<market id>|<side>'
+    game_id: t.u32().index('btree'),
+    identity: t.identity().index('btree'),
+    market_id: t.string(),
+    side: t.string(), // yes | no
+    shares: t.f64(),
+    cost: t.f64(), // points paid for the shares still held
+    settled: t.bool(),
+    payout: t.f64(),
+  }
+);
+
+export const pm_trade = table(
+  { name: 'pm_trade', public: true },
+  {
+    key: t.string().primaryKey(), // '<game_id>|<seq>'
+    game_id: t.u32().index('btree'),
+    seq: t.u32(),
+    identity: t.identity(),
+    market_id: t.string(),
+    side: t.string(),
+    action: t.string(), // buy | sell
+    shares: t.f64(),
+    price: t.u32(), // cents paid or received per share of that side
+    hour: t.u32(),
+  }
+);
+
+export const pm_tick = table(
+  { name: 'pm_tick' },
+  { scheduled_id: t.u64().primaryKey().autoInc(), scheduled_at: t.scheduleAt(), game_id: t.u32() }
+);
