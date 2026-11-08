@@ -28,6 +28,7 @@ function Hourly({ regions }) {
   const n = Math.max(0, ...regions.map((r) => r.series?.length ?? 0))
   if (n < 2) return null
   const rows = Array.from({ length: n }, (_, i) => regions.reduce((a, r) => a + (r.series?.[i]?.boalf_mw ?? 0), 0))
+  if (!rows.some((v) => v > 0)) return null // nothing switched off: no empty chart block
   const x = scaleLinear().domain([0, n - 1]).range([0, 520])
   const y = scaleLinear().domain([0, Math.max(1, ...rows)]).range([54, 4])
   const d = area().x((_, i) => x(i)).y0(54).y1((v) => y(v)).curve(curveMonotoneX)(rows)
