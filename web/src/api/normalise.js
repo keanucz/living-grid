@@ -94,6 +94,7 @@ export function normaliseState(c, zones) {
           demand_mw: z.load_mw ?? null,
           net_import_mw: flows.length ? netImport[z.zone] ?? 0 : null,
           mix: groupMix(z.mix_mw),
+          metered_as_of: z.metered_as_of ?? null,
           carbon: z.carbon ?? null,
           forecast: z.forecast ?? null,
           series: [],

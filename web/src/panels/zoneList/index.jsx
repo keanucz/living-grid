@@ -32,7 +32,7 @@ function Row({ z, st, on }) {
         <div className="zav" style={{ background: `rgb(${c[0]},${c[1]},${c[2]})` }}>{z.id.replace('-LU', '')}</div>
         <div className="zname">
           <div>{z.name}</div>
-          <div className="faint num">{st.demand_mw != null ? `${fmt.gw(st.demand_mw)} demand` : st.price_kind ?? ''}</div>
+          <div className="faint num">{st.demand_mw != null ? `${fmt.gw(st.demand_mw)} demand${st.metered_as_of ? ' · a day behind' : ''}` : st.price_kind ?? ''}</div>
         </div>
         <div className="zspark" style={{ color: on ? 'var(--accent)' : 'var(--text-3)' }}><Spark series={st.series} /></div>
         <div className="zprice">
