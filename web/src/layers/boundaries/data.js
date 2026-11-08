@@ -55,3 +55,19 @@ export function whatIf(boundary, addMw) {
   const lerp = (k) => a[k] + (b[k] - a[k]) * t
   return { addMw: x, costSaved: lerp('cost_saved_gbp'), windSaved: lerp('wind_saved_mwh'), maxMw: rows[rows.length - 1].add_mw }
 }
+
+const pct = (v) => `${Math.round(v * 100)}%`
+
+// One plain line for a boundary or cable: over 100% reads as how often it was over its limit, never 'N% full' above 100.
+export function plainStatus(row) {
+  const u = utilisation(row)
+  if (u > 1 && row.over_share != null) return `Over the limit in ${pct(row.over_share)} of hours`
+  if (u > 1) return 'Over the limit on average'
+  return `${pct(u)} full`
+}
+
+// 'Scotland to England' style direction, only when both ends are known (never 'null to null').
+export function direction(row) {
+  if (row.flow_mw == null || !row.from || !row.to) return ''
+  return row.flow_mw >= 0 ? `${row.from} to ${row.to}` : `${row.to} to ${row.from}`
+}

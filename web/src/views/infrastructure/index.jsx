@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Icon } from '../../shell/icons.jsx'
 import { actions, getState } from '../../store/store.js'
 import { gaugeColor } from '../../layers/boundaries/index.js'
-import { useInfra, utilisation, whatIf } from '../../layers/boundaries/data.js'
+import { direction, plainStatus, useInfra, utilisation, whatIf } from '../../layers/boundaries/data.js'
 
 // Where the grid is full: each boundary and interconnector with a flow-against-capacity gauge, what it cost over the
 // window, a story card on tap, and "build a power line": add capacity to a boundary and see the cost and wind that
@@ -12,6 +12,52 @@ const money = (v) => (Math.abs(v) >= 1e6 ? `£${(v / 1e6).toFixed(1)}m` : `£${M
 const mw = (v) => `${Math.round(v).toLocaleString('en-GB')} MW`
 const gwh = (v) => `${(v / 1000).toFixed(1)} GWh`
 const pct = (v) => `${Math.round(v * 100)}%`
+const gw = (v) => `${(Math.abs(v) / 1000).toFixed(1)} GW`
+
+// Glossary terms. TODO(#270): replace with the shared <Term> from web/src/ui/Term.jsx (same children, add its id prop).
+function Term({ children }) {
+  return <span className="inf-term">{children}</span>
+}
+
+// Layer 3 of every card: codes, source and method, closed by default. TODO(#270): swap for Explain's 'For experts'.
+function Experts({ children }) {
+  return (
+    <details className="inf-experts" onClick={(e) => e.stopPropagation()}>
+      <summary>For experts</summary>
+      <div className="inf-experts-body">{children}</div>
+    </details>
+  )
+}
+
+// 'What am I looking at?': open on the first visit, remembered closed (localStorage may be unavailable).
+const SEEN = 'lg-infra-context-closed'
+const readClosed = () => {
+  try {
+    return localStorage.getItem(SEEN) === '1'
+  } catch {
+    return false
+  }
+}
+function Context() {
+  const [open, setOpen] = useState(() => !readClosed())
+  const toggle = (e) => {
+    const isOpen = e.currentTarget.open
+    setOpen(isOpen)
+    try {
+      if (isOpen) localStorage.removeItem(SEEN)
+      else localStorage.setItem(SEEN, '1')
+    } catch {
+      /* private mode: just not remembered */
+    }
+  }
+  return (
+    <details className="inf-panel inf-context" open={open} onToggle={toggle}>
+      <summary>What am I looking at?</summary>
+      <p>Electricity moves around Britain and Europe on a few big power lines. When one is full, power that could have flowed through it is wasted on one side, and someone has to make extra on the other. Each card below is one of those lines: how full it was, and what that cost.</p>
+      <p>The grid sets each line's limit below what it can physically carry, so that a single fault can't cause a blackout. Over the limit means the forecast flow was higher than that, so the grid had to pay generators to change their output.</p>
+    </details>
+  )
+}
 
 function Source({ s }) {
   if (!s) return null
@@ -20,22 +66,29 @@ function Source({ s }) {
 
 function Gauge({ row, selected, onPick, days }) {
   const u = utilisation(row)
-  const dir = row.flow_mw == null ? '' : row.flow_mw >= 0 ? `${row.from} to ${row.to}` : `${row.to} to ${row.from}`
+  const dir = direction(row)
+  const colour = `rgb(${gaugeColor(u).slice(0, 3).join(',')})`
   return (
-    <button className={`inf-card ${selected ? 'on' : ''}`} onClick={onPick} aria-pressed={selected}>
+    <div className={`inf-card ${selected ? 'on' : ''}`} role="button" tabIndex={0} onClick={onPick}
+      onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && onPick()} aria-pressed={selected}>
       <div className="inf-top">
         <b>{row.name}</b>
-        <span className="num" style={{ color: `rgb(${gaugeColor(u).slice(0, 3).join(',')})` }}>{pct(u)} full</span>
+        <span className="num" style={{ color: colour }}>{plainStatus(row)}</span>
       </div>
-      <div className="inf-bar" role="img" aria-label={`${pct(u)} of capacity in use`}>
-        <i style={{ width: `${Math.min(100, u * 100)}%`, background: `rgb(${gaugeColor(u).slice(0, 3).join(',')})` }} />
+      <div className="inf-bar" role="img" aria-label={`${pct(u)} of the limit in use`}>
+        <i style={{ width: `${Math.min(100, u * 100)}%`, background: colour }} />
       </div>
       <div className="inf-meta">
-        <span>{mw(Math.abs(row.flow_mw ?? 0))} of {mw(row.capacity_mw)}{dir && ` · ${dir}`}</span>
+        {row.flow_mw != null && row.capacity_mw != null && <span>{gw(row.flow_mw)} used of {gw(row.capacity_mw)} allowed{dir && ` · ${dir}`}</span>}
         {row.cost_gbp_window != null && <span>{money(row.cost_gbp_window)} in {days} days</span>}
       </div>
-      <Source s={row.source} />
-    </button>
+      <Experts>
+        <div>{row.kind === 'boundary' ? <>NESO <Term>boundary</Term></> : <Term>Interconnector</Term>} code {row.code ?? row.id}{row.etys ? ` · ETYS boundary ${row.etys}` : ''}</div>
+        <div>Average use {pct(u)} of the {row.kind === 'boundary' ? 'limit' : 'capacity'}: {mw(Math.abs(row.flow_mw ?? 0))} of {mw(row.capacity_mw ?? 0)}{row.over_share != null ? `; forecast over the limit in ${pct(row.over_share)} of hours` : ''}{row.full_import_share != null ? `; importing at full capacity in ${pct(row.full_import_share)} of hours` : ''}.</div>
+        <div>{row.kind === 'boundary' ? 'Method: NESO day-ahead forecast flows against the published limit, averaged over the window.' : 'Method: Elexon metered flows against the published cable capacity, averaged over the window.'}</div>
+        <Source s={row.source} />
+      </Experts>
+    </div>
   )
 }
 
@@ -45,7 +98,7 @@ function Story({ row, days }) {
     <section className="inf-panel">
       <div className="inf-h">{row.name}</div>
       <p>
-        {row.name} was {pct(u)} full on average{row.flow_mw != null && row.capacity_mw != null ? `: ${mw(Math.abs(row.flow_mw))} against ${row.kind === 'boundary' ? 'a limit' : 'a capacity'} of ${mw(row.capacity_mw)}` : ''}.
+        {row.name}: {u > 1 ? 'over its limit on average' : `${pct(u)} full on average`}{row.flow_mw != null && row.capacity_mw != null ? `, ${mw(Math.abs(row.flow_mw))} against ${row.kind === 'boundary' ? 'a limit' : 'a capacity'} of ${mw(row.capacity_mw)}` : ''}.
         {row.over_share != null && ` NESO's day-ahead flow forecast was above the limit in ${pct(row.over_share)} of hours${row.overload_mwh ? `, ${gwh(row.overload_mwh)} more than it could carry` : ''}.`}
         {row.cost_gbp_window != null && ` Over the last ${days} days, managing the limit cost ${money(row.cost_gbp_window)}.`}
         {row.wind_curtailed_mwh_window != null && ` About ${gwh(row.wind_curtailed_mwh_window)} of wind was paid to switch off in Scotland over ${days} days (estimate from accepted bids, an upper bound).`}
@@ -68,7 +121,7 @@ function Build({ row, days }) {
         <input type="range" min={0} max={max} step={max >= 1000 ? 250 : 50} value={r.addMw} onChange={(e) => setAdd(Number(e.target.value))} aria-label="Added capacity in megawatts" />
       </label>
       <div className="inf-result">
-        <div><span>Cost avoided</span><b className="num yes">{money(r.costSaved)}</b>{row.cf?.cost_total_gbp != null && <small>over {row.cf.cost_days} days with NESO cost data, out of {money(row.cf.cost_total_gbp)} of GB thermal constraint costs</small>}</div>
+        <div><span>Cost avoided</span><b className="num yes">{money(r.costSaved)}</b>{row.cf?.cost_total_gbp != null && <small>over {row.cf.cost_days} days with NESO cost data, out of {money(row.cf.cost_total_gbp)} of GB thermal <Term>constraint costs</Term></small>}</div>
         <div><span>Wind no longer wasted</span><b className="num yes">{gwh(r.windSaved)}</b>{row.cf?.wind_total_mwh != null && <small>out of {gwh(row.cf.wind_total_mwh)} switched off in Scotland in {days} days</small>}</div>
       </div>
       <p className="inf-muted">A counterfactual on the same {days} days, not a forecast: it assumes the extra capacity had been in place and everything else unchanged, so treat both figures as upper bounds (other Scottish boundaries would still bind). Values between the published points are interpolated; nothing beyond +{mw(max)} is shown.</p>
@@ -101,6 +154,8 @@ function Infrastructure() {
         {source === 'sample' && <span className="inf-badge" title="The live figures are not available yet">SAMPLE</span>}
         <button className="inf-map" onClick={showOnMap}><Icon name="globe" size={16} /> Show on the map</button>
       </header>
+
+      <Context />
 
       <div className="inf-grid">
         {sorted.map((r) => <Gauge key={r.id} row={r} days={days} selected={sel?.id === r.id} onPick={() => setPick(r.id)} />)}
@@ -140,7 +195,7 @@ body { overflow: auto; }
 .inf-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 10px; margin-bottom: 14px; }
 .inf-card { text-align: left; background: var(--panel-solid); border: 1px solid var(--line); border-radius: 18px; padding: 14px; color: var(--text); font: inherit; display: flex; flex-direction: column; gap: 8px; }
 .inf-card.on { border-color: var(--accent); }
-.inf-top { display: flex; justify-content: space-between; gap: 8px; }
+.inf-top { display: flex; flex-direction: column; gap: 2px; }
 .inf-bar { height: 10px; border-radius: 5px; background: var(--card); overflow: hidden; }
 .inf-bar i { display: block; height: 100%; border-radius: 5px; }
 .inf-meta { display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; font-size: 12px; color: var(--text-2); }
@@ -158,6 +213,14 @@ body { overflow: auto; }
 .inf-result small { font-size: 11px; color: var(--text-3); }
 .inf-plan { display: flex; flex-direction: column; gap: 2px; padding: 8px 0; border-top: 1px solid var(--line); font-size: 14px; }
 .inf-plan:first-of-type { border-top: 0; }
+.inf-card { cursor: pointer; }
+.inf-grid { align-items: start; }
+.inf-context summary, .inf-experts summary { cursor: pointer; font-weight: 600; }
+.inf-context p { font-size: 14px; }
+.inf-term { border-bottom: 1px dotted var(--text-3); }
+.inf-experts { font-size: 12px; color: var(--text-2); }
+.inf-experts summary { font-size: 12px; color: var(--text-3); font-weight: 500; }
+.inf-experts-body { display: flex; flex-direction: column; gap: 4px; margin-top: 6px; line-height: 1.45; }
 `
 
 export default { path: '/infrastructure', title: 'Infrastructure', Component: Infrastructure }

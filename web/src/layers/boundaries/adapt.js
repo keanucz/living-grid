@@ -1,7 +1,7 @@
 // Maps the engine's GET /infrastructure body (InfrastructureResponse, #184/#202) to the shape the map layer and the
 // Infrastructure view read. Path geometry stays client side. Numbers the engine did not send stay null, never 0.
 const GEO = {
-  SCOTEX: { name: 'Scotland to England (B6)', from: 'Scotland', to: 'England', path: [[-3.6, 54.95], [-2.6, 55.12], [-1.7, 55.2]] },
+  SCOTEX: { from: 'Scotland', to: 'England', path: [[-3.6, 54.95], [-2.6, 55.12], [-1.7, 55.2]] },
 }
 const num = (v) => (typeof v === 'number' && Number.isFinite(v) ? v : null)
 const urlIn = (s) => (typeof s === 'string' ? s.match(/\((https?:\/\/[^)\s]+)\)/)?.[1] ?? null : null)
@@ -32,7 +32,10 @@ export function adapt(d) {
     const isCf = b.boundary === cf.boundary
     return {
       id: b.boundary,
-      name: geo.name ?? b.name ?? `NESO boundary ${b.boundary}`,
+      // The engine's plain name (#271); the NESO code only when it has none.
+      name: b.name ?? b.boundary,
+      code: b.boundary,
+      etys: b.etys_boundary ?? null,
       from: geo.from ?? null,
       to: geo.to ?? null,
       path: geo.path ?? null,
@@ -58,8 +61,8 @@ export function adapt(d) {
     id: l.zone,
     zone: l.zone,
     name: l.name,
-    from: 'GB',
-    to: l.zone,
+    from: 'Britain',
+    to: l.name ?? l.zone,
     capacity_mw: num(l.capacity_mw),
     flow_mw: num(l.mean_import_mw) == null ? null : -l.mean_import_mw, // view: positive is GB to the far end
     util: num(l.import_utilisation),

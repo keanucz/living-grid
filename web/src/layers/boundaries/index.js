@@ -1,7 +1,7 @@
 import { PathLayer, TextLayer } from 'deck.gl'
 import { scaleLinear } from 'd3-scale'
 import { rgb } from 'd3-color'
-import { getInfra, load, utilisation } from './data.js'
+import { getInfra, load, plainStatus, utilisation } from './data.js'
 
 // Boundaries and interconnectors as lines: colour is how full they are (flow against capacity), width is capacity,
 // the label gives the gauge and the cost over the window. Click a label to open the infrastructure view.
@@ -55,7 +55,7 @@ export default {
         id: 'boundaries-labels',
         data: rows,
         getPosition: (r) => [...r.line[Math.floor(r.line.length / 2)], Z],
-        getText: (r) => `${r.id.toUpperCase()} ${Math.round(utilisation(r) * 100)}% full${r.cost_gbp_window != null ? ` · ${money(r.cost_gbp_window)}` : ''}${tag}`,
+        getText: (r) => `${r.name}: ${plainStatus(r).replace(/^Over/, 'over')}${r.cost_gbp_window != null ? ` · ${money(r.cost_gbp_window)}` : ''}${tag}`,
         getSize: 12,
         sizeUnits: 'pixels',
         getColor: [244, 244, 240, 240],
