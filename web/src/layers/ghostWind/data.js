@@ -28,11 +28,13 @@ const set = (patch) => {
   subs.forEach((f) => f())
 }
 
-async function fetchWindow(key) {
+const TIMEOUT_MS = 20000
+
+async function fetchOnce(key) {
   const w = WINDOWS[key]
   const qs = w.from ? `?from=${encodeURIComponent(w.from)}&to=${encodeURIComponent(w.to)}` : ''
   const ctrl = new AbortController()
-  const t = setTimeout(() => ctrl.abort(), 12000)
+  const t = setTimeout(() => ctrl.abort(), TIMEOUT_MS)
   try {
     const r = await fetch(`/api/unseen/ghost-wind${qs}`, { signal: ctrl.signal })
     return r.ok ? await r.json() : null
@@ -41,6 +43,16 @@ async function fetchWindow(key) {
   } finally {
     clearTimeout(t)
   }
+}
+
+// The API has one worker and the page fires several calls at load, so a slow answer is usually a queue, not an
+// outage: try twice before falling back to the bundled sample (which the panel and the Hidden grid label as such).
+export async function fetchWindow(key, tries = 2) {
+  for (let i = 0; i < tries; i++) {
+    const d = await fetchOnce(key)
+    if (d) return d
+  }
+  return null
 }
 
 const total = (d) => (d?.total_boalf_mwh ?? 0) + (d?.total_weather_gap_mwh ?? 0)

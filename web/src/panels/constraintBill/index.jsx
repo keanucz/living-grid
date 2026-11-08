@@ -12,7 +12,8 @@ function useCountUp(target, ms = 1400) {
     const a = from.current
     let raf
     const tick = (now) => {
-      const t = Math.min(1, (now - start) / ms)
+      // The first frame's timestamp can be a little before `start`; unclamped, the ease dips below zero.
+      const t = Math.min(1, Math.max(0, (now - start) / ms))
       const cur = a + (target - a) * (1 - Math.pow(1 - t, 3))
       setV(cur)
       from.current = cur
@@ -52,11 +53,11 @@ function ConstraintBill({ ctx }) {
     if (on && !gw.window && !gw.loading) load('live')
   }, [on, gw.window, gw.loading])
   const d = gw.data
-  const boalf = d?.total_boalf_mwh ?? 0
-  const gap = d?.total_weather_gap_mwh ?? 0
+  const boalf = Math.max(0, d?.total_boalf_mwh ?? 0)
+  const gap = Math.max(0, d?.total_weather_gap_mwh ?? 0)
   const gwh = useCountUp(on ? boalf / 1000 : 0)
   const bill = constraintBill(d, gw.window)
-  const cost = bill.gbp
+  const cost = Math.max(0, bill.gbp ?? 0)
   const costUp = useCountUp(on ? cost : 0, 1800)
   if (!on) return null
 
@@ -77,12 +78,12 @@ function ConstraintBill({ ctx }) {
       <div className="kgrid">
         <div>
           <div className="faint klabel">Switched off</div>
-          <div className="kval num" style={{ color: 'var(--wind)' }}>{gw.loading ? '…' : `${gwh.toFixed(1)} GWh`}</div>
+          <div className="kval num" style={{ color: 'var(--wind)' }}>{gw.loading ? '…' : `${Math.max(0, gwh).toFixed(1)} GWh`}</div>
           <div className="faint knote">accepted bids (BOALF)</div>
         </div>
         <div>
           <div className="faint klabel">Constraint bill</div>
-          <div className="kval num">{cost ? fmt.money(costUp) : '—'}</div>
+          <div className="kval num">{cost ? fmt.money(Math.max(0, costUp)) : '—'}</div>
           <div className="faint knote">{bill.note}</div>
         </div>
         <div>
