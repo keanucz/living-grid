@@ -57,7 +57,11 @@ export default function Movie({ onOpenReplay }) {
   const last = useRef(0)
 
   useEffect(() => {
-    load('index').then((i) => { setIndex(i.events); setSlug(i.events[0]?.slug) }).catch(() => setIndex(null))
+    load('index').then((i) => {
+      const wanted = new URLSearchParams(window.location.hash.split('?')[1] ?? '').get('e')
+      setIndex(i.events)
+      setSlug(i.events.find((e) => e.slug === wanted)?.slug ?? i.events[0]?.slug)
+    }).catch(() => setIndex(null))
   }, [])
   useEffect(() => {
     if (!slug) return
