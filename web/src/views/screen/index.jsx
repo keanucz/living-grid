@@ -8,6 +8,7 @@ import { demoState, DEMO_REPLAY } from './demo.js'
 import { CSS } from './style.js'
 import { connectRoom } from './room/connection.js'
 import { BEAT_CSS, BeatEnd, BeatHeader, BeatPlaying, beatPhase } from './room/BeatScreen.jsx'
+import { PM_CSS, PmEnd, PmHeader, PmPlaying, pmPhase } from './room/PmScreen.jsx'
 
 // Big screen for the mystery-day market, made for a 1080p projector: #/screen?code=ABCD (one per lobby), or
 // #/screen for the current round. Waiting room with the join QR, then the leaderboard race, the crowd against
@@ -396,6 +397,30 @@ function BeatScreen({ room, code }) {
   )
 }
 
+const PM_HOW = [
+  'We pick a real past day of Europe’s grid and hide the date.',
+  'Yes/no markets: buy YES or NO on your phone. The model sets the price and it moves every game hour.',
+  'Profit by being right before the price catches up. Points only, no money. Beat the bots.',
+]
+
+function PmRoomScreen({ room, code }) {
+  const phase = pmPhase(room)
+  const url = useMemo(() => joinUrl(code), [code])
+  useEffect(() => {
+    document.body.classList.add('sc-body')
+    return () => document.body.classList.remove('sc-body')
+  }, [])
+  return (
+    <div className="sc" data-phase={phase === 'end' ? 'reveal' : phase}>
+      <PmHeader room={room} phase={phase} />
+      {(phase === 'waiting' || phase === 'countdown') && <Waiting s={{ players: room.members, bots: [] }} url={url} code={code} phase={phase} how={PM_HOW} />}
+      {phase === 'playing' && <PmPlaying room={room} />}
+      {phase === 'end' && <PmEnd room={room} />}
+      <style>{CSS}{BEAT_CSS}{PM_CSS}</style>
+    </div>
+  )
+}
+
 function Screen() {
   const code = (param('code') || '').toUpperCase().slice(0, 8) || null
   const demo = param('demo') === '1'
@@ -406,6 +431,7 @@ function Screen() {
     return () => c.close()
   }, [code, demo])
   if (!demo && code && room.lobby?.mode === 'beat') return <BeatScreen room={room} code={code} />
+  if (!demo && code && room.lobby?.mode === 'pm') return <PmRoomScreen room={room} code={code} />
   if (!demo && code && room.status === 'connecting') return <div className="sc"><div className="sc-status">Connecting to the game server…</div><style>{CSS}</style></div>
   return <MarketScreen />
 }

@@ -4,14 +4,14 @@ import { readPm, toPmModel } from './adapter.js'
 
 // Live state of the player's solo markets game as the UI model, plus the actions. Trade errors from the module (not
 // enough points, market closed) come back as rejected promises with its message.
-export function usePm() {
+export function usePm({ lobbyId = null } = {}) {
   const [snap, setSnap] = useState({ status: 'connecting' })
   const api = useRef(null)
   useEffect(() => {
     api.current = connectPm({ onState: (s) => setSnap(s) })
     return () => api.current?.close()
   }, [])
-  const raw = useMemo(() => (snap.conn && snap.me ? readPm(snap.conn, snap.me) : null), [snap])
+  const raw = useMemo(() => (snap.conn && snap.me ? readPm(snap.conn, snap.me, lobbyId) : null), [snap, lobbyId])
   const model = useMemo(() => toPmModel(raw), [raw])
   return {
     status: snap.status,

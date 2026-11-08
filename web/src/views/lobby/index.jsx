@@ -5,7 +5,7 @@ import { connectMarket } from '../market/connection.js'
 import { Phone } from '../market/index.jsx'
 import { BatteryMode } from './BatteryMode.jsx'
 import { DemoPlay, isDemo } from '../play/DemoPlay.jsx'
-import { BeatRoom, PmSolo } from '../play/Live.jsx'
+import { BeatRoom, PmRoom, PmSolo } from '../play/Live.jsx'
 import { AVATARS, Avatar, avatarIds } from './avatars.jsx'
 import {
   COUNTDOWN_S, QUESTION_COUNTS, SPEEDS, countdownLeft, members, myLobby, normaliseCode, playLink, roundLength, routeCode, screenLink,
@@ -15,7 +15,7 @@ import {
 // host settings and Start; 5 s countdown on every screen; the round; rematch. Deep link: #/play/<CODE>.
 const PROFILE_KEY = 'lg-lobby-profile'
 // The screen that plays each game mode (lobby.mode).
-const ROUNDS = { beat: (props) => <BeatRoom {...props} />, market: (props) => <Phone {...props} />, battery: (props) => <BatteryMode {...props} /> }
+const ROUNDS = { pm: (props) => <PmRoom {...props} />, beat: (props) => <BeatRoom {...props} />, market: (props) => <Phone {...props} />, battery: (props) => <BatteryMode {...props} /> }
 
 function loadProfile() {
   try {
@@ -152,12 +152,13 @@ function Landing({ profile, setProfile, queue, onSolo, onHost, onJoinCode, onQui
 }
 
 const MODES = [
+  { value: 'pm', label: 'Markets', note: 'Yes/no markets on a mystery day: buy and sell against the model, and see who earns most' },
   { value: 'beat', label: 'Beat the model', note: 'Five calls on a mystery day: call it, say how sure you are, and see if you beat the model and the bots' },
   { value: 'battery', label: 'Battery', note: 'Charge, hold or discharge a 1 MW battery against two planning agents' },
 ]
 
 function HostForm({ profile, setProfile, busy, onCreate, onBack }) {
-  const [mode, setMode] = useState('beat')
+  const [mode, setMode] = useState('pm')
   const ok = (profile.name ?? '').trim().length > 0
   return (
     <section className="lb-card">
@@ -212,7 +213,7 @@ function Settings({ lobby, busy, onChange }) {
     <section className="lb-card">
       <h2>Settings</h2>
       <Segmented label="Game" options={MODES} value={lobby.mode} onChange={(mode) => set({ mode })} disabled={busy} />
-      {lobby.mode === 'beat' ? <p className="lb-muted">Five calls, about 15 seconds each, with the bots playing along. A round takes under two minutes.</p> : <>
+      {lobby.mode === 'pm' ? <p className="lb-muted">Yes/no markets on a mystery day. The model sets the price, everyone trades with it, and prices move every game hour. The bots play along. A round takes about a minute and a half.</p> : lobby.mode === 'beat' ? <p className="lb-muted">Five calls, about 15 seconds each, with the bots playing along. A round takes under two minutes.</p> : <>
       <Segmented label="Speed" options={SPEEDS} value={lobby.secondsPerHour} onChange={(secondsPerHour) => set({ secondsPerHour })} disabled={busy} />
       <Segmented label="Questions" options={QUESTION_COUNTS.map((n) => ({ value: n, label: String(n) }))} value={lobby.nQuestions} onChange={(nQuestions) => set({ nQuestions })} disabled={busy} />
       <label className="lb-check"><input type="checkbox" checked={lobby.botsOn} disabled={busy} onChange={(e) => set({ botsOn: e.target.checked })} /> Bots play too</label>

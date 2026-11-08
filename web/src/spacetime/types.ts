@@ -691,6 +691,12 @@ export const PmPrice = __t.object("PmPrice", {
 });
 export type PmPrice = __Infer<typeof PmPrice>;
 
+export const PmRoom = __t.object("PmRoom", {
+  gameId: __t.u32(),
+  lobbyId: __t.u32(),
+});
+export type PmRoom = __Infer<typeof PmRoom>;
+
 export const PmSecret = __t.object("PmSecret", {
   gameId: __t.u32(),
   day: __t.string(),

@@ -5,7 +5,7 @@ import { DbConnection } from '../../spacetime/index.ts'
 const DB = 'living-grid'
 const TOKEN_KEY = 'lg-game-token'
 const TABLES = ['beat_game', 'beat_call', 'beat_player', 'beat_result']
-const PM_TABLES = ['pm_game', 'pm_market', 'pm_price', 'pm_account', 'pm_position', 'pm_trade']
+const PM_TABLES = ['pm_game', 'pm_market', 'pm_price', 'pm_account', 'pm_position', 'pm_trade', 'pm_room']
 const EXTRA = ['meta_leaderboard', 'lobby'] // optional: the final rank, and the room's state
 
 const tokenStore = {

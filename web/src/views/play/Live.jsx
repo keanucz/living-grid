@@ -63,6 +63,35 @@ export function BeatRoom({ lobbyId, footer }) {
   return <BeatRound model={beat.model} busy={busy} error={error} onAnswer={(o, c) => run(() => beat.answer(o, c))} onAgain={null} onLeave={null} footer={footer} />
 }
 
+// A room's markets game: the lobby started it; leaving and rematches go through the lobby footer.
+export function PmRoom({ lobbyId, footer }) {
+  const pm = usePm({ lobbyId })
+  const { busy, error, run } = useRun()
+  const [err, setErr] = useState(null)
+  if (pm.model.status === 'idle') return waiting(pm.status, error, 'Opening the markets…')
+  return (
+    <PmGame
+      model={pm.model}
+      busy={busy}
+      error={err ?? error}
+      clearError={() => setErr(null)}
+      onTrade={async (action, marketId, side, shares) => {
+        setErr(null)
+        try {
+          await pm.trade(action, marketId, side, shares)
+          return true
+        } catch (e) {
+          setErr(e?.message || 'That did not go through. Try again.')
+          return false
+        }
+      }}
+      onAgain={null}
+      onLeave={null}
+      footer={footer}
+    />
+  )
+}
+
 // Solo markets: starts its own game, then shows the market feed. Leaving gives the game up.
 export function PmSolo({ name, avatar, onExit }) {
   const pm = usePm()

@@ -116,8 +116,7 @@ function Board({ players }) {
   )
 }
 
-function End({ beat }) {
-  const { game, players, results } = beat
+export function End({ day, players }) {
   const sorted = [...players].sort((a, b) => b.score - a.score)
   const people = sorted.filter((p) => !p.isBot)
   const bots = sorted.filter((p) => p.isBot)
@@ -126,7 +125,7 @@ function End({ beat }) {
     <main className="sc-reveal" aria-label="Round over">
       <section className="sc-card sc-day-reveal sc-stage in">
         <div className="sc-kicker">The mystery day was</div>
-        <div className="sc-date">{game.dayRevealed ? longDate(game.dayRevealed) : 'a real past day'}</div>
+        <div className="sc-date">{day ? longDate(day) : 'a real past day'}</div>
         <p className="sc-muted">Real prices from that day, played back at speed. Every bot saw only data from before it.</p>
       </section>
       <section className="sc-card sc-podium sc-stage in">
@@ -187,7 +186,7 @@ export function BeatPlaying({ room }) {
 }
 
 export function BeatEnd({ room }) {
-  return room.beat ? <End beat={room.beat} /> : <main className="sc-wait"><section className="sc-card"><p className="sc-muted">Round over.</p></section></main>
+  return room.beat ? <End day={room.beat.game.dayRevealed} players={room.beat.players} /> : <main className="sc-wait"><section className="sc-card"><p className="sc-muted">Round over.</p></section></main>
 }
 
 export const BEAT_CSS = `

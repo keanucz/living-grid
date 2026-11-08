@@ -46,7 +46,7 @@ function Standings({ standings }) {
   )
 }
 
-export function PmGame({ model, onTrade, onAgain, onLeave, busy, error, banner, rehearsal = false, clearError }) {
+export function PmGame({ model, onTrade, onAgain, onLeave, busy, error, banner, rehearsal = false, clearError, footer }) {
   const [sheet, setSheet] = useState(null) // { id, side, mode }
   const [toast, setToast] = useState(null)
   const seenClosed = useRef(null)
@@ -119,6 +119,7 @@ export function PmGame({ model, onTrade, onAgain, onLeave, busy, error, banner, 
         </div>
       )}
       {open && <TradeSheet key={`${open.id}|${sheet.side}|${sheet.mode}`} m={open} side={sheet.side} mode={sheet.mode} cash={model.me.cash} busy={busy} error={error} onClose={() => setSheet(null)} onSubmit={submit} />}
+      {footer}
       <style>{CSS}</style>
     </div>
   )

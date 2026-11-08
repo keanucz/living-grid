@@ -51,6 +51,9 @@ const CSS = `
 .race-row.lead .race-name { color: var(--accent-ink); }
 .race-name { z-index: 1; font-size: 24px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; letter-spacing: -0.01em; }
 .race-row.bot .race-name { color: var(--hydro); }
+.race-row.lead .race-name, .race-row.lead.bot .race-name { color: var(--accent-ink); }
+.race-row.lead.bot .race-name small { background: rgba(10,10,10,.12); color: var(--accent-ink); }
+.race-bar { min-width: 190px; }
 .race-pts { font-size: 26px; font-weight: 700; display: flex; flex-direction: column; align-items: flex-end; line-height: 1.05; }
 .race-pts small { font-size: 16px; font-weight: 500; }
 .race-pts small.up { color: var(--accent); } .race-pts small.down { color: var(--hot); }

@@ -76,6 +76,8 @@ const lastTrade = async (g, q) => rowsOf(await q(`SELECT seq, market_id, side, a
 // One solo markets round on a phone. opts.rounds > 1 plays "Play again" and collects the dates for the variety check.
 async function soloRound(page, cap, label, { first = true } = {}) {
   const t0 = Date.now()
+  const pre = await publicDays()
+  const preTexts = await publicTexts()
   const feed = page.locator('section.pm-feed')
   await feed.waitFor({ timeout: 40000 }).catch(() => issue(page, `${label}-no-feed`, `${label}: the market feed never appeared`, ''))
   if (!(await feed.count())) return null
@@ -211,7 +213,7 @@ async function soloRound(page, cap, label, { first = true } = {}) {
       if (seenClosed.size === 1) await page.screenshot({ path: path.join(OUT, `${label}-04-first-resolved.png`), fullPage: true })
       // nothing about this outcome may have reached the client earlier
       const s1 = happened.replace(/^What happened\s*/, '').slice(0, 30)
-      const first = s1.length > 12 ? cap.firstSeen(s1) : null
+      const first = s1.length > 12 && !preTexts.some((t) => t.includes(s1)) ? cap.firstSeen(s1) : null
       if (first !== null && first < Date.now() - 12000) await issue(page, `${label}-leak-actual`, `${label}: the "what happened" text of a market reached the client ${((Date.now() - first) / 1000).toFixed(0)} s before it resolved`, s1)
     }
     if (await doneBtn.count()) break
@@ -252,13 +254,32 @@ async function soloRound(page, cap, label, { first = true } = {}) {
   if (beats !== 4) await issue(page, `${label}-end-bots`, `${label}: the end screen compares you with ${beats} bots, expected 4`, '')
   if (!/#\d+ of 5/.test(et)) await issue(page, `${label}-end-rank`, `${label}: the end screen shows no rank "#n of 5"`, et.slice(0, 160))
   if (!(await end.getByRole('button', { name: 'Play again' }).count())) await issue(page, `${label}-end-again`, `${label}: no Play again button`, '')
-  if (day) {
+  if (day && !pre.has(day)) {
     const early = cap.frames.filter((f) => f.t < endAt - 15000 && f.text.includes(day))
     if (early.length) await issue(page, `${label}-leak-day`, `${label}: the date reached the client well before the end`, `${early.length} frame(s) contained ${day}`)
   }
   const secs = (Date.now() - t0) / 1000
   log(`${label}: ${secs.toFixed(0)} s, day ${day}, profit ${pnl}`)
   return { day, pnl, secs }
+}
+
+// Days already public through other, finished games when this game starts (reported once as sql-finished-games-public).
+async function publicTexts() {
+  try {
+    const q = await anon(STDB_HTTP)
+    return rowsOf(await q("SELECT actual_text FROM pm_market WHERE status = 'closed'")).map((r) => r.actual_text).filter(Boolean)
+  } catch {
+    return []
+  }
+}
+
+async function publicDays() {
+  try {
+    const q = await anon(STDB_HTTP)
+    return new Set([...rowsOf(await q('SELECT day_revealed FROM pm_game')), ...rowsOf(await q('SELECT day_revealed FROM beat_game'))].map((r) => r.day_revealed).filter(Boolean))
+  } catch {
+    return new Set()
+  }
 }
 
 // What anonymous clients can read mid-game: no outcome, no day, no price beyond the game clock.
@@ -325,6 +346,7 @@ async function room(browser) {
   await host.page.goto(`${BASE}/#/play`, { waitUntil: 'domcontentloaded', timeout: 60000 })
   await host.page.locator('.lb-field input').first().fill('E2E Host')
   await host.page.getByRole('button', { name: 'Host a room' }).click()
+  await host.page.getByRole('radio', { name: /Beat the model/ }).click()
   await host.page.getByRole('button', { name: 'Create game' }).click()
   const codeEl = host.page.locator('.lb-code')
   await codeEl.waitFor({ timeout: T.step })
@@ -356,6 +378,7 @@ async function room(browser) {
 
   const t0 = Date.now()
   const startedAt = t0 - 500
+  const publicBefore = await publicDays()
   await host.page.getByRole('button', { name: 'Start game' }).click()
   const events = []
   for (let k = 0; k < 5; k++) {
@@ -414,6 +437,100 @@ async function room(browser) {
   for (const x of [host, screenCtx, ...phones]) await x.ctx.close()
 }
 
+
+// A room playing the markets: a desktop host, the big screen and two phones. Each phone trades on its own account at the
+// same model prices; checks the shared prices, isolated accounts, the big screen at each stage and the results.
+async function roomPm(browser) {
+  log('room (markets): start')
+  const host = await ctxPage(browser, DESKTOP)
+  const hcap = capture(host.page, 'host')
+  await host.page.goto(`${BASE}/#/play`, { waitUntil: 'domcontentloaded', timeout: 60000 })
+  await host.page.locator('.lb-field input').first().fill('E2E Host')
+  await host.page.getByRole('button', { name: 'Host a room' }).click()
+  await host.page.getByRole('radio', { name: /Markets/ }).click()
+  await host.page.getByRole('button', { name: 'Create game' }).click()
+  const codeEl = host.page.locator('.lb-code')
+  await codeEl.waitFor({ timeout: T.step })
+  const code = (await text(codeEl)).replace(/\s/g, '')
+  log('room (markets): code', code)
+  const screen = await ctxPage(browser, { viewport: { width: 1920, height: 1080 } })
+  const scap = capture(screen.page, 'screen')
+  await screen.page.goto(`${BASE}/#/screen?code=${code}`, { waitUntil: 'domcontentloaded', timeout: 60000 })
+  const phones = []
+  for (const [i, nm] of ['E2E Ann', 'E2E Ben'].entries()) {
+    const p = await ctxPage(browser, IPHONE)
+    p.cap = capture(p.page, `phone${i + 1}`)
+    await p.page.goto(`${BASE}/#/play`, { waitUntil: 'domcontentloaded', timeout: 60000 })
+    await p.page.locator('.lb-code-in').fill(code)
+    await p.page.getByRole('button', { name: 'Continue' }).click()
+    await p.page.locator('.lb-field input').first().fill(nm)
+    await p.page.getByRole('button', { name: 'Join', exact: true }).click()
+    await p.page.getByRole('button', { name: /^Ready/ }).click().catch(() => {})
+    phones.push(p)
+  }
+  await sleep(1500)
+  await screen.page.screenshot({ path: path.join(OUT, 'roompm-01-screen-waiting.png') })
+  const t0 = Date.now()
+  const publicBefore = await publicDays()
+  await host.page.getByRole('button', { name: 'Start game' }).click()
+  for (const [i, p] of phones.entries()) {
+    const ok = await p.page.locator('section.pm-feed').waitFor({ timeout: 40000 }).then(() => true).catch(() => false)
+    if (!ok) await issue(p.page, `roompm-no-feed-${i + 1}`, `Room (markets): phone ${i + 1} never showed the market feed`, '')
+  }
+  // Same first market, same price on both phones; Ann buys Yes, Ben buys No.
+  const cards = phones.map((p) => p.page.locator('article.pm-card').first())
+  const q = await Promise.all(cards.map((c) => text(c.locator('.pm-q'))))
+  const pr = await Promise.all(cards.map((c) => text(c.locator('.pm-prob b'))))
+  if (q[0] !== q[1]) await issue(phones[0].page, 'roompm-same-markets', 'Room (markets): the phones show different first markets', `${q[0]} | ${q[1]}`)
+  if (pr[0] !== pr[1]) log(`room (markets): prices differed on the two phones at the same moment (${pr.join(' / ')}); an hour may have ticked`)
+  for (const [i, side] of [['yes'], ['no']].map((x, i) => [i, x[0]])) {
+    const p = phones[i]
+    await cards[i].locator(side === 'yes' ? '.pm-yes' : '.pm-no').click()
+    const sh = p.page.locator('[role="dialog"]')
+    await sh.getByRole('button', { name: '25', exact: true }).click()
+    await sh.getByRole('button', { name: new RegExp(`^Buy ${side === 'yes' ? 'Yes' : 'No'}`) }).click()
+    await sh.waitFor({ state: 'detached', timeout: 8000 }).catch(() => issue(p.page, `roompm-sheet-${i + 1}`, `Room (markets): the trade sheet stayed open on phone ${i + 1}`, ''))
+  }
+  await sleep(1500)
+  const standings = await Promise.all(phones.map((p) => text(p.page.locator('.pm-stand'))))
+  if (!/E2E Ben/.test(standings[0]) || !/E2E Ann/.test(standings[1])) await issue(phones[0].page, 'roompm-standings', 'Room (markets): a phone does not list the other person in the standings', standings.join(' | ').slice(0, 200))
+  const eq = await Promise.all(phones.map((p) => text(p.page.locator('.pm-eq b'))))
+  await phones[0].page.screenshot({ path: path.join(OUT, 'roompm-02-phone1-trade.png'), fullPage: true })
+  await screen.page.screenshot({ path: path.join(OUT, 'roompm-03-screen-playing.png') })
+  const screenText = await text(screen.page.locator('body'))
+  if (!/E2E Ann/.test(screenText) || !/E2E Ben/.test(screenText)) await issue(screen.page, 'roompm-screen-players', 'Room (markets): the big screen does not list both players while playing', screenText.slice(0, 200))
+  if (!/bought/.test(screenText)) await issue(screen.page, 'roompm-screen-trades', 'Room (markets): the big screen shows no trade ticker after two buys', '')
+  setTimeout(() => anonChecks(phones[0].page, 'roompm').catch(() => {}), 1000)
+  // play out the day
+  const done = await Promise.all(phones.map((p) => p.page.getByRole('button', { name: /The day is over/ }).waitFor({ timeout: 130000 }).then(() => true).catch(() => false)))
+  log(`room (markets): ${done.every(Boolean) ? 'both phones finished' : 'a phone did not finish'} in ${((Date.now() - t0) / 1000).toFixed(0)} s`)
+  if (!done.every(Boolean)) await issue(phones[done.indexOf(false)].page, 'roompm-no-end', 'Room (markets): a phone never reached the end of the day', '')
+  else {
+    for (const p of phones) await p.page.getByRole('button', { name: /The day is over/ }).click()
+    await sleep(800)
+    const endTexts = await Promise.all(phones.map((p) => text(p.page.locator('section.pm-end'))))
+    await phones[0].page.screenshot({ path: path.join(OUT, 'roompm-04-phone1-end.png'), fullPage: true })
+    endTexts.forEach((t, i) => { if (!/#\d+ of 7/.test(t)) issue(phones[i].page, `roompm-rank-${i + 1}`, `Room (markets): phone ${i + 1} end card shows no rank "#n of 7" (host + 2 phones + 4 bots)`, t.slice(0, 160)) })
+    const dayOnPhone = endTexts[0].match(/\b20\d\d-\d\d-\d\d\b/)?.[0]
+    await sleep(1500)
+    await screen.page.screenshot({ path: path.join(OUT, 'roompm-05-screen-end.png') })
+    const st = await text(screen.page.locator('body'))
+    if (!/(January|February|March|April|May|June|July|August|September|October|November|December) 20\d\d/.test(st)) await issue(screen.page, 'roompm-screen-date', 'Room (markets): the big screen does not reveal the date at the end', st.slice(0, 200))
+    if (!/E2E Ann/.test(st) || !/E2E Ben/.test(st)) await issue(screen.page, 'roompm-screen-end-names', 'Room (markets): the big screen end shows no player names', st.slice(0, 200))
+    const q2 = await anon(STDB_HTTP).catch(() => null)
+    if (q2) {
+      const res = rowsOf(await q2("SELECT name, mode, lobby_id FROM game_result WHERE mode = 'pm'")).filter((r) => r.lobby_id > 0)
+      if (res.length < 6) await issue(phones[0].page, 'roompm-results', `Room (markets): ${res.length} room result rows recorded, expected 6`, '')
+    }
+    if (dayOnPhone) for (const c of [hcap, scap, phones[0].cap, phones[1].cap]) {
+      if (publicBefore.has(dayOnPhone)) continue // already public through an earlier finished game (reported as sql-finished-games-public)
+      const early = c.frames.filter((f) => f.t >= t0 && f.t < t0 + 70000 && f.text.includes(dayOnPhone))
+      if (early.length) { const t = early[0].text; const i = t.indexOf(dayOnPhone); await issue(host.page, `roompm-leak-day-${c.label}`, `Room (markets): the date reached ${c.label} early`, `${early.length} frame(s), ${((early[0].t - t0) / 1000).toFixed(1)} s after start: ...${t.slice(Math.max(0, i - 120), i + 40).replace(/[^\x20-\x7e]/g, '.')}`) }
+    }
+  }
+  for (const x of [host, screen, ...phones]) await x.ctx.close()
+}
+
 async function demo(browser) {
   log('demo: start')
   const { ctx, page } = await ctxPage(browser, IPHONE)
@@ -434,7 +551,7 @@ async function demo(browser) {
   const browser = await launch()
   for (const w of WANT) {
     try {
-      await { solo, room, demo }[w](browser)
+      await { solo, room, roompm: roomPm, demo }[w](browser)
     } catch (e) {
       console.log(`RUN ERROR in ${w}:`, e.message)
       issues.push({ key: `run-${w}`, title: `The ${w} run stopped with an error`, detail: e.message.split('\n')[0], shot: null })

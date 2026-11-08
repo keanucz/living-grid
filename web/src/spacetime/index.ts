@@ -127,6 +127,7 @@ import PmGameRow from "./pm_game_table";
 import PmMarketRow from "./pm_market_table";
 import PmPositionRow from "./pm_position_table";
 import PmPriceRow from "./pm_price_table";
+import PmRoomRow from "./pm_room_table";
 import PmTradeRow from "./pm_trade_table";
 import ProfileRow from "./profile_table";
 import QuickQueueRow from "./quick_queue_table";
@@ -633,6 +634,20 @@ const tablesSchema = __schema({
       { name: 'pm_price_key_key', constraint: 'unique', columns: ['key'] },
     ],
   }, PmPriceRow),
+  pmRoom: __table({
+    name: 'pm_room',
+    indexes: [
+      { accessor: 'game_id', name: 'pm_room_game_id_idx_btree', algorithm: 'btree', columns: [
+        'gameId',
+      ] },
+      { accessor: 'lobby_id', name: 'pm_room_lobby_id_idx_btree', algorithm: 'btree', columns: [
+        'lobbyId',
+      ] },
+    ],
+    constraints: [
+      { name: 'pm_room_game_id_key', constraint: 'unique', columns: ['gameId'] },
+    ],
+  }, PmRoomRow),
   pmTrade: __table({
     name: 'pm_trade',
     indexes: [
@@ -853,6 +868,8 @@ type __SchemaWithTableAccessorAliases = Omit<typeof tablesSchema.schemaType, "ta
     readonly "pm_position": Omit<typeof tablesSchema.schemaType.tables["pmPosition"], "accessorName"> & { readonly accessorName: "pm_position" };
     /** @deprecated Use `pmPrice` instead. This alias will be removed in the next major version. */
     readonly "pm_price": Omit<typeof tablesSchema.schemaType.tables["pmPrice"], "accessorName"> & { readonly accessorName: "pm_price" };
+    /** @deprecated Use `pmRoom` instead. This alias will be removed in the next major version. */
+    readonly "pm_room": Omit<typeof tablesSchema.schemaType.tables["pmRoom"], "accessorName"> & { readonly accessorName: "pm_room" };
     /** @deprecated Use `pmTrade` instead. This alias will be removed in the next major version. */
     readonly "pm_trade": Omit<typeof tablesSchema.schemaType.tables["pmTrade"], "accessorName"> & { readonly accessorName: "pm_trade" };
     /** @deprecated Use `quickQueue` instead. This alias will be removed in the next major version. */
@@ -913,6 +930,7 @@ const tableAccessorAliases = {
   "pm_market": "pmMarket",
   "pm_position": "pmPosition",
   "pm_price": "pmPrice",
+  "pm_room": "pmRoom",
   "pm_trade": "pmTrade",
   "quick_queue": "quickQueue",
   "battery_my_pending": "batteryMyPending",
@@ -993,6 +1011,8 @@ export type DbView = __DbViewBase & {
   readonly "pm_position": __DbViewBase["pmPosition"];
   /** @deprecated Use `pmPrice` instead. This alias will be removed in the next major version. */
   readonly "pm_price": __DbViewBase["pmPrice"];
+  /** @deprecated Use `pmRoom` instead. This alias will be removed in the next major version. */
+  readonly "pm_room": __DbViewBase["pmRoom"];
   /** @deprecated Use `pmTrade` instead. This alias will be removed in the next major version. */
   readonly "pm_trade": __DbViewBase["pmTrade"];
   /** @deprecated Use `quickQueue` instead. This alias will be removed in the next major version. */
@@ -1065,6 +1085,8 @@ export type Tables = __TablesBase & {
   readonly "pm_position": __TablesBase["pmPosition"];
   /** @deprecated Use `pmPrice` instead. This alias will be removed in the next major version. */
   readonly "pm_price": __TablesBase["pmPrice"];
+  /** @deprecated Use `pmRoom` instead. This alias will be removed in the next major version. */
+  readonly "pm_room": __TablesBase["pmRoom"];
   /** @deprecated Use `pmTrade` instead. This alias will be removed in the next major version. */
   readonly "pm_trade": __TablesBase["pmTrade"];
   /** @deprecated Use `quickQueue` instead. This alias will be removed in the next major version. */

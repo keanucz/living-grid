@@ -6,10 +6,14 @@ import { START_POINTS, fill, mark, points, quote } from './pmMath.js'
 const hex = (id) => id?.toHexString?.() ?? String(id)
 const ms = (t) => (t == null ? null : typeof t === 'number' ? t : Number(t.microsSinceUnixEpoch / 1000n))
 
-export function readPm(conn, me) {
+export function readPm(conn, me, lobbyId = null) {
   const rows = (t) => (conn.db[t] ? [...conn.db[t].iter()] : [])
   const meHex = hex(me)
-  const games = rows('pm_game').filter((g) => hex(g.owner) === meHex).sort((a, b) => b.id - a.id)
+  // A room's game is linked to its lobby (pm_room); a solo game is the newest one I own that no room claims.
+  const roomOf = new Map(rows('pm_room').map((r) => [r.gameId, String(r.lobbyId)]))
+  const games = rows('pm_game')
+    .filter((g) => (lobbyId != null ? roomOf.get(g.id) === String(lobbyId) : hex(g.owner) === meHex && !roomOf.has(g.id)))
+    .sort((a, b) => b.id - a.id)
   const g = games[0] ?? null
   if (!g) return { me: meHex, game: null }
   const mine = rows('meta_leaderboard').find((r) => hex(r.identity) === meHex) ?? null

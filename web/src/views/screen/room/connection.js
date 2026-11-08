@@ -5,7 +5,7 @@ import { uri } from '../../market/connection.js'
 // plays. Beat the model rooms (mode 'beat') read beat_*; only public tables are subscribed, so what the screen shows
 // is exactly what any phone could see (nobody's pick, and no answer, before a call's reveal).
 const DB = 'living-grid'
-const TABLES = ['lobby', 'lobby_player', 'beat_game', 'beat_call', 'beat_player', 'beat_result', 'meta_leaderboard']
+const TABLES = ['lobby', 'lobby_player', 'beat_game', 'beat_call', 'beat_player', 'beat_result', 'pm_game', 'pm_room', 'pm_market', 'pm_price', 'pm_account', 'pm_trade', 'meta_leaderboard']
 const hex = (id) => id?.toHexString?.() ?? String(id ?? '')
 const ms = (t) => (t?.microsSinceUnixEpoch != null ? Number(t.microsSinceUnixEpoch / 1000n) : null)
 
@@ -30,6 +30,20 @@ export function readRoom(conn, code) {
         calls: rows('beat_call').filter((c) => c.gameId === g.id).sort((a, b) => a.idx - b.idx),
         players: rows('beat_player').filter((p) => p.gameId === g.id).map((p) => ({ id: hex(p.identity), name: p.name, score: p.score, isBot: p.isBot })),
         results: rows('beat_result').filter((r) => r.gameId === g.id).map((r) => ({ id: hex(r.identity), idx: r.idx, choice: r.choice, confidence: r.confidence, correct: r.correct, score: r.score })),
+      }
+    }
+  }
+  if (lobby.mode === 'pm') {
+    const gid = rows('pm_room').filter((r) => String(r.lobbyId) === String(lobby.id)).map((r) => r.gameId).sort((a, b) => b - a)[0]
+    const g = gid != null ? rows('pm_game').find((x) => x.id === gid) : null
+    if (g) {
+      const accounts = rows('pm_account').filter((a) => a.gameId === g.id).map((a) => ({ id: hex(a.identity), name: a.name, isBot: a.isBot, equity: a.equity }))
+      out.pm = {
+        game: { id: g.id, state: g.state, clockHour: g.clockHour, startHour: g.startHour, endHour: g.endHour, secondsPerHour: g.secondsPerHour, openedAt: ms(g.openedAt), dayRevealed: g.dayRevealed },
+        markets: rows('pm_market').filter((m) => m.gameId === g.id).sort((a, b) => Number(a.status === 'closed') - Number(b.status === 'closed') || a.closeHour - b.closeHour || a.marketId.localeCompare(b.marketId)),
+        prices: rows('pm_price').filter((p) => p.gameId === g.id).map((p) => ({ marketId: p.marketId, hour: p.hour, price: p.priceYes })),
+        accounts,
+        trades: rows('pm_trade').filter((t) => t.gameId === g.id).sort((a, b) => b.seq - a.seq).slice(0, 12).map((t) => ({ seq: t.seq, who: accounts.find((a) => a.id === hex(t.identity))?.name ?? 'Someone', isBot: !!accounts.find((a) => a.id === hex(t.identity))?.isBot, marketId: t.marketId, side: t.side, action: t.action, shares: t.shares, price: t.price })),
       }
     }
   }
