@@ -16,6 +16,11 @@ const Z = 7100
 const NARROW = typeof innerWidth !== 'undefined' && innerWidth < 700
 const shortStatus = (r) => plainStatus(r).replace(/^Over the limit in (\S+) of hours$/, 'over limit $1').replace(/^Over the limit on average$/, 'over limit')
 const money = (v) => (v >= 1e6 ? `£${(v / 1e6).toFixed(1)}m` : `£${Math.round(v / 1e3)}k`)
+// The three Channel cables end close together: their labels sit at the continental end, fanned out vertically
+// (north to south, as on the map) so they never overlap at any zoom. Netherlands reads to the left, over the
+// North Sea, so the story panel on smaller screens does not cover it.
+const CHANNEL = { NL: [-10, -24, 'end'], BE: [10, 0, 'start'], FR: [10, 24, 'start'] }
+const fanned = (r) => r.kind === 'link' && (r.zone ?? r.id) in CHANNEL
 
 export default {
   id: 'boundaries',
@@ -29,9 +34,9 @@ export default {
     const { data: infra, source } = getInfra()
     const zl = data?.zones?.interconnectors ?? []
     const ic = Object.fromEntries(zl.map((l) => [l.id, l]))
-    // /infrastructure groups links by far-end country: draw that country's largest link.
+    // /infrastructure groups links by far-end country: draw that country's largest cable from Britain.
     const byZone = {}
-    for (const l of zl) if (l.from_at && l.to_at && l.capacity_mw > (byZone[l.to]?.capacity_mw ?? 0)) byZone[l.to] = l
+    for (const l of zl) if (l.from === 'GB' && l.from_at && l.to_at && l.capacity_mw > (byZone[l.to]?.capacity_mw ?? 0)) byZone[l.to] = l
     const lineFor = (l) => {
       const z = ic[l.id] ?? byZone[l.zone ?? l.id]
       return z?.from_at && z?.to_at ? [z.from_at, z.to_at] : null
@@ -58,7 +63,7 @@ export default {
         id: 'boundaries-labels',
         // Phones label the boundaries and the busy links only; the Channel links' labels would sit on top of each other.
         data: NARROW ? rows.filter((r) => r.kind === 'boundary' || utilisation(r) >= 0.8) : rows,
-        getPosition: (r) => [...r.line[Math.floor(r.line.length / 2)], Z],
+        getPosition: (r) => [...(fanned(r) ? r.line[r.line.length - 1] : r.line[Math.floor(r.line.length / 2)]), Z],
         getText: (r) =>
           NARROW
             ? `${r.name}: ${shortStatus(r)}${tag}`
@@ -72,9 +77,9 @@ export default {
         backgroundPadding: [6, 3],
         fontFamily: 'Inter, system-ui, sans-serif',
         fontWeight: 600,
-        getTextAnchor: 'middle',
+        getTextAnchor: (r) => (fanned(r) ? CHANNEL[r.zone ?? r.id][2] : 'middle'),
         getAlignmentBaseline: 'center',
-        getPixelOffset: [0, -16],
+        getPixelOffset: (r) => (fanned(r) ? CHANNEL[r.zone ?? r.id].slice(0, 2) : [0, -16]),
         pickable: true,
         onClick: (info) => {
           if (!info.object) return false
@@ -82,7 +87,7 @@ export default {
           return true
         },
         parameters: { depthTest: false },
-        updateTriggers: { getText: [infra, source], getBackgroundColor: [infra] },
+        updateTriggers: { getText: [infra, source], getBackgroundColor: [infra], getPosition: [infra] },
       }),
     ]
   },
