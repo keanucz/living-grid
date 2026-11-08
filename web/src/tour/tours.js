@@ -17,7 +17,7 @@ const day = (d) => new Date(`${d}T00:00:00Z`).toLocaleDateString('en-GB', { day:
 
 const LIVE = {
   gb: { path: '/state', get: gbPrice, fallback: 'the price on the map' },
-  no2: { path: '/state', get: euPrice('NO2'), fallback: 'far cheaper' },
+  no2: { path: '/state', get: euPrice('NO2'), fallback: 'its own price' },
   bill: {
     path: '/unseen/ghost-wind',
     get: (j) => {
@@ -74,7 +74,7 @@ const MORE = {
   carbon: { id: 'carbon', section: 'hidden', layers: { carbon: true, ghostWind: false }, target: 'stories', duration: 10, camera: null,
     say: 'Carbon travels too. A grid can look clean at home and still run on dirty imports: this shows the intensity each country actually consumes (modelled, with standard emission factors).' },
   battery: { id: 'battery', section: 'whatif', target: 'simDock', duration: 9,
-    say: 'A 1 MW battery in every zone reacts to the shock. The risk-aware one, which sees the forecast bands, matches or beats one that trusts only the median in every zone scored so far.' },
+    say: 'A 1 MW battery in every zone reacts to the shock. The risk-aware one, which sees the forecast bands, and one that trusts only the median are both scored against perfect foresight on the battery card.' },
   replay: { id: 'replay', page: '#/replay', target: 'map', duration: 10,
     say: 'Replay of 26 October: models trained only on data before that day, so “would we have seen it coming?” is a genuine out-of-sample test.' },
   reveal: { id: 'reveal', page: '#/reveal', target: 'map', duration: 9,
