@@ -220,7 +220,8 @@ function Overlay({ viewport, ctx }) {
           )
         })}
 
-      {sim &&
+      {/* Phones show plant pins only for a running scenario: at that size the full set crowds GB and NL. */}
+      {sim && (scenario || !PHONE) &&
         data.assets
           ?.filter((a) => (scenario ? scenario.assetType === a.type && a.mw >= 900 : a.mw >= 2400))
           .map((a) => {
