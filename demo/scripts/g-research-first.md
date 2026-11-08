@@ -4,13 +4,13 @@ Three minutes. Spoken lines are in plain text; **clicks are in bold**. Times are
 
 ## 0:00 Open (20 s)
 
-*Screen: Overview, map coloured by price, flows moving between countries.*
+*Screen: the **Now** tab, map coloured by price, flows moving between countries.*
 
 "Electricity is invisible. You cannot see what it costs to waste, or where its carbon comes from. This is Europe's grid right now: six zones coloured by price, and the arcs are power flowing through undersea cables."
 
 ## 0:20 Ghost wind over Scotland (45 s)
 
-**Click the Ghost wind chip.** **In the constraint card, click 26 Oct storm.**
+**Click the Hidden grid tab, then Scotland’s wind, paid to stop. Click More detail, then 26 Oct storm.**
 
 "On 26 October a storm hit Scotland. The grid could not carry the wind power south, so farms were paid to switch off. The glow is that wind: about 72 gigawatt hours in one day."
 
@@ -20,19 +20,19 @@ Three minutes. Spoken lines are in plain text; **clicks are in bold**. Times are
 
 ## 1:05 Carbon through the cables (30 s)
 
-**Click Ghost wind off. Click the Carbon chip on.**
+**Click Carbon that comes in by cable.**
 
 "Second hidden thing: carbon. A grid can look clean while importing dirty power, or the other way round. We trace carbon through every import. Right now Britain generates at about 370 grams per kilowatt hour but consumes at about 347, because the cables bring in French nuclear and Norwegian hydro. Those are standard estimates, and the screen says so."
 
 ## 1:35 Why a price moved (20 s)
 
-**Hover GB on the map (or click it in the zone list) to show the explanation card.**
+**Click the Forecast tab. The Why this price card for Britain is under the chart.**
 
 "Every forecast tells you why, in plain causes: wind, demand, gas, imports. It is the model explaining itself, not a proven cause, and it says so."
 
 ## 1:55 A shock nobody can see coming (40 s)
 
-**Click Simulate. Click Strait of Hormuz. Click Run.**
+**Click the What if tab, then the Gas gets dearer card. It runs at once.**
 
 "Now close the Strait of Hormuz. Gas goes up 40% for two weeks, and the shock travels through those same cables. The Netherlands, Germany and Belgium rise most, because gas sets their price more often; southern Norway, on hydro, barely moves."
 
@@ -42,7 +42,7 @@ Three minutes. Spoken lines are in plain text; **clicks are in bold**. Times are
 
 ## 2:35 Proof (25 s)
 
-**Click Overview. Point at the How right are we? card.**
+**Click the Proof tab. Point at the Can we trust the forecast? card.**
 
 "Why trust any of it? Every forecast is logged before its outcome exists and scored against simple guesses. In our backtest we are 36% more accurate than persistence. Our bands catch 78.5% of outcomes against a target of 80%, and in the 26 October storm only 46%, and we show that too."
 
@@ -53,5 +53,5 @@ Three minutes. Spoken lines are in plain text; **clicks are in bold**. Times are
 ## If something breaks
 
 - **Ghost wind shows 0:** the storm window failed to load. Say "on the storm day" and switch to the `#/replay` tab, which also states the £36M figure.
-- **Run hangs:** the card falls back to the pre-computed scenario after the timeout. Keep talking; the numbers are the same within rounding.
+- **The result hangs:** the card falls back to the pre-computed scenario after the timeout. Keep talking; the numbers are the same within rounding.
 - **Top-right chip says Fixture data:** the API is down. Everything above still renders from fixtures. Say "this is running offline from our cache".

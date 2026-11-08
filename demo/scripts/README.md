@@ -9,14 +9,30 @@ Both were timed against https://htb.stefvuck.dev on Saturday 7 November at about
 
 ## Before you start (both scripts)
 
-1. Open https://htb.stefvuck.dev full screen at 1080p. Check the top-right chip says **Live**. If it says **Fixture data**, carry on: every step below still works from the bundled fixtures. The pound figures then come from the bundled sample (Hormuz about £752M, Norway link about £9.4M), not the live ones below: read them off the screen instead of the script.
+1. Open https://htb.stefvuck.dev full screen at 1080p. The first visit plays a short intro (a pylon, then Edinburgh, then the six countries) and a welcome: click **Skip, show me the map**. Check the top-right chip says **Live**. If it says **Fixture data**, wait 15 s (the page retries live by itself); if it stays, carry on: every step below still works from the bundled fixtures, but read the pound figures off the screen, not the table below.
 2. Open two more tabs, ready to switch to: `https://htb.stefvuck.dev/#/replay` and `https://htb.stefvuck.dev/#/reveal`. Keep `#/household` on a phone for the QR moment.
-3. Turn the **Ghost wind** chip on once so its data is cached, then click **Last 24 h** in the constraint card to reset.
-4. Pre-warm Simulate: click **Simulate**, run **Strait of Hormuz** once, then click back to **Overview**. The first `/intervene` call is the slowest.
+3. Pre-warm the hidden grid: **Hidden grid** tab, **Scotland’s wind, paid to stop**, **More detail**, **26 Oct storm**, then **Last 24 h** and **Less detail** to reset.
+4. Pre-warm What if: **What if** tab, click the **Gas gets dearer** card once (it runs straight away; there is no Run button), then the **Now** tab. The first run is the slowest.
+5. Presenter mode for a second screen: `https://htb.stefvuck.dev/#tour=g-research&autoplay` (or `hrt`, or `main`) plays the matching tour on a loop with no buttons.
 
-## Click paths (TODO: re-walk before presenting)
+## Click paths (walked on the live site, Sunday 07:30 UTC)
 
-**TODO:** this section described the Saturday 17:40 layout (left rail icons, a greyed-out Forecast tab, an unfrozen reveal) and is out of date: the app now opens on section tabs (Now, Forecast, What if, Proof, Hidden grid) and the Monday forecast was frozen at 23:59 UTC Saturday. Re-walk both scripts against the live site and rewrite the click steps.
+The app has one row of tabs: **Now · Forecast · Hidden grid · What if · Proof · Play**. Each tab sets the map for you (layers, time, tilt), so there are no layer chips to toggle in either script. Panels open simple first; the detail is behind **Why?**, **For experts** and **More detail**.
+
+| Script beat | Clicks |
+|---|---|
+| Open (both) | **Now** tab. Price map with flows; the answer card bottom right reads “Britain £…/MWh wholesale, about …p per kWh”. |
+| Forecast ghost (HRT 0:00) | **Forecast** tab. It opens six hours ahead (time bar reads “+6 h”), with the faint forecast block on the map and the GB chart with its likely range. Drag the time bar to move. |
+| Why a price moved (G-R 1:35) | **Forecast** tab: the **Why this price** card is under the chart. Click a country in the map to switch zone. |
+| Wind paid to stop, 26 Oct (G-R 0:20) | **Hidden grid** tab, **Scotland’s wind, paid to stop**, **More detail**, **26 Oct storm**: 71.6 GWh switched off, £36.5m constraint bill. **Watch the storm that cost £36.5m** opens the event movie. |
+| Carbon through the cables (G-R 1:05) | **Hidden grid** tab, **Carbon that comes in by cable**. |
+| Strait of Hormuz (G-R 1:55, HRT 0:25) | **What if** tab, click **Gas gets dearer** (The Strait of Hormuz closes). It runs at once; the map tilts and the “What it would change” card counts up. **Why?** gives the one-paragraph reason, **For experts** the formula. |
+| Norway link trips (HRT 1:15) | **What if** tab, click **The cable to Norway breaks**. |
+| Battery (HRT 1:35) | **What if** tab, **More detail**, then the zone buttons (**GB** …) on the battery card. |
+| Scoreboard (G-R 2:35, HRT 2:00) | **Proof** tab: “Can we trust the forecast?” card (backtest). **For experts** for the table by zone. |
+| Replay the storm (HRT 2:20) | **Proof** tab, **Replay: 26 October storm →** (or the `#/replay` tab), **Play the day**. |
+| Reveal (HRT 2:45) | **Proof** tab, **Day-ahead reveal →** (or the `#/reveal` tab). **Verify** under “Was the forecast changed after the fact?” re-checks the published fingerprint. |
+| Play (either, if asked) | **Play** tab: **Quick play** (Beat the model) or **Play Market day solo**. `#/play?demo=1` is an offline rehearsal that touches nothing live. |
 
 ## Live numbers to expect (checked Sunday 8 November, 07:17 UTC)
 
