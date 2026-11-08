@@ -17,7 +17,7 @@ export function n(id: string, key = 'value'): number | null {
 export const fmt = {
   int: (v: number) => Math.round(v).toLocaleString('en-GB'),
   pct: (v: number) => `${Math.round(v)}%`,
-  gbp: (v: number) => (Math.abs(v) >= 1e9 ? `£${(v / 1e9).toFixed(2)}bn` : Math.abs(v) >= 1e6 ? `£${(v / 1e6).toFixed(1)}m` : `£${Math.round(v).toLocaleString('en-GB')}`),
+  gbp: (v: number) => (Math.abs(v) >= 1e9 ? `£${(v / 1e9).toFixed(1)}bn` : Math.abs(v) >= 1e6 ? `£${(v / 1e6).toFixed(1)}m` : `£${Math.round(v).toLocaleString('en-GB')}`),
 }
 
 /** "8 Nov 07:52 UTC" */
