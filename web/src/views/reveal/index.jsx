@@ -72,10 +72,10 @@ function ZoneCard({ z, fresh }) {
         {z.published ? (
           <>
             <span>Average error <b className="num">{cur}{z.mae?.toFixed(1)}</b></span>
-            <span>Inside band <b className="num">{Math.round((z.inside_band_share ?? 0) * 100)}%</b></span>
+            <span>Inside likely range <b className="num">{Math.round((z.inside_band_share ?? 0) * 100)}%</b></span>
           </>
         ) : (
-          <span className="faint">Frozen P50 range {cur}{Math.min(...hrs.map((h) => h.p50)).toFixed(0)}–{cur}{Math.max(...hrs.map((h) => h.p50)).toFixed(0)}</span>
+          <span className="faint">Best guess between {cur}{Math.min(...hrs.map((h) => h.p50)).toFixed(0)} and {cur}{Math.max(...hrs.map((h) => h.p50)).toFixed(0)} across the day</span>
         )}
       </div>
     </article>
@@ -157,7 +157,7 @@ function Reveal() {
           {data.zones.map((z) => <ZoneCard key={z.zone} z={z} fresh={fresh.has(z.zone)} />)}
         </div>
       )}
-      <div className="rv-legend"><span><i className="b" />Frozen P10–P90</span><span><i className="m" />Frozen P50</span><span><i className="d" />Result inside band</span><span><i className="h" />Outside band</span></div>
+      <div className="rv-legend"><span><i className="b" />Frozen <Term id="likely-range">likely range</Term></span><span><i className="m" />Frozen <Term id="best-guess">best guess</Term></span><span><i className="d" />Result inside the likely range</span><span><i className="h" />Outside it</span></div>
       <Verify />
       <style>{CSS}</style>
     </div>

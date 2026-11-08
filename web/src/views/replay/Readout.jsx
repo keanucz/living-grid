@@ -36,7 +36,7 @@ export function Readout({ at, state, stateAt, loading, missing, replay, intercon
 
       {rows.length > 0 && (
         <table className="rp-zones">
-          <thead><tr><th>Zone</th><th>Day-ahead price</th>{replay && <th>Forecast P50</th>}</tr></thead>
+          <thead><tr><th>Zone</th><th>Day-ahead price</th>{replay && <th>Best guess</th>}</tr></thead>
           <tbody>
             {rows.map(({ z, fc }) => {
               const inside = fc ? z.price >= fc.p10 && z.price <= fc.p90 : null
@@ -44,14 +44,14 @@ export function Readout({ at, state, stateAt, loading, missing, replay, intercon
                 <tr key={z.zone}>
                   <td>{NAMES[z.zone] ?? z.zone}</td>
                   <td className="num">{SYM[z.currency] ?? ''}{Math.round(z.price)}</td>
-                  {replay && <td className="num">{fc ? <>{SYM[z.currency] ?? ''}{Math.round(fc.p50)} <i className={inside ? 'in' : 'out'} title={inside ? 'inside the P10 to P90 band' : 'outside the band'}>{inside ? '✓' : '✗'}</i></> : '—'}</td>}
+                  {replay && <td className="num">{fc ? <>{SYM[z.currency] ?? ''}{Math.round(fc.p50)} <i className={inside ? 'in' : 'out'} title={inside ? 'inside our likely range' : 'outside our likely range'}>{inside ? '✓' : '✗'}</i></> : '—'}</td>}
                 </tr>
               )
             })}
           </tbody>
         </table>
       )}
-      {replay && <p className="rp-foot">Forecast: made 12 hours ahead by a model that saw nothing from this day. ✓ means the price landed inside its P10 to P90 band.</p>}
+      {replay && <p className="rp-foot">Forecast made 12 hours ahead by a model that never saw this day. ✓ means the price landed inside our likely range.</p>}
 
       <div className="rp-stat"><span>Biggest flow</span><b className="num">{flow ? `${Math.round(flow.mw).toLocaleString('en-GB')} MW` : '—'}</b>{flow && <small>{flow.from ? `${NAMES[flow.from] ?? flow.from} to ${NAMES[flow.to] ?? flow.to}` : flow.name}</small>}</div>
       <div className="rp-stat"><span>Wind paid to switch off, that day so far</span><b className="num">{wind == null ? '—' : `${Math.round(wind).toLocaleString('en-GB')} MWh`}</b><small>Estimated from accepted bids on Scottish wind farms</small></div>

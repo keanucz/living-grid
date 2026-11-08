@@ -4,12 +4,33 @@ import { scaleLinear, scaleUtc } from 'd3-scale'
 import { Icon } from '../../shell/icons.jsx'
 import { api, useApi } from '../../api/client.js'
 import { fmt } from '../../styles/tokens.js'
+import Term from '../../ui/Term.jsx'
+import { Disclosure } from '../../ui/Explain.jsx'
 import { useStore } from '../../store/store.js'
 import Movie from '../events/Movie.jsx'
 import { ReplayMap } from './ReplayMap.jsx'
 import { Readout } from './Readout.jsx'
 import { SPEEDS, atIndex, iso, usePlayhead, useReplayShell, windowFor } from './playhead.js'
 import { daysAround, useDayStates, useDayWind, useMapState } from './useMapState.js'
+
+const plural = (n, word) => `${n.toLocaleString('en-GB')} ${word}${n === 1 ? '' : 's'}`
+const longDay = (d) => {
+  const t = d ? new Date(`${String(d).slice(0, 10)}T12:00:00Z`) : null
+  return t && !Number.isNaN(t.getTime()) ? t.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' }) : 'this day'
+}
+// Hours with an actual that landed between P10 and P90, over every series in the replay (as the engine counts them).
+function coverage(replay) {
+  let inside = 0
+  let total = 0
+  for (const s of replay?.series ?? []) {
+    for (const p of s.points ?? []) {
+      if (p.actual == null || p.p10 == null || p.p90 == null) continue
+      total += 1
+      if (p.actual >= p.p10 && p.actual <= p.p90) inside += 1
+    }
+  }
+  return total ? { inside, total } : null
+}
 
 // Replay: the map plays a day with the data, the chart and the readout follow the same playhead (the shared ui.at, which
 // the history scrubber also moves). The default is the 26 October storm with the as-of forecast; every event in the
@@ -159,7 +180,7 @@ function Replay() {
           <p>{mode === 'movies'
             ? 'Each movie plays an event from public data, with the moments that mattered and a plain-English script.'
             : isStorm
-              ? `Would we have seen it coming? The map plays the day; forecasts come from a model trained only on data before ${replay?.trained_before ?? '2026-10-26'}, made 12 hours ahead.`
+              ? `Would we have seen it coming? The map plays the day; each forecast was made 12 hours ahead by a model that never saw this day.`
               : `${ev?.headline ?? ''} The map plays ${ev ? `${day(ev.start)} to ${day(ev.end)}` : 'the event'} from public data.`}</p>
         </div>
       </header>
@@ -215,7 +236,7 @@ function Replay() {
                     {cur && <line x1={tx(cur)} x2={tx(cur)} y1={P.t} y2={H - P.b} stroke="var(--hot)" strokeWidth="1.5" />}
                     {cur?.actual != null && <circle cx={tx(cur)} cy={y(cur.actual)} r="5" fill="var(--text)" stroke="var(--bg)" strokeWidth="2" />}
                   </svg>
-                  <div className="rp-legend"><span><i style={{ background: 'var(--text)' }} />What happened</span><span><i style={{ background: 'var(--accent)' }} />Forecast P50, P10–P90 band</span><span>{inBand} of {shown.filter((p) => p.actual != null).length} hours inside the band</span></div>
+                  <div className="rp-legend"><span><i style={{ background: 'var(--text)' }} />What happened</span><span><i style={{ background: 'var(--accent)' }} />Our <Term id="best-guess">best guess</Term> and <Term id="likely-range">likely range</Term></span><span>{inBand} of {plural(shown.filter((p) => p.actual != null).length, 'hour')} inside the likely range</span></div>
                 </section>
               )}
               {isStorm && replay === undefined && <p className="rp-muted">Loading the forecast…</p>}
@@ -237,7 +258,15 @@ function Replay() {
               events={isStorm && replay?.constraint_cost_gbp ? <div className="rp-stat"><span>GB constraint bill that day</span><b className="num">{fmt.money(replay.constraint_cost_gbp)}</b></div> : null}
             />
           </div>
-          {isStorm && replay?.summary && <p className="rp-sum">{replay.summary}</p>}
+          {isStorm && replay?.summary && (
+            <div className="rp-sum">
+              <p>
+                Our model was trained only on data before {longDay(replay.trained_before)}: each forecast was made 12 hours ahead by a model that never saw this day.
+                {coverage(replay) && <> {coverage(replay).inside} of {plural(coverage(replay).total, 'hour')} landed inside our <Term id="likely-range">likely range</Term>.</>}
+              </p>
+              <Disclosure label="For experts">{replay.summary}</Disclosure>
+            </div>
+          )}
         </>
       )}
       <style>{CSS}</style>
@@ -271,7 +300,9 @@ body { overflow: auto; }
 .rp-stat b { display: block; font-size: 24px; font-weight: 600; margin-top: 2px; }
 .rp-stat small { font-size: 13px; color: var(--accent); font-weight: 500; }
 .rp-why p { margin: 4px 0 0; line-height: 1.45; }
-.rp-sum { font-size: 12px; color: var(--text-3); line-height: 1.5; margin: 0; }
+.rp-sum { margin: 14px 0 0; max-width: 820px; }
+.rp-sum p { font-size: 15px; color: var(--text-2); line-height: 1.5; margin: 0 0 4px; }
+.rp-sum .ex-dbody { font-size: 12px; color: var(--text-3); }
 .rp-muted { color: var(--text-2); }
 .rp-mode { margin-bottom: 16px; }
 .rp-main { display: grid; gap: 12px; min-width: 0; }

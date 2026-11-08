@@ -2,7 +2,7 @@ import { useId, useState } from 'react'
 
 // The shared plain-English card: a question as the title, the answer in larger type, then two closed disclosures,
 // "Why?" and "For experts". Copy carries no typed numbers: callers pass live values into `answer` and `why`.
-function Disclosure({ label, children }) {
+export function Disclosure({ label, children }) {
   const [open, setOpen] = useState(false)
   const id = useId()
   return (
@@ -14,6 +14,7 @@ function Disclosure({ label, children }) {
       <div id={id} className="ex-dbody" hidden={!open}>
         {children}
       </div>
+      <style>{CSS}</style>
     </div>
   )
 }
