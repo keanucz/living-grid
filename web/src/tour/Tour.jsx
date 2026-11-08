@@ -84,7 +84,11 @@ export default function Tour() {
     return () => clearTimeout(h)
   }, [tour, step])
 
-  if (!tour || !step) return null
+  useEffect(() => {
+    document.documentElement.dataset.tourStep = step?.id ?? ''
+  }, [step])
+
+  if (!tour || !step || tour.clean) return null
   const pad = 6
   const low = box && box.t + box.h / 2 > innerHeight * 0.55
   const wide = innerWidth > 700

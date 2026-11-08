@@ -13,12 +13,20 @@ const gbPrice = (j) => {
 }
 const euPrice = (zone) => (j) => `€${Math.round(j.zones.find((x) => x.zone === zone).price.value)}/MWh`
 const money = (v) => `£${(v / 1e6).toFixed(1)} million`
+const day = (d) => new Date(`${d}T00:00:00Z`).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', timeZone: 'UTC' })
 
 const LIVE = {
   gb: { path: '/state', get: gbPrice, fallback: 'the price on the map' },
   no2: { path: '/state', get: euPrice('NO2'), fallback: 'far cheaper' },
-  bill: { path: '/unseen/ghost-wind', get: (j) => money(j.constraint_cost_total_gbp), fallback: 'millions of pounds' },
-  mae: { path: '/scores', get: (j) => `${j.headline.mae_model.toFixed(1)} against ${j.headline.mae_persistence.toFixed(1)}`, fallback: 'lower than the baseline' },
+  bill: {
+    path: '/unseen/ghost-wind',
+    get: (j) => {
+      const c = j.constraint_costs
+      return `${money(j.constraint_cost_total_gbp)} over the ${c.length} days it has published, ${day(c[0].date)} to ${day(c.at(-1).date)}`
+    },
+    fallback: 'millions of pounds over the days it has published',
+  },
+  mae: { path: '/scores', get: (j) => `${j.headline.mae_model.toFixed(1)} against ${j.headline.mae_persistence.toFixed(1)} for the persistence baseline`, fallback: 'lower than the persistence baseline' },
   scored: { path: '/scores', get: (j) => String(j.headline.forecasts_scored), fallback: 'many' },
 }
 const pick = (...keys) => Object.fromEntries(keys.map((k) => [k, LIVE[k]]))
@@ -38,11 +46,11 @@ export const TOURS = {
       { id: 'explain', section: 'forecast', at: '+6', target: 'explain', duration: 8,
         say: 'Every forecast comes with a reason in plain words, from the model’s own feature contributions.' },
       { id: 'ghostwind', section: 'hidden', at: 'now', target: 'stories', duration: 10, camera: { longitude: -4.0, latitude: 57.0, zoom: 5.0 },
-        say: 'What normally stays hidden: Scottish wind that was paid to switch off. NESO’s constraint costs in the latest window come to {bill}. Wind and carbon figures here are estimates, and labelled so.', live: pick('bill') },
+        say: 'What normally stays hidden: Scottish wind that was paid to switch off. NESO’s published constraint costs come to {bill}. Wind and carbon figures here are estimates, and labelled so.', live: pick('bill') },
       { id: 'hormuz', section: 'whatif', event: { id: 'hormuz' }, target: 'simDock', duration: 12,
         say: 'Close the Strait of Hormuz and watch the gas shock ripple across Europe, with the bill in pounds. Gas pass-through approximates market coupling.' },
       { id: 'proof', section: 'proof', at: 'now', target: 'scoreboard', duration: 10,
-        say: 'Proof: {scored} forecasts logged before their outcome, with an average error of {mae}. Where we lose to the baseline, we say so.', live: pick('scored', 'mae') },
+        say: 'Proof: {scored} live forecasts scored so far, each logged before its outcome. In the walk-forward backtest our average price error is {mae} (per MWh, pooled across zones). Where we lose to the baseline, we say so.', live: pick('scored', 'mae') },
       { id: 'play', section: 'play', target: 'tab-play', duration: 7,
         say: 'Think you can read the grid better than the model? Play a real, hidden day against our forecasters.' },
     ],
@@ -66,7 +74,7 @@ const MORE = {
   carbon: { id: 'carbon', section: 'hidden', layers: { carbon: true, ghostWind: false }, target: 'stories', duration: 10, camera: null,
     say: 'Carbon travels too. A grid can look clean at home and still run on dirty imports: this shows the intensity each country actually consumes (modelled, with standard emission factors).' },
   battery: { id: 'battery', section: 'whatif', target: 'simDock', duration: 9,
-    say: 'A 1 MW battery in every zone reacts to the shock. The risk-aware one, which sees the forecast bands, loses less on bad hours than one that trusts the median.' },
+    say: 'A 1 MW battery in every zone reacts to the shock. The risk-aware one, which sees the forecast bands, matches or beats one that trusts only the median in every zone scored so far.' },
   replay: { id: 'replay', page: '#/replay', target: 'map', duration: 10,
     say: 'Replay of 26 October: models trained only on data before that day, so “would we have seen it coming?” is a genuine out-of-sample test.' },
   reveal: { id: 'reveal', page: '#/reveal', target: 'map', duration: 9,

@@ -47,9 +47,9 @@ export function go(i) {
   apply(steps[next.i])
 }
 
-export function start(name, { i = 0, autoplay = false } = {}) {
+export function start(name, { i = 0, autoplay = false, clean = false } = {}) {
   if (!TOURS[name]) return false
-  setTour({ name, i: 0, autoplay })
+  setTour({ name, i: 0, autoplay, clean })
   go(i)
   return true
 }
@@ -69,11 +69,11 @@ export function resumable(name = 'main') {
   return s && s.name === name && s.i > 0 && s.i < stepsOf(name).length ? s : null
 }
 
-// #tour=<name>[&step=N][&autoplay]; the hash is cleared so the app's own hash routes keep working.
+// #tour=<name>[&step=N][&autoplay][&clean] (clean: drive the app but draw no ring or caption, for screen recordings); the hash is cleared so the app's own hash routes keep working.
 export function startFromHash() {
   const raw = location.hash.replace(/^#/, '')
   if (!raw.startsWith('tour=')) return false
   const q = new URLSearchParams(raw)
   history.replaceState(null, '', location.pathname + location.search + '#/')
-  return start(q.get('tour'), { i: Number(q.get('step') ?? 0) || 0, autoplay: q.has('autoplay') })
+  return start(q.get('tour'), { i: Number(q.get('step') ?? 0) || 0, autoplay: q.has('autoplay'), clean: q.has('clean') })
 }
