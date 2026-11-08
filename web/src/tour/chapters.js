@@ -69,7 +69,7 @@ export const CHAPTERS = [
       caption: 'Close the Strait of Hormuz and gas rises by 40%. Over two weeks that is about {hormuz_cost} more for the wholesale market, and Britain’s price goes up {hormuz_gb}.',
       fallback: 'Close the Strait of Hormuz and gas rises by 40%. The pound figure counts up as the price shock spreads from the LNG terminals.' },
     { id: 'whatif.battery', section: 'whatif', at: 'now', panel: 'more', ms: 12000, for: ['hrt', 'story'],
-      caption: 'A one-megawatt battery that plans for our uncertainty earns {battery_risk} of what perfect foresight would; one that trusts our median alone earns {battery_median}. Shares are averaged over the six zones.',
+      caption: 'A one-megawatt battery that plans for our uncertainty earns {battery_risk} of what perfect foresight would; one that trusts our median alone earns {battery_median}. Shares are averaged over the five zones we score (southern Norway is too flat to score).',
       fallback: 'We run two batteries on the same forecasts, one that plans for our uncertainty and one that trusts the median, against perfect foresight.' },
     { id: 'whatif.datacentre', section: 'whatif', at: 'now', panel: 'simDock', ms: 11000, for: ['story'],
       caption: 'Or drop in a data centre. {dc_line}',
