@@ -3,6 +3,7 @@ import { Identity, Timestamp } from 'spacetimedb';
 import { clearRound, lk } from './market_core';
 import { clearBattery } from './battery_core';
 import { clearBeatForLobby } from './beat_core';
+import { clearPmForLobby } from './pm_core';
 import { applyResults } from './profile_core';
 
 // Helpers shared by lobby.ts and later reducer files (quick play, votes). reducers/*.ts may only export reducers, so
@@ -63,7 +64,7 @@ export function recordResults(ctx: any, l: any, mode: string, day: string) {
 
 export const CODE_LETTERS = 'ABCDEFGHJKLMNPQRSTUVWXYZ'; // no I or O: they read as 1 and 0
 export const AVATARS = ['turbine', 'pylon', 'solar', 'flame', 'battery', 'wave'];
-export const MODES = ['market', 'battery', 'beat'];
+export const MODES = ['market', 'battery', 'beat', 'pm'];
 export const SWEEP_EVERY_US = 600_000_000n;
 export const MAX_PLAYERS = 40;
 export const DEFAULTS = { seconds_per_hour: 30, n_questions: 6, bots: true };
@@ -111,6 +112,7 @@ export function deleteLobby(ctx: any, id: number) {
   clearRound(ctx, id);
   clearBattery(ctx, id);
   clearBeatForLobby(ctx, id);
+  clearPmForLobby(ctx, id);
   for (const p of [...ctx.db.lobby_player.lobby_id.filter(id)]) ctx.db.lobby_player.key.delete(p.key);
   for (const d of [...ctx.db.lobby_day_played.lobby_id.filter(id)]) ctx.db.lobby_day_played.key.delete(d.key);
   deleteVotes(ctx, id);

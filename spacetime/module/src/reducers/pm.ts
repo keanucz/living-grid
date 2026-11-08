@@ -5,7 +5,7 @@ import { pm_tick } from '../tables';
 import { ensureProfile } from '../profile_core';
 import { cleanAvatar, cleanName } from '../lobby_core';
 import { MAX_PRICE, MIN_PRICE } from '../pm_math';
-import { PM_BOTS, clearPm, startPm, tickPm, tradePm, type PmMarket } from '../pm_core';
+import { PM_BOTS, clearPm, roomOf, startPm, tickPm, tradePm, type PmMarket } from '../pm_core';
 
 // Solo markets. pm_start begins a game on a random mystery day from pm_day; pm_buy and pm_sell trade at the model's
 // current quote; the module advances the clock itself (pm_tick_run). See pm_core.ts.
@@ -15,7 +15,7 @@ export const pm_start = spacetimedb.reducer({ name: t.string(), avatar: t.string
   const face = cleanAvatar(avatar);
   const days = [...ctx.db.pm_day.iter()];
   if (!days.length) throw new SenderError('no mystery days are loaded yet');
-  for (const old of [...ctx.db.pm_game.owner.filter(ctx.sender)]) clearPm(ctx, old.id); // one solo game at a time
+  for (const old of [...ctx.db.pm_game.owner.filter(ctx.sender)]) if (!roomOf(ctx, old.id)) clearPm(ctx, old.id); // one solo game at a time; a room's game is not ours to clear
   const profile = ensureProfile(ctx, ctx.sender, who, face, false);
   ctx.db.profile.identity.update({ ...profile, name: who, avatar: face, updated_at: ctx.timestamp });
   const seen = new Set([...ctx.db.game_result.identity.filter(ctx.sender)].map((r: any) => r.day));
@@ -33,7 +33,7 @@ export const pm_sell = spacetimedb.reducer({ game_id: t.u32(), market_id: t.stri
 // Give up a running game (or clear a finished one).
 export const pm_leave = spacetimedb.reducer({ game_id: t.u32() }, (ctx, { game_id }) => {
   const g = ctx.db.pm_game.id.find(game_id);
-  if (g && g.owner.isEqual(ctx.sender)) clearPm(ctx, game_id);
+  if (g && g.owner.isEqual(ctx.sender) && !roomOf(ctx, game_id)) clearPm(ctx, game_id); // rooms: leave through the lobby
 });
 
 export const pm_tick_run = spacetimedb.reducer({ onSchedule: pm_tick }, { arg: pm_tick.rowType }, (ctx, { arg }) => {

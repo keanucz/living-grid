@@ -96,4 +96,35 @@ wait_for "SELECT state FROM pm_game WHERE id = $G" 'done' 1
 call_as "$U" pm_buy "[$G,\"m2\",\"yes\",1]" 530
 call_as "$U" pm_leave "[$G]" 200
 [ "$(count "SELECT id FROM pm_game" '^ [0-9]')" = 0 ] || { echo "FAIL leave clears the game" >&2; exit 1; }
+
+# ---- a room plays the markets: two people and the bots share one game and one clock
+read -r R1 R1ID < <(new_user); read -r R2 R2ID < <(new_user)
+call_as "$R1" lobby_create '["Rhea","turbine","pm"]' 200
+L=$(sql "SELECT id FROM lobby WHERE mode = 'pm'" | tail -1 | tr -d ' ')
+CODE=$(sql "SELECT code FROM lobby WHERE id = $L" | tail -1 | tr -d ' "')
+call_as "$R2" lobby_join "[\"$CODE\",\"Rory\",\"wave\"]" 200
+call_as "$R1" lobby_start '[]' 200
+wait_for "SELECT state FROM lobby WHERE id = $L" playing 1
+RG=$(sql "SELECT game_id FROM pm_room WHERE lobby_id = $L" | tail -1 | tr -d ' ')
+[ -n "$RG" ] || { echo "FAIL no pm_room row" >&2; exit 1; }
+[ "$(count "SELECT key FROM pm_account WHERE game_id = $RG" "^ \"$RG|")" = 6 ] || { echo "FAIL room accounts (2 people + 4 bots)" >&2; exit 1; }
+call_as "$R1" pm_buy "[$RG,\"m1\",\"yes\",10]" 200
+call_as "$R2" pm_buy "[$RG,\"m1\",\"no\",7]" 200                # each trades on their own account at the same price
+call_as "$U" pm_buy "[$RG,\"m1\",\"yes\",1]" 530                 # a stranger cannot trade in the room's game
+call_as "$PUB" pm_buy "[$RG,\"m1\",\"yes\",1]" 530
+[ "$(count "SELECT points FROM pm_account WHERE game_id = $RG AND identity = 0x$R1ID" '^ 995.9 ')" = 1 ] || { echo "FAIL R1 points: $(sql "SELECT * FROM pm_account WHERE game_id = $RG")" >&2; exit 1; }
+[ "$(count "SELECT points FROM pm_account WHERE game_id = $RG AND identity = 0x$R2ID" '^ 995.73 ')" = 1 ] || { echo "FAIL R2 points" >&2; exit 1; }
+call_as "$R1" pm_leave "[$RG]" 200                                 # leaving a room game goes through the lobby, not pm_leave
+[ "$(count "SELECT id FROM pm_game WHERE id = $RG" '^ [0-9]')" = 1 ] || { echo "FAIL pm_leave must not clear a room game" >&2; exit 1; }
+call_as "$R1" pm_start '["Rhea","turbine"]' 200                     # a solo game next to the room's game leaves the room's alone
+[ "$(count "SELECT id FROM pm_game WHERE id = $RG" '^ [0-9]')" = 1 ] || { echo "FAIL pm_start cleared the room game" >&2; exit 1; }
+call_as "$R1" pm_leave "[$(sql "SELECT id FROM pm_game WHERE owner = 0x$R1ID" | tail -n +3 | tr -d ' ' | grep -v "^$RG$" | head -1)]" 200
+call_as "$ANON" lobby_join "[\"$CODE\",\"Late\",\"flame\"]" 530      # no joining a running room game
+wait_for "SELECT state FROM lobby WHERE id = $L" reveal 1
+[ "$(count "SELECT rank FROM game_result WHERE mode = 'pm' AND lobby_id = $L" '^ [0-9]')" = 6 ] || { echo "FAIL room results" >&2; exit 1; }
+[ "$(count "SELECT day_revealed FROM pm_game WHERE id = $RG" '2026-10-26')" = 1 ] || { echo "FAIL room day revealed" >&2; exit 1; }
+call_as "$R2" lobby_rematch '[]' 530
+call_as "$R1" lobby_rematch '[]' 200
+[ "$(count "SELECT game_id FROM pm_room WHERE lobby_id = $L" '^ [0-9]')" = 0 ] || { echo "FAIL rematch clears the room game" >&2; exit 1; }
+[ "$(count "SELECT id FROM pm_game WHERE id = $RG" '^ [0-9]')" = 0 ] || { echo "FAIL room game still there after rematch" >&2; exit 1; }
 echo "pm smoke: PASS"

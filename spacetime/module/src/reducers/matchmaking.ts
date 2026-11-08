@@ -14,7 +14,7 @@ function addToLobby(ctx: any, lobby: number, who: any, name: string, avatar: str
 }
 
 export const quick_play = spacetimedb.reducer({ name: t.string(), avatar: t.string(), mode: t.string() }, (ctx, { name, avatar, mode }) => {
-  if (!MODES.includes(mode)) throw new SenderError('mode must be market or battery');
+  if (!MODES.includes(mode)) throw new SenderError('mode must be market, battery, beat or pm');
   const who = cleanName(name);
   const face = cleanAvatar(avatar);
   // Already in a quick lobby that has not started: nothing to do.

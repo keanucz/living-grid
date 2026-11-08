@@ -745,3 +745,9 @@ export const pm_tick = table(
   { name: 'pm_tick' },
   { scheduled_id: t.u64().primaryKey().autoInc(), scheduled_at: t.scheduleAt(), game_id: t.u32() }
 );
+
+// A pm_game played by a room: which lobby it belongs to (solo games have no row). Additive, so pm_game itself is unchanged.
+export const pm_room = table(
+  { name: 'pm_room', public: true },
+  { game_id: t.u32().primaryKey(), lobby_id: t.u32().index('btree') }
+);

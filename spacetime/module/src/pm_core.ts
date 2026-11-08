@@ -35,7 +35,15 @@ export function clearPm(ctx: any, game: number) {
   const PK: Record<string, string> = { pm_market: 'key', pm_price: 'key', pm_account: 'key', pm_position: 'key', pm_trade: 'key' };
   for (const tbl of Object.keys(PK)) for (const row of [...ctx.db[tbl].game_id.filter(game)]) ctx.db[tbl][PK[tbl]].delete(row[PK[tbl]]);
   ctx.db.pm_secret.game_id.delete(game);
+  ctx.db.pm_room.game_id.delete(game);
   ctx.db.pm_game.id.delete(game);
+}
+
+export const roomOf = (ctx: any, game: number): number => ctx.db.pm_room.game_id.find(game)?.lobby_id ?? 0;
+
+export function clearPmForLobby(ctx: any, lobby: number) {
+  if (lobby === 0) return;
+  for (const r of [...ctx.db.pm_room.lobby_id.filter(lobby)]) clearPm(ctx, r.game_id);
 }
 
 function priceAt(m: PmMarket, hour: number): number {
@@ -103,20 +111,27 @@ function apply(ctx: any, game: number, who: Identity, market: string, side: 'yes
 export function tradePm(ctx: any, game: number, who: Identity, market: string, side: string, action: 'buy' | 'sell', shares: number) {
   const g = ctx.db.pm_game.id.find(game);
   if (!g || g.state !== 'running') throw new SenderError('this game is over');
-  if (!g.owner.isEqual(who)) throw new SenderError('this is not your game');
+  const acct = ctx.db.pm_account.key.find(ak(game, who));
+  if (!acct || acct.is_bot) throw new SenderError('you are not playing in this game');
   if (side !== 'yes' && side !== 'no') throw new SenderError('side must be yes or no');
   apply(ctx, game, who, market, side, action, shares, g.clock_hour);
 }
 
 export function startPm(ctx: any, owner: Identity, name: string, day: any): number {
+  return startPmGame(ctx, [{ identity: owner, name }], owner, 0, day, true);
+}
+
+// A game for `players` (one for solo, the lobby's players for a room, `lobby` > 0), owned by `owner` (the host in a room).
+export function startPmGame(ctx: any, players: { identity: Identity; name: string }[], owner: Identity, lobby: number, day: any, bots: boolean): number {
   const markets: PmMarket[] = JSON.parse(day.markets_json);
   const g = ctx.db.pm_game.insert({
     id: 0, owner, state: 'running', clock_hour: day.start_hour, start_hour: day.start_hour, end_hour: day.end_hour,
     seconds_per_hour: SECONDS_PER_HOUR, opened_at: ctx.timestamp, day_revealed: '', started_at: ctx.timestamp,
   });
   ctx.db.pm_secret.insert({ game_id: g.id, day: day.day });
-  ctx.db.pm_account.insert({ key: ak(g.id, owner), game_id: g.id, identity: owner, name, is_bot: false, points: START_POINTS, equity: START_POINTS });
-  for (const b of PM_BOTS) {
+  if (lobby > 0) ctx.db.pm_room.insert({ game_id: g.id, lobby_id: lobby });
+  for (const p of players) ctx.db.pm_account.insert({ key: ak(g.id, p.identity), game_id: g.id, identity: p.identity, name: p.name, is_bot: false, points: START_POINTS, equity: START_POINTS });
+  for (const b of bots ? PM_BOTS : []) {
     const spec = BOT_SPECS.find(x => x.name === b)!;
     ctx.db.pm_account.insert({ key: ak(g.id, botId(b)), game_id: g.id, identity: botId(b), name: spec.title, is_bot: true, points: START_POINTS, equity: START_POINTS });
   }
@@ -127,7 +142,7 @@ export function startPm(ctx: any, owner: Identity, name: string, day: any): numb
       status: 'open', price_yes: p, note: m.reasons?.[String(day.start_hour)] ?? '', outcome: '', actual_text: '',
     });
     ctx.db.pm_price.insert({ key: priceKey(g.id, m.id, day.start_hour), game_id: g.id, market_id: m.id, hour: day.start_hour, price_yes: p });
-    for (const b of PM_BOTS) {
+    for (const b of bots ? PM_BOTS : []) {
       const belief = m.bots?.[b];
       if (belief === undefined) continue;
       const cash = ctx.db.pm_account.key.find(ak(g.id, botId(b))).points;
@@ -181,13 +196,18 @@ export function tickPm(ctx: any, game: number) {
 
 // Final standings: profit over the starting points, into the same ratings and meta leaderboard as the other modes.
 function finishPm(ctx: any, g: any, day: string) {
+  const lobby = roomOf(ctx, g.id);
   const rows = [...ctx.db.pm_account.game_id.filter(g.id)].sort((a: any, b: any) => b.equity - a.equity);
-  const avatar = ctx.db.profile.identity.find(g.owner)?.avatar ?? '';
+  const avatars: Record<string, string> = {};
+  if (lobby) for (const lp of ctx.db.lobby_player.lobby_id.filter(lobby)) avatars[hex(lp.identity)] = lp.avatar;
+  for (const r of rows) if (!r.is_bot && !avatars[hex(r.identity)]) avatars[hex(r.identity)] = ctx.db.profile.identity.find(r.identity)?.avatar ?? '';
   rows.forEach((r: any, i: number) => {
     ctx.db.game_result.insert({
-      key: lk(0, `pm${g.id}|${hex(r.identity)}`), lobby_id: 0, round_no: g.id, identity: r.identity, name: r.name, is_bot: r.is_bot, mode: 'pm', day,
+      key: lk(lobby, `pm${g.id}|${hex(r.identity)}`), lobby_id: lobby, round_no: g.id, identity: r.identity, name: r.name, is_bot: r.is_bot, mode: 'pm', day,
       rank: i + 1, n_players: rows.length, points: Math.round((r.equity - START_POINTS) * 100) / 100, ended_at: ctx.timestamp,
     });
   });
-  applyResults(ctx, rows.map((r: any, i: number) => ({ identity: r.identity, name: r.name, is_bot: r.is_bot, points: r.equity - START_POINTS, rank: i + 1 })), { [hex(g.owner)]: avatar });
+  const l = lobby ? ctx.db.lobby.id.find(lobby) : null;
+  if (l) ctx.db.lobby.id.update({ ...l, state: 'reveal', state_since: ctx.timestamp });
+  applyResults(ctx, rows.map((r: any, i: number) => ({ identity: r.identity, name: r.name, is_bot: r.is_bot, points: r.equity - START_POINTS, rank: i + 1 })), avatars);
 }

@@ -9,6 +9,7 @@ import {
   newCode, pkey, recordResults, removePlayer, schedule, setState, startCountdown,
 } from '../lobby_core';
 import { clearBeatForLobby, startBeat } from '../beat_core';
+import { clearPmForLobby, startPmGame } from '../pm_core';
 import { addBatteryPlayer, clearBattery, startBattery, tickBattery } from '../battery_core';
 
 // Lobbies: a room with a 4-letter code and a host. The host starts the game; after a 5 s countdown the module picks a
@@ -38,7 +39,7 @@ function hostLobby(ctx: any) {
 }
 
 export const lobby_create = spacetimedb.reducer({ name: t.string(), avatar: t.string(), mode: t.string() }, (ctx, { name, avatar, mode }) => {
-  if (!MODES.includes(mode)) throw new SenderError('mode must be market or battery');
+  if (!MODES.includes(mode)) throw new SenderError('mode must be market, battery, beat or pm');
   const who = cleanName(name);
   leaveOthers(ctx, null);
   const l = ctx.db.lobby.insert({
@@ -59,6 +60,7 @@ export const lobby_join = spacetimedb.reducer({ code: t.string(), name: t.string
     return;
   }
   if (l.state === 'countdown' && l.kind !== 'quick') throw new SenderError('the game is about to start');
+  if (l.state === 'playing' && (l.mode === 'beat' || l.mode === 'pm')) throw new SenderError('this game has already started: join the next round');
   if ([...ctx.db.lobby_player.lobby_id.filter(l.id)].length >= MAX_PLAYERS) throw new SenderError('that lobby is full');
   leaveOthers(ctx, l.id);
   ctx.db.lobby_player.insert({ key: pkey(l.id, ctx.sender), lobby_id: l.id, identity: ctx.sender, name: who, avatar: cleanAvatar(avatar), ready: false, points: 0 });
@@ -96,7 +98,7 @@ export const lobby_settings = spacetimedb.reducer(
   (ctx, { seconds_per_hour, n_questions, bots, mode }) => {
     const l = hostLobby(ctx);
     if (l.state !== 'waiting') throw new SenderError('settings can only change while waiting');
-    if (!MODES.includes(mode)) throw new SenderError('mode must be market or battery');
+    if (!MODES.includes(mode)) throw new SenderError('mode must be market, battery, beat or pm');
     const [sLo, sHi] = LIMITS.seconds_per_hour;
     const [nLo, nHi] = LIMITS.n_questions;
     if (seconds_per_hour < sLo || seconds_per_hour > sHi) throw new SenderError(`seconds per hour must be ${sLo} to ${sHi}`);
@@ -108,7 +110,7 @@ export const lobby_settings = spacetimedb.reducer(
 export const lobby_start = spacetimedb.reducer({}, ctx => {
   const l = hostLobby(ctx);
   if (l.state !== 'waiting') throw new SenderError('the game has already started');
-  const pool = l.mode === 'battery' ? ctx.db.battery_day : l.mode === 'beat' ? ctx.db.beat_day : ctx.db.market_day_pool;
+  const pool = l.mode === 'battery' ? ctx.db.battery_day : l.mode === 'beat' ? ctx.db.beat_day : l.mode === 'pm' ? ctx.db.pm_day : ctx.db.market_day_pool;
   if ([...pool.iter()].length === 0) throw new SenderError('no mystery days are loaded yet');
   startCountdown(ctx, l);
 });
@@ -120,6 +122,7 @@ export const lobby_rematch = spacetimedb.reducer({}, ctx => {
   clearRound(ctx, l.id);
   clearBattery(ctx, l.id);
   clearBeatForLobby(ctx, l.id);
+  clearPmForLobby(ctx, l.id);
   for (const p of [...ctx.db.lobby_player.lobby_id.filter(l.id)]) ctx.db.lobby_player.key.update({ ...p, ready: false, points: 0 });
   setState(ctx, l, 'waiting');
 });
@@ -137,7 +140,13 @@ function pickDay(ctx: any, lobby: number, table: any) {
 function begin(ctx: any, lobbyId: number) {
   const l = ctx.db.lobby.id.find(lobbyId);
   if (!l || l.state !== 'countdown') return;
-  const day = pickDay(ctx, lobbyId, l.mode === 'battery' ? ctx.db.battery_day : l.mode === 'beat' ? ctx.db.beat_day : ctx.db.market_day_pool);
+  const day = pickDay(ctx, lobbyId, l.mode === 'battery' ? ctx.db.battery_day : l.mode === 'beat' ? ctx.db.beat_day : l.mode === 'pm' ? ctx.db.pm_day : ctx.db.market_day_pool);
+  if (day && l.mode === 'pm') {
+    startPmGame(ctx, [...ctx.db.lobby_player.lobby_id.filter(lobbyId)].map((p: any) => ({ identity: p.identity, name: p.name })), l.host, lobbyId, day, l.bots);
+    ctx.db.lobby_day_played.insert({ key: lk(lobbyId, day.day), lobby_id: lobbyId, day: day.day });
+    setState(ctx, l, 'playing', { round_no: l.round_no + 1, countdown_until: ctx.timestamp });
+    return;
+  }
   if (day && l.mode === 'beat') {
     startBeat(ctx, lobbyId, [...ctx.db.lobby_player.lobby_id.filter(lobbyId)].map((p: any) => ({ identity: p.identity, name: p.name })), day, l.bots);
     ctx.db.lobby_day_played.insert({ key: lk(lobbyId, day.day), lobby_id: lobbyId, day: day.day });
