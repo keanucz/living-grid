@@ -12,8 +12,8 @@ export const Caption: React.FC<{ children: React.ReactNode; delay?: number }> = 
   const frame = useCurrentFrame()
   const o = interpolate(frame, [delay, delay + 12], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' })
   return (
-    <div style={{ position: 'absolute', left: 120, right: 120, bottom: 88, display: 'flex', justifyContent: 'center', opacity: o }}>
-      <div style={{ background: 'rgba(23,23,23,0.92)', border: `1px solid ${COLORS.line2}`, borderRadius: 14, padding: '16px 30px', fontSize: 32, lineHeight: 1.35, color: COLORS.text, maxWidth: 1500, textAlign: 'center' }}>{children}</div>
+    <div style={{ position: 'absolute', left: 120, right: 120, bottom: 84, display: 'flex', justifyContent: 'center', opacity: o }}>
+      <div style={{ background: 'rgba(23,23,23,0.92)', border: `1px solid ${COLORS.line2}`, borderRadius: 14, padding: '16px 30px', fontSize: 34, lineHeight: 1.3, color: COLORS.text, maxWidth: 1560, textAlign: 'center' }}>{children}</div>
     </div>
   )
 }
@@ -124,6 +124,23 @@ export const ClipFrame: React.FC<{ step: string | null; title: string; width?: n
           <div>{title}</div>
         </AbsoluteFill>
       )}
+    </div>
+  )
+}
+
+/** A real screenshot of the app, public/shots/<scene>.png, with a slow pan and zoom. Falls back to the clip frame. */
+export const ShotFrame: React.FC<{ scene: string; step: string | null; title: string; width?: number; badge?: React.ReactNode; from?: [number, number]; to?: [number, number] }> = ({ scene, step, title, width = 1000, badge, from = [0, 0], to = [-40, -24] }) => {
+  const frame = useCurrentFrame()
+  const { durationInFrames } = useVideoConfig()
+  const path = `shots/${scene}.png`
+  if (!hasStatic(path)) return <ClipFrame step={step} title={title} width={width}>{badge}</ClipFrame>
+  const height = (width * 9) / 16
+  const k = interpolate(frame, [0, durationInFrames], [0, 1], { extrapolateRight: 'clamp' })
+  const z = 1.04 + 0.1 * k
+  return (
+    <div style={{ width, height, borderRadius: 18, overflow: 'hidden', border: `1px solid ${COLORS.line2}`, background: COLORS.panel, position: 'relative', flex: 'none' }}>
+      <img src={staticFile(path)} style={{ width: '100%', height: '100%', objectFit: 'cover', transform: `translate(${from[0] + (to[0] - from[0]) * k}px, ${from[1] + (to[1] - from[1]) * k}px) scale(${z})`, transformOrigin: '30% 40%' }} />
+      {badge && <div style={{ position: 'absolute', left: 24, bottom: 24, background: 'rgba(10,10,10,0.9)', border: `1px solid ${COLORS.line2}`, borderRadius: 14, padding: '14px 26px' }}>{badge}</div>}
     </div>
   )
 }

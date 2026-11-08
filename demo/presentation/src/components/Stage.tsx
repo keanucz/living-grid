@@ -12,11 +12,11 @@ export const Stage: React.FC<{ kicker?: string; sources?: Fig[]; children: React
   const uniq = [...new Set(sources.map((s) => s.src))]
   return (
     <AbsoluteFill style={{ background: COLORS.bg, color: COLORS.text, fontFamily: FONT, opacity: fade }}>
-      <AbsoluteFill style={{ padding: '88px 120px 96px' }}>
-        {kicker && <div style={{ fontFamily: MONO, fontSize: 22, letterSpacing: '0.08em', textTransform: 'uppercase', color: COLORS.text3, marginBottom: 18 }}>{kicker}</div>}
+      <AbsoluteFill style={{ padding: '70px 120px 96px' }}>
+        {kicker && <div style={{ fontFamily: MONO, fontSize: 28, letterSpacing: '0.08em', textTransform: 'uppercase', color: COLORS.text3, marginBottom: 18 }}>{kicker}</div>}
         {children}
       </AbsoluteFill>
-      <div style={{ position: 'absolute', left: 120, right: 120, bottom: 36, display: 'flex', justifyContent: 'space-between', fontFamily: MONO, fontSize: 18, color: COLORS.text3 }}>
+      <div style={{ position: 'absolute', left: 120, right: 120, bottom: 30, display: 'flex', justifyContent: 'space-between', fontFamily: MONO, fontSize: 24, color: COLORS.text3 }}>
         <span>The Living Grid</span>
         <span>{uniq.length ? `Source: ${uniq.join(', ')} · ${generatedAt.slice(0, 16).replace('T', ' ')} UTC` : ''}</span>
       </div>

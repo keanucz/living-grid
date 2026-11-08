@@ -1,9 +1,10 @@
 import React from 'react'
 import { interpolate, useCurrentFrame, useVideoConfig } from 'remotion'
 import { F, fmt, wallet } from '../data'
+import type { Fig } from '../data'
 import { COLORS, FONT, MONO } from '../theme'
 import { Bars, Big, Line, LineChart, Row, Title } from '../components/Parts'
-import { Beats, Caption, ClipFrame, EuropeMap, QR, QR_URL, Rise } from '../components/Extra'
+import { Beats, Caption, EuropeMap, QR, QR_URL, Rise, ShotFrame } from '../components/Extra'
 import * as X from '../figs'
 
 // The deck, about three minutes. Every number comes from the snapshot (src/data.ts and src/figs.ts); the words are plain
@@ -14,6 +15,7 @@ import * as X from '../figs'
 export const CLIPS: Record<string, string | null> = { hidden: 'ghostwind', hormuz: 'hormuz', history: 'history', tonight: null, datacentre: null }
 
 const gbpSeries = () => X.replaySeries('GB', 'price_da').map((p) => ({ x: p.hour, y: p.actual as number, lo: p.p10, hi: p.p90, mid: p.p50 }))
+const missed = () => { const s = gbpSeries(); const out = s.filter((p) => p.lo != null && p.hi != null && (p.y > p.hi! || p.y < p.lo!)); const peak = s.reduce((a, p) => (p.y > a.y ? p : a), s[0]); return { n: out.length, of: s.length, peak, high: out.filter((p) => p.y > p.hi!).length } }
 const asOf = (iso: string | null) => (iso ? `${iso.slice(0, 10)} ${iso.slice(11, 16)} UTC` : '–')
 
 // 1. Hook (15 s)
@@ -26,8 +28,8 @@ export const Hook: React.FC = () => {
       seconds: 15, kicker: 'The Living Grid', sources: [X.stateSrc()], render: () => (
         <div style={{ display: 'flex', alignItems: 'center', gap: 40, marginTop: 10 }}>
           <div style={{ flex: 1 }}>
-            <Title size={140}>Electricity is invisible.</Title>
-            <Line delay={20} size={40}>You cannot see what it costs, where it flows or where its carbon comes from. This is the price across Europe right now.</Line>
+            <Title size={150}>Electricity is invisible.</Title>
+            <Line delay={20} size={44}>{`You cannot see what it costs, where it flows or where its carbon comes from. This is the wholesale price across Europe at ${asOf(X.text('state', (b) => b.at))}. Coupled markets often clear at one price.`}</Line>
           </div>
           <EuropeMap prices={prices} reveal={reveal} width={760} height={780} />
         </div>
@@ -45,7 +47,7 @@ export const Problem: React.FC = () => {
       {
         seconds: 6.5, kicker: 'The problem', sources: [low, high], render: () => (
           <>
-            <Title size={84}>Prices swing hard.</Title>
+            <Title size={88}>Prices swing hard.</Title>
             <LineChart width={1300} height={420} series={gbpSeries()} unit="GB day-ahead price through 26 October, £ per MWh (solid line: what happened)" draw={70} />
             <Caption>{`In one day, Great Britain went from ${fmt.gbp(low.v)} to ${fmt.gbp(high.v)} per megawatt-hour.`}</Caption>
           </>
@@ -54,7 +56,7 @@ export const Problem: React.FC = () => {
       {
         seconds: 6.5, kicker: 'The problem', sources: [bill], render: () => (
           <>
-            <Title size={84}>Wind gets paid to switch off.</Title>
+            <Title size={88}>Wind gets paid to switch off.</Title>
             <Row gap={120}>
               <Big fig={bill} format={(v) => fmt.bigGbp(v)} label="GB grid-constraint bill, 26 Oct" delay={12} size={170} />
               <div style={{ marginBottom: 10 }}><EuropeMap prices={[]} labels={false} glowScotland width={420} height={430} /></div>
@@ -66,7 +68,7 @@ export const Problem: React.FC = () => {
       {
         seconds: 7, kicker: 'The problem', sources: [gap.made, gap.used, gap.share], render: () => (
           <>
-            <Title size={84}>Clean at home, dirty by cable.</Title>
+            <Title size={88}>Clean at home, dirty by cable.</Title>
             <Row gap={110}>
               <Big fig={gap.made} format={(v) => `${fmt.n(v)} g`} label={`${gap.zone}: made at home, per kWh`} delay={8} size={130} />
               <Big fig={gap.used} format={(v) => `${fmt.n(v)} g`} label="Used, counting imports, per kWh" delay={22} size={130} />
@@ -83,13 +85,13 @@ export const Problem: React.FC = () => {
 // 3. What we built (20 s)
 export const Built: React.FC = () => {
   const z = X.zoneCount(), l = X.linkCount()
-  const p50 = F.gbForecastP50(), p10 = F.gbForecastP10(), p90 = F.gbForecastP90()
+  const miss = missed()
   return (
     <Beats beats={[
       {
         seconds: 9, kicker: 'What we built', sources: [z, l], render: () => (
           <>
-            <Title size={84}>The grid, made visible.</Title>
+            <Title size={88}>The grid, made visible.</Title>
             <div style={{ display: 'flex', gap: 60, alignItems: 'center', marginTop: 20 }}>
               <div style={{ flex: 1 }}>
                 {['Prices in every country, on one fixed scale', 'Power flowing along the cables between them', 'Wind that was paid to switch off', 'Carbon, counting what each country imports'].map((t, i) => (
@@ -106,11 +108,11 @@ export const Built: React.FC = () => {
         ),
       },
       {
-        seconds: 11, kicker: 'What we built', sources: [p10, p50, p90], render: () => (
+        seconds: 11, kicker: 'What we built', sources: [X.stormHigh()], render: () => (
           <>
-            <Title size={84}>Then forecast, and say how sure we are.</Title>
-            <LineChart width={1300} height={380} series={gbpSeries()} unit="GB price on 26 October: actual, our forecast (dashed) and its likely range (P10 to P90), made with data from before the day" draw={90} />
-            <Caption>{`Next hour in Great Britain: ${fmt.gbp(p50.v)}, probably between ${fmt.gbp(p10.v)} and ${fmt.gbp(p90.v)}.`}</Caption>
+            <Title size={76}>Made with data from before the day, with its range.</Title>
+            <LineChart width={1300} height={340} series={gbpSeries()} unit="26 Oct: actual (solid), forecast (dashed), likely range. Red rings: outside it" draw={90} marks />
+            <Caption>{`The range missed ${miss.n} of ${miss.of} hours${miss.high === miss.n ? ', every time with the price above it' : ''}, including the ${fmt.gbp(miss.peak.y)} peak. We show it.`}</Caption>
           </>
         ),
       },
@@ -118,16 +120,17 @@ export const Built: React.FC = () => {
   )
 }
 
-// 4. The product, in short real clips (65 s, five clips of 13 s)
-const Segment: React.FC<{ title: string; lines: string[]; clip: string; stand: React.ReactNode }> = ({ title, lines, clip, stand }) => (
-  <div style={{ display: 'flex', gap: 56, alignItems: 'center', marginTop: 10 }}>
-    <div style={{ width: 640 }}>
-      <Title size={64}>{title}</Title>
-      {lines.map((t, i) => <Rise key={t} delay={14 + i * 12}><div style={{ fontSize: 32, color: COLORS.text2, marginTop: 18, lineHeight: 1.35 }}>{t}</div></Rise>)}
+// 4. The product, from real screenshots of the app (65 s, five segments of 13 s, one number each)
+const Segment: React.FC<{ scene: string; title: string; lines: string[]; clip: string; badge: React.ReactNode }> = ({ scene, title, lines, clip, badge }) => (
+  <div style={{ display: 'flex', gap: 50, alignItems: 'center', marginTop: 20 }}>
+    <div style={{ width: 600 }}>
+      <Title size={72}>{title}</Title>
+      {lines.map((t, i) => <Rise key={t} delay={14 + i * 12}><div style={{ fontSize: 34, color: COLORS.text2, marginTop: 22, lineHeight: 1.35 }}>{t}</div></Rise>)}
     </div>
-    <ClipFrame step={CLIPS[clip]} title={title} width={1000}>{stand}</ClipFrame>
+    <ShotFrame scene={scene} step={CLIPS[clip]} title={title} width={1000} badge={badge} />
   </div>
 )
+const Badge: React.FC<{ fig: Fig; format: (v: number | null) => string; label: string }> = ({ fig, format, label }) => <Big fig={fig} format={format} label={label} size={84} />
 
 export const Product: React.FC = () => {
   const cost = X.hormuzCost(), lo = X.hormuzCostLow(), hi = X.hormuzCostHigh()
@@ -136,83 +139,81 @@ export const Product: React.FC = () => {
   const bill = F.stormConstraintGbp()
   const sentence = X.hormuzSentence()
   const gap = X.dirtiestImportGap()
+  const peak = X.stormHigh()
+  const first = hw[0]
   return (
     <Beats beats={[
       {
         seconds: 13, kicker: 'The product · Hidden grid', sources: [bill, gap.used], render: () => (
-          <Segment title="See the hidden grid" clip="hidden" lines={['Wind switched off, with the bill.', 'Carbon that arrives by cable.', 'Where the grid is full.']}
-            stand={<Big fig={bill} format={(v) => fmt.bigGbp(v)} label="Constraint bill, 26 Oct" size={110} />} />
+          <Segment scene="hidden" title="See the hidden grid" clip="hidden" lines={['Wind paid to switch off, and the bill.', 'Carbon that arrives by cable.']}
+            badge={<Badge fig={bill} format={(v) => fmt.bigGbp(v)} label="Constraint bill, 26 Oct" />} />
         ),
       },
       {
         seconds: 13, kicker: 'The product · What if', sources: [cost, lo, hi], render: () => (
-          <Segment title="Close the Strait of Hormuz" clip="hormuz" lines={[sentence ?? 'Gas goes up; so does power.', 'The cost counts up in pounds, with a range.']}
-            stand={<><Big fig={cost} format={(v) => fmt.bigGbp(v)} label="Extra cost to consumers (central)" size={110} /><div style={{ fontSize: 24 }}>{`range ${fmt.bigGbp(lo.v)} to ${fmt.bigGbp(hi.v)}`}</div></>} />
+          <Segment scene="hormuz" title="Close the Strait of Hormuz" clip="hormuz" lines={[sentence ?? 'Gas goes up; so does power.', `Likely range ${fmt.bigGbp(lo.v)} to ${fmt.bigGbp(hi.v)}.`]}
+            badge={<Badge fig={cost} format={(v) => fmt.bigGbp(v)} label="Extra cost to consumers" />} />
         ),
       },
       {
-        seconds: 13, kicker: 'The product · History', sources: [X.stormHigh()], render: () => (
-          <Segment title="Replay 26 October" clip="history" lines={['The map plays the day.', 'Forecasts come from a model that had not seen it.']}
-            stand={<LineChart width={800} height={300} series={gbpSeries()} unit="GB price, £ per MWh" draw={90} />} />
+        seconds: 13, kicker: 'The product · History', sources: [peak], render: () => (
+          <Segment scene="history" title="Replay 26 October" clip="history" lines={['The map plays the day.', 'The forecasts come from a model that had not seen it.']}
+            badge={<Badge fig={peak} format={(v) => fmt.gbp(v)} label="GB peak, per MWh" />} />
         ),
       },
       {
         seconds: 13, kicker: 'The product · Tonight', sources: [], render: () => (
-          <Segment title="Cheapest hours tonight" clip="tonight" lines={hw.length ? hw.map((w) => `${w.label}: ${w.start} to ${w.end}, about ${fmt.n(w.pence, 1)}p per kWh.`) : ['The cheapest hours for your car and dishwasher.']}
-            stand={<div style={{ fontSize: 30, lineHeight: 1.6 }}>{hw.map((w) => <div key={w.label}>{`${w.label}: ${w.start} to ${w.end}`}</div>)}</div>} />
+          <Segment scene="tonight" title="Cheapest hours tonight" clip="tonight" lines={first ? [`${first.label}: ${first.start} to ${first.end}.`, 'Wholesale price, before network costs and charges.'] : ['The cheapest hours for your car and dishwasher.']}
+            badge={first ? <div style={{ fontSize: 56, fontWeight: 500 }}>{`${first.start} to ${first.end}`}</div> : null} />
         ),
       },
       {
         seconds: 13, kicker: 'The product · Data centres', sources: [dcg, flex], render: () => (
-          <Segment title="Where to put a data centre" clip="datacentre" lines={[`A ${fmt.n(dcg.v)}-GPU site, ${fmt.n(flex.v)}% of the work movable within the day.`, 'Energy cost and carbon, by country. Estimates, not quotes.']}
-            stand={<Big fig={dcg} format={(v) => fmt.n(v)} label="GPUs in the example" size={110} />} />
+          <Segment scene="datacentre" title="Where to put a data centre" clip="datacentre" lines={[`A ${fmt.n(dcg.v)}-GPU site.`, 'Energy cost and carbon by country. Estimates, not quotes.']}
+            badge={<Badge fig={flex} format={(v) => `${fmt.n(v)}%`} label="of the work can move within the day" />} />
         ),
       },
     ]} />
   )
 }
 
-// 5. Proof (25 s)
+// 5. Proof (34 s): one honest slide, then the frozen forecast
 export const Proof: React.FC = () => {
   const m = F.maeModel(), pr = F.maePersistence(), imp = F.maeImprovementPct(), cov = F.coverage(), n = F.forecastsScored(), hrs = X.backtestHours()
   const share = F.batteryShare()
+  const wp = F.weatherPriceCutPct(), ww = F.weatherWindCutPct()
   const rev = X.revealGb(), c = X.latestCommit(), cc = X.commitmentCount()
   return (
     <Beats beats={[
       {
-        seconds: 9, kicker: 'Proof', sources: [m, pr, imp, hrs], render: () => (
+        seconds: 22, kicker: 'Proof', sources: [m, pr, imp, hrs, cov, n, share, wp, ww], render: () => (
           <>
-            <Title size={80}>Scored against simple guesses.</Title>
-            <Bars format={(v) => fmt.n(v, 1)} items={[{ label: 'Our model, error (per MWh)', fig: m, strong: true }, { label: 'Assume it stays put, error', fig: pr }]} />
-            <Caption>{`${fmt.pct(imp.v)} smaller average error than assuming the price stays where it was, over ${fmt.n(hrs.v)} hours of testing. A significance test agrees: it is not luck. Against a strong day-ahead rival it is a tie, and we say so.`}</Caption>
-          </>
-        ),
-      },
-      {
-        seconds: 7, kicker: 'Proof', sources: [cov, n, share], render: () => (
-          <>
-            <Title size={80}>Honest about the range.</Title>
-            <Row gap={110}>
-              <Big fig={cov} format={(v) => fmt.pct(v)} label={`Outcomes inside our likely range (aim: ${X.coverageTarget}%, 8 times out of 10)`} delay={6} size={130} />
-              <Big fig={n} format={(v) => fmt.n(v)} label="Forecasts scored live, each logged first" delay={18} size={110} />
-              <Big fig={share} format={(v) => fmt.pct(v)} label="Battery profit vs perfect foresight" delay={30} size={110} />
+            <Title size={76}>Scored in public. It wins, and it ties.</Title>
+            <Bars format={(v) => fmt.n(v, 1)} items={[{ label: 'Our model, error per MWh', fig: m, strong: true }, { label: 'Assume it stays put', fig: pr }]} />
+            <Line delay={20} size={30} color={COLORS.text3}>{`${fmt.pct(imp.v)} smaller error. Backtest of ${fmt.n(hrs.v)} hours, six zones, pooled £ and €.`}</Line>
+            <Row gap={90}>
+              <Big fig={cov} format={(v) => fmt.pct(v, 1)} label={`Inside our likely range. Aim: ${X.coverageTarget}%`} delay={40} size={100} />
+              <Big fig={n} format={(v) => fmt.n(v)} label="Scored live, each logged first (separate from the backtest)" delay={52} size={100} />
+              <Big fig={share} format={(v) => fmt.pct(v)} label="Battery profit vs perfect foresight, 5 zones" delay={64} size={100} />
             </Row>
+            <Line delay={80} size={30} color={COLORS.text2}>{`Next: adding gusts, cloud, rain and ensemble weather cut day-ahead price error ${fmt.n(wp.v, 1)}% and wind error ${fmt.n(ww.v, 1)}% (${F.weatherFolds() ?? '–'}-fold backtest, ${F.weatherWindow() ?? '–'}; not live yet).`}</Line>
+            <Caption delay={90}>Against a strong day-ahead rival it is a tie. We say so.</Caption>
           </>
         ),
       },
       {
-        seconds: 9, kicker: 'Proof', sources: [X.commitmentCount(), X.revealSrc()], render: () => (
+        seconds: 12, kicker: 'Proof', sources: [X.commitmentCount(), X.revealSrc()], render: () => (
           <>
-            <Title size={80}>Monday’s forecast, frozen before the result.</Title>
-            <div style={{ display: 'flex', gap: 60, alignItems: 'center' }}>
-              <LineChart width={900} height={340} series={rev.map((p: any) => ({ x: p.hour, y: p.actual as number, lo: p.p10, hi: p.p90, mid: p.p50 }))} unit={`GB day-ahead forecast for ${X.deliveryDate() ?? '–'} (dashed), P10 to P90 band`} draw={60} />
-              <div style={{ fontFamily: MONO, fontSize: 24, color: COLORS.text2, lineHeight: 1.7 }}>
+            <Title size={72}>Monday’s forecast, frozen before the result.</Title>
+            <div style={{ display: 'flex', gap: 50, alignItems: 'center' }}>
+              <LineChart width={900} height={330} series={rev.map((p: any) => ({ x: p.hour, y: p.actual as number, lo: p.p10, hi: p.p90, mid: p.p50 }))} unit={`GB forecast for ${X.deliveryDate() ?? '–'} (dashed), likely range`} draw={60} />
+              <div style={{ fontFamily: MONO, fontSize: 28, color: COLORS.text2, lineHeight: 1.6 }}>
                 <div>{`Frozen: ${asOf(X.frozenAt())}`}</div>
-                <div>{`Commitments on Solana devnet: ${fmt.n(cc.v)}`}</div>
-                <div>{c ? `Latest hash: ${c.sha.slice(0, 12)}…` : ''}</div>
+                <div>{`Public commitments: ${fmt.n(cc.v)}`}</div>
+                <div>{c ? `Latest hash: ${c.sha.slice(0, 10)}…` : ''}</div>
               </div>
             </div>
-            <Caption>Each frozen forecast is fingerprinted on a public chain, so anyone can check we did not change it, then compared with the real auction result.</Caption>
+            <Caption>It is fingerprinted on a public chain, so anyone can check we did not change it, then compared with the real auction result.</Caption>
           </>
         ),
       },
@@ -220,63 +221,40 @@ export const Proof: React.FC = () => {
   )
 }
 
-// 6. Play (15 s)
-export const Play: React.FC = () => {
+// 6. How we built it (8 s)
+export const How: React.FC = () => {
+  const t = F.hubMerged(), a = F.hubAgents()
+  return (
+    <Beats beats={[{
+      seconds: 8, kicker: 'How we built it', sources: [t, a], render: () => (
+        <>
+          <Title size={88}>Three people and a lot of Claudes.</Title>
+          <Row gap={120}>
+            <Big fig={t} format={(v) => fmt.n(v)} label="Tasks merged through one queue" delay={0} size={140} />
+            <Big fig={a} format={(v) => fmt.n(v)} label="Agents that merged them" delay={10} size={140} />
+          </Row>
+        </>
+      ),
+    }]} />
+  )
+}
+
+// 7. Close (18 s): the play invitation and the QR
+export const Close: React.FC = () => {
   const m = F.maeModel()
   return (
     <Beats beats={[{
-      seconds: 15, kicker: 'Play', sources: [m], render: () => (
-        <>
-          <Title size={120}>Can you beat our model?</Title>
-          <Line delay={16} size={44}>Call the grid on a real day with its date hidden. Buy and sell Yes or No on questions such as “will GB wind be switched off?”, against our forecasters.</Line>
-          <Row><Big fig={m} format={(v) => fmt.n(v, 1)} label="Our average error to beat (per MWh, pooled over 6 zones, backtest)" delay={30} size={110} /></Row>
-        </>
-      ),
-    }]} />
-  )
-}
-
-// 7. How we built it (15 s)
-export const How: React.FC = () => {
-  const frame = useCurrentFrame()
-  const { fps } = useVideoConfig()
-  const t = F.hubMerged(), a = F.hubAgents()
-  const N = Math.round(t.v ?? 0)
-  const shown = Math.round(interpolate(frame, [20, 20 + 5 * fps], [0, N], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' }))
-  return (
-    <Beats beats={[{
-      seconds: 15, kicker: 'How we built it', sources: [t, a], render: () => (
-        <>
-          <Title size={88}>Three people and a lot of Claudes.</Title>
-          <div style={{ display: 'flex', gap: 80, marginTop: 40, alignItems: 'flex-start' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(26, 1fr)', gap: 6, width: 1000 }}>
-              {Array.from({ length: N }).map((_, i) => <div key={i} style={{ aspectRatio: '1', borderRadius: 3, background: i < shown ? COLORS.accent : COLORS.card2 }} />)}
-            </div>
-            <div>
-              <Big fig={t} format={() => fmt.n(shown)} label="Tasks merged through one queue" delay={0} size={120} />
-              <div style={{ height: 40 }} />
-              <Big fig={a} format={(v) => fmt.n(v)} label="Agents that merged them" delay={20} size={90} />
-            </div>
+      seconds: 18, kicker: 'Check it yourself', sources: [m], render: () => (
+        <div style={{ display: 'flex', gap: 80, alignItems: 'center', marginTop: 20 }}>
+          <div style={{ flex: 1 }}>
+            <Title size={110}>Can you beat our model?</Title>
+            <Line delay={14} size={40}>{`Call the grid on a real day with its date hidden. Our average error to beat: ${fmt.n(m.v, 1)} per MWh, six zones, pooled £ and €.`}</Line>
+            <Line delay={28} size={40} color={COLORS.text}>{QR_URL.replace('https://', '')}</Line>
+            <div style={{ fontFamily: FONT, color: COLORS.text3, fontSize: 28, marginTop: 36 }}>{`${wallet ? `Frozen forecasts are hashed on Solana (${wallet.slice(0, 6)}…${wallet.slice(-4)}). ` : ''}Built at HackTheBurgh XIII. Public data only.`}</div>
           </div>
-          <Caption>Python and LightGBM for the forecasts, FastAPI for the engine, React and deck.gl for the map, SpacetimeDB for shared live state.</Caption>
-        </>
+          <Rise delay={8}><QR size={420} /></Rise>
+        </div>
       ),
     }]} />
   )
 }
-
-// 8. Close (10 s)
-export const Close: React.FC = () => (
-  <Beats beats={[{
-    seconds: 10, kicker: 'Check it yourself', render: () => (
-      <div style={{ display: 'flex', gap: 80, alignItems: 'center', marginTop: 20 }}>
-        <div style={{ flex: 1 }}>
-          <Title size={110}>{QR_URL.replace('https://', '')}</Title>
-          <Line delay={12} size={40}>{wallet ? `Every frozen forecast is hashed on Solana (${wallet.slice(0, 6)}…${wallet.slice(-4)}). Open it on your phone and call the grid yourself.` : 'Open it on your phone and call the grid yourself.'}</Line>
-          <div style={{ fontFamily: FONT, color: COLORS.text3, fontSize: 28, marginTop: 40 }}>Built at HackTheBurgh XIII. Public data only.</div>
-        </div>
-        <Rise delay={8}><QR size={420} /></Rise>
-      </div>
-    ),
-  }]} />
-)

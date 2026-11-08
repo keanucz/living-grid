@@ -2,7 +2,7 @@
 // each fetch, so no number in the deck is typed by hand. Read-only: it only issues GET requests (never /intervene,
 // which publishes to the shared SpacetimeDB). Usage:
 //   node scripts/snapshot.mjs [--api https://htb.stefvuck.dev/api]
-import { mkdirSync, writeFileSync } from 'node:fs'
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -54,6 +54,22 @@ async function hubFacts() {
   }
 }
 
+function weatherV2() {
+  // The weather-v2 backtest (#227): tested, not live. Read from the headline table of the findings note, which is the source.
+  const file = 'docs/findings/weather-v2.md'
+  try {
+    const md = readFileSync(new URL(`../../../${file}`, import.meta.url), 'utf8')
+    const row = (t) => Number(new RegExp(`^\\|\\s*${t}\\s*\\|\\s*(-?[\\d.]+)%`, 'm').exec(md)?.[1])
+    const win = /(\w+)\s+weekly test folds, (\d+ \w+ to \d+ \w+ \d{4})/.exec(md)
+    const folds = { Six: 6, Five: 5, Four: 4, Eight: 8 }[win?.[1]] ?? null
+    const out = { source: file, price_da_mae_change_pct: row('price_da'), wind_mae_change_pct: row('wind'), folds, window: win?.[2] ?? null, live: false }
+    if (![out.price_da_mae_change_pct, out.wind_mae_change_pct, out.folds].every(Number.isFinite) || !out.window) throw new Error('summary table not found')
+    return out
+  } catch (e) {
+    return { source: file, error: String(e.message ?? e).slice(0, 120) }
+  }
+}
+
 const items = {}
 const failed = []
 for (const [name, path] of Object.entries(ENDPOINTS)) {
@@ -66,7 +82,7 @@ for (const [name, path] of Object.entries(ENDPOINTS)) {
   console.log(`${items[name].error ? 'FAIL' : 'ok  '} ${name.padEnd(15)} ${path}`)
 }
 const hub = await hubFacts()
-const snapshot = { generated_at: new Date().toISOString(), api: API, items, hub }
+const snapshot = { generated_at: new Date().toISOString(), api: API, items, hub, weather_v2: weatherV2() }
 mkdirSync(dirname(out), { recursive: true })
 writeFileSync(out, JSON.stringify(snapshot))
 console.log(`wrote ${out}${failed.length ? `\nMISSING: ${failed.join(', ')}` : ''}`)
