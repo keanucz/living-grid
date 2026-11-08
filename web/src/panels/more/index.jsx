@@ -7,7 +7,8 @@ import { sectionById } from '../../shell/sections.js'
 function More({ ctx }) {
   const [open, setOpen] = useState(false)
   const ids = sectionById[ctx.ui.section ?? 'now']?.more ?? []
-  const items = PANELS.filter((p) => ids.includes(p.id))
+  const forced = ctx.ui.forcePanels ?? []
+  const items = PANELS.filter((p) => ids.includes(p.id) && !forced.includes(p.id))
   if (!items.length) return null
   return (
     <div className="more">

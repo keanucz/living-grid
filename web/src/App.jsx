@@ -114,7 +114,8 @@ function MapApp() {
   useEffect(() => {
     if (ui.section === 'whatif' && ui.mode === 'overview') openSection('now')
   }, [ui.section, ui.mode])
-  const inSection = (p) => (section.panels ? section.panels.includes(p.id) : p.modes.includes(ui.mode))
+  const forced = ui.forcePanels ?? []
+  const inSection = (p) => forced.includes(p.id) || (section.panels ? section.panels.includes(p.id) : p.modes.includes(ui.mode))
   if (narrow) return <MobileShell ctx={ctx} at={state.data?.at} source={state.source} />
 
   return (
@@ -149,6 +150,9 @@ function MapApp() {
           </div>
         </div>
       </main>
+      {forced.length > 0 && (
+        <button className="debug-back" onClick={() => { setState({ forcePanels: [] }); location.hash = '#/debug' }}>← Debug: showing {forced.join(', ')}</button>
+      )}
       {ui.welcome && <Welcome />}
     </div>
   )

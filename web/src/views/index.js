@@ -13,9 +13,11 @@ export function matchView(hash) {
 }
 
 // One game entrance: the old market and room-game pages now live behind #/play.
-const REDIRECTS = { '/market': '#/play', '/game': '#/play' }
+export const REDIRECTS = { '/market': '#/play', '/game': '#/play' }
 
 export function redirectOf(hash) {
   const path = (hash || '').replace(/^#/, '').split('?')[0]
+  // The debug page opens from #debug or from ?debug=1 on any address.
+  if (path === 'debug' || (path !== '/debug' && new URLSearchParams(location.search).get('debug'))) return `${location.pathname}#/debug`
   return REDIRECTS[path] ?? null
 }

@@ -8,6 +8,7 @@ const initial = {
   layers: {}, // id -> boolean, filled from the layer registry defaults
   scenario: null, // { id, magnitude } once a world event has been run
   scenarioArmed: 'hormuz',
+  forcePanels: [], // panel ids the debug page forces visible, even when no section lists them
 }
 
 let state = initial

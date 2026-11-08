@@ -281,3 +281,5 @@ h1, .headline h1, .kval, .sim-name, .tile b { letter-spacing: -0.012em; }
 .page-body { flex: 1; min-height: 0; overflow: auto; position: relative; }
 .m-page { height: 100%; display: flex; flex-direction: column; }
 .m-page-body { flex: 1; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+
+.debug-back { position: fixed; left: 16px; bottom: 16px; z-index: 30; padding: 10px 14px; border-radius: 8px; background: #fafafa; color: #0a0a0a; font-weight: 600; font-size: 13px; }
