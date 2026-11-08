@@ -6,7 +6,6 @@ import { sectionById } from '../../shell/sections.js'
 import { actions } from '../../store/store.js'
 import Explain from '../../ui/Explain.jsx'
 import Term from '../../ui/Term.jsx'
-import Builder from '../../views/datacentre/Builder.jsx'
 import compute from '../compute/index.jsx'
 import { RESULT_CSS, ResultCard, duration } from './Result.jsx'
 import { EVENTS, HOUSEHOLD, KEY, answer, why } from './copy.js'
@@ -40,7 +39,6 @@ function SimDock({ ctx }) {
   const [mags, setMags] = useState({})
   const mag = mags[armed] ?? sc?.magnitude ?? 0
   const [run, setRun] = useState({ status: 'idle', result: null, key: 0, type: null })
-  const [dcOpen, setDcOpen] = useState(false)
   const narrow = useNarrow()
 
   const go = async (id, magnitude) => {
@@ -135,12 +133,6 @@ function SimDock({ ctx }) {
               </div>
               <ResultCard result={live ? res : null} scenario={sc} runKey={run.key} />
               <div className="faint note">Gas and carbon pass-through approximates market coupling. The map shows the pre-computed shape scaled to your magnitude; the figures come from the live model.</div>
-              <button className="sim-row dc-toggle" onClick={() => setDcOpen((v) => !v)} aria-expanded={dcOpen}>
-                <span className="sim-title">Data centre builder</span>
-                <span style={{ flex: 1 }} />
-                <span className="faint" style={{ fontSize: 12 }}>{dcOpen ? 'Hide' : 'Cost, carbon and grid for a GPU site'}</span>
-              </button>
-              {dcOpen && <div style={{ marginTop: 12 }}><Builder initialZone={ctx.ui.selectedZone} /></div>}
               <compute.Component ctx={ctx} />
             </div>
           }
@@ -193,7 +185,6 @@ ${RESULT_CSS}
 .wl { display: flex; flex-direction: column; gap: 8px; }
 .wl > div { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: 12px; }
 .wl .faint { width: 58px; }
-.dc-toggle { width: 100%; background: none; color: var(--text); text-align: left; padding: 8px 0; }
 .mode-simulate .slot-left { overflow-y: auto; scrollbar-width: none; }
 `
 

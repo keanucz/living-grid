@@ -17,7 +17,10 @@ export const SECTIONS = [
     title: 'The outlook', blurb: 'Our forecast for every zone, with the odds in plain words and the reasons behind it',
     door: 'The outlook: where prices are heading, how sure we are, and the cheapest hours tonight',
     panels: ['zoneChart', 'explain', 'scrubber'], layers: { flows: true, ghost: true, ghostWind: false, carbon: false, boundaries: false, wind: false, solar: false },
-    pages: [{ label: 'Plan around it: cheapest hours tonight', href: '#/household', paths: ['/household'] }] },
+    pages: [
+      { label: 'Plan around it: cheapest hours tonight', href: '#/household', paths: ['/household'] },
+      { label: 'Plan around it: where to put a data centre', href: '#/datacentre', paths: ['/datacentre'] },
+    ] },
   { id: 'hidden', label: 'Hidden grid', question: "What’s normally hidden?", icon: 'wind', mode: 'overview', at: 'now',
     title: 'The radar: what you cannot see', blurb: 'Four things that normally stay hidden: wind paid to switch off, carbon carried in by cable, the grid’s bottlenecks and sunny-day negative prices',
     door: 'The radar: wind paid to switch off, carbon in imports, where the grid is full',
