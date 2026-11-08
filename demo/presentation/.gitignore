@@ -2,3 +2,6 @@ node_modules/
 out/
 dist/
 public/clips/
+review/**/*.png
+review/**/*.jpg
+review/**/*.mp4

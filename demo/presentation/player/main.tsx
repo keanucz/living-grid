@@ -7,6 +7,12 @@ import { VIDEO } from '../src/theme'
 // Live presenter: shows one scene at a time in the Remotion Player and waits at the end of each scene.
 // Click, Space or the right arrow go to the next scene, the left arrow to the previous one, Home restarts, F is full screen.
 // ?scene=proof opens at a scene.
+// ?scene=<id>&frame=<n>&still=1 shows one frame, paused and without click handling. scripts/review-stills.mjs uses it to
+// read the on-screen text of a scene from the real DOM.
+const params = new URLSearchParams(location.search)
+const STILL = params.get('still') === '1'
+const FRAME = Number(params.get('frame') ?? 0)
+
 function startIndex(): number {
   const id = new URLSearchParams(location.search).get('scene')
   const i = SCENES.findIndex((s) => s.id === id)
@@ -44,7 +50,7 @@ function App() {
   }, [i])
 
   return (
-    <div onClick={() => go(1)} style={{ height: '100%', display: 'grid', placeItems: 'center', cursor: 'pointer', position: 'relative' }}>
+    <div onClick={() => !STILL && go(1)} style={{ height: '100%', display: 'grid', placeItems: 'center', cursor: 'pointer', position: 'relative' }}>
       <div style={{ width: 'min(100vw, calc(100vh * 16 / 9))', aspectRatio: '16 / 9' }}>
         <Player
           ref={ref}
@@ -55,7 +61,8 @@ function App() {
           compositionHeight={VIDEO.height}
           fps={VIDEO.fps}
           controls={false}
-          autoPlay
+          autoPlay={!STILL}
+          initialFrame={STILL ? FRAME : 0}
           loop={false}
           clickToPlay={false}
           acknowledgeRemotionLicense
