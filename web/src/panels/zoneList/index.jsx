@@ -5,6 +5,7 @@ import { Icon } from '../../shell/icons.jsx'
 import { actions } from '../../store/store.js'
 import { fmt, priceColor } from '../../styles/tokens.js'
 import { GBP_EUR } from '../../api/client.js'
+import { GenMixModal } from '../genMix/GenMix.jsx'
 
 const MIX_COLOR = { wind: 'var(--wind)', solar: '#facc15', nuclear: 'var(--nuclear)', gas: 'var(--gas)', hydro: 'var(--hydro)', coal: '#8b6f5a', biomass: '#84a35b', imports: '#5d5d58' }
 
@@ -23,6 +24,7 @@ function Spark({ series }) {
 }
 
 function Row({ z, st, on }) {
+  const [mixOpen, setMixOpen] = useState(false)
   const c = priceColor(st.price_eur)
   const hasChange = st.change_24h_eur != null
   const up = st.change_24h_eur >= 0
@@ -54,6 +56,8 @@ function Row({ z, st, on }) {
             ))}
             {mix.length === 0 && <span className="faint">No generation mix for this hour</span>}
           </div>
+          <button className="gm-open" onClick={(e) => { e.stopPropagation(); setMixOpen(true) }}>Today’s mix, hour by hour →</button>
+          {mixOpen && <GenMixModal zone={z.id} onClose={() => setMixOpen(false)} />}
           <div className="zfacts">
             {st.net_import_mw != null && <div title="Sum of Britain's ten interconnectors to Europe, Norway and Ireland"><span className="faint">Britain's cables: net {st.net_import_mw >= 0 ? 'import' : 'export'}</span><b className="num">{fmt.gw(Math.abs(st.net_import_mw))}</b></div>}
             <div><span className="faint">{z.id.replace('-LU', '')} carbon</span><b className="num">{st.carbon?.consumption_gco2_kwh != null ? `${Math.round(st.carbon.consumption_gco2_kwh)} g/kWh` : '—'}</b></div>
