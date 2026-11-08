@@ -173,13 +173,17 @@ function tooltip({ object, layer }, ctx) {
   return null
 }
 
-// Labels that would sit under the layer chips or the top bar are skipped rather than hidden behind them.
-function underControls(x, y) {
+// Labels that would sit under the layer chips, the top bar or the phone's selected-zone chip, or past the
+// map's edge, are skipped rather than hidden behind them or spilling onto the sheet below.
+function underControls(x, y, viewport) {
   if (typeof document === 'undefined') return false
-  const main = document.querySelector('.main')?.getBoundingClientRect()
-  return [...document.querySelectorAll('.actions, .topbar')].some((el) => {
+  if (x < 24 || x > viewport.width - 24 || y < 14 || y > viewport.height - 20) return true
+  const box = (document.querySelector('.main') ?? document.querySelector('.m-map'))?.getBoundingClientRect()
+  const px = x + (box?.left ?? 0)
+  const py = y + (box?.top ?? 0)
+  return [...document.querySelectorAll('.actions, .topbar, .m-layers, .m-sel')].some((el) => {
     const r = el.getBoundingClientRect()
-    return x + (main?.left ?? 0) > r.left - 24 && x + (main?.left ?? 0) < r.right + 24 && y + (main?.top ?? 0) > r.top - 14 && y + (main?.top ?? 0) < r.bottom + 14
+    return px > r.left - 24 && px < r.right + 24 && py > r.top - 14 && py < r.bottom + 14
   })
 }
 
@@ -196,7 +200,7 @@ function Overlay({ viewport, ctx }) {
           const [x, y] = project(z.label_at)
           const st = ctx.stateByZone[z.id]
           if (!st) return null
-          if (underControls(x, y)) return null
+          if (underControls(x, y, viewport)) return null
           return (
             <div key={z.id} className={`map-label ${ui.selectedZone === z.id ? 'on' : ''}`} style={{ left: x, top: y }}
               onClick={() => actions.selectZone(z.id)}>
