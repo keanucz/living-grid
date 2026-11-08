@@ -1,7 +1,7 @@
 // On-screen words. Plain English, British spelling, no em dashes.
 export const TITLE = {
   name: 'The Living Grid',
-  tagline: 'Europe’s hidden power grid, made visible, and where it is heading next.',
+  tagline: 'A weather forecast for Europe’s power grid. What it costs now, what happens next, and proof we got it right.',
   event: 'HackTheBurgh XIII',
 }
 
