@@ -19,10 +19,20 @@ function Explain({ ctx }) {
     setRes(null)
     api.explain(zone, at ?? undefined)
       .then((r) => live && setRes({ body: r.data, sample: false }))
-      .catch(() => live && setRes({ body: sample, sample: true }))
+      // Explanations are stored for forecasts of the coming hours only: a past hour (history scrubber) gets a plain
+      // note, never the bundled sample. The sample is only for an unreachable API on the live view.
+      .catch(() => live && setRes(at && Date.parse(at) < Date.now() - 3_600_000 ? { past: true } : { body: sample, sample: true }))
     return () => { live = false }
   }, [zone, at])
   if (!res) return null
+  if (res.past) {
+    return (
+      <section className="panel xplain fade-in">
+        <div className="panel-head"><span>Why this price <span className="faint" style={{ fontWeight: 500 }}>· {ctx.zoneById[zone]?.name ?? zone}</span></span></div>
+        <p className="xsent">We keep the reasons for forecasts of the coming hours only, so this past hour has none. The map and the time bar still show what the price did.</p>
+      </section>
+    )
+  }
 
   const { body } = res
   const s = sym(body.unit)
