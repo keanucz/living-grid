@@ -22,11 +22,13 @@ const LIVE = {
     path: '/unseen/ghost-wind',
     get: (j) => {
       const c = j.constraint_costs
-      return `${money(j.constraint_cost_total_gbp)} over the ${c.length} days it has published, ${day(c[0].date)} to ${day(c.at(-1).date)}`
+      return `${money(j.constraint_cost_total_gbp)} over the ${c.length} days published so far, ${day(c[0].date)} to ${day(c.at(-1).date)}`
     },
-    fallback: 'millions of pounds over the days it has published',
+    fallback: 'millions of pounds over the days published so far',
   },
-  mae: { path: '/scores', get: (j) => `${j.headline.mae_model.toFixed(1)} against ${j.headline.mae_persistence.toFixed(1)} for the persistence baseline`, fallback: 'lower than the persistence baseline' },
+  // Pooled across zones in £ and €, so a plain number: the caption says "per MWh".
+  model: { path: '/scores', get: (j) => j.headline.mae_model.toFixed(1), fallback: 'a few tens' },
+  baseline: { path: '/scores', get: (j) => j.headline.mae_persistence.toFixed(1), fallback: 'more' },
   scored: { path: '/scores', get: (j) => String(j.headline.forecasts_scored), fallback: 'many' },
 }
 const pick = (...keys) => Object.fromEntries(keys.map((k) => [k, LIVE[k]]))
@@ -36,23 +38,23 @@ export const TOURS = {
     title: 'The 3-minute tour',
     steps: [
       { id: 'prices', section: 'now', at: 'now', target: 'zoneList', duration: 9, camera: null,
-        say: 'Electricity is invisible. This is every country’s day-ahead price right now: Great Britain is {gb}, southern Norway {no2}.', live: pick('gb', 'no2') },
+        say: "Electricity is invisible, so we drew it. Each country is coloured by its price for this hour, set in yesterday's auction. Britain is {gb}; southern Norway is {no2}.", live: pick('gb', 'no2') },
       { id: 'flows', section: 'now', layers: { flows: true }, target: 'layers', duration: 8,
-        say: 'The arcs are power flowing through the cables between countries, thicker for bigger links. The Layers menu turns the other views on and off.' },
+        say: "The lines between countries are power flowing through the cables that link them, many under the sea. Thicker lines are bigger cables. The Layers button switches the other views on and off." },
       { id: 'forecast', section: 'forecast', target: 'zoneChart', duration: 9,
-        say: 'The translucent ghost is our forecast for the next hours. It fades as the P10 to P90 band widens: honest uncertainty, not a single line.' },
+        say: "The faint block shows our forecast for the next few hours. The fainter it is, the less sure we are." },
       { id: 'history', section: 'forecast', at: '2026-10-26T12:00:00Z', target: 'scrubber', duration: 12,
-        say: 'The time bar reaches back to January 2024. Drag it, pick a date or press play; orange marks on the strip are big events. This is 26 October, the storm day. Live brings you back.' },
+        say: "The time bar goes back to January 2024. Drag it, pick a date or press play. Orange ticks are big events: this one is the storm on 26 October. Press Live to jump back." },
       { id: 'explain', section: 'forecast', at: '+6', target: 'explain', duration: 8,
-        say: 'Every forecast comes with a reason in plain words, from the model’s own feature contributions.' },
+        say: "Each forecast comes with its reasons in plain words: what pushed the price up and what pulled it down." },
       { id: 'ghostwind', section: 'hidden', at: 'now', target: 'stories', duration: 10, camera: { longitude: -4.0, latitude: 57.0, zoom: 5.0 },
-        say: 'What normally stays hidden: Scottish wind that was paid to switch off. NESO’s published constraint costs come to {bill}. Wind and carbon figures here are estimates, and labelled so.', live: pick('bill') },
+        say: "When the lines to the south are full, Scottish wind farms get paid to stop generating. The grid's published bills for that come to {bill}. The numbers here are estimates, and we say so.", live: pick('bill') },
       { id: 'hormuz', section: 'whatif', event: { id: 'hormuz' }, target: 'simDock', duration: 12,
-        say: 'Close the Strait of Hormuz and watch the gas shock ripple across Europe, with the bill in pounds. Gas pass-through approximates market coupling.' },
+        say: "Close the Strait of Hormuz and watch dearer gas push up electricity prices across Europe. The bill comes out in pounds." },
       { id: 'proof', section: 'proof', at: 'now', target: 'scoreboard', duration: 10,
-        say: 'Proof: {scored} live forecasts scored so far, each logged before its outcome. In the walk-forward backtest our average price error is {mae} (per MWh, pooled across zones). Where we lose to the baseline, we say so.', live: pick('scored', 'mae') },
+        say: "We've scored {scored} live forecasts so far, each saved before the real price was known. On past weeks it never saw, the model was off by {model} per MWh on average. Guessing that the price stays put was off by {baseline}. Where we lose, we show it.", live: pick('scored', 'model', 'baseline') },
       { id: 'play', section: 'play', target: 'tab-play', duration: 7,
-        say: 'Think you can read the grid better than the model? Play a real, hidden day against our forecasters.' },
+        say: "Think you can read the grid better than our model? Play a real day from the past, with the date hidden." },
     ],
   },
   // A short tour used to test the engine on desktop and phone.
@@ -72,13 +74,13 @@ export const TOURS = {
 const byId = Object.fromEntries(TOURS.main.steps.map((s) => [s.id, s]))
 const MORE = {
   carbon: { id: 'carbon', section: 'hidden', layers: { carbon: true, ghostWind: false }, target: 'stories', duration: 10, camera: null,
-    say: 'Carbon travels too. A grid can look clean at home and still run on dirty imports: this shows the intensity each country actually consumes (modelled, with standard emission factors).' },
+    say: "Carbon crosses borders too. A country can look clean at home while running on dirty imports. This view shows the carbon in each country's electricity use, worked out with standard emission figures." },
   battery: { id: 'battery', section: 'whatif', target: 'simDock', duration: 9,
-    say: 'A 1 MW battery in every zone reacts to the shock. The risk-aware one, which sees the forecast bands, and one that trusts only the median are both scored against perfect foresight on the battery card.' },
+    say: "Every country has a test battery that reacts to the gas shock. One plans with our likely range, the other with our best guess only. The battery card shows how close each gets to perfect hindsight." },
   replay: { id: 'replay', page: '#/replay', target: 'map', duration: 10,
-    say: 'Replay of 26 October: models trained only on data before that day, so “would we have seen it coming?” is a genuine out-of-sample test.' },
+    say: "This replays 26 October with a model trained only on data from before that day, so asking whether we'd have seen it coming is a fair test." },
   reveal: { id: 'reveal', page: '#/reveal', target: 'map', duration: 9,
-    say: 'The day-ahead reveal: Monday’s forecast frozen and timestamped hours before the real auction result lands next to it.' },
+    say: "Monday's forecast was saved before the auction. As the real prices arrive, they appear next to it." },
 }
 const compose = (title, ids) => ({ title, steps: ids.map((i) => byId[i] ?? MORE[i]) })
 TOURS['g-research'] = compose('G-Research order', ['prices', 'ghostwind', 'carbon', 'explain', 'hormuz', 'proof'])

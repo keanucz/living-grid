@@ -10,7 +10,35 @@ const hourIso = (offsetH) => {
   return d.toISOString().replace('.000Z', 'Z')
 }
 let ranEvent = false
-export const CAMERA = { home: { longitude: 3.6, latitude: 54.2, zoom: 3.15, pitch: 0, bearing: 0 } }
+let seq = 0
+export const CAMERA = { home: 'home' }
+
+// Where a step leaves the camera: its own camera (null = the map's home view), else its section's view (the section's
+// mode: flat for overview, tilted for simulate). Pages and the Play section have no map, so no camera.
+function aimOf(step) {
+  if (!step || step.page) return null
+  if (step.camera !== undefined) return step.camera ?? CAMERA.home
+  const mode = sectionById[step.section]?.mode
+  return mode ? { mode } : null
+}
+
+// Every step entry, forwards or backwards, ends with the camera at the step's view (MapView, 'lg-camera'). Forwards it
+// flies from wherever the camera is, so a half-finished move is picked up, never left mid-way. Backwards it first
+// snaps to the previous step's view, so the step's own move (Proof un-tilting after What if, say) plays again. A
+// newer step cancels an older step's pending move. The request is also left on window for a map that mounts late
+// (coming back from a page such as Play).
+function aim(steps, i, backwards) {
+  const to = aimOf(steps[i])
+  const n = ++seq
+  if (!to) return
+  const from = backwards && i > 0 ? aimOf(steps[i - 1]) : null
+  const detail = { to, from, duration: 2000 }
+  setTimeout(() => {
+    if (n !== seq) return
+    window.lgPendingCamera = { detail, at: performance.now() }
+    dispatchEvent(new CustomEvent('lg-camera', { detail }))
+  }, 150)
+}
 
 export const stepsOf = (name) => TOURS[name]?.steps ?? []
 
@@ -22,7 +50,6 @@ export async function apply(step) {
     return
   }
   if (step.section && sectionById[step.section]) openSection(step.section)
-  if (step.camera !== undefined) setTimeout(() => dispatchEvent(new CustomEvent('lg-camera', { detail: step.camera ?? CAMERA.home })), 400)
   if (step.layers) setState({ layers: { ...getState().layers, ...step.layers } })
   if (step.at != null) actions.setAt(step.at === 'now' ? null : /^[+-]\d+$/.test(step.at) ? hourIso(Number(step.at)) : step.at)
   if (step.event) {
@@ -42,9 +69,11 @@ export function go(i) {
   const steps = stepsOf(t.name)
   if (i >= steps.length) return t.autoplay ? go(0) : finish()
   const next = { ...t, i: Math.max(0, i) }
+  const backwards = next.i < t.i
   setTour(next)
   save(next)
   apply(steps[next.i])
+  aim(steps, next.i, backwards)
 }
 
 export function start(name, { i = 0, autoplay = false, clean = false } = {}) {

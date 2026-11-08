@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { back, next, skip, startFromHash, stepsOf } from './engine.js'
 import { useTour } from './state.js'
 
@@ -104,6 +104,43 @@ function useLive(step) {
   return vals
 }
 
+// Where the caption card goes: beside the ring on the side with the most free room, so it never covers its target.
+// Desktop prefers left or right of the ring (aligned with its top), then above or below; phone, with a full-width
+// card, goes above or below. If no side has room (a target as big as the screen), the roomiest side wins.
+const GAP = 16 // ring padding plus breathing room
+const EDGE = 16
+const TOP = 64 // the top bar on desktop, the header on phone
+const BOTTOM_PHONE = 64 // the phone's tab bar
+const clampTo = (v, lo, hi) => Math.max(lo, Math.min(hi, v))
+
+export function placeCard(box, card, vw, vh, wide) {
+  const { w: cw, h: ch } = card
+  if (!wide) {
+    const base = { left: 8, right: 8 }
+    if (!box) return { ...base, bottom: BOTTOM_PHONE }
+    const above = box.t - GAP - TOP
+    const below = vh - BOTTOM_PHONE - (box.t + box.h) - GAP
+    if (below >= ch || below >= above) return { ...base, top: clampTo(box.t + box.h + GAP, TOP, vh - BOTTOM_PHONE - ch) }
+    return { ...base, top: clampTo(box.t - GAP - ch, TOP, vh - BOTTOM_PHONE - ch) }
+  }
+  if (!box) return { right: 20, bottom: 20 }
+  const room = {
+    right: vw - (box.l + box.w) - GAP - EDGE,
+    left: box.l - GAP - EDGE,
+    below: vh - (box.t + box.h) - GAP - EDGE,
+    above: box.t - GAP - TOP,
+  }
+  const fitsSide = ['right', 'left'].filter((k) => room[k] >= cw).sort((a, b) => room[b] - room[a])[0]
+  const fitsEnd = ['below', 'above'].filter((k) => room[k] >= ch).sort((a, b) => room[b] - room[a])[0]
+  const side = fitsSide ?? fitsEnd ?? Object.keys(room).sort((a, b) => room[b] - room[a])[0]
+  const y = clampTo(box.t, TOP, vh - ch - EDGE)
+  const x = clampTo(box.l + box.w / 2 - cw / 2, EDGE, vw - cw - EDGE)
+  if (side === 'right') return { left: clampTo(box.l + box.w + GAP, EDGE, vw - cw - EDGE), top: y }
+  if (side === 'left') return { left: clampTo(box.l - GAP - cw, EDGE, vw - cw - EDGE), top: y }
+  if (side === 'below') return { left: x, top: clampTo(box.t + box.h + GAP, TOP, vh - ch - EDGE) }
+  return { left: x, top: clampTo(box.t - GAP - ch, TOP, vh - ch - EDGE) }
+}
+
 function caption(step, vals) {
   return step.say.replace(/\{(\w+)\}/g, (_, k) => vals[k] ?? step.live?.[k]?.fallback ?? '')
 }
@@ -117,6 +154,14 @@ export default function Tour() {
   const box = useBox(target)
   useScrollIntoView(tour ? target : null)
   const vals = useLive(step)
+  const cardRef = useRef(null)
+  const [card, setCard] = useState({ w: 340, h: 160 })
+  useLayoutEffect(() => {
+    const el = cardRef.current
+    if (!el) return
+    const r = el.getBoundingClientRect()
+    if (Math.abs(r.width - card.w) > 1 || Math.abs(r.height - card.h) > 1) setCard({ w: r.width, h: r.height })
+  })
 
   useEffect(() => {
     if (!tour) return
@@ -143,14 +188,13 @@ export default function Tour() {
 
   if (!tour || !step || tour.clean) return null
   const pad = 6
-  const low = box && box.t + box.h / 2 > innerHeight * 0.55
   const wide = innerWidth > 700
-  const cardAt = wide ? { right: 20, [low ? 'bottom' : 'top']: low ? 20 : 88 } : { left: 8, right: 8, [low ? 'top' : 'bottom']: low ? 52 : 64 }
+  const cardAt = placeCard(box, card, innerWidth, innerHeight, wide)
 
   return (
     <div className="tour" role="dialog" aria-label={`${step.id}: tour`} data-tour-step={step.id}>
       {box && <div className="tour-ring" style={{ left: box.l - pad, top: box.t - pad, width: box.w + 2 * pad, height: box.h + 2 * pad }} />}
-      <div className={`tour-card ${wide ? '' : 'sheet'}`} style={cardAt}>
+      <div ref={cardRef} className={`tour-card ${wide ? '' : 'sheet'}`} style={cardAt}>
         <p>{caption(step, vals)}</p>
         {!tour.autoplay && (
           <div className="tour-foot">
@@ -173,6 +217,8 @@ const STYLE = `
 .tour { position: fixed; inset: 0; z-index: 60; pointer-events: none; }
 .tour-ring { position: fixed; border-radius: 14px; border: 2px solid var(--accent); box-shadow: 0 0 0 4px rgba(197,240,107,.18), 0 0 0 9999px rgba(8,8,8,.38);
   transition: all .35s ease; }
+.tour-card { transition: left .3s ease, top .3s ease; }
+@media (prefers-reduced-motion: reduce) { .tour-card, .tour-ring { transition: none; } }
 .tour-card { position: fixed; width: 340px; padding: 14px 16px; border-radius: 14px; pointer-events: auto; background: var(--panel-solid);
   border: 1px solid var(--line-2); box-shadow: 0 12px 40px rgba(0,0,0,.5); }
 .tour-card.sheet { width: auto; }

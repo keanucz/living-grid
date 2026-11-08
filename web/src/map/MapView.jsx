@@ -67,30 +67,77 @@ export default function MapView({ ctx }) {
   const ui = ctx.ui
   const time = useClock()
   const [viewState, setViewState] = useState(() => clampView(VIEWS.overview))
+  // Read-only mirror of the camera for browser QA scripts (tour and intro camera checks); nothing reads it back.
+  useEffect(() => { window.lgViewState = viewState }, [viewState])
   const first = useRef(true)
+
+  // The view for a mode: simulate tilts and, during an event, centres on the zone it hits hardest (unless that is GB).
+  const latest = useRef(ctx)
+  latest.current = ctx
+  const modeView = (mode) => {
+    const c = latest.current
+    const focus = c.scenario ? c.zoneById[c.scenario.focus] : null
+    const target = { ...(VIEWS[mode] ?? VIEWS.overview) }
+    if (mode === 'simulate' && focus && focus.id !== 'GB') {
+      target.longitude = focus.centroid[0]
+      target.latitude = focus.centroid[1] + 2
+    }
+    return target
+  }
 
   useEffect(() => {
     if (first.current) {
       first.current = false
       return
     }
-    const focus = ctx.scenario ? ctx.zoneById[ctx.scenario.focus] : null
-    const target = { ...VIEWS[ui.mode] }
-    if (ui.mode === 'simulate' && focus && focus.id !== 'GB') {
-      target.longitude = focus.centroid[0]
-      target.latitude = focus.centroid[1] + 2
-    }
-    setViewState((v) => ({ ...v, ...target, transitionDuration: 1600, transitionInterpolator: new FlyToInterpolator({ speed: 1.4 }) }))
+    setViewState((v) => ({ ...v, ...modeView(ui.mode), transitionDuration: 1600, transitionInterpolator: new FlyToInterpolator({ speed: 1.4 }) }))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ui.mode, ctx.scenario?.focus])
 
-  // The tour's camera moves (tour/engine.js): a smooth fly-to to { longitude, latitude, zoom, pitch?, bearing?, duration? }.
+  // Camera requests (tour/engine.js, intro/Intro.jsx). detail is { to, from?, duration } where to and from are each a
+  // camera { longitude, latitude, zoom, pitch?, bearing? }, 'home', or { mode }; or, older form, a camera plus duration.
+  // With from, the view snaps there first and the move plays from it; without, it flies from wherever the camera is,
+  // which also takes over cleanly from a move still running. Either way the move always runs to its end.
+  // Until deck has loaded, a camera set here is overwritten by its first view report; hold requests until then.
+  const loaded = useRef(false)
+  const held = useRef(null)
+  const onCamera = useRef(null)
+  const onLoad = () => {
+    window.lgMapReady = performance.now()
+    setTimeout(() => {
+      loaded.current = true
+      if (held.current) onCamera.current?.(held.current)
+      held.current = null
+    }, 300)
+  }
   useEffect(() => {
+    const resolve = (x) => (x === 'home' ? VIEWS.overview : x?.mode ? modeView(x.mode) : x)
     const on = (e) => {
-      const { duration = 2200, ...to } = e.detail ?? {}
-      setViewState((v) => clampView({ ...v, ...to, transitionDuration: duration, transitionInterpolator: new FlyToInterpolator({ speed: 1.2 }) }))
+      if (!loaded.current) {
+        held.current = e
+        return
+      }
+      const d = e.detail ?? {}
+      const { duration = 2200, from, to: target, ...plain } = d
+      const to = resolve(target ?? plain)
+      if (!to) return
+      const fly = () =>
+        setViewState((v) => clampView({ ...v, ...to, transitionDuration: duration, transitionInterpolator: new FlyToInterpolator({ speed: 1.2 }) }))
+      const start = resolve(from)
+      if (start) {
+        setViewState((v) => clampView({ ...v, ...start, transitionDuration: 0 }))
+        requestAnimationFrame(() => requestAnimationFrame(fly))
+      } else if (duration === 0) {
+        setViewState((v) => clampView({ ...v, ...to, transitionDuration: 0 }))
+      } else fly()
     }
+    onCamera.current = on
     addEventListener('lg-camera', on)
+    // A request made just before this map mounted (back from a page such as Play) still plays.
+    const pending = window.lgPendingCamera
+    if (pending && performance.now() - pending.at < 1500) on({ detail: pending.detail })
     return () => removeEventListener('lg-camera', on)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const zoom = (d) =>
@@ -137,6 +184,8 @@ export default function MapView({ ctx }) {
     <DeckGL
       viewState={viewState}
       onViewStateChange={({ viewState: v }) => setViewState(clampView(v))}
+      // The intro waits for this before its first cut: a camera set while deck is still starting up is overwritten.
+      onLoad={onLoad}
       controller={{ dragRotate: ui.mode === 'simulate', touchRotate: ui.mode === 'simulate' }}
       layers={layers}
       effects={[LIGHTING]}
