@@ -12,7 +12,7 @@ export const BEATS: Record<string, { step: string; line: string }> = {
   forecast: { step: 'Forecast', line: 'Where prices are going in the next hours, with honest uncertainty bands.' },
   proof: { step: 'Proof', line: 'Every forecast is logged before the outcome, then scored against a simple baseline.' },
   tonight: { step: 'Tonight', line: 'The cheapest hours tonight to charge a car or run the dishwasher.' },
-  meter: { step: 'Big loads', line: 'What running AI costs in each country, and how a battery answers the shock.' },
+  meter: { step: 'At home', line: 'The same forecast on a little screen at home: the price now, and the cheapest hours tonight.' },
   play: { step: 'Play', line: 'Call a real, hidden day and see if you beat our model.' },
   reveal: { step: 'Reveal', line: 'Monday’s forecast, frozen hours ago, meets the real auction result.' },
 }
