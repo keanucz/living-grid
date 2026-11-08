@@ -7,6 +7,7 @@ import { PANELS } from './panels/registry.js'
 import { api, useApi, overlayState, currentHour } from './api/client.js'
 import { setState, useStore } from './store/store.js'
 import { PRICE_LEGEND } from './styles/tokens.js'
+import GbRegionsLegend from './layers/gbRegions/Legend.jsx'
 import Term from './ui/Term.jsx'
 import { matchView, redirectOf } from './views/index.js'
 import { SECTIONS, sectionById, sectionOfPath, openSection } from './shell/sections.js'
@@ -161,6 +162,7 @@ function MapApp() {
             <div className="bar" style={{ background: `linear-gradient(90deg, ${PRICE_LEGEND.map((s) => s.c).join(',')})` }} />
             <div className="ticks num">{PRICE_LEGEND.map((s) => <span key={s.v}>{s.v}</span>)}</div>
           </div>
+          {ui.layers?.gbRegions && <GbRegionsLegend />}
           <SunNote ui={ui} />
           {ui.layers?.coupled && <span className="muted" style={{ fontSize: 11 }}>Prices only, not forecast. Zone borders approximate. Source: Nord Pool.</span>}
         </div>

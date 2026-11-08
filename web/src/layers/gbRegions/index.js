@@ -1,11 +1,11 @@
 import { GeoJsonLayer } from 'deck.gl'
 import geo from './regions.json'
 import { getRegions, load } from './data.js'
-import { priceColor } from '../../styles/tokens.js'
+import { regionColour, regionExtent } from './scale.js'
 
-// The 14 GB distribution regions as a plain coloured map: filled on the main price scale (one GB wholesale price, so the
-// same colour as Britain on the price map) with thin borders. No on-map text; the name and numbers appear on hover or tap.
-const FALLBACK_EUR = 120
+// The 14 GB distribution regions as a plain coloured map: each filled by its household price now (Octopus Agile, p/kWh)
+// on its own sequential scale (legend.jsx), thin borders. No on-map text; the name and numbers appear on hover or tap.
+const hhmm = (iso) => (iso ? `${iso.slice(11, 16)} UTC` : '')
 const p = (v) => (v == null ? 'n/a' : `${v.toFixed(1)}p/kWh`)
 
 export default {
@@ -15,16 +15,16 @@ export default {
   order: 35,
   modes: ['overview'],
   defaultOn: false,
-  build({ stateByZone }) {
+  build() {
     load()
     const { data, source } = getRegions()
     const rows = Object.fromEntries((data?.regions ?? []).map((r) => [r.region, r]))
-    const eur = stateByZone?.GB?.price_eur ?? FALLBACK_EUR
+    const extent = regionExtent(data)
     const tooltip = (f) => {
       const r = rows[f.properties.region]
       const name = r?.name ?? f.properties.name ?? `Region ${f.properties.region}`
       if (!r) return `<b>${name}</b>`
-      return `<b>${name}</b><br/>Agile now ${p(r.agile_now_p_kwh)}<br/>Tonight, cheapest ${p(r.agile_tonight_min_p_kwh)}<br/><span style="opacity:.6">Retail${source === 'fixture' ? ' · sample' : ''}; one GB wholesale price</span>`
+      return `<b>${name}</b><br/>Household price now ${p(r.agile_now_p_kwh)}<br/>Cheapest tonight ${p(r.agile_tonight_min_p_kwh)}${r.agile_tonight_min_at ? ` at ${hhmm(r.agile_tonight_min_at)}` : ''}<br/><span style="opacity:.6">Octopus Agile, retail${source === 'fixture' ? ' · sample data' : ''}</span>`
     }
     return [
       new GeoJsonLayer({
@@ -32,13 +32,13 @@ export default {
         data: geo,
         filled: true,
         stroked: true,
-        getFillColor: priceColor(eur, 150),
+        getFillColor: (f) => regionColour(rows[f.properties.region]?.agile_now_p_kwh, extent),
         getLineColor: [255, 255, 255, 90],
         getLineWidth: 0.8,
         lineWidthUnits: 'pixels',
         pickable: true,
         tooltip,
-        updateTriggers: { getFillColor: [eur] },
+        updateTriggers: { getFillColor: [data] },
         parameters: { depthTest: false },
       }),
     ]
