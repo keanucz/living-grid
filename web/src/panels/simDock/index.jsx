@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { api } from '../../api/client.js'
 import { Icon } from '../../shell/icons.jsx'
+import { useNarrow } from '../../shell/mobile/useNarrow.js'
+import { sectionById } from '../../shell/sections.js'
 import { actions } from '../../store/store.js'
 import Explain from '../../ui/Explain.jsx'
 import Term from '../../ui/Term.jsx'
@@ -39,6 +41,7 @@ function SimDock({ ctx }) {
   const mag = mags[armed] ?? sc?.magnitude ?? 0
   const [run, setRun] = useState({ status: 'idle', result: null, key: 0, type: null })
   const [dcOpen, setDcOpen] = useState(false)
+  const narrow = useNarrow()
 
   const go = async (id, magnitude) => {
     const s = all?.[id]
@@ -78,6 +81,8 @@ function SimDock({ ctx }) {
 
   return (
     <>
+      {/* The phone shell already shows the section's title and blurb above this panel; the desktop map hides them in this mode. */}
+      {!narrow && <header className="wi-head fade-in"><h1>{sectionById.whatif.title}</h1><p>{sectionById.whatif.blurb}</p></header>}
       <section className="wi-cards fade-in" aria-label="What if">
         {EVENTS.map((e) => (
           <button key={e.id} className={`wi-card ${e.id === armed && shown ? 'on' : ''}`} onClick={() => go(e.id, mags[e.id] ?? all[e.id]?.magnitude)}
@@ -148,6 +153,8 @@ function SimDock({ ctx }) {
 
 const CSS = `
 ${RESULT_CSS}
+.wi-head h1 { margin: 0 0 4px; font-size: 22px; letter-spacing: -0.02em; }
+.wi-head p { margin: 0 0 4px; font-size: 13px; line-height: 1.45; color: var(--text-2); }
 .wi-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .wi-card { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; min-height: 132px; padding: 16px; border-radius: 22px; text-align: left;
   background: var(--panel-solid); border: 1px solid var(--line); box-shadow: var(--shadow); color: var(--text); transition: border-color .15s, background .15s; }

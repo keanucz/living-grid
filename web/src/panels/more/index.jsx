@@ -13,8 +13,8 @@ function More({ ctx }) {
   return (
     <div className="more">
       <button className="more-btn" onClick={() => setOpen((v) => !v)} aria-expanded={open}>
-        <span>More</span>
-        <span className="faint">{items.length} {items.length === 1 ? 'panel' : 'panels'} · {open ? 'Hide' : 'Show'}</span>
+        <span>More detail</span>
+        <span className="faint">{open ? 'Hide' : 'Show'}</span>
       </button>
       {open && (
         <div className="more-body fade-in">

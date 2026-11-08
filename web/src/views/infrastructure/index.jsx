@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Icon } from '../../shell/icons.jsx'
+import Term from '../../ui/Term.jsx'
 import { actions, getState } from '../../store/store.js'
 import { gaugeColor } from '../../layers/boundaries/index.js'
 import { direction, plainStatus, useInfra, utilisation, whatIf } from '../../layers/boundaries/data.js'
@@ -14,12 +15,8 @@ const gwh = (v) => `${(v / 1000).toFixed(1)} GWh`
 const pct = (v) => `${Math.round(v * 100)}%`
 const gw = (v) => `${(Math.abs(v) / 1000).toFixed(1)} GW`
 
-// Glossary terms. TODO(#270): replace with the shared <Term> from web/src/ui/Term.jsx (same children, add its id prop).
-function Term({ children }) {
-  return <span className="inf-term">{children}</span>
-}
-
-// Layer 3 of every card: codes, source and method, closed by default. TODO(#270): swap for Explain's 'For experts'.
+// Layer 3 of every card: codes, source and method, closed by default. Plain words stay above it; NESO and ETYS
+// codes, "thermal" and the method live here.
 function Experts({ children }) {
   return (
     <details className="inf-experts" onClick={(e) => e.stopPropagation()}>
@@ -83,7 +80,7 @@ function Gauge({ row, selected, onPick, days }) {
         {row.cost_gbp_window != null && <span>{money(row.cost_gbp_window)} in {days} days</span>}
       </div>
       <Experts>
-        <div>{row.kind === 'boundary' ? <>NESO <Term>boundary</Term></> : <Term>Interconnector</Term>} code {row.code ?? row.id}{row.etys ? ` · ETYS boundary ${row.etys}` : ''}</div>
+        <div>{row.kind === 'boundary' ? <>NESO <Term id="boundary">boundary</Term></> : <Term id="interconnector">Interconnector</Term>} code {row.code ?? row.id}{row.etys ? ` · ETYS boundary ${row.etys}` : ''}</div>
         <div>Average use {pct(u)} of the {row.kind === 'boundary' ? 'limit' : 'capacity'}: {mw(Math.abs(row.flow_mw ?? 0))} of {mw(row.capacity_mw ?? 0)}{row.over_share != null ? `; forecast over the limit in ${pct(row.over_share)} of hours` : ''}{row.full_import_share != null ? `; importing at full capacity in ${pct(row.full_import_share)} of hours` : ''}.</div>
         <div>{row.kind === 'boundary' ? 'Method: NESO day-ahead forecast flows against the published limit, averaged over the window.' : 'Method: Elexon metered flows against the published cable capacity, averaged over the window.'}</div>
         <Source s={row.source} />
@@ -99,11 +96,15 @@ function Story({ row, days }) {
       <div className="inf-h">{row.name}</div>
       <p>
         {row.name}: {u > 1 ? 'over its limit on average' : `${pct(u)} full on average`}{row.flow_mw != null && row.capacity_mw != null ? `, ${mw(Math.abs(row.flow_mw))} against ${row.kind === 'boundary' ? 'a limit' : 'a capacity'} of ${mw(row.capacity_mw)}` : ''}.
-        {row.over_share != null && ` NESO's day-ahead flow forecast was above the limit in ${pct(row.over_share)} of hours${row.overload_mwh ? `, ${gwh(row.overload_mwh)} more than it could carry` : ''}.`}
+        {row.over_share != null && ` The power expected to flow was over the limit in ${pct(row.over_share)} of hours${row.overload_mwh ? `, ${gwh(row.overload_mwh)} more than it could carry` : ''}.`}
         {row.cost_gbp_window != null && ` Over the last ${days} days, managing the limit cost ${money(row.cost_gbp_window)}.`}
         {row.wind_curtailed_mwh_window != null && ` About ${gwh(row.wind_curtailed_mwh_window)} of wind was paid to switch off in Scotland over ${days} days (estimate from accepted bids, an upper bound).`}
       </p>
-      <Source s={row.source} />
+      <Experts>
+        {row.over_share != null && <div>Over the limit: NESO's day-ahead flow forecast for the {row.kind === 'boundary' ? 'boundary' : 'link'} above its published limit{row.code ? ` (${row.code})` : ''}.</div>}
+        {row.wind_curtailed_mwh_window != null && <div>Wind switched off: Elexon accepted bids (BOALF) for mapped Scottish wind units.</div>}
+        <Source s={row.source} />
+      </Experts>
     </section>
   )
 }
@@ -121,11 +122,14 @@ function Build({ row, days }) {
         <input type="range" min={0} max={max} step={max >= 1000 ? 250 : 50} value={r.addMw} onChange={(e) => setAdd(Number(e.target.value))} aria-label="Added capacity in megawatts" />
       </label>
       <div className="inf-result">
-        <div><span>Cost avoided</span><b className="num yes">{money(r.costSaved)}</b>{row.cf?.cost_total_gbp != null && <small>over {row.cf.cost_days} days with NESO cost data, out of {money(row.cf.cost_total_gbp)} of GB thermal <Term>constraint costs</Term></small>}</div>
+        <div><span>Cost avoided</span><b className="num yes">{money(r.costSaved)}</b>{row.cf?.cost_total_gbp != null && <small>out of {money(row.cf.cost_total_gbp)} of <Term id="constraint">constraint costs</Term> in {row.cf.cost_days} days</small>}</div>
         <div><span>Wind no longer wasted</span><b className="num yes">{gwh(r.windSaved)}</b>{row.cf?.wind_total_mwh != null && <small>out of {gwh(row.cf.wind_total_mwh)} switched off in Scotland in {days} days</small>}</div>
       </div>
-      <p className="inf-muted">A counterfactual on the same {days} days, not a forecast: it assumes the extra capacity had been in place and everything else unchanged, so treat both figures as upper bounds (other Scottish boundaries would still bind). Values between the published points are interpolated; nothing beyond +{mw(max)} is shown.</p>
-      <Source s={row.source} />
+      <p className="inf-muted">What these {days} days would have looked like with the extra line in place, everything else the same. Treat both figures as the most it could save: other lines in Scotland would still fill up.</p>
+      <Experts>
+        <div>Counterfactual, not a forecast. Cost avoided is out of Britain's thermal constraint costs on the {row.cf?.cost_days ?? days} days with NESO cost data. Values between the published capacity points are interpolated; nothing beyond +{mw(max)} is shown.</div>
+        <Source s={row.source} />
+      </Experts>
     </section>
   )
 }
@@ -176,7 +180,9 @@ function Infrastructure() {
           ))}
         </section>
       )}
-      {(data.notes ?? []).map((n) => <p key={n} className="inf-muted">{n}</p>)}
+      {(data.notes ?? []).length > 0 && (
+        <section className="inf-panel"><Experts>{data.notes.map((n) => <div key={n}>{n}</div>)}</Experts></section>
+      )}
       <style>{CSS}</style>
     </div>
   )
@@ -217,7 +223,6 @@ body { overflow: auto; }
 .inf-grid { align-items: start; }
 .inf-context summary, .inf-experts summary { cursor: pointer; font-weight: 600; }
 .inf-context p { font-size: 14px; }
-.inf-term { border-bottom: 1px dotted var(--text-3); }
 .inf-experts { font-size: 12px; color: var(--text-2); }
 .inf-experts summary { font-size: 12px; color: var(--text-3); font-weight: 500; }
 .inf-experts-body { display: flex; flex-direction: column; gap: 4px; margin-top: 6px; line-height: 1.45; }
