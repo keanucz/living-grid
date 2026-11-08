@@ -30,6 +30,8 @@ if (typeof matchMedia !== 'undefined' && matchMedia('(max-width: 700px)').matche
 }
 
 const PHONE = typeof matchMedia !== 'undefined' && matchMedia('(max-width: 700px)').matches
+// On the small phone map Belgium's price label lands on Germany's: move it down and left, clear of both neighbours.
+const PHONE_NUDGE = { BE: [-26, 18] }
 // Bounded zoom and pan; the default views below still frame our six zones in Europe.
 // The whole world is drawn (grey context); zoom out far enough to see it, but no further than one world.
 const LIMITS = { minZoom: PHONE ? 0.3 : 1.1, maxZoom: 7.5, lon: [-180, 180], lat: [-58, 78] }
@@ -270,7 +272,9 @@ function Overlay({ viewport, ctx }) {
         .pin:hover .pin-name, .pin:focus-within .pin-name { display: block; }`}</style>
       {!sim && ui.section !== 'hidden' && viewport.zoom >= 3 &&
         data.zones.zones.map((z) => {
-          const [x, y] = project(z.label_at)
+          const [dx, dy] = (PHONE && PHONE_NUDGE[z.id]) || [0, 0]
+          const [px, py] = project(z.label_at)
+          const [x, y] = [px + dx, py + dy]
           const st = ctx.stateByZone[z.id]
           if (!st) return null
           if (underControls(x, y, viewport)) return null
@@ -303,7 +307,10 @@ function Overlay({ viewport, ctx }) {
         const [x, y] = viewport.project([...z.centroid, towerHeight(priceOf(z.id))])
         const d = scenario.price_delta_eur[z.id] * scenario.scale
         return (
-          <div className="callout fade-in" key={scenario.type} style={{ left: x, top: y }}>
+          // Phones: keep the callout (14 px offset, up to 220 px wide) inside the map's right edge, and below the
+          // "Illustrative effect" label.
+          <div className="callout fade-in" key={scenario.type}
+            style={PHONE ? { left: Math.max(0, Math.min(x, viewport.width - 242)), top: y + 50 } : { left: x, top: y }}>
             <div className="ic"><Icon name="pound" size={18} stroke={2.2} /></div>
             <div>
               {/* Britain in the units on a bill (wholesale pence per kWh); other zones in euros per MWh. */}
