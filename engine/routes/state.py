@@ -1,11 +1,11 @@
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime
 from functools import lru_cache
 
 import pandas as pd
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 
 from engine import data, timeline
-from engine.schemas import StateResponse
+from engine.schemas import StateDayResponse, StateResponse
 from pipeline import cache
 
 router = APIRouter(tags=["map"])
@@ -49,6 +49,33 @@ def _compute(t: pd.Timestamp) -> dict:
         for z in data.ZONES
     ]
     return {"at": t.to_pydatetime(), "zones": zones, "flows": data.link_flows(t)}
+
+
+def _compute_day(day: pd.Timestamp) -> dict:
+    hours = pd.date_range(day, periods=24, freq="h")
+    with data.scoped(hours[0], hours[-1]):
+        rows = [_compute(t) for t in hours]
+    return {"date": day.date(), "hours": rows}
+
+
+@lru_cache(maxsize=64)
+def _day(day: pd.Timestamp, sig: tuple) -> dict:
+    return _compute_day(day)
+
+
+def build_day(day) -> dict:
+    """The 24 hourly states of one UTC day, as GET /state would give each hour, from one slice of the cache.
+    Memoised per day and cache-file state. The result is shared: read it, never mutate it."""
+    d = data.as_utc(pd.Timestamp(day)).floor("D")
+    return _day(d, timeline._signature())
+
+
+@router.get("/state/day", response_model=StateDayResponse)
+def state_day(date: date) -> dict:
+    """Every hour of one UTC day in one response, for replay and scrubbing (24 GET /state calls in one)."""
+    if pd.Timestamp(date) > pd.Timestamp(datetime.now(UTC).date()):
+        raise HTTPException(422, "date must not be in the future")
+    return build_day(date)
 
 
 @router.get("/state", response_model=StateResponse)

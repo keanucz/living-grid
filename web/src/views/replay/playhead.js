@@ -22,14 +22,16 @@ export const indexOf = (win, at) => (at ? Math.max(0, Math.min(win.n - 1, Math.r
 
 export const SPEEDS = [1, 2, 4]
 
-export function usePlayhead(win) {
+// `ready(iso)` says whether an hour's data is on hand; while playing, the playhead waits on an hour that is not, so the
+// map and the readout never fall behind the clock.
+export function usePlayhead(win, ready = () => true) {
   const at = useStore((s) => s.at)
   const [playing, setPlaying] = useState(false)
   const [speed, setSpeed] = useState(1)
   const i = indexOf(win, at)
   const inWindow = at != null && Date.parse(at) >= win.start - HOUR && Date.parse(at) <= win.start + win.n * win.stepH * HOUR
-  const ref = useRef({ i, win })
-  ref.current = { i, win }
+  const ref = useRef({ i, win, ready })
+  ref.current = { i, win, ready }
 
   // Land on the first hour when the window changes or the playhead is somewhere else entirely.
   useEffect(() => {
@@ -40,9 +42,10 @@ export function usePlayhead(win) {
   useEffect(() => {
     if (!playing) return undefined
     const id = setInterval(() => {
-      const { i: cur, win: w } = ref.current
+      const { i: cur, win: w, ready: ok } = ref.current
       if (cur >= w.n - 1) return setPlaying(false)
-      actions.setAt(atIndex(w, cur + 1))
+      const next = atIndex(w, cur + 1)
+      if (ok(next)) actions.setAt(next)
     }, 800 / speed)
     return () => clearInterval(id)
   }, [playing, speed])

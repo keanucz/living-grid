@@ -136,6 +136,14 @@ class StateResponse(Model):
     flows: list[Flow]
 
 
+# ---------- GET /state/day?date=YYYY-MM-DD ----------
+
+
+class StateDayResponse(Model):
+    date: date
+    hours: list[StateResponse]  # 24 rows, 00:00 to 23:00 UTC, each exactly what GET /state?at= gives for that hour
+
+
 # ---------- GET /timeline?from=&to=&step= ----------
 
 

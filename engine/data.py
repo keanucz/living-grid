@@ -1,5 +1,7 @@
 """Thin read-only access to pipeline parquet (data/ first, committed fixtures as fallback). All UTC."""
 
+from contextlib import contextmanager
+from contextvars import ContextVar
 from functools import lru_cache
 from pathlib import Path
 
@@ -59,8 +61,34 @@ def _read(path: Path) -> pd.DataFrame:
     return _read_parquet(path, path.stat().st_mtime)
 
 
+# Set by scoped(): actuals() and carbon() return only rows in a time window, so computing many hours of one day filters
+# a few thousand rows per hour instead of the whole cache. Every as-of lookup here looks back at most DELAYED_TOLERANCE.
+_SCOPE: ContextVar[dict | None] = ContextVar("data_scope", default=None)
+
+
+@contextmanager
+def scoped(start: pd.Timestamp, end: pd.Timestamp):
+    """Within the block, actuals() and carbon() hold only rows with start - DELAYED_TOLERANCE < ts <= end, which is
+    everything an as-of lookup at any time in [start, end] can see."""
+    lo = as_utc(start) - DELAYED_TOLERANCE
+    hi = as_utc(end)
+    a, c = actuals(), carbon()
+    view = {
+        "actuals": a[(a["ts"] > lo) & (a["ts"] <= hi)],
+        "carbon": c[(c["ts"] > lo) & (c["ts"] <= hi)] if len(c) else c,
+    }
+    token = _SCOPE.set(view)
+    try:
+        yield
+    finally:
+        _SCOPE.reset(token)
+
+
 def actuals() -> pd.DataFrame:
     """Every cached actual with its source. Shared and memoised on file mtimes: callers filter, never mutate."""
+    view = _SCOPE.get()
+    if view is not None:
+        return view["actuals"]
     files = tuple((stem, p, p.stat().st_mtime) for stem, p in sorted(_files("actuals").items()))
     return _concat_actuals(files)
 
@@ -88,6 +116,9 @@ def forecast_log() -> pd.DataFrame:
 
 
 def carbon() -> pd.DataFrame:
+    view = _SCOPE.get()
+    if view is not None:
+        return view["carbon"]
     p = _files("carbon").get("consumption_intensity")
     return _read(p) if p else pd.DataFrame(columns=["ts", "zone"])
 

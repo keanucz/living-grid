@@ -4,11 +4,12 @@ import { scaleLinear, scaleUtc } from 'd3-scale'
 import { Icon } from '../../shell/icons.jsx'
 import { api, useApi } from '../../api/client.js'
 import { fmt } from '../../styles/tokens.js'
+import { useStore } from '../../store/store.js'
 import Movie from '../events/Movie.jsx'
 import { ReplayMap } from './ReplayMap.jsx'
 import { Readout } from './Readout.jsx'
 import { SPEEDS, atIndex, iso, usePlayhead, useReplayShell, windowFor } from './playhead.js'
-import { useMapState } from './useMapState.js'
+import { daysAround, useDayStates, useDayWind, useMapState } from './useMapState.js'
 
 // Replay: the map plays a day with the data, the chart and the readout follow the same playhead (the shared ui.at, which
 // the history scrubber also moves). The default is the 26 October storm with the as-of forecast; every event in the
@@ -35,10 +36,10 @@ function useEvents() {
   return events
 }
 
-function useGhostWind(from, at, playing, i) {
+function useGhostWind(from, at, playing, i, on = true) {
   const [mwh, setMwh] = useState(null)
   useEffect(() => {
-    if (playing && i % 3 !== 0) return undefined
+    if (!on || (playing && i % 3 !== 0)) return undefined
     let live = true
     const t = setTimeout(() => {
       api.ghostWind(from, at).then((r) => live && setMwh(r?.data?.total_boalf_mwh ?? null)).catch(() => live && setMwh(null))
@@ -47,7 +48,7 @@ function useGhostWind(from, at, playing, i) {
       live = false
       clearTimeout(t)
     }
-  }, [from, at, playing, i])
+  }, [from, at, playing, i, on])
   return mwh
 }
 
@@ -113,10 +114,16 @@ function Replay() {
     }
     return windowFor(ev.start, ev.end)
   }, [isStorm, ev, replay])
-  const ph = usePlayhead(win)
-  const map = useMapState(ph.at)
-  const dayStart = iso(Math.floor(Date.parse(ph.at) / 864e5) * 864e5)
-  const wind = useGhostWind(isStorm ? dayStart : iso(win.start), ph.at, ph.playing, ph.i)
+  // The day's hours come in one /state/day request; the playhead waits for an hour that has not arrived yet.
+  const at0 = useStore((st) => st.at) ?? atIndex(win, 0)
+  const dayData = useDayStates(daysAround(at0, win.stepH))
+  const dayOfIso = (t) => t.slice(0, 10)
+  const ready = (t) => Boolean(dayData.hours[t]) || Boolean(dayData.failed[dayOfIso(t)])
+  const ph = usePlayhead(win, ready)
+  const map = useMapState(ph.at, dayData.hours, Boolean(dayData.failed[dayOfIso(ph.at)]))
+  const dayWind = useDayWind(ph.at)
+  const eventWind = useGhostWind(iso(win.start), ph.at, ph.playing, ph.i, !isStorm)
+  const wind = isStorm ? dayWind : eventWind
 
   const s = replay?.series?.find((x) => `${x.zone}|${x.target}` === key) ?? replay?.series?.[0]
   const pts = s?.points ?? []

@@ -4086,6 +4086,29 @@
     "title": "ScoresResponse",
     "type": "object"
    },
+   "StateDayResponse": {
+    "additionalProperties": false,
+    "properties": {
+     "date": {
+      "format": "date",
+      "title": "Date",
+      "type": "string"
+     },
+     "hours": {
+      "items": {
+       "$ref": "#/components/schemas/StateResponse"
+      },
+      "title": "Hours",
+      "type": "array"
+     }
+    },
+    "required": [
+     "date",
+     "hours"
+    ],
+    "title": "StateDayResponse",
+    "type": "object"
+   },
    "StateResponse": {
     "additionalProperties": false,
     "properties": {
@@ -5955,6 +5978,50 @@
      }
     },
     "summary": "State",
+    "tags": [
+     "map"
+    ]
+   }
+  },
+  "/state/day": {
+   "get": {
+    "description": "Every hour of one UTC day in one response, for replay and scrubbing (24 GET /state calls in one).",
+    "operationId": "state_day_state_day_get",
+    "parameters": [
+     {
+      "in": "query",
+      "name": "date",
+      "required": true,
+      "schema": {
+       "format": "date",
+       "title": "Date",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/StateDayResponse"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "State Day",
     "tags": [
      "map"
     ]
