@@ -73,8 +73,36 @@ def locate(location: str) -> tuple[str, str, str | None]:
     raise BadRequest(f"unknown location {location!r}; use a zone ({', '.join(data.ZONES)}) or a GB region letter ({', '.join(regions)})")
 
 
+# Prices and carbon change at most hourly, but the page asks for every site on each slider move. Results are kept per
+# key and reused only while the cached frames they came from are the same objects (data.* memoises reads on file
+# mtimes), so a new file means a fresh read. Callers must not mutate what comes back.
+_MEMO: dict = {}
+_MEMO_MAX = 256
+
+
+def _memo(key: tuple, tokens: tuple, fn):
+    hit = _MEMO.get(key)
+    if hit is not None and len(hit[0]) == len(tokens) and all(a is b for a, b in zip(hit[0], tokens)):
+        return hit[1]
+    value = fn()
+    if len(_MEMO) >= _MEMO_MAX:
+        _MEMO.clear()
+    _MEMO[key] = (tokens, value)
+    return value
+
+
+def _mtime(name: str) -> tuple[str, float | None]:
+    p = cache.path(name)
+    return str(p), (p.stat().st_mtime_ns if p.exists() else None)
+
+
 def hourly_prices(zone: str, upto: pd.Timestamp) -> tuple[pd.Series, str]:
     a = data.actuals()
+    # The index is whole hours, so everything up to `upto` is everything up to its hour.
+    return _memo(("prices", zone, upto.floor("h")), (a,), lambda: _hourly_prices(a, zone, upto.floor("h")))
+
+
+def _hourly_prices(a: pd.DataFrame, zone: str, upto: pd.Timestamp) -> tuple[pd.Series, str]:
     if zone == "GB":
         s = a[(a["zone"] == "GB") & (a["series"] == "system_price")]
         basis = "Elexon system price (GB day-ahead history is only about 60 days)"
@@ -94,6 +122,10 @@ def hourly_prices(zone: str, upto: pd.Timestamp) -> tuple[pd.Series, str]:
 
 def hourly_carbon(zone: str) -> pd.Series:
     c = data.carbon()
+    return _memo(("carbon", zone), (c,), lambda: _hourly_carbon(c, zone))
+
+
+def _hourly_carbon(c: pd.DataFrame, zone: str) -> pd.Series:
     if not len(c):
         return pd.Series(dtype=float)
     c = c[c["zone"] == zone]
@@ -102,6 +134,10 @@ def hourly_carbon(zone: str) -> pd.Series:
 
 def regional_carbon(region: str) -> pd.Series:
     """Hourly modelled intensity of electricity consumed in a GB region (gCO2/kWh), empty when not cached."""
+    return _memo(("regional", region, _mtime(REGIONAL_CI), cache.offline()), (), lambda: _regional_carbon(region))
+
+
+def _regional_carbon(region: str) -> pd.Series:
     r = read_live(REGIONAL_CI)
     if r is None or not len(r):
         return pd.Series(dtype=float)
@@ -122,6 +158,10 @@ def site_carbon(zone: str, region: str | None) -> tuple[pd.Series, str]:
 
 
 def eua_price() -> float | None:
+    return _memo(("eua", _mtime("markets/gas_carbon"), cache.offline()), (), _eua_price)
+
+
+def _eua_price() -> float | None:
     try:
         g = cache.read("markets/gas_carbon")
     except FileNotFoundError:
@@ -147,31 +187,36 @@ def place_flexible(price: np.ndarray, base_kw: float, flex: float, cap_kw: float
     return load
 
 
-def annual(prices: pd.Series, carbon: pd.Series, base_kw: float, flex: float, cap_kw: float) -> dict:
-    """Totals over the days we have complete prices for, then scaled to a year."""
+def complete_days(prices: pd.Series, carbon: pd.Series) -> tuple[list[tuple[np.ndarray, np.ndarray]], float]:
+    """([(hourly price, hourly carbon)] for each day with complete prices, mean carbon over all priced hours)."""
     df = pd.DataFrame({"p": prices})
     df["ci"] = carbon.reindex(df.index)
     df["ci"] = df["ci"].fillna(df["ci"].mean() if df["ci"].notna().any() else carbon.mean())
     df["day"] = df.index.floor("D")
+    days = [(g["p"].to_numpy(), g["ci"].to_numpy()) for _, g in df.groupby("day") if len(g) >= MIN_DAY_HOURS and not g["p"].isna().any()]
+    return days, float(df["ci"].mean())
+
+
+def annual(prices: pd.Series, carbon: pd.Series, base_kw: float, flex: float, cap_kw: float,
+           prepared: tuple[list[tuple[np.ndarray, np.ndarray]], float] | None = None) -> dict:
+    """Totals over the days we have complete prices for, then scaled to a year."""
+    day_arrays, mean_ci = prepared if prepared is not None else complete_days(prices, carbon)
     flat_cost = flex_cost = flat_t = flex_t = hours = price_sum = 0.0
     days = 0
-    for _, g in df.groupby("day"):
-        if len(g) < MIN_DAY_HOURS or g["p"].isna().any():
-            continue
-        p, ci = g["p"].to_numpy(), g["ci"].to_numpy()
+    for p, ci in day_arrays:
         load = place_flexible(p, base_kw, flex, cap_kw)
         flat_cost += float((p * base_kw / 1000).sum())
         flex_cost += float((p * load / 1000).sum())
         flat_t += float((ci * base_kw / 1e6).sum())
         flex_t += float((ci * load / 1e6).sum())
-        hours += len(g)
+        hours += len(p)
         price_sum += float(p.sum())
         days += 1
     if not hours:
         return {}
     k = HOURS_YEAR / hours
     return {"days": days, "mwh": base_kw * HOURS_YEAR / 1000, "cost": flat_cost * k, "cost_flex": flex_cost * k,
-            "tonnes": flat_t * k, "tonnes_flex": flex_t * k, "mean_price": price_sum / hours, "mean_ci": float(df["ci"].mean())}
+            "tonnes": flat_t * k, "tonnes_flex": flex_t * k, "mean_price": price_sum / hours, "mean_ci": mean_ci}
 
 
 def grid_notes(zone: str, location: str) -> list[dict]:
@@ -199,6 +244,13 @@ def grid_notes(zone: str, location: str) -> list[dict]:
 def next_job(zone: str, flex_kw: float, now: datetime | None) -> dict | None:
     if flex_kw <= 0:
         return None
+    # /compute uses the clock only to pick whole hours and to drop forecasts made after it; new forecasts or prices
+    # arrive as a new file, which changes the tokens.
+    t = data.as_utc(now) if now is not None else compute.default_now()
+    return _memo(("job", zone, flex_kw, t.floor("h"), now is None), (data.forecast_log(), data.actuals()), lambda: _next_job(zone, flex_kw, now))
+
+
+def _next_job(zone: str, flex_kw: float, now: datetime | None) -> dict | None:
     try:
         r = compute.build(min(flex_kw, compute.MAX_KW), compute.DEFAULT_HOURS, zone, None, now)
     except compute.BadRequest:
@@ -221,7 +273,8 @@ def site(location: str, gpus: int, gpu_type: str, pue: float, util: float, flex:
     carbon, carbon_basis = site_carbon(zone, region)
     cur = data.CURRENCY[zone]
     fx = EUR_PER_GBP if cur == "GBP" else 1.0
-    a = annual(prices, carbon, base_kw, flex, cap_kw) if len(prices) else {}
+    prepared = _memo(("days", zone, region), (prices, carbon), lambda: complete_days(prices, carbon)) if len(prices) else None
+    a = annual(prices, carbon, base_kw, flex, cap_kw, prepared) if len(prices) else {}
     eua = eua_price()
     out = {"location": location.upper(), "zone": zone, "name": name, "currency": cur, "peak_it_kw": peak_it, "facility_kw_avg": base_kw,
            "annual_mwh": base_kw * HOURS_YEAR / 1000, "price_basis": basis, "price_days": a.get("days", 0), "energy": None, "carbon": None,
