@@ -93,7 +93,7 @@ function read(conn, me, lobbyId = null) {
       const q = conn.db.quick_queue ? [...conn.db.quick_queue.iter()] : []
       return {
         mine: q.find((x) => x.identity.toHexString() === hex)?.mode ?? null,
-        waiting: { market: q.filter((x) => x.mode === 'market').length, battery: q.filter((x) => x.mode === 'battery').length },
+        waiting: { market: q.filter((x) => x.mode === 'market').length, battery: q.filter((x) => x.mode === 'battery').length, beat: q.filter((x) => x.mode === 'beat').length },
       }
     })(),
     ballots: (conn.db.lobby_ballot ? [...conn.db.lobby_ballot.iter()] : []).map((b) => ({ lobbyId: b.lobbyId, id: b.identity.toHexString(), vote: b.vote })),

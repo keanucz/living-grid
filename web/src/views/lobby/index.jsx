@@ -4,6 +4,8 @@ import { Icon } from '../../shell/icons.jsx'
 import { connectMarket } from '../market/connection.js'
 import { Phone } from '../market/index.jsx'
 import { BatteryMode } from './BatteryMode.jsx'
+import { DemoPlay, isDemo } from '../play/DemoPlay.jsx'
+import { BeatRoom, BeatSolo } from '../play/Live.jsx'
 import { AVATARS, Avatar, avatarIds } from './avatars.jsx'
 import {
   COUNTDOWN_S, QUESTION_COUNTS, SPEEDS, countdownLeft, members, myLobby, normaliseCode, playLink, roundLength, routeCode, screenLink,
@@ -13,7 +15,7 @@ import {
 // host settings and Start; 5 s countdown on every screen; the round; rematch. Deep link: #/play/<CODE>.
 const PROFILE_KEY = 'lg-lobby-profile'
 // The screen that plays each game mode (lobby.mode).
-const ROUNDS = { market: (props) => <Phone {...props} />, battery: (props) => <BatteryMode {...props} /> }
+const ROUNDS = { beat: (props) => <BeatRoom {...props} />, market: (props) => <Phone {...props} />, battery: (props) => <BatteryMode {...props} /> }
 
 function loadProfile() {
   try {
@@ -108,32 +110,31 @@ function Profile({ profile, setProfile, autoFocus }) {
 
 const defaultName = () => `Player ${100 + Math.floor(Math.random() * 900)}`
 
-function Landing({ profile, setProfile, queue, onHost, onJoinCode, onQuick, onCancel }) {
+function Landing({ profile, setProfile, queue, onSolo, onHost, onJoinCode, onQuick, onCancel }) {
   const [code, setCode] = useState('')
-  const [mode, setMode] = useState('market')
-  const waiting = queue?.waiting ?? { market: 0, battery: 0 }
+  const waiting = queue?.waiting?.beat ?? 0
   return (
     <>
       <section className="lb-card lb-quick">
-        <h2>Quick play</h2>
+        <h2>Beat the model</h2>
+        <p className="lb-muted">Five calls on a mystery day. Say what you think and how sure you are, then see whether you beat the model and the bots.</p>
+        <Profile profile={profile} setProfile={setProfile} />
+        <button className="lb-primary" onClick={onSolo}>Play solo</button>
+      </section>
+      <section className="lb-card">
+        <h2>Play with others</h2>
         {queue?.mine ? (
           <>
-            <p className="lb-muted"><b>Looking for another player…</b> {waiting[queue.mine]} waiting for {queue.mine === 'battery' ? 'a battery game' : 'a prediction market'}. The game starts a few seconds after a second person arrives. Ask a friend to scan the same QR code.</p>
-            <button className="lb-ghost" onClick={onCancel}>Cancel</button>
+            <p className="lb-muted"><b>Looking for another player…</b> {waiting} waiting. The game starts a few seconds after a second person arrives. Ask a friend to scan the same QR code.</p>
+            <button className="lb-ghost wide" onClick={onCancel}>Cancel</button>
           </>
         ) : (
           <>
-            <p className="lb-muted">No code, no host. You are matched as soon as two or more people are waiting.</p>
-            <Profile profile={profile} setProfile={setProfile} />
-            <Segmented label="Game" options={MODES} value={mode} onChange={setMode} />
-            <button className="lb-primary" onClick={() => onQuick(mode)}>Quick play{waiting[mode] ? ` · ${waiting[mode]} waiting` : ''}</button>
+            <p className="lb-muted">Quick play matches you with whoever is waiting. Or host a room and share its code.</p>
+            <button className="lb-ghost wide" onClick={onQuick}>Quick play{waiting ? ` · ${waiting} waiting` : ''}</button>
+            <button className="lb-ghost wide" style={{ marginTop: 8 }} onClick={onHost}>Host a room</button>
           </>
         )}
-      </section>
-      <section className="lb-card">
-        <h2>Host a game</h2>
-        <p className="lb-muted">You get a 4-letter code, a QR for phones and a link for the big screen.</p>
-        <button className="lb-ghost wide" onClick={onHost}>Host a game</button>
       </section>
       <section className="lb-card">
         <h2>Join with a code</h2>
@@ -145,24 +146,25 @@ function Landing({ profile, setProfile, queue, onHost, onJoinCode, onQuick, onCa
           <button className="lb-ghost wide" disabled={code.length !== 4}>Continue</button>
         </form>
       </section>
+      <a className="lb-link" href="#/play?demo=1">Try a rehearsal round (invented calls)</a>
     </>
   )
 }
 
 const MODES = [
-  { value: 'market', label: 'Prediction market', note: 'Trade yes/no questions on a mystery day' },
+  { value: 'beat', label: 'Beat the model', note: 'Five calls on a mystery day: call it, say how sure you are, and see if you beat the model and the bots' },
   { value: 'battery', label: 'Battery', note: 'Charge, hold or discharge a 1 MW battery against two planning agents' },
 ]
 
 function HostForm({ profile, setProfile, busy, onCreate, onBack }) {
-  const [mode, setMode] = useState('market')
+  const [mode, setMode] = useState('beat')
   const ok = (profile.name ?? '').trim().length > 0
   return (
     <section className="lb-card">
       <h2>Host a game</h2>
       <Profile profile={profile} setProfile={setProfile} autoFocus />
       <Segmented label="Game" options={MODES} value={mode} onChange={setMode} />
-      <p className="lb-muted">{MODES.find((m) => m.value === mode).note}. You choose speed, number of questions and bots in the waiting room, where the code and QR appear.</p>
+      <p className="lb-muted">{MODES.find((m) => m.value === mode).note}. The code and QR appear in the waiting room.</p>
       <button className="lb-primary" disabled={busy || !ok} onClick={() => onCreate({ mode })}>Create game</button>
       <button className="lb-link" onClick={onBack}>Back</button>
     </section>
@@ -210,10 +212,11 @@ function Settings({ lobby, busy, onChange }) {
     <section className="lb-card">
       <h2>Settings</h2>
       <Segmented label="Game" options={MODES} value={lobby.mode} onChange={(mode) => set({ mode })} disabled={busy} />
+      {lobby.mode === 'beat' ? <p className="lb-muted">Five calls, about 15 seconds each, with the bots playing along. A round takes under two minutes.</p> : <>
       <Segmented label="Speed" options={SPEEDS} value={lobby.secondsPerHour} onChange={(secondsPerHour) => set({ secondsPerHour })} disabled={busy} />
       <Segmented label="Questions" options={QUESTION_COUNTS.map((n) => ({ value: n, label: String(n) }))} value={lobby.nQuestions} onChange={(nQuestions) => set({ nQuestions })} disabled={busy} />
       <label className="lb-check"><input type="checkbox" checked={lobby.botsOn} disabled={busy} onChange={(e) => set({ botsOn: e.target.checked })} /> Bots play too</label>
-      <p className="lb-muted">A round takes {roundLength(lobby.secondsPerHour)}.</p>
+      <p className="lb-muted">A round takes {roundLength(lobby.secondsPerHour)}.</p></>}
     </section>
   )
 }
@@ -311,6 +314,16 @@ function RoundFooter({ s, lobby, busy, run, api, profile }) {
   )
 }
 
+function Play() {
+  const [demo, setDemo] = useState(isDemo())
+  useEffect(() => {
+    const on = () => setDemo(isDemo())
+    addEventListener('hashchange', on)
+    return () => removeEventListener('hashchange', on)
+  }, [])
+  return demo ? <DemoPlay /> : <Lobby />
+}
+
 function Lobby() {
   const [s, api] = useLobby()
   const routeCodeNow = useRouteCode()
@@ -318,6 +331,7 @@ function Lobby() {
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState(null)
   const [hosting, setHosting] = useState(false)
+  const [solo, setSolo] = useState(false)
   const setProfile = (p) => (setProfileState(p), saveProfile(p))
   const run = (fn) => {
     setBusy(true)
@@ -341,10 +355,11 @@ function Lobby() {
   const quickPlay = (mode) => {
     const name = (profile.name ?? '').trim() || defaultName()
     if (!profile.name) setProfile({ ...profile, name })
-    return run(() => api.current.quickPlay(name, profile.avatar ?? avatarIds[0], mode))
+    return run(() => api.current.quickPlay(name, profile.avatar ?? avatarIds[0], 'beat'))
   }
   const join = (code) => run(() => api.current.lobbyJoin(code, profile.name.trim(), profile.avatar ?? avatarIds[0]))
 
+  if (solo) return <BeatSolo name={(profile.name ?? '').trim() || defaultName()} avatar={profile.avatar ?? avatarIds[0]} onExit={() => setSolo(false)} />
   let body
   if (s.status === 'connecting') body = <p className="lb-muted">Connecting…</p>
   else if (s.status === 'offline') body = <p className="lb-muted">The game server is out of reach. Check the Wi-Fi and reload.</p>
@@ -353,8 +368,8 @@ function Lobby() {
       ? <HostForm profile={profile} setProfile={setProfile} busy={busy} onCreate={create} onBack={() => setHosting(false)} />
       : routeCodeNow
         ? <JoinForm code={routeCodeNow} profile={profile} setProfile={setProfile} busy={busy} onJoin={join} onBack={() => go('')} />
-        : <Landing profile={profile} setProfile={setProfile} queue={s.queue} onHost={() => setHosting(true)} onJoinCode={go}
-            onQuick={(mode) => quickPlay(mode)} onCancel={() => run(() => api.current.quickCancel())} />
+        : <Landing profile={profile} setProfile={setProfile} queue={s.queue} onSolo={() => { if (!profile.name) setProfile({ ...profile, name: defaultName() }); setSolo(true) }} onHost={() => setHosting(true)} onJoinCode={go}
+            onQuick={() => quickPlay()} onCancel={() => run(() => api.current.quickCancel())} />
   } else if (lobby.state === 'waiting') body = <Waiting s={s} lobby={lobby} busy={busy} run={run} api={api} />
   else if (lobby.state === 'countdown') {
     const ballots = (s.ballots ?? []).filter((b) => b.lobbyId === lobby.id)
@@ -434,4 +449,4 @@ body { overflow: auto; }
 
 export { Countdown, HostForm, JoinForm, Landing, RoundFooter, Waiting }
 
-export default { path: '/play', prefix: true, title: 'Play with the room', Component: Lobby }
+export default { path: '/play', prefix: true, title: 'Play', Component: Play }

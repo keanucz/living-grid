@@ -37,6 +37,10 @@ import {
 import AddAdminReducer from "./add_admin_reducer";
 import BatteryDecideReducer from "./battery_decide_reducer";
 import BatteryPoolPutReducer from "./battery_pool_put_reducer";
+import BeatAnswerReducer from "./beat_answer_reducer";
+import BeatDayDeleteReducer from "./beat_day_delete_reducer";
+import BeatDayPutReducer from "./beat_day_put_reducer";
+import BeatStartReducer from "./beat_start_reducer";
 import ClaimZoneReducer from "./claim_zone_reducer";
 import ClearInterventionReducer from "./clear_intervention_reducer";
 import ClueBuyReducer from "./clue_buy_reducer";
@@ -85,6 +89,10 @@ import BatteryMyPendingRow from "./battery_my_pending_table";
 import BatteryPlayerRow from "./battery_player_table";
 import BatteryRoundRow from "./battery_round_table";
 import BatterySlotRow from "./battery_slot_table";
+import BeatCallRow from "./beat_call_table";
+import BeatGameRow from "./beat_game_table";
+import BeatPlayerRow from "./beat_player_table";
+import BeatResultRow from "./beat_result_table";
 import CarbonRow from "./carbon_table";
 import ForecastRow from "./forecast_table";
 import GameResultRow from "./game_result_table";
@@ -218,6 +226,68 @@ const tablesSchema = __schema({
       { name: 'battery_slot_key_key', constraint: 'unique', columns: ['key'] },
     ],
   }, BatterySlotRow),
+  beatCall: __table({
+    name: 'beat_call',
+    indexes: [
+      { accessor: 'game_id', name: 'beat_call_game_id_idx_btree', algorithm: 'btree', columns: [
+        'gameId',
+      ] },
+      { accessor: 'key', name: 'beat_call_key_idx_btree', algorithm: 'btree', columns: [
+        'key',
+      ] },
+    ],
+    constraints: [
+      { name: 'beat_call_key_key', constraint: 'unique', columns: ['key'] },
+    ],
+  }, BeatCallRow),
+  beatGame: __table({
+    name: 'beat_game',
+    indexes: [
+      { accessor: 'id', name: 'beat_game_id_idx_btree', algorithm: 'btree', columns: [
+        'id',
+      ] },
+      { accessor: 'lobby_id', name: 'beat_game_lobby_id_idx_btree', algorithm: 'btree', columns: [
+        'lobbyId',
+      ] },
+    ],
+    constraints: [
+      { name: 'beat_game_id_key', constraint: 'unique', columns: ['id'] },
+    ],
+  }, BeatGameRow),
+  beatPlayer: __table({
+    name: 'beat_player',
+    indexes: [
+      { accessor: 'game_id', name: 'beat_player_game_id_idx_btree', algorithm: 'btree', columns: [
+        'gameId',
+      ] },
+      { accessor: 'identity', name: 'beat_player_identity_idx_btree', algorithm: 'btree', columns: [
+        'identity',
+      ] },
+      { accessor: 'key', name: 'beat_player_key_idx_btree', algorithm: 'btree', columns: [
+        'key',
+      ] },
+    ],
+    constraints: [
+      { name: 'beat_player_key_key', constraint: 'unique', columns: ['key'] },
+    ],
+  }, BeatPlayerRow),
+  beatResult: __table({
+    name: 'beat_result',
+    indexes: [
+      { accessor: 'game_id', name: 'beat_result_game_id_idx_btree', algorithm: 'btree', columns: [
+        'gameId',
+      ] },
+      { accessor: 'identity', name: 'beat_result_identity_idx_btree', algorithm: 'btree', columns: [
+        'identity',
+      ] },
+      { accessor: 'key', name: 'beat_result_key_idx_btree', algorithm: 'btree', columns: [
+        'key',
+      ] },
+    ],
+    constraints: [
+      { name: 'beat_result_key_key', constraint: 'unique', columns: ['key'] },
+    ],
+  }, BeatResultRow),
   carbon: __table({
     name: 'carbon',
     indexes: [
@@ -575,6 +645,10 @@ const reducersSchema = __reducers(
   __reducerSchema("add_admin", AddAdminReducer),
   __reducerSchema("battery_decide", BatteryDecideReducer),
   __reducerSchema("battery_pool_put", BatteryPoolPutReducer),
+  __reducerSchema("beat_answer", BeatAnswerReducer),
+  __reducerSchema("beat_day_delete", BeatDayDeleteReducer),
+  __reducerSchema("beat_day_put", BeatDayPutReducer),
+  __reducerSchema("beat_start", BeatStartReducer),
   __reducerSchema("claim_zone", ClaimZoneReducer),
   __reducerSchema("clear_intervention", ClearInterventionReducer),
   __reducerSchema("clue_buy", ClueBuyReducer),
@@ -629,6 +703,14 @@ type __SchemaWithTableAccessorAliases = Omit<typeof tablesSchema.schemaType, "ta
     readonly "battery_round": Omit<typeof tablesSchema.schemaType.tables["batteryRound"], "accessorName"> & { readonly accessorName: "battery_round" };
     /** @deprecated Use `batterySlot` instead. This alias will be removed in the next major version. */
     readonly "battery_slot": Omit<typeof tablesSchema.schemaType.tables["batterySlot"], "accessorName"> & { readonly accessorName: "battery_slot" };
+    /** @deprecated Use `beatCall` instead. This alias will be removed in the next major version. */
+    readonly "beat_call": Omit<typeof tablesSchema.schemaType.tables["beatCall"], "accessorName"> & { readonly accessorName: "beat_call" };
+    /** @deprecated Use `beatGame` instead. This alias will be removed in the next major version. */
+    readonly "beat_game": Omit<typeof tablesSchema.schemaType.tables["beatGame"], "accessorName"> & { readonly accessorName: "beat_game" };
+    /** @deprecated Use `beatPlayer` instead. This alias will be removed in the next major version. */
+    readonly "beat_player": Omit<typeof tablesSchema.schemaType.tables["beatPlayer"], "accessorName"> & { readonly accessorName: "beat_player" };
+    /** @deprecated Use `beatResult` instead. This alias will be removed in the next major version. */
+    readonly "beat_result": Omit<typeof tablesSchema.schemaType.tables["beatResult"], "accessorName"> & { readonly accessorName: "beat_result" };
     /** @deprecated Use `gameResult` instead. This alias will be removed in the next major version. */
     readonly "game_result": Omit<typeof tablesSchema.schemaType.tables["gameResult"], "accessorName"> & { readonly accessorName: "game_result" };
     /** @deprecated Use `ghostWind` instead. This alias will be removed in the next major version. */
@@ -690,6 +772,10 @@ const tableAccessorAliases = {
   "battery_player": "batteryPlayer",
   "battery_round": "batteryRound",
   "battery_slot": "batterySlot",
+  "beat_call": "beatCall",
+  "beat_game": "beatGame",
+  "beat_player": "beatPlayer",
+  "beat_result": "beatResult",
   "game_result": "gameResult",
   "ghost_wind": "ghostWind",
   "lobby_ballot": "lobbyBallot",
@@ -739,6 +825,14 @@ export type DbView = __DbViewBase & {
   readonly "battery_round": __DbViewBase["batteryRound"];
   /** @deprecated Use `batterySlot` instead. This alias will be removed in the next major version. */
   readonly "battery_slot": __DbViewBase["batterySlot"];
+  /** @deprecated Use `beatCall` instead. This alias will be removed in the next major version. */
+  readonly "beat_call": __DbViewBase["beatCall"];
+  /** @deprecated Use `beatGame` instead. This alias will be removed in the next major version. */
+  readonly "beat_game": __DbViewBase["beatGame"];
+  /** @deprecated Use `beatPlayer` instead. This alias will be removed in the next major version. */
+  readonly "beat_player": __DbViewBase["beatPlayer"];
+  /** @deprecated Use `beatResult` instead. This alias will be removed in the next major version. */
+  readonly "beat_result": __DbViewBase["beatResult"];
   /** @deprecated Use `gameResult` instead. This alias will be removed in the next major version. */
   readonly "game_result": __DbViewBase["gameResult"];
   /** @deprecated Use `ghostWind` instead. This alias will be removed in the next major version. */
@@ -791,6 +885,14 @@ export type Tables = __TablesBase & {
   readonly "battery_round": __TablesBase["batteryRound"];
   /** @deprecated Use `batterySlot` instead. This alias will be removed in the next major version. */
   readonly "battery_slot": __TablesBase["batterySlot"];
+  /** @deprecated Use `beatCall` instead. This alias will be removed in the next major version. */
+  readonly "beat_call": __TablesBase["beatCall"];
+  /** @deprecated Use `beatGame` instead. This alias will be removed in the next major version. */
+  readonly "beat_game": __TablesBase["beatGame"];
+  /** @deprecated Use `beatPlayer` instead. This alias will be removed in the next major version. */
+  readonly "beat_player": __TablesBase["beatPlayer"];
+  /** @deprecated Use `beatResult` instead. This alias will be removed in the next major version. */
+  readonly "beat_result": __TablesBase["beatResult"];
   /** @deprecated Use `gameResult` instead. This alias will be removed in the next major version. */
   readonly "game_result": __TablesBase["gameResult"];
   /** @deprecated Use `ghostWind` instead. This alias will be removed in the next major version. */

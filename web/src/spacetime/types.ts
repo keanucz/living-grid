@@ -160,6 +160,92 @@ export const BatterySlot = __t.object("BatterySlot", {
 });
 export type BatterySlot = __Infer<typeof BatterySlot>;
 
+export const BeatCall = __t.object("BeatCall", {
+  key: __t.string(),
+  gameId: __t.u32(),
+  idx: __t.u32(),
+  kind: __t.string(),
+  text: __t.string(),
+  hour: __t.u32(),
+  unit: __t.string(),
+  optionsJson: __t.string(),
+  revealed: __t.bool(),
+  answer: __t.string(),
+  actualText: __t.string(),
+  modelChoice: __t.string(),
+  modelConfidence: __t.f64(),
+  modelReason: __t.string(),
+  botsJson: __t.string(),
+});
+export type BeatCall = __Infer<typeof BeatCall>;
+
+export const BeatDay = __t.object("BeatDay", {
+  day: __t.string(),
+  regime: __t.string(),
+  callsJson: __t.string(),
+});
+export type BeatDay = __Infer<typeof BeatDay>;
+
+export const BeatGame = __t.object("BeatGame", {
+  id: __t.u32(),
+  lobbyId: __t.u32(),
+  state: __t.string(),
+  callNo: __t.u32(),
+  nCalls: __t.u32(),
+  answerS: __t.u32(),
+  revealS: __t.u32(),
+  openedAt: __t.timestamp(),
+  dayRevealed: __t.string(),
+  startedAt: __t.timestamp(),
+});
+export type BeatGame = __Infer<typeof BeatGame>;
+
+export const BeatPick = __t.object("BeatPick", {
+  key: __t.string(),
+  gameId: __t.u32(),
+  identity: __t.identity(),
+  idx: __t.u32(),
+  choice: __t.string(),
+  confidence: __t.u32(),
+});
+export type BeatPick = __Infer<typeof BeatPick>;
+
+export const BeatPlayer = __t.object("BeatPlayer", {
+  key: __t.string(),
+  gameId: __t.u32(),
+  identity: __t.identity(),
+  name: __t.string(),
+  score: __t.f64(),
+  isBot: __t.bool(),
+});
+export type BeatPlayer = __Infer<typeof BeatPlayer>;
+
+export const BeatResult = __t.object("BeatResult", {
+  key: __t.string(),
+  gameId: __t.u32(),
+  identity: __t.identity(),
+  idx: __t.u32(),
+  choice: __t.string(),
+  confidence: __t.u32(),
+  correct: __t.bool(),
+  score: __t.f64(),
+});
+export type BeatResult = __Infer<typeof BeatResult>;
+
+export const BeatSecret = __t.object("BeatSecret", {
+  gameId: __t.u32(),
+  day: __t.string(),
+});
+export type BeatSecret = __Infer<typeof BeatSecret>;
+
+export const BeatTick = __t.object("BeatTick", {
+  scheduledId: __t.u64(),
+  scheduledAt: __t.scheduleAt(),
+  kind: __t.string(),
+  gameId: __t.u32(),
+});
+export type BeatTick = __Infer<typeof BeatTick>;
+
 export const Carbon = __t.object("Carbon", {
   key: __t.string(),
   ts: __t.timestamp(),
