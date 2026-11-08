@@ -5,6 +5,7 @@ export const GLOSSARY = {
   "likely-range": { term: "Likely range", text: "The range where we think the real price will land. It should fall inside 8 times out of 10." },
   "best-guess": { term: "Best guess", text: "Our single most likely price. The real price should come in above it about half the time and below it about half the time." },
   kwh: { term: "Kilowatt-hour (kWh)", text: "The unit on your electricity bill. An average British home uses about 2,700 kWh a year. A megawatt-hour (MWh) is 1,000 kWh." },
+  mwh: { term: "Megawatt-hour (MWh)", text: "1,000 kilowatt-hours, the unit wholesale electricity is traded in. A price of £100 per MWh is 10p per kWh, before the network costs and other charges on a household bill." },
   gw: { term: "Gigawatt (GW)", text: "How much power something produces at one moment. A gigawatt is roughly what a big power station puts out. A megawatt (MW) is a thousandth of that." },
   interconnector: { term: "Interconnector", text: "A cable under the sea or underground that links Britain's grid to another country's, so electricity can be traded across the border." },
   constraint: { term: "Constraint cost", text: "When a power line is full, the grid pays generators on one side to make less and generators on the other side to make more. That bill is the constraint cost, and it ends up on everyone's bills." },

@@ -6,6 +6,7 @@ import { PANELS } from './panels/registry.js'
 import { api, useApi, overlayState, currentHour } from './api/client.js'
 import { setState, useStore } from './store/store.js'
 import { PRICE_LEGEND } from './styles/tokens.js'
+import Term from './ui/Term.jsx'
 import { matchView, redirectOf } from './views/index.js'
 import { SECTIONS, sectionById, sectionOfPath, openSection } from './shell/sections.js'
 import MobileShell from './shell/mobile/MobileShell.jsx'
@@ -142,8 +143,11 @@ function MapApp() {
           </div>
         ))}
 
-        <div className="legend panel">
-          <span className="muted">€/MWh</span>
+        <div className="legend panel" style={{ flexDirection: 'column', alignItems: 'stretch', gap: 6 }}>
+          <span style={{ display: 'flex', flexDirection: 'column', gap: 2, width: 220 }}>
+            <span><Term id="wholesale">Wholesale price</Term>, € per <Term id="mwh">MWh</Term></span>
+            <span className="muted" style={{ fontSize: 11 }}>Britain converted from £</span>
+          </span>
           <div>
             <div className="bar" style={{ background: `linear-gradient(90deg, ${PRICE_LEGEND.map((s) => s.c).join(',')})` }} />
             <div className="ticks num">{PRICE_LEGEND.map((s) => <span key={s.v}>{s.v}</span>)}</div>

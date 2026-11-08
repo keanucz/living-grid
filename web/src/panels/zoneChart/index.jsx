@@ -68,8 +68,8 @@ function ZoneChart({ ctx }) {
       <div className="zlegend">
         <span><i style={{ background: 'var(--text)' }} /><Term id="day-ahead">Day-ahead price</Term></span>
         <span><i className="dot2" />Already auctioned</span>
-        <span><i className="dash" /><Term id="best-guess">Best guess</Term> <span className="faint">P50</span></span>
-        <span><i className="band" /><Term id="likely-range">Likely range</Term> <span className="faint">P10–P90</span></span>
+        <span><i className="dash" /><Term id="best-guess">Best guess</Term></span>
+        <span><i className="band" /><Term id="likely-range">Likely range</Term></span>
         <p className="zghost">The faint block on the map is our forecast; the fainter it is, the less sure we are.</p>
         {!s && <span className="faint">loading…</span>}
         {s && !act.length && !fc.length && <span className="faint">No history yet</span>}

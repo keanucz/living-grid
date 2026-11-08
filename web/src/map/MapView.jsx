@@ -6,6 +6,9 @@ import { COLORS, fmt } from '../styles/tokens.js'
 import { Icon, ASSET_ICON } from '../shell/icons.jsx'
 import { towerHeight, GLASS, outlines } from '../layers/price/index.js'
 
+// Short country names for the price labels on the map; the zone list and hover cards keep the full names.
+const MAP_NAME = { GB: 'Britain', FR: 'France', 'DE-LU': 'Germany', NL: 'Netherlands', BE: 'Belgium', NO2: 'Norway' }
+
 // Soft ambient plus a high point light over the North Sea: flat country slabs pick up a moving
 // specular sheen as the map pans, which reads as glass/epoxy rather than flat paint.
 const LIGHTING = new LightingEffect({
@@ -216,7 +219,7 @@ function Overlay({ viewport, ctx }) {
           return (
             <div key={z.id} className={`map-label ${ui.selectedZone === z.id ? 'on' : ''}`} style={{ left: x, top: y }}
               onClick={() => actions.selectZone(z.id)}>
-              {z.id} <b className="num">{fmt.price(st.price, st.currency)}</b>
+              {MAP_NAME[z.id] ?? z.name} <b className="num">{fmt.price(st.price, st.currency)}</b>
             </div>
           )
         })}
