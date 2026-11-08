@@ -1,0 +1,356 @@
+{
+ "gresearch": {
+  "log": [
+   {
+    "t": 0.7,
+    "id": "prices",
+    "text": "Electricity is invisible, so we drew it. Each country is coloured by its price for this hour, set in yesterday's auction. Britain is the price on the map; southern Norway is its own price.",
+    "ov": 0,
+    "lit": "tab-now",
+    "ring": true,
+    "card": [
+     374,
+     190,
+     714,
+     313
+    ],
+    "ringBox": [
+     22,
+     184,
+     364,
+     299
+    ]
+   },
+   {
+    "t": 19.5,
+    "id": "ghostwind",
+    "text": "When the lines to the south are full, Scottish wind farms get paid to stop generating. The grid's published bills for that come to £205.4 million over the 11 days published so far, 17 October to 29 October. The numbers here are estimates, and we say so.",
+    "ov": 0,
+    "lit": "tab-hidden",
+    "ring": true,
+    "card": [
+     374,
+     190,
+     714,
+     354
+    ],
+    "ringBox": [
+     22,
+     184,
+     364,
+     299
+    ]
+   },
+   {
+    "t": 36.5,
+    "id": "carbon",
+    "text": "Carbon crosses borders too. A country can look clean at home while running on dirty imports. This view shows the carbon in each country's electricity use, worked out with standard emission figures.",
+    "ov": 0,
+    "lit": "tab-hidden",
+    "ring": true,
+    "card": [
+     1016,
+     921,
+     1356,
+     1064
+    ],
+    "ringBox": [
+     1366,
+     918,
+     1898,
+     1058
+    ]
+   },
+   {
+    "t": 48.7,
+    "id": "explain",
+    "text": "Each forecast comes with its reasons in plain words: what pushed the price up and what pulled it down.",
+    "ov": null,
+    "lit": "tab-forecast",
+    "ring": false,
+    "card": [
+     1560,
+     957,
+     1900,
+     1060
+    ]
+   },
+   {
+    "t": 62,
+    "id": "hormuz",
+    "text": "Close the Strait of Hormuz and watch dearer gas push up electricity prices across Europe. The bill comes out in pounds.",
+    "ov": 0,
+    "lit": "tab-whatif",
+    "ring": true,
+    "card": [
+     404,
+     96,
+     744,
+     199
+    ],
+    "ringBox": [
+     22,
+     90,
+     394,
+     488
+    ]
+   },
+   {
+    "t": 73.3,
+    "id": "proof",
+    "text": "We've scored 879 live forecasts so far, each saved before the real price was known. On past weeks it never saw, the model was off by 33.3 per MWh on average. Guessing that the price stays put was off by 52.3. Where we lose, we show it.",
+    "ov": null,
+    "lit": "tab-proof",
+    "ring": false,
+    "card": [
+     1560,
+     896,
+     1900,
+     1060
+    ]
+   },
+   {
+    "t": 89,
+    "id": "prices",
+    "text": "Electricity is invisible, so we drew it. Each country is coloured by its price for this hour, set in yesterday's auction. Britain is £177/MWh; southern Norway is €192/MWh.",
+    "ov": 0,
+    "lit": "tab-now",
+    "ring": true,
+    "card": [
+     1016,
+     784,
+     1356,
+     907
+    ],
+    "ringBox": [
+     1366,
+     778,
+     1898,
+     1066
+    ]
+   },
+   {
+    "t": 104.5,
+    "id": "ghostwind",
+    "text": "When the lines to the south are full, Scottish wind farms get paid to stop generating. The grid's published bills for that come to £205.4 million over the 11 days published so far, 17 October to 29 October. The numbers here are estimates, and we say so.",
+    "ov": 0,
+    "lit": "tab-hidden",
+    "ring": true,
+    "card": [
+     374,
+     190,
+     714,
+     354
+    ],
+    "ringBox": [
+     22,
+     184,
+     364,
+     815
+    ]
+   },
+   {
+    "t": 112.6,
+    "id": "carbon",
+    "text": "Carbon crosses borders too. A country can look clean at home while running on dirty imports. This view shows the carbon in each country's electricity use, worked out with standard emission figures.",
+    "ov": 0,
+    "lit": "tab-hidden",
+    "ring": true,
+    "card": [
+     1016,
+     900,
+     1356,
+     1044
+    ],
+    "ringBox": [
+     1366,
+     926,
+     1898,
+     1066
+    ]
+   },
+   {
+    "t": 131.3,
+    "id": "explain",
+    "text": "Each forecast comes with its reasons in plain words: what pushed the price up and what pulled it down.",
+    "ov": null,
+    "lit": "tab-forecast",
+    "ring": false,
+    "card": [
+     1560,
+     957,
+     1900,
+     1060
+    ]
+   }
+  ],
+  "errs": []
+ },
+ "hrt": {
+  "log": [
+   {
+    "t": 2.8,
+    "id": "prices",
+    "text": "Electricity is invisible, so we drew it. Each country is coloured by its price for this hour, set in yesterday's auction. Britain is the price on the map; southern Norway is its own price.",
+    "ov": 0,
+    "lit": "tab-now",
+    "ring": true,
+    "card": [
+     374,
+     190,
+     714,
+     313
+    ],
+    "ringBox": [
+     22,
+     184,
+     364,
+     299
+    ]
+   },
+   {
+    "t": 12.1,
+    "id": "prices",
+    "text": "Electricity is invisible, so we drew it. Each country is coloured by its price for this hour, set in yesterday's auction. Britain is £177/MWh; southern Norway is €192/MWh.",
+    "ov": 0,
+    "lit": "tab-now",
+    "ring": true,
+    "card": [
+     374,
+     190,
+     714,
+     313
+    ],
+    "ringBox": [
+     22,
+     184,
+     364,
+     299
+    ]
+   },
+   {
+    "t": 16.5,
+    "id": "forecast",
+    "text": "The faint block shows our forecast for the next few hours. The fainter it is, the less sure we are.",
+    "ov": 0,
+    "lit": "tab-forecast",
+    "ring": true,
+    "card": [
+     374,
+     182,
+     714,
+     265
+    ],
+    "ringBox": [
+     22,
+     176,
+     364,
+     291
+    ]
+   },
+   {
+    "t": 27.2,
+    "id": "hormuz",
+    "text": "Close the Strait of Hormuz and watch dearer gas push up electricity prices across Europe. The bill comes out in pounds.",
+    "ov": 0,
+    "lit": "tab-whatif",
+    "ring": true,
+    "card": [
+     374,
+     230,
+     714,
+     333
+    ],
+    "ringBox": [
+     22,
+     224,
+     364,
+     557
+    ]
+   },
+   {
+    "t": 40.8,
+    "id": "battery",
+    "text": "Every country has a test battery that reacts to the gas shock. One plans with our likely range, the other with our best guess only. The battery card shows how close each gets to perfect hindsight.",
+    "ov": 0,
+    "lit": "tab-whatif",
+    "ring": true,
+    "card": [
+     404,
+     96,
+     744,
+     239
+    ],
+    "ringBox": [
+     22,
+     90,
+     394,
+     488
+    ]
+   },
+   {
+    "t": 56.4,
+    "id": "proof",
+    "text": "We've scored 879 live forecasts so far, each saved before the real price was known. On past weeks it never saw, the model was off by 33.3 per MWh on average. Guessing that the price stays put was off by 52.3. Where we lose, we show it.",
+    "ov": null,
+    "lit": "tab-proof",
+    "ring": false,
+    "card": [
+     1560,
+     896,
+     1900,
+     1060
+    ]
+   },
+   {
+    "t": 70.8,
+    "id": "replay",
+    "text": "This replays 26 October with a model trained only on data from before that day, so asking whether we'd have seen it coming is a fair test.",
+    "ov": null,
+    "lit": "tab-proof",
+    "ring": false,
+    "card": [
+     1560,
+     957,
+     1900,
+     1060
+    ]
+   },
+   {
+    "t": 88,
+    "id": "reveal",
+    "text": "Monday's forecast was saved before the auction. As the real prices arrive, they appear next to it.",
+    "ov": null,
+    "lit": "tab-proof",
+    "ring": false,
+    "card": [
+     1560,
+     957,
+     1900,
+     1060
+    ]
+   },
+   {
+    "t": 95.2,
+    "id": "prices",
+    "text": "Electricity is invisible, so we drew it. Each country is coloured by its price for this hour, set in yesterday's auction. Britain is £177/MWh; southern Norway is €192/MWh.",
+    "ov": 0,
+    "lit": "tab-now",
+    "ring": true,
+    "card": [
+     374,
+     190,
+     714,
+     313
+    ],
+    "ringBox": [
+     22,
+     184,
+     364,
+     299
+    ]
+   }
+  ],
+  "errs": []
+ }
+}

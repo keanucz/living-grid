@@ -1,0 +1,279 @@
+{
+ "main-1920.introSeconds": 94,
+ "main-1920": {
+  "steps": [
+   {
+    "n": 1,
+    "id": "prices",
+    "text": "Electricity is invisible, so we drew it. Each country is coloured by its price for this hour, set in yesterday's auction. Britain is £177/MWh; southern Norway is €192/MWh.",
+    "ring": true,
+    "ov": 0,
+    "onScreen": true,
+    "seconds": 12,
+    "live": true
+   },
+   {
+    "n": 2,
+    "id": "flows",
+    "text": "The lines between countries are power flowing through the cables that link them, many under the sea. Thicker lines are bigger cables. The Layers button switches the other views on and off.",
+    "ring": true,
+    "ov": 0,
+    "onScreen": true,
+    "seconds": 12.5,
+    "live": true
+   },
+   {
+    "n": 3,
+    "id": "forecast",
+    "text": "The faint block shows our forecast for the next few hours. The fainter it is, the less sure we are.",
+    "ring": true,
+    "ov": 0,
+    "onScreen": true,
+    "seconds": 16,
+    "live": true
+   },
+   {
+    "n": 4,
+    "id": "history",
+    "text": "The time bar goes back to January 2024. Drag it, pick a date or press play. Orange ticks are big events: this one is the storm on 26 October. Press Live to jump back.",
+    "ring": true,
+    "ov": 0,
+    "onScreen": true,
+    "seconds": 17.3,
+    "live": true
+   },
+   {
+    "n": 5,
+    "id": "explain",
+    "text": "Each forecast comes with its reasons in plain words: what pushed the price up and what pulled it down.",
+    "ring": true,
+    "ov": 0,
+    "onScreen": true,
+    "seconds": 18.4,
+    "live": true
+   },
+   {
+    "n": 6,
+    "id": "ghostwind",
+    "text": "When the lines to the south are full, Scottish wind farms get paid to stop generating. The grid's published bills for that come to £205.4 million over the 11 days published so far, 17 October to 29 October. The numbers here are estimates, and we say so.",
+    "ring": true,
+    "ov": 0,
+    "onScreen": true,
+    "seconds": 18.5,
+    "live": true
+   },
+   {
+    "n": 7,
+    "id": "hormuz",
+    "text": "Close the Strait of Hormuz and watch dearer gas push up electricity prices across Europe. The bill comes out in pounds.",
+    "ring": true,
+    "ov": 0,
+    "onScreen": true,
+    "seconds": 15.2,
+    "live": true
+   },
+   {
+    "n": 8,
+    "id": "proof",
+    "text": "We've scored 879 live forecasts so far, each saved before the real price was known. On past weeks it never saw, the model was off by 33.3 per MWh on average. Guessing that the price stays put was off by 52.3. Where we lose, we show it.",
+    "ring": true,
+    "ov": 0,
+    "onScreen": true,
+    "seconds": 20.4,
+    "live": true
+   },
+   {
+    "n": 9,
+    "id": "play",
+    "text": "Think you can read the grid better than our model? Play a real day from the past, with the date hidden.",
+    "ring": true,
+    "ov": 0,
+    "onScreen": true,
+    "seconds": 3.9,
+    "live": true
+   }
+  ],
+  "errors": [
+   "main-1920 HTTP 404 /api/explain?zone=GB&ts=2026-10-26T12%3A00%3A00Z",
+   "main-1920: Failed to load resource: the server responded with a status of 404 ()"
+  ]
+ },
+ "gresearch-1920": {
+  "steps": [
+   {
+    "n": 1,
+    "id": "prices",
+    "text": "Electricity is invisible, so we drew it. Each country is coloured by its price for this hour, set in yesterday's auction. Britain is the price on the map; southern Norway is its own price.",
+    "ring": true,
+    "ov": 39330,
+    "onScreen": true,
+    "live": false,
+    "seconds": 46.5
+   },
+   {
+    "n": 2,
+    "id": "explain",
+    "text": "Each forecast comes with its reasons in plain words: what pushed the price up and what pulled it down.",
+    "ring": false,
+    "ov": null,
+    "onScreen": true,
+    "live": true,
+    "seconds": 29.6
+   },
+   {
+    "n": 3,
+    "id": "proof",
+    "text": "We've scored 879 live forecasts so far, each saved before the real price was known. On past weeks it never saw, the model was off by 33.3 per MWh on average. Guessing that the price stays put was off by 52.3. Where we lose, we show it.",
+    "ring": false,
+    "ov": null,
+    "onScreen": true,
+    "live": true,
+    "seconds": 27.4
+   }
+  ],
+  "errors": []
+ },
+ "hrt-1920": {
+  "steps": [
+   {
+    "n": 1,
+    "id": "prices",
+    "text": "Electricity is invisible, so we drew it. Each country is coloured by its price for this hour, set in yesterday's auction. Britain is £177/MWh; southern Norway is €192/MWh.",
+    "ring": true,
+    "ov": 39330,
+    "onScreen": true,
+    "live": true,
+    "seconds": 47.3
+   },
+   {
+    "n": 2,
+    "id": "battery",
+    "text": "Every country has a test battery that reacts to the gas shock. One plans with our likely range, the other with our best guess only. The battery card shows how close each gets to perfect hindsight.",
+    "ring": true,
+    "ov": 147940,
+    "onScreen": true,
+    "live": true,
+    "seconds": 27.6
+   },
+   {
+    "n": 3,
+    "id": "replay",
+    "text": "This replays 26 October with a model trained only on data from before that day, so asking whether we'd have seen it coming is a fair test.",
+    "ring": false,
+    "ov": null,
+    "onScreen": true,
+    "live": true,
+    "seconds": 17.2
+   },
+   {
+    "n": 4,
+    "id": "reveal",
+    "text": "Monday's forecast was saved before the auction. As the real prices arrive, they appear next to it.",
+    "ring": false,
+    "ov": null,
+    "onScreen": true,
+    "live": true,
+    "seconds": 5.8
+   }
+  ],
+  "errors": []
+ },
+ "main-phone": {
+  "steps": [
+   {
+    "n": 1,
+    "id": "prices",
+    "text": "Electricity is invisible, so we drew it. Each country is coloured by its price for this hour, set in yesterday's auction. Britain is £177/MWh; southern Norway is €192/MWh.",
+    "ring": true,
+    "ov": 0,
+    "onScreen": true,
+    "seconds": 26,
+    "live": true
+   },
+   {
+    "n": 2,
+    "id": "flows",
+    "text": "The lines between countries are power flowing through the cables that link them, many under the sea. Thicker lines are bigger cables. The Layers button switches the other views on and off.",
+    "ring": true,
+    "ov": 0,
+    "onScreen": true,
+    "seconds": 14.3,
+    "live": true
+   },
+   {
+    "n": 3,
+    "id": "forecast",
+    "text": "The faint block shows our forecast for the next few hours. The fainter it is, the less sure we are.",
+    "ring": true,
+    "ov": 0,
+    "onScreen": true,
+    "seconds": 15.3,
+    "live": true
+   },
+   {
+    "n": 4,
+    "id": "history",
+    "text": "The time bar goes back to January 2024. Drag it, pick a date or press play. Orange ticks are big events: this one is the storm on 26 October. Press Live to jump back.",
+    "ring": true,
+    "ov": 0,
+    "onScreen": true,
+    "seconds": 13.3,
+    "live": true
+   },
+   {
+    "n": 5,
+    "id": "explain",
+    "text": "Each forecast comes with its reasons in plain words: what pushed the price up and what pulled it down.",
+    "ring": true,
+    "ov": 0,
+    "onScreen": true,
+    "seconds": 13.8,
+    "live": true
+   },
+   {
+    "n": 6,
+    "id": "ghostwind",
+    "text": "When the lines to the south are full, Scottish wind farms get paid to stop generating. The grid's published bills for that come to £205.4 million over the 11 days published so far, 17 October to 29 October. The numbers here are estimates, and we say so.",
+    "ring": true,
+    "ov": 0,
+    "onScreen": true,
+    "seconds": 17.1,
+    "live": true
+   },
+   {
+    "n": 7,
+    "id": "hormuz",
+    "text": "Close the Strait of Hormuz and watch dearer gas push up electricity prices across Europe. The bill comes out in pounds.",
+    "ring": true,
+    "ov": 0,
+    "onScreen": true,
+    "seconds": 14.6,
+    "live": true
+   },
+   {
+    "n": 8,
+    "id": "proof",
+    "text": "We've scored 879 live forecasts so far, each saved before the real price was known. On past weeks it never saw, the model was off by 33.3 per MWh on average. Guessing that the price stays put was off by 52.3. Where we lose, we show it.",
+    "ring": true,
+    "ov": 0,
+    "onScreen": true,
+    "seconds": 12.9,
+    "live": true
+   },
+   {
+    "n": 9,
+    "id": "play",
+    "text": "Think you can read the grid better than our model? Play a real day from the past, with the date hidden.",
+    "ring": false,
+    "ov": null,
+    "onScreen": true,
+    "seconds": 3.5,
+    "live": true
+   }
+  ],
+  "errors": [
+   "main-phone HTTP 404 /api/explain?zone=GB&ts=2026-10-26T12%3A00%3A00Z",
+   "main-phone: Failed to load resource: the server responded with a status of 404 ()"
+  ]
+ }
+}
