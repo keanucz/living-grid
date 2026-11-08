@@ -1,37 +1,63 @@
-# Presentation and tour: checked numbers
+# Presentation facts
 
-Checked on Sunday 8 November 2026, about 01:50 UTC, against the live API (`https://htb.stefvuck.dev/api`), `CLAUDE.md` and the committed code. Every caption in `web/src/tour/tours.js` was read; this lists each claim, its source and what changed. The Remotion presentation (#252/#253) had not landed yet, so its scenes are **not** checked here: add them to this list when they do, using the same method.
+Every number the deck shows (scenes in `demo/presentation/src/scenes/Scenes.tsx`), where it comes from, and a check against the live API. Snapshot: `demo/presentation/data/snapshot.json`, generated 2026-11-08 01:45 UTC. Live column fetched 2026-11-08 about 03:00 UTC with the same requests. The numbers on screen are the snapshot's, and a render re-runs the snapshot first, so a render picks up the live values.
 
-## Figures that come live (the caption fetches them, so they cannot go stale)
+| Scene | Figure | Endpoint | Snapshot | Live | Status |
+|---|---|---|---|---|---|
+| Hook | GB price now | `/state` | 181 | 179 | moved since snapshot |
+| Hook | FR price now | `/state` | 215 | 216 | moved since snapshot |
+| Hook | DE-LU price now | `/state` | 215 | 216 | moved since snapshot |
+| Hook | NL price now | `/state` | 215 | 216 | moved since snapshot |
+| Hook | BE price now | `/state` | 215 | 216 | moved since snapshot |
+| Hook | NO2 price now | `/state` | 195 | 193 | moved since snapshot |
+| Problem | GB lowest hour, 26 Oct | `/replay?event=2026-10-26` | £19 | £19 | same |
+| Problem | GB highest hour, 26 Oct | `/replay?event=2026-10-26` | £200 | £200 | same |
+| Problem | GB constraint bill, 26 Oct | `/replay?event=2026-10-26` | £36,530,869 | £36,530,869 | same |
+| Problem | Largest import gap: zone | `/unseen/carbon` | BE | BE | same |
+| Problem | that zone, made at home g/kWh | `/unseen/carbon` | 342 | 345 | moved since snapshot |
+| Problem | that zone, used g/kWh | `/unseen/carbon` | 379 | 383 | moved since snapshot |
+| Problem | that zone, imported share % | `/unseen/carbon` | 19 | 24 | moved since snapshot |
+| Built | zones | `/zones` | 6 | 6 | same |
+| Built | interconnectors | `/zones` | 17 | 17 | same |
+| Built | GB forecast p10 | `/state` | £186 | £175 | moved since snapshot |
+| Built | GB forecast p50 | `/state` | £213 | £201 | moved since snapshot |
+| Built | GB forecast p90 | `/state` | £219 | £209 | moved since snapshot |
+| Product | Hormuz cost, central | `/scenarios` | £1,754,592,000 | £1,754,592,000 | same |
+| Product | Hormuz cost, low (P10) | `/scenarios` | £1,052,755,000 | £1,052,755,000 | same |
+| Product | Hormuz cost, high (P90) | `/scenarios` | £2,456,428,000 | £2,456,428,000 | same |
+| Product | Hormuz sentence | `/scenarios` | GB price up £38: gas up 40% (+£38) | GB price up £38: gas up 40% (+£38) | same |
+| Product | Household window 1: start-end | `/household` | 03:00-06:00 | 03:00-06:00 | same |
+| Product | Household window 1: p/kWh | `/household` | 33.9 | 33.9 | same |
+| Product | Household window 2: start-end | `/household` | 05:30-06:30 | 05:30-06:30 | same |
+| Product | Household window 2: p/kWh | `/household` | 33.7 | 33.7 | same |
+| Product | Data centre GPUs | `/datacentre` | 1,000 | 1,000 | same |
+| Product | Data centre movable share % | `/datacentre` | 20 | 20 | same |
+| Proof | MAE, our model | `/scores` | 33.0 | 33.3 | moved since snapshot |
+| Proof | MAE, persistence | `/scores` | 43.2 | 52.3 | moved since snapshot |
+| Proof | Smaller error % | `/scores` | 24 | 36 | moved since snapshot |
+| Proof | Backtest hours | `/scores` | 6,039 | 12,086 | moved since snapshot |
+| Proof | Coverage P10-P90 % | `/scores` | 80 | 78 | moved since snapshot |
+| Proof | Forecasts scored | `/scores` | 301 | 379 | moved since snapshot |
+| Proof | Battery share of perfect % | `/scores` | 91 | 95 | moved since snapshot |
+| Proof | Monday delivery date | `/reveal` | 2026-11-09 | 2026-11-09 | same |
+| Proof | Frozen at | `/reveal` | 2026-11-07T23:59:02Z | 2026-11-07T23:59:02Z | same |
+| Proof | Solana commitments | `/commitments` | 9 | 10 | moved since snapshot |
+| Proof | Latest commitment hash (first 12) | `/commitments` | 3e938fc199f4 | 3e938fc199f4 | same |
+| Play | Our MAE to beat | `/scores` | 33.0 | 33.3 | moved since snapshot |
+| How | Tasks merged | hub.db | 234 | (counted at render) | n/a |
+| How | Agents that merged them | hub.db | 15 | (counted at render) | n/a |
 
-| Caption | Source | Value when checked |
-|---|---|---|
-| GB and southern Norway day-ahead price | `/state`, `zones[].price.value` (GB in £/MWh, NO2 in €/MWh) | the map's own numbers |
-| NESO constraint costs | `/unseen/ghost-wind`, `constraint_cost_total_gbp` | £205.4 million, but over **11 days** (17 to 29 October), not the last day |
-| Live forecasts scored | `/scores`, `headline.forecasts_scored` | 301, scoring since 7 Nov 13:48 UTC |
-| Average price error | `/scores`, `headline.mae_model` / `mae_persistence` | 33.0 against 43.2 (walk-forward backtest, 6,039 hours, pooled over zones) |
+Prices in the Hook are £/MWh for GB and €/MWh for the rest. Hormuz costs are the central estimate and its P10 to P90 range for the consumer cost over the scenario period.
 
-## Fixed statements
+## Reading the table
 
-| Statement | Check | Result |
-|---|---|---|
-| Time bar reaches back to January 2024 | `HISTORY_START` in `panels/scrubber/timeline.js`; `/timeline` coverage from 2024-01-01 | true; GB price before 8 Sep 2026 is the Elexon market index, a proxy (the scrubber says so) |
-| 26 October was the storm day | `/replay?event=2026-10-26`: GB constraint cost £36,530,869 (NESO daily total) | true |
-| Replay uses models trained only on data before that day | same response, `trained_before: 2026-10-26` | true; 78 of 168 hours inside the P10 to P90 band |
-| Orange marks on the strip are big events | `scrub-ev` fill `#f5a65b`, one per entry in `data/events/index.json` | true |
-| Battery: 1 MW in every zone | `CLAUDE.md` feature 7 (1 MW / 2 MWh, 88% round trip) | true |
-| Risk-aware battery matches or beats median-only | `/scores` `battery[]`, share of perfect foresight: BE 97.1/97.1, FR 94.8/94.8, NL 97.5/97.5, DE-LU 98.1 vs 81.7, GB 98.7 vs 95.1; NO2 has no share | true in all five zones with a score; equal in three |
-| Hormuz closes: gas shock, bill in pounds | `/scenarios`: default 40% gas rise for 14 days, `cost_total_gbp` present, `method_note` states the pass-through approximates market coupling | true |
-| Reveal: Monday's forecast frozen before the auction result | `CLAUDE.md` feature 11 | true by design; depends on `data/forecasts/frozen_monday.parquet` being the final freeze |
+- **same**: the live API returns exactly what the snapshot holds. The 26 October replay, the Hormuz result, the household windows, the data centre defaults and the frozen Monday forecast do not move.
+- **moved since snapshot**: expected for live figures (today's prices, forecast, carbon, scores). Not a mismatch: the deck always shows the snapshot's value with its time in the footer.
+- **How we built it**: the hub counts (merged tasks, agents) come from `hub.db` at snapshot time and grow while the team merges; the dot grid and counter show the snapshot's count.
 
-## Wording corrected (these were wrong or misleading before)
+## Things to check by eye on the render
 
-1. **Constraint costs "in the latest window"** read as the last day. The API total is eleven published days, 17 to 29 October (NESO runs about ten days behind). The caption now says "over the 11 days it has published, 17 October to 29 October", computed from the response.
-2. **"N forecasts logged before their outcome, with an average error of 33.0"** joined two different things: 301 is the live scored count, 33.0 is the backtest over 6,039 hours. The caption now separates them and says "per MWh, pooled across zones".
-3. **"Risk-aware loses less on bad hours"** is not what `/scores` reports (it reports profit and share of perfect foresight). Now: "matches or beats ... in every zone scored so far".
-
-## Not checked, and why
-
-- The battery headline pools zones and has a known caveat (#246: NO2 has no share, so the pooled 90.7% would be 97.3% without it). The tour does not quote the pooled number; the presentation should not either, or must say which pool.
-- The "Live" chip and day-ahead prices can show fixture data offline; clips recorded from the live site were not compared with the offline pack.
-- Explanation sentences (#247: "demand down 20% (+£10)" reads as a contradiction) should not be quoted until that is fixed.
+- **Proof scores moved a lot.** Live `/scores` now reports 12,086 backtest hours, persistence error 52.3 and 36% smaller error (snapshot: 6,039 hours, 43.2, 24%), so the backtest was extended or re-run after the snapshot. A render takes the live numbers; if the Mac render shows different values from this table's Snapshot column, that is why.
+- **Derived values.** "£19 to £200" is the lowest and highest actual GB hour in the replay; "improvement" is 1 minus model error over persistence error; the carbon scene picks the zone with the largest gap between used and made-at-home carbon (currently BE).
+- **Not shown on purpose.** Diebold-Mariano p-values (no endpoint), so the caption states the result in words only.
+- **Hormuz cost.** `F.hormuzCostGbp` in `src/data.ts` reads an object and shows a dash; the scenes use `hormuzCost` in `src/figs.ts` (the P50) instead.
