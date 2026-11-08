@@ -12,7 +12,8 @@ import '../../styles/mobile.css'
 // Phone layout (< 700 px): map on top, a bottom sheet with one tab per section (shell/sections.js, the same six as the
 // desktop tabs and the welcome doors). Tap a zone (or its label) to select it; the sheet then shows its chart and the "why" card.
 // Panels come from the section; the phone keeps the zone chart and the "why" card on the Now tab so a tap has an answer.
-const PHONE_PANELS = { now: ['zoneList', 'explain', 'zoneChart', 'kpis'] }
+// The plain-English answer (kpis) comes first, as on the desktop's simple-first plan; detail follows.
+const PHONE_PANELS = { now: ['kpis', 'zoneList', 'explain', 'zoneChart'] }
 const TABS = SECTIONS.map((s) => ({ ...s, panels: PHONE_PANELS[s.id] ?? s.panels ?? [] }))
 
 const byId = Object.fromEntries(PANELS.map((p) => [p.id, p]))

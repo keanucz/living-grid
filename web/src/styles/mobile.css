@@ -37,7 +37,9 @@
 /* lighter on phones */
 .m-app .fade-in { animation: none; }
 /* sheet children keep their natural height (the desktop panels set min-height: 0 / max-height for side columns) */
-.m-sheet > * { flex: none; }
+/* Panels sit inside display:contents tour wrappers ([data-tour], #239): match them through the wrapper too, or the
+   scrolling sheet shrinks them to nothing. */
+.m-sheet > *, .m-sheet > [data-tour] > * { flex: none; }
 .m-sheet .zonelist { display: block; }
 .m-sheet.full .hh-top { display: none; }
 
