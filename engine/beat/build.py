@@ -25,6 +25,7 @@ import pandas as pd
 from engine.market import bots as market_bots
 from engine.market import question_types as qt
 from engine.market import questions as q
+from engine.replay_days import list_days
 
 log = logging.getLogger("engine.beat.build")
 
@@ -252,7 +253,7 @@ def main() -> None:
     ap.add_argument("--dry-run", action="store_true")
     args = ap.parse_args()
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(message)s")
-    days = sorted(date.fromisoformat(p.stem) for p in rp.path(rp.HEADLINE_EVENT).parent.glob("2*.json") if p.stem.count("-") == 2) if args.all else [args.day or rp.HEADLINE_EVENT]
+    days = list_days(rp.path(rp.HEADLINE_EVENT).parent) if args.all else [args.day or rp.HEADLINE_EVENT]
     client = None if args.dry_run else from_env()
     try:
         boalf = cache.read("actuals/elexon_boalf_mwh")
