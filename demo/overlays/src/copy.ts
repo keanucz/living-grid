@@ -14,6 +14,7 @@ export const BEATS: Record<string, { step: string; line: string }> = {
   tonight: { step: 'Tonight', line: 'The cheapest hours tonight to charge a car or run the dishwasher.' },
   meter: { step: 'At home', line: 'The same forecast on a little screen at home: the price now, and the cheapest hours tonight.' },
   datacentre: { step: 'Data centres', line: 'Where should a data centre go? A year of power costs by country, with flexible work moved to cheap hours.' },
+  tamper: { step: 'Tamper test', line: 'We change one digit of the sealed file. Its fingerprint no longer matches the one on Solana, so any edit would be caught.' },
   play: { step: 'Play', line: 'Call a real, hidden day and see if you beat our model.' },
   reveal: { step: 'Reveal', line: 'Monday’s forecast, sealed on Solana before the auction, meets the real result.' },
 }

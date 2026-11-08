@@ -4,7 +4,7 @@ import { seconds } from './list'
 import { Beat, Callout, EndCard, LowerThird, Title } from './Overlays'
 import { VIDEO } from './theme'
 
-const BEATS = ['now', 'hidden-grid', 'what-if', 'forecast', 'proof', 'tonight', 'meter', 'datacentre', 'play', 'reveal']
+const BEATS = ['now', 'hidden-grid', 'what-if', 'forecast', 'proof', 'tonight', 'meter', 'datacentre', 'tamper', 'play', 'reveal']
 const CALLOUTS = ['constraint-bill', 'hormuz', 'less-wrong', 'in-range', 'battery', 'scored']
 const PEOPLE = [['Keanu', 'keanu'], ['Stefan', 'stefan'], ['Manu', 'manu']] as const
 

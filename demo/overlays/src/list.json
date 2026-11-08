@@ -70,6 +70,11 @@
   "still": 30
  },
  {
+  "id": "Beat-tamper",
+  "seconds": 6,
+  "still": 30
+ },
+ {
   "id": "Callout-constraint-bill",
   "seconds": 5,
   "still": 75
