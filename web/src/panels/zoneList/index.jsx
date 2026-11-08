@@ -4,6 +4,7 @@ import { scaleLinear } from 'd3-scale'
 import { Icon } from '../../shell/icons.jsx'
 import { actions } from '../../store/store.js'
 import { fmt, priceColor } from '../../styles/tokens.js'
+import { GBP_EUR } from '../../api/client.js'
 
 const MIX_COLOR = { wind: 'var(--wind)', solar: '#facc15', nuclear: 'var(--nuclear)', gas: 'var(--gas)', hydro: 'var(--hydro)', coal: '#8b6f5a', biomass: '#84a35b', imports: '#5d5d58' }
 
@@ -37,7 +38,7 @@ function Row({ z, st, on }) {
         <div className="zspark" style={{ color: on ? 'var(--accent)' : 'var(--text-3)' }}><Spark series={st.series} /></div>
         <div className="zprice">
           <div className="num">{fmt.price(st.price, st.currency)}</div>
-          {hasChange && <div className={`pill-delta ${up ? 'up' : 'down'}`}>{up ? '▲' : '▼'} {Math.abs(st.change_24h_eur).toFixed(1)}</div>}
+          {hasChange && <div className={`pill-delta ${up ? 'up' : 'down'}`}>{up ? '▲' : '▼'} {st.currency === 'GBP' ? '£' : '€'}{Math.abs(st.currency === 'GBP' ? st.change_24h_eur / GBP_EUR : st.change_24h_eur).toFixed(1)}</div>}
         </div>
       </div>
       {on && (
@@ -71,7 +72,6 @@ function ZoneList({ ctx }) {
     <section className="panel zonelist fade-in">
       <div className="panel-head">
         <span>Zones</span>
-        <button className="square-btn" title="Open zone detail"><Icon name="arrowUpRight" size={15} /></button>
       </div>
       <div className="zsearch">
         <label className="search">

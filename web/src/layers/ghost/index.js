@@ -27,7 +27,7 @@ const Z = 16000
 
 export default {
   id: 'ghost',
-  label: 'Forecast ghost',
+  label: 'Forecast',
   swatch: '#c5f06b',
   order: 15,
   modes: ['overview', 'simulate'],

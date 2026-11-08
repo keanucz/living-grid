@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { area, line, curveMonotoneX } from 'd3-shape'
 import { scaleLinear, scaleUtc } from 'd3-scale'
 import { zoneSeries } from './series.js'
+import Term from '../../ui/Term.jsx'
 
 const W = 300
 const H = 150
@@ -65,9 +66,11 @@ function ZoneChart({ ctx }) {
         {scrub && <line x1={x(scrub)} x2={x(scrub)} y1={PAD.t} y2={H - PAD.b} stroke="var(--hot)" strokeWidth="1.5" />}
       </svg>
       <div className="zlegend">
-        <span><i style={{ background: 'var(--text)' }} />Day-ahead price</span>
+        <span><i style={{ background: 'var(--text)' }} /><Term id="day-ahead">Day-ahead price</Term></span>
         <span><i className="dot2" />Already auctioned</span>
-        <span><i style={{ background: 'var(--accent)' }} />Forecast P50, P10–P90 band</span>
+        <span><i className="dash" /><Term id="best-guess">Best guess</Term> <span className="faint">P50</span></span>
+        <span><i className="band" /><Term id="likely-range">Likely range</Term> <span className="faint">P10–P90</span></span>
+        <p className="zghost">The faint block on the map is our forecast; the fainter it is, the less sure we are.</p>
         {!s && <span className="faint">loading…</span>}
         {s && !act.length && !fc.length && <span className="faint">No history yet</span>}
       </div>
@@ -78,6 +81,9 @@ function ZoneChart({ ctx }) {
         .zlegend { display: flex; flex-wrap: wrap; gap: 4px 12px; padding: 4px 18px 14px; font-size: 11px; color: var(--text-2); }
         .zlegend i { display: inline-block; width: 10px; height: 2px; margin-right: 6px; vertical-align: middle; }
         .zlegend i.dot2 { border-top: 2px dotted var(--text-2); height: 0; }
+        .zlegend i.dash { border-top: 2px dashed var(--accent); height: 0; }
+        .zlegend i.band { background: var(--accent); opacity: 0.35; height: 8px; border-radius: 2px; }
+        .zghost { flex-basis: 100%; margin: 4px 0 0; font-size: 12px; color: var(--text-2); line-height: 1.4; }
       `}</style>
     </section>
   )

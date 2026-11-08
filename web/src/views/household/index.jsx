@@ -3,6 +3,7 @@ import { api } from '../../api/client.js'
 import { Icon } from '../../shell/icons.jsx'
 import Savings from './Savings.jsx'
 import qr from '../../panels/qr/index.jsx'
+import Explain from '../../ui/Explain.jsx'
 
 const TZ = 'Europe/London'
 const t = (iso) => new Date(iso).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', timeZone: TZ })
@@ -67,6 +68,7 @@ function Household() {
         <div>
           <div className="hh-kicker">The Living Grid</div>
           <h1>Cheapest power tonight</h1>
+          <p className="hh-sub">Octopus Agile, a tariff whose price changes every half hour.</p>
         </div>
       </header>
       <div className="hh-qr"><qr.Component /></div>
@@ -83,23 +85,22 @@ function Household() {
       {d === undefined && <p className="hh-muted">Working out the cheapest hours…</p>}
       {d === null && <p className="hh-muted">Couldn’t reach the forecast right now. Try again in a minute.</p>}
 
-      <Savings region={region} />
-
-      {d?.windows?.map((w) => (
-        <article key={w.task} className="hh-card">
-          <div className="hh-ic"><Icon name={ICON[w.task] ?? 'bolt'} size={20} /></div>
-          <div className="hh-body">
-            <div className="hh-label">{w.label}</div>
-            <div className="hh-when">{day(w.start)} {t(w.start)}–{t(w.end)}</div>
-            <div className="hh-meta">{w.avg_p_kwh.toFixed(1)}p/kWh average <span className={`hh-kind ${w.kind}`}>{w.kind === 'forecast' ? 'Forecast' : 'Published'}</span></div>
-          </div>
-          <div className="hh-save">
-            <div className="hh-save-n">£{w.saving_gbp.p50.toFixed(2)}</div>
-            <div className="hh-save-r">£{w.saving_gbp.p10.toFixed(2)}–£{w.saving_gbp.p90.toFixed(2)}</div>
-            <div className="hh-save-l">saved vs now</div>
-          </div>
-        </article>
+      {[...(d?.windows ?? [])].sort((a, b) => a.avg_p_kwh - b.avg_p_kwh).map((w, k) => (
+        <Explain
+          key={w.task}
+          className="hh-ex"
+          icon={<Icon name={ICON[w.task] ?? 'bolt'} size={18} />}
+          question={w.label}
+          tag={w.kind === 'forecast' ? 'Forecast' : 'Published'}
+          answer={<><span className="hh-when">{day(w.start)} {t(w.start)}–{t(w.end)}</span> <span className="hh-meta">{w.avg_p_kwh.toFixed(1)}p/kWh average</span></>}
+          why={[
+            <span key="now"><b className="num">£{w.saving_gbp.p50.toFixed(2)}</b> saved vs now (£{w.saving_gbp.p10.toFixed(2)}–£{w.saving_gbp.p90.toFixed(2)})</span>,
+            ...(k === 0 ? [<Savings key="cap" region={region} />] : []),
+          ]}
+          experts={k === 0 && d?.note ? <p className="hh-note">{d.note}</p> : null}
+        />
       ))}
+      {d && !d.windows?.length && <Savings region={region} />}
 
       {d?.prices && (
         <section className="hh-chart">
@@ -109,7 +110,6 @@ function Household() {
           <div className="hh-legend"><span><i className="pub" />Published</span><span><i className="fc" />Forecast</span><span><i className="win" />Best windows</span></div>
         </section>
       )}
-      {d?.note && <p className="hh-note">{d.note}</p>}
 
       <style>{CSS}</style>
     </div>
@@ -125,6 +125,9 @@ body { overflow: auto; }
 .hh-logo { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; background: var(--accent); color: var(--accent-ink); flex: none; }
 .hh-kicker { font-size: 12px; color: var(--text-3); }
 .hh h1 { font-size: 22px; margin: 2px 0 0; letter-spacing: -0.02em; }
+.hh-sub { margin: 4px 0 0; font-size: 13px; color: var(--text-2); }
+.hh-ex { margin-bottom: 10px; border-radius: 20px; }
+.hh-ex .ex-why { list-style: none; padding-left: 0; }
 .hh-region { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; font-size: 12px; color: var(--text-2); }
 .hh-region select { height: 46px; border-radius: 14px; background: var(--card); border: 1px solid var(--line-2); color: var(--text); padding: 0 12px; font: inherit; font-size: 15px; }
 .hh-card { display: flex; gap: 12px; align-items: center; background: var(--panel-solid); border: 1px solid var(--line); border-radius: 20px; padding: 14px; margin-bottom: 10px; }

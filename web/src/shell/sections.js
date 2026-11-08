@@ -8,11 +8,11 @@ import { actions, setState, getState } from '../store/store.js'
 // section; they keep its tab lit and are linked from its headline.
 export const SECTIONS = [
   { id: 'now', label: 'Now', question: "Is power cheap right now?", icon: 'globe', mode: 'overview', at: 'now',
-    title: 'Europe’s power grid', blurb: 'Day-ahead prices and the electricity flowing between countries, right now',
+    title: 'Is power cheap right now?', blurb: 'Day-ahead prices and the electricity flowing between countries, right now',
     door: 'Europe’s grid right now: prices, and the power flowing between countries',
     panels: ['zoneList', 'kpis'], layers: { flows: true, ghost: false, ghostWind: false, carbon: false } },
   { id: 'forecast', label: 'Forecast', question: "Where are prices going?", icon: 'chart', mode: 'overview', at: '+6',
-    title: 'Where prices are heading', blurb: 'Our forecast for every zone, with honest uncertainty bands and the reasons behind it',
+    title: 'Where are prices going?', blurb: 'Our forecast for every zone, with honest uncertainty bands and the reasons behind it',
     door: 'Where prices are heading, with honest bands, and the cheapest hours tonight',
     panels: ['zoneChart', 'explain', 'scrubber'], layers: { flows: true, ghost: true, ghostWind: false, carbon: false },
     pages: [{ label: 'Tonight: cheapest hours', href: '#/household', paths: ['/household'] }] },

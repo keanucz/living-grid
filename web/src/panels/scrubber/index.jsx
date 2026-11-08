@@ -160,7 +160,6 @@ function Scrubber({ ctx }) {
       )}
       {noData && <div className="scrub-note">No data for this time: the cache holds no prices for it, so the map shows blanks.</div>}
       {proxyGb && !noData && <div className="scrub-note">GB price before September 2026 is the Elexon market index, a proxy for the day-ahead auction.</div>}
-      {rel > 0 && <div className="scrub-note">Ghost = forecast P50; fainter where the P10–P90 band is wider.</div>}
       <style>{`
         .mode-overview .slot-bottom { top: 76px; bottom: auto; left: 50%; right: auto; transform: translateX(-50%); max-width: none; }
         .scrubber { width: min(640px, calc(100vw - 32px)); padding: 12px 16px 10px; }

@@ -1,5 +1,38 @@
-import { Icon } from '../../shell/icons.jsx'
 import { fmt } from '../../styles/tokens.js'
+import { GBP_EUR } from '../../api/client.js'
+import { fmtPence } from '../../lib/wholesale.js'
+import Explain from '../../ui/Explain.jsx'
+import Term from '../../ui/Term.jsx'
+
+const whole = (v) => Math.round(v).toLocaleString('en-GB')
+
+// The section headline asks 'Is power cheap right now?' (shell/sections.js); this card is its answer.
+// The answer line from live prices, each zone in its own currency. France and Germany usually clear at the same price
+// (market coupling); when they do not, each gets its own figure.
+export function answerParts(zs) {
+  const by = Object.fromEntries((zs ?? []).map((z) => [z.zone, z]))
+  const gb = by.GB?.price
+  const fr = by.FR?.price
+  const de = by['DE-LU']?.price
+  return {
+    gb: gb != null ? { mwh: `£${whole(gb)}`, p: fmtPence(gb) } : null,
+    eu: fr != null && de != null
+      ? (whole(fr) === whole(de) ? { both: `€${whole(fr)}` } : { fr: `€${whole(fr)}`, de: `€${whole(de)}` })
+      : null,
+  }
+}
+
+function Answer({ zs }) {
+  const { gb, eu } = answerParts(zs)
+  return (
+    <>
+      {gb && <>Britain {gb.mwh}/MWh <Term id="wholesale">wholesale</Term>, about {gb.p} per kWh.</>}
+      {eu && ' '}
+      {eu?.both && <>France and Germany {eu.both}/MWh.</>}
+      {eu?.fr && <>France {eu.fr}/MWh and Germany {eu.de}/MWh.</>}
+    </>
+  )
+}
 
 function Kpis({ ctx }) {
   const zs = ctx.data.state?.zones
@@ -24,12 +57,8 @@ function Kpis({ ctx }) {
     { label: 'Crossing borders', value: fmt.gw(flowing), note: 'all interconnectors' },
     { label: 'Europe carbon', value: carbon != null ? `${carbon.toFixed(0)} g` : '—', note: carbonZones < zs.length ? `per kWh consumed, ${carbonZones} of ${zs.length} zones` : 'per kWh consumed, average' },
   ]
-  return (
-    <section className="panel kpis fade-in">
-      <div className="panel-head">
-        <span>Europe right now <span className="tag" style={{ marginLeft: 8 }}>{ctx.source === 'live' ? 'Live' : 'Fixture'}</span></span>
-        <button className="square-btn" title="Open scoreboard"><Icon name="arrowUpRight" size={15} /></button>
-      </div>
+  const experts = (
+    <>
       <div className="kgrid">
         {items.map((it) => (
           <div key={it.label}>
@@ -43,14 +72,27 @@ function Kpis({ ctx }) {
           </div>
         ))}
       </div>
+      <p className="knote kconv">Average and cheapest are in euros per MWh; Britain’s price is converted at £1 = €{GBP_EUR}.</p>
+    </>
+  )
+  return (
+    <div className="kpis">
+      <Explain
+        question={null}
+        tag={ctx.source === 'live' ? 'Live' : 'Fixture'}
+        answer={<Answer zs={zs} />}
+        experts={experts}
+      />
       <style>{`
-        .kpis { width: 560px; }
-        .kgrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; padding: 4px 18px 18px; }
+        .kpis { width: 560px; max-width: 100%; }
+        .kgrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; padding: 4px 0 8px; }
         .klabel { font-size: 12px; }
-        .kval { font-size: 26px; font-weight: 600; margin: 6px 0 4px; white-space: nowrap; }
+        .kval { font-size: 22px; font-weight: 600; margin: 6px 0 4px; white-space: nowrap; color: var(--text); }
         .knote { font-size: 12px; }
+        .kconv { margin: 4px 0 0; color: var(--text-3); }
+        @media (max-width: 700px) { .kgrid { grid-template-columns: repeat(2, 1fr); } }
       `}</style>
-    </section>
+    </div>
   )
 }
 
