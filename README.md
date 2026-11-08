@@ -148,26 +148,25 @@ The replay of 26 October 2026, a stormy day, generated separately from the backt
 
 ### Bot league: which technique wins, and when
 
-Four rival forecasters run on exactly the same backtest rows as ours, each trained only on data from before the week it forecasts: **Yesterday** and **Last week** (same hour a day or a week earlier, with a band from their own past errors), **The Engineer** (merit order: price from residual load, gas and carbon) and **The Committee** (a weighted blend of the others, then calibrated). Storm days are the windiest 15% of days by GB wind output: 6 of the 43 days, 26 October among them. Run on 7 November at 20:57 UTC in an agent's worktree, not on the runner; `python -m pipeline.bot_league` reproduces it into `data/backtest/bot_league.json` in about 14 minutes.
+Four rival forecasters run on exactly the same backtest folds as ours, each trained only on data from before the week it forecasts: **Yesterday** and **Last week** (same hour a day or a week earlier, with a band from their own past errors), **The Engineer** (merit order: price from residual load, gas and carbon) and **The Committee** (a weighted blend of the others, then calibrated). Same twelve folds as the Results above (mid-August to 8 November 2026). Storm days are the windiest 15% of days by GB wind output: 11 of the 85 days, 26 October among them. Run on 8 November at 07:29 to 07:47 UTC from the runner's cached data (`python -m pipeline.bot_league --folds 12`, about 18 minutes). The data had moved on by a few hours since the Results run, so our model's day-ahead error here is 33.5 rather than 33.3.
 
-Day-ahead prices (MAE in £ or €/MWh; pinball loss scores the whole P10 to P90 band; lower is better):
+Day-ahead prices (MAE in £ or €/MWh; pinball loss scores the whole P10 to P90 band; Brier scores a yes/no question, below; lower is better):
 
-| Model | MAE, calm | MAE, storm | Pinball, all | Inside P10 to P90 |
-|---|---|---|---|---|
-| The Committee | **29.9** | 46.0 | **11.5** | 83% |
-| Our model | 30.5 | **43.2** | 11.6 | 78% |
-| Yesterday | 32.0 | 64.5 | 12.8 | 81% |
-| The Engineer | 79.1 | 46.6 | 19.6 | 74% |
-| Last week | 62.0 | 83.0 | 21.8 | 71% |
-| Persistence (no band) | 40.6 | 59.0 | | |
+| Model | MAE, calm | MAE, storm | Pinball, all | Inside P10 to P90 | Brier, all |
+|---|---|---|---|---|---|
+| Our model | **32.0** | **43.9** | **11.1** | 78% | **0.150** |
+| The Committee | 32.1 | 47.4 | 11.8 | 74% | 0.151 |
+| Yesterday | 34.0 | 53.9 | 13.1 | 76% | 0.168 |
+| The Engineer | 40.1 | 62.8 | 14.1 | 76% | 0.201 |
+| Last week | 53.0 | 70.9 | 19.1 | 69% | 0.243 |
+| Persistence (no band) | 50.9 | 61.2 | | | 0.338 |
 
-- **On day-ahead prices it's a tie.** The Committee edges us on pinball loss, but a Diebold-Mariano test on the hourly errors can't tell us apart (p = 0.94). We beat persistence clearly (p < 0.001).
-- **On GB system price we come out on top:** the best Brier score in every regime, and the lowest pinball loss overall and in storms (level with the Committee on calm days). The Committee's MAE is slightly lower overall (42.5 against 43.1), and the difference isn't significant (p = 0.61).
-- **The Engineer is the storm specialist.** It is worst of the four on calm days (79.1) and nearly level with us in storms (46.6 against 43.2, no significant difference), because that's when wind and gas really do set the price.
-- **Yesterday is fine until the weather turns.** On calm days we can't beat it significantly (p = 0.62); in storms its error doubles and its band catches only 57% of outcomes.
-- **Yes/no questions:** asked "will the price be above its average of the past week?" every hour, our model has the best Brier score in storms (0.129 on day-ahead prices) and the Committee in calm weather (0.146 against our 0.155). A forecast with no band is always sure of itself, and it shows: the same-hour-yesterday guess scores 0.222 on its own and 0.168 once the Yesterday bot adds a band from its past errors.
+- **On day-ahead prices we have the lowest error and pinball loss in calm weather, in storms and overall, but the lead over the best two is not proven.** A Diebold-Mariano test on the hourly errors can't tell us apart from the Committee (p = 0.49) or the Yesterday bot (p = 0.25). We beat the Engineer, Last week and persistence clearly (p < 0.001).
+- **Storms are where the gap is widest:** 43.9 against the Committee's 47.4 and Yesterday's 53.9. It's still short of significance (p = 0.09 and 0.06), because there are only 11 storm days.
+- **On GB system price it's a three-way tie.** We, the Committee and the Engineer all score 43.4 to 43.5 on MAE, and no difference between the three is significant (p of 0.25 or more). We have the lowest pinball loss overall (13.7) and in storms (16.0 against the Engineer's 18.2). The Engineer is level with us on calm days (13.3) and has the best Brier score (0.188 against our 0.196).
+- **Yes/no questions:** asked "will the price be above its average of the past week?" every hour, our model has the best day-ahead Brier score overall (0.150, the Committee 0.151) and in storms (0.138). The Committee is best on calm days (0.150 against our 0.152). A forecast with no band is always sure of itself, and it shows: the same-hour-yesterday guess scores 0.215 on its own and 0.168 once the Yesterday bot adds a band from its past errors.
 
-Every band is still too narrow in storms: the best catch 66% to 72% of outcomes, against the 80% target.
+Day-ahead bands are too narrow in storms: ours catches 67% of outcomes and the others 53% to 66%, against the 80% target (79% on calm days). On GB system price ours and the Committee's hold up in storms (78% and 77%); the Engineer's catches 59%.
 
 ### Events you can trigger
 
