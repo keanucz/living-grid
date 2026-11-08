@@ -53,7 +53,11 @@ function StatTiles({ ctx }) {
         .klabel { font-size: 12px; }
         .kval { font-size: 26px; font-weight: 600; margin: 6px 0 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .knote { font-size: 12px; }
-        .impact .kgrid { grid-template-columns: repeat(3, 1fr); }
+        .kpis.impact { width: 100%; max-width: 100%; min-width: 0; box-sizing: border-box; }
+        .impact .kgrid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+        .impact .kgrid > div { min-width: 0; }
+        .impact .kval { font-size: 24px; }
+        .impact .klabel, .impact .knote, .impact .pill-delta { overflow-wrap: anywhere; }
         .impact .panel-head > span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
       `}</style>
     </section>

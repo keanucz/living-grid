@@ -62,20 +62,21 @@ function Battery({ ctx }) {
         </p>
       </div>
       <style>{`
-        .batt { width: 560px; }
-        .batt .panel-head > span { display: flex; align-items: center; gap: 8px; }
-        .batt-zones { display: flex; gap: 2px; padding: 3px; border-radius: 999px; background: var(--card); }
+        .batt { width: 560px; max-width: 100%; min-width: 0; box-sizing: border-box; }
+        .batt .panel-head { flex-wrap: wrap; gap: 8px; }
+        .batt .panel-head > span { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; min-width: 0; }
+        .batt-zones { display: flex; flex-wrap: wrap; gap: 2px; padding: 3px; border-radius: 999px; background: var(--card); }
         .batt-zones button { padding: 4px 8px; border-radius: 999px; font-size: 11px; color: var(--text-2); font-weight: 600; }
         .batt-zones button.on { background: var(--card-2); color: var(--accent); }
         .batt-body { padding: 0 18px 16px; }
-        .batt-row { display: grid; grid-template-columns: 170px 1fr 64px 44px; gap: 10px; align-items: center; margin-bottom: 8px; font-size: 12px; }
+        .batt-row { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) 56px 52px; gap: 10px; align-items: center; margin-bottom: 8px; font-size: 12px; }
         .batt-l { color: var(--text-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .batt-track { position: relative; height: 10px; background: var(--card); border-radius: 5px; }
         .batt-track i { position: absolute; top: 0; bottom: 0; border-radius: 5px; }
         .batt-mid { position: absolute; left: 50%; top: -2px; bottom: -2px; width: 1px; background: var(--line-2); }
         .batt-v { text-align: right; font-weight: 600; font-size: 13px; }
         .batt-s { text-align: right; }
-        .batt-h { margin: 8px 0 0; font-size: 12px; color: var(--text-2); line-height: 1.45; }
+        .batt-h { overflow-wrap: anywhere; margin: 8px 0 0; font-size: 12px; color: var(--text-2); line-height: 1.45; }
         .batt-h b { color: var(--text); }
       `}</style>
     </section>

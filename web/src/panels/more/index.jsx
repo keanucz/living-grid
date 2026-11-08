@@ -22,13 +22,15 @@ function More({ ctx }) {
         </div>
       )}
       <style>{`
-        .more { width: 100%; }
+        .more { width: 100%; min-width: 0; overflow-x: hidden; }
         .more-btn { width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 10px 16px; border-radius: 16px;
           background: var(--panel-solid); border: 1px solid var(--line); color: var(--text); font-weight: 600; }
         .more-btn .faint { font-weight: 400; font-size: 12px; }
-        .more-body { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; max-height: calc(100vh - 460px); overflow-y: auto; scrollbar-width: none; }
+        .more-body { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; max-height: calc(100vh - 460px); overflow-y: auto; overflow-x: hidden; scrollbar-width: none; }
         .more-body::-webkit-scrollbar { display: none; }
-        .more-body > * { flex: none; }
+        .more-body > * { flex: none; min-width: 0; }
+        /* Panels set their own fixed widths; inside the drawer they take the column's width. */
+        .more-body .panel { width: 100% !important; max-width: 100%; min-width: 0; box-sizing: border-box; }
       `}</style>
     </div>
   )

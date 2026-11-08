@@ -28,7 +28,7 @@ export const SECTIONS = [
   { id: 'proof', label: 'Proof', question: "Can we trust the forecast?", icon: 'replay', mode: 'overview', at: 'now',
     title: 'How right are we?', blurb: 'Every forecast logged before its outcome, scored against simple baselines',
     door: 'How right are we: scores against baselines, the 26 October replay, the Monday reveal',
-    panels: ['scoreboard', 'more'], more: ['botLeague', 'leaderboard'], layers: { flows: true, ghost: false, ghostWind: false, carbon: false },
+    panels: ['scoreboard'], layers: { flows: true, ghost: false, ghostWind: false, carbon: false },
     pages: [
       { label: 'Replay: 26 October storm', href: '#/replay', paths: ['/replay'] },
       { label: 'Day-ahead reveal', href: '#/reveal', paths: ['/reveal'] },

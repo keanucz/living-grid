@@ -122,16 +122,16 @@ function Compute({ ctx }) {
         </div>
       )}
       <style>{`
-        .cmp { width: 560px; }
+        .cmp { width: 560px; max-width: 100%; min-width: 0; box-sizing: border-box; }
         .cmp-head { width: 100%; display: flex; justify-content: space-between; align-items: center; gap: 12px; text-align: left; color: inherit; }
-        .cmp-head > span:first-child { display: flex; align-items: center; gap: 8px; }
-        .cmp-sum { font-size: 12px; color: var(--text-2); display: flex; gap: 8px; align-items: center; }
+        .cmp-head > span:first-child { display: flex; align-items: center; gap: 8px; flex: none; }
+        .cmp-sum { font-size: 12px; color: var(--text-2); display: flex; gap: 8px; align-items: center; min-width: 0; text-align: right; overflow-wrap: anywhere; }
         .cmp-body { padding: 0 18px 16px; }
         .cmp-presets { display: flex; gap: 4px; flex-wrap: wrap; padding: 3px; border-radius: 16px; background: var(--card); margin-bottom: 10px; }
         .cmp-presets button, .cmp-zones button { padding: 5px 10px; border-radius: 999px; font-size: 12px; color: var(--text-2); font-weight: 600; }
         .cmp-presets button.on, .cmp-zones button.on { background: var(--card-2); color: var(--accent); }
-        .cmp-zones { display: flex; gap: 2px; margin-bottom: 10px; }
-        .cmp-hero { display: grid; grid-template-columns: 1fr auto 1fr; gap: 6px 12px; align-items: center; transition: opacity .2s; }
+        .cmp-zones { display: flex; flex-wrap: wrap; gap: 2px; margin-bottom: 10px; }
+        .cmp-hero { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: 6px 12px; align-items: center; transition: opacity .2s; }
         .cmp-hero.stale { opacity: .5; }
         .cmp-hero b { font-size: 28px; font-weight: 700; letter-spacing: -0.02em; display: block; }
         .cmp-hero b.acc { color: var(--accent); }
