@@ -10,8 +10,8 @@ body { overflow: auto; }
 .pm-head b { font-size: 24px; letter-spacing: -.02em; } .pm-head small { display: block; font-size: 11px; color: var(--text-2); }
 .pm-eq { text-align: right; }
 .pm-bar { grid-column: 1 / -1; height: 4px; border-radius: 2px; background: var(--card-2); overflow: hidden; } .pm-bar i { display: block; height: 100%; background: var(--text-2); transition: width .6s; }
-.pm-stand { list-style: none; display: flex; gap: 6px; overflow-x: auto; margin: 0 0 10px; padding: 0; scrollbar-width: none; }
-.pm-stand li { flex: none; display: flex; flex-direction: column; min-width: 84px; padding: 7px 10px; border-radius: 12px; background: var(--panel-solid); border: 1px solid var(--line); font-size: 11px; color: var(--text-2); }
+.pm-stand { list-style: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(104px, 1fr)); gap: 6px; margin: 0 0 10px; padding: 0; }
+.pm-stand li { display: flex; flex-direction: column; min-width: 0; padding: 7px 10px; border-radius: 12px; background: var(--panel-solid); border: 1px solid var(--line); font-size: 11px; color: var(--text-2); }
 .pm-stand li.me { border-color: var(--text-2); } .pm-stand li b { font-size: 15px; }
 .pm-tag { margin-left: 4px; padding: 0 5px; border-radius: 6px; background: var(--card-2); color: var(--text-3); font-size: 9px; text-transform: uppercase; }
 .pm-feed { display: grid; gap: 10px; }
