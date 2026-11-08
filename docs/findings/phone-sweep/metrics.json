@@ -1,0 +1,3340 @@
+[
+ {
+  "hscroll": 0,
+  "small": [
+   [
+    "11px Live \u00b7 Sun 07:00",
+    1
+   ],
+   [
+    "10px Britain \u00a3177",
+    1
+   ],
+   [
+    "10px France \u20ac220",
+    1
+   ],
+   [
+    "10px Belgium \u20ac220",
+    1
+   ],
+   [
+    "10px LIVE",
+    1
+   ],
+   [
+    "11px GB",
+    1
+   ],
+   [
+    "11px Gas 67%",
+    1
+   ],
+   [
+    "11px Nuclear 19%",
+    1
+   ],
+   [
+    "11px Biomass 11%",
+    1
+   ],
+   [
+    "11px Wind 1%",
+    1
+   ],
+   [
+    "11px FR",
+    1
+   ],
+   [
+    "11px DE",
+    1
+   ],
+   [
+    "11px NL",
+    1
+   ],
+   [
+    "11px BE",
+    1
+   ],
+   [
+    "11px NO2",
+    1
+   ],
+   [
+    "10px MODEL EXPLANATION",
+    1
+   ],
+   [
+    "11px Compared with a typical hour. These are the model\u2019",
+    1
+   ],
+   [
+    "10px \u221224 H TO +24 H",
+    1
+   ],
+   [
+    "9px 150",
+    1
+   ],
+   [
+    "9px 200",
+    1
+   ],
+   [
+    "9px 250",
+    1
+   ],
+   [
+    "9px 300",
+    1
+   ],
+   [
+    "9px 350",
+    1
+   ],
+   [
+    "9px 400",
+    1
+   ],
+   [
+    "9px -24h",
+    1
+   ]
+  ],
+  "tiny": [
+   "56x32 button.on \"Price\"",
+   "127x32 button. \"Wind paid to stop\"",
+   "68x32 button. \"Carbon\"",
+   "89x32 button. \"GB regions\"",
+   "55x32 button. \"Wind\"",
+   "48x32 button. \"Sun\"",
+   "89x28 button.term-word \"wholesale\"",
+   "291x19 input. \"\"",
+   "99x15 button.term-word \"Day-ahead price\"",
+   "66x15 button.term-word \"Best guess\"",
+   "79x15 button.term-word \"Likely range\"",
+   "56x35 button.intro-skip \"Skip\""
+  ],
+  "cut": [
+   "Wind [371..426] in scroller",
+   "Sun [432..480] in scroller"
+  ],
+  "size": 390,
+  "step": "01-intro",
+  "errors": []
+ },
+ {
+  "hscroll": 0,
+  "small": [
+   [
+    "11px Live \u00b7 Sun 07:00",
+    1
+   ],
+   [
+    "10px Britain \u00a3177",
+    1
+   ],
+   [
+    "10px Germany \u20ac220",
+    1
+   ],
+   [
+    "10px Netherlands \u20ac220",
+    1
+   ],
+   [
+    "10px Belgium \u20ac220",
+    1
+   ],
+   [
+    "10px LIVE",
+    1
+   ],
+   [
+    "11px GB",
+    1
+   ],
+   [
+    "11px Gas 67%",
+    1
+   ],
+   [
+    "11px Nuclear 19%",
+    1
+   ],
+   [
+    "11px Biomass 11%",
+    1
+   ],
+   [
+    "11px Wind 1%",
+    1
+   ],
+   [
+    "11px FR",
+    1
+   ],
+   [
+    "11px DE",
+    1
+   ],
+   [
+    "11px NL",
+    1
+   ],
+   [
+    "11px BE",
+    1
+   ],
+   [
+    "11px NO2",
+    1
+   ],
+   [
+    "10px MODEL EXPLANATION",
+    1
+   ],
+   [
+    "11px Compared with a typical hour. These are the model\u2019",
+    1
+   ],
+   [
+    "10px \u221224 H TO +24 H",
+    1
+   ],
+   [
+    "9px 150",
+    1
+   ],
+   [
+    "9px 200",
+    1
+   ],
+   [
+    "9px 250",
+    1
+   ],
+   [
+    "9px 300",
+    1
+   ],
+   [
+    "9px 350",
+    1
+   ],
+   [
+    "9px 400",
+    1
+   ]
+  ],
+  "tiny": [
+   "56x32 button.on \"Price\"",
+   "127x32 button. \"Wind paid to stop\"",
+   "68x32 button. \"Carbon\"",
+   "89x32 button. \"GB regions\"",
+   "55x32 button. \"Wind\"",
+   "48x32 button. \"Sun\"",
+   "89x28 button.term-word \"wholesale\"",
+   "291x19 input. \"\"",
+   "99x15 button.term-word \"Day-ahead price\"",
+   "66x15 button.term-word \"Best guess\"",
+   "79x15 button.term-word \"Likely range\""
+  ],
+  "cut": [
+   "Wind [371..426] in scroller",
+   "Sun [432..480] in scroller"
+  ],
+  "size": 390,
+  "step": "02-welcome",
+  "errors": []
+ },
+ {
+  "hscroll": 0,
+  "small": [
+   [
+    "11px Live \u00b7 Sun 07:00",
+    1
+   ],
+   [
+    "10px Britain \u00a3177",
+    1
+   ],
+   [
+    "10px Germany \u20ac220",
+    1
+   ],
+   [
+    "10px Netherlands \u20ac220",
+    1
+   ],
+   [
+    "10px Belgium \u20ac220",
+    1
+   ],
+   [
+    "10px LIVE",
+    1
+   ],
+   [
+    "11px GB",
+    1
+   ],
+   [
+    "11px Gas 67%",
+    1
+   ],
+   [
+    "11px Nuclear 19%",
+    1
+   ],
+   [
+    "11px Biomass 11%",
+    1
+   ],
+   [
+    "11px Wind 1%",
+    1
+   ],
+   [
+    "11px FR",
+    1
+   ],
+   [
+    "11px DE",
+    1
+   ],
+   [
+    "11px NL",
+    1
+   ],
+   [
+    "11px BE",
+    1
+   ],
+   [
+    "11px NO2",
+    1
+   ],
+   [
+    "10px MODEL EXPLANATION",
+    1
+   ],
+   [
+    "11px Compared with a typical hour. These are the model\u2019",
+    1
+   ],
+   [
+    "10px \u221224 H TO +24 H",
+    1
+   ],
+   [
+    "9px 150",
+    1
+   ],
+   [
+    "9px 200",
+    1
+   ],
+   [
+    "9px 250",
+    1
+   ],
+   [
+    "9px 300",
+    1
+   ],
+   [
+    "9px 350",
+    1
+   ],
+   [
+    "9px 400",
+    1
+   ]
+  ],
+  "tiny": [
+   "56x32 button.on \"Price\"",
+   "127x32 button. \"Wind paid to stop\"",
+   "68x32 button. \"Carbon\"",
+   "89x32 button. \"GB regions\"",
+   "55x32 button. \"Wind\"",
+   "48x32 button. \"Sun\"",
+   "89x28 button.term-word \"wholesale\"",
+   "291x19 input. \"\"",
+   "99x15 button.term-word \"Day-ahead price\"",
+   "66x15 button.term-word \"Best guess\"",
+   "79x15 button.term-word \"Likely range\""
+  ],
+  "cut": [
+   "Wind [371..426] in scroller",
+   "Sun [432..480] in scroller"
+  ],
+  "size": 390,
+  "step": "10-now",
+  "errors": []
+ },
+ {
+  "hscroll": 0,
+  "small": [
+   [
+    "11px Live \u00b7 Sun 07:00",
+    1
+   ],
+   [
+    "10px Britain \u00a3177",
+    1
+   ],
+   [
+    "10px Germany \u20ac220",
+    1
+   ],
+   [
+    "10px Netherlands \u20ac220",
+    1
+   ],
+   [
+    "10px Belgium \u20ac220",
+    1
+   ],
+   [
+    "10px \u221224 H TO +24 H",
+    1
+   ],
+   [
+    "9px 150",
+    1
+   ],
+   [
+    "9px 200",
+    1
+   ],
+   [
+    "9px 250",
+    1
+   ],
+   [
+    "9px 300",
+    1
+   ],
+   [
+    "9px 350",
+    1
+   ],
+   [
+    "9px 400",
+    1
+   ],
+   [
+    "9px -24h",
+    1
+   ],
+   [
+    "9px -12h",
+    1
+   ],
+   [
+    "9px now",
+    1
+   ],
+   [
+    "9px +12h",
+    1
+   ],
+   [
+    "9px +24h",
+    1
+   ],
+   [
+    "11px Day-ahead price",
+    1
+   ],
+   [
+    "11px Already auctioned",
+    1
+   ],
+   [
+    "11px Best guess",
+    1
+   ],
+   [
+    "11px Likely range",
+    1
+   ],
+   [
+    "10px MODEL EXPLANATION",
+    1
+   ],
+   [
+    "11px Compared with a typical hour. These are the model\u2019",
+    1
+   ],
+   [
+    "10px LIVE",
+    1
+   ],
+   [
+    "11px History not loaded",
+    1
+   ]
+  ],
+  "tiny": [
+   "56x32 button.on \"Price\"",
+   "127x32 button. \"Wind paid to stop\"",
+   "68x32 button. \"Carbon\"",
+   "89x32 button. \"GB regions\"",
+   "55x32 button. \"Wind\"",
+   "48x32 button. \"Sun\"",
+   "99x15 button.term-word \"Day-ahead price\"",
+   "66x15 button.term-word \"Best guess\"",
+   "79x15 button.term-word \"Likely range\"",
+   "120x24 input.scrub-date \"Jump to date\"",
+   "34x18 button.scrub-live \"Live\"",
+   "30x26 button.scrub-play \"\u25b6\"",
+   "28x22 button.scrub-pill \"1\u00d7\"",
+   "35x22 button.scrub-pill \"10\u00d7\"",
+   "37x22 button.scrub-pill \"60\u00d7\"",
+   "51x22 button.scrub-pill \"2 days\"",
+   "47x22 button.scrub-pill \"Week\"",
+   "50x22 button.scrub-pill \"Month\"",
+   "40x22 button.scrub-pill \"Year\"",
+   "76x22 button.scrub-pill \"Since 2024\""
+  ],
+  "cut": [
+   "Wind [371..426] in scroller",
+   "Sun [432..480] in scroller"
+  ],
+  "size": 390,
+  "step": "11-forecast",
+  "errors": []
+ },
+ {
+  "hscroll": 0,
+  "small": [
+   [
+    "11px Live \u00b7 Sun 07:00",
+    1
+   ],
+   [
+    "10px Now",
+    1
+   ],
+   [
+    "10px Forecast",
+    1
+   ],
+   [
+    "10px Hidden grid",
+    1
+   ],
+   [
+    "10px What if",
+    1
+   ],
+   [
+    "10px Proof",
+    1
+   ],
+   [
+    "10px Play",
+    1
+   ]
+  ],
+  "tiny": [
+   "56x32 button. \"Price\"",
+   "127x32 button.on \"Wind paid to stop\"",
+   "68x32 button. \"Carbon\"",
+   "89x32 button. \"GB regions\"",
+   "55x32 button. \"Wind\"",
+   "48x32 button. \"Sun\""
+  ],
+  "cut": [
+   "Wind [371..426] in scroller",
+   "Sun [432..480] in scroller"
+  ],
+  "size": 390,
+  "step": "12-hidden",
+  "errors": []
+ },
+ {
+  "hscroll": 0,
+  "small": [
+   [
+    "11px Live \u00b7 Sun 07:00",
+    1
+   ],
+   [
+    "10px ESTIMATED",
+    1
+   ],
+   [
+    "10px Now",
+    1
+   ],
+   [
+    "10px Forecast",
+    1
+   ],
+   [
+    "10px Hidden grid",
+    1
+   ],
+   [
+    "10px What if",
+    1
+   ],
+   [
+    "10px Proof",
+    1
+   ],
+   [
+    "10px Play",
+    1
+   ],
+   [
+    "10px New version available \u00b7 Reload",
+    1
+   ]
+  ],
+  "tiny": [
+   "56x32 button. \"Price\"",
+   "127x32 button.on \"Wind paid to stop\"",
+   "68x32 button. \"Carbon\"",
+   "89x32 button. \"GB regions\"",
+   "55x32 button. \"Wind\"",
+   "48x32 button. \"Sun\"",
+   "80x21 button.term-word \"constraint bill\"",
+   "215x21 button.term-word \"power line from Scotland to England\"",
+   "72x27 button.story-ex-btn \"\u203a For experts\"",
+   "210x29 a. \"Watch the storm that cost \u00a336.5m\"",
+   "110x29 button. \"See it over time\"",
+   "87x31 button.story-more \"More detail\"",
+   "198x23 button.update-chip \"New version available \u00b7 Reload\""
+  ],
+  "cut": [
+   "Wind [371..426] in scroller",
+   "Sun [432..480] in scroller"
+  ],
+  "size": 390,
+  "step": "13-hidden-story1",
+  "errors": []
+ },
+ {
+  "hscroll": 0,
+  "small": [
+   [
+    "11px Live \u00b7 Sun 07:00",
+    1
+   ],
+   [
+    "10px ESTIMATED",
+    1
+   ],
+   [
+    "10px Now",
+    1
+   ],
+   [
+    "10px Forecast",
+    1
+   ],
+   [
+    "10px Hidden grid",
+    1
+   ],
+   [
+    "10px What if",
+    1
+   ],
+   [
+    "10px Proof",
+    1
+   ],
+   [
+    "10px Play",
+    1
+   ],
+   [
+    "10px New version available \u00b7 Reload",
+    1
+   ]
+  ],
+  "tiny": [
+   "56x32 button. \"Price\"",
+   "127x32 button. \"Wind paid to stop\"",
+   "68x32 button.on \"Carbon\"",
+   "89x32 button. \"GB regions\"",
+   "55x32 button. \"Wind\"",
+   "48x32 button. \"Sun\"",
+   "41x21 button.term-word \"g/kWh\"",
+   "72x27 button.story-ex-btn \"\u203a For experts\"",
+   "87x31 button.story-more \"More detail\"",
+   "198x23 button.update-chip \"New version available \u00b7 Reload\""
+  ],
+  "cut": [
+   "Wind [371..426] in scroller",
+   "Sun [432..480] in scroller"
+  ],
+  "size": 390,
+  "step": "13-hidden-story2",
+  "errors": []
+ },
+ {
+  "hscroll": 0,
+  "small": [
+   [
+    "11px Live \u00b7 Sun 07:00",
+    1
+   ],
+   [
+    "10px ESTIMATED",
+    1
+   ],
+   [
+    "10px Now",
+    1
+   ],
+   [
+    "10px Forecast",
+    1
+   ],
+   [
+    "10px Hidden grid",
+    1
+   ],
+   [
+    "10px What if",
+    1
+   ],
+   [
+    "10px Proof",
+    1
+   ],
+   [
+    "10px Play",
+    1
+   ],
+   [
+    "10px New version available \u00b7 Reload",
+    1
+   ]
+  ],
+  "tiny": [
+   "56x32 button.on \"Price\"",
+   "127x32 button. \"Wind paid to stop\"",
+   "68x32 button. \"Carbon\"",
+   "89x32 button. \"GB regions\"",
+   "55x32 button. \"Wind\"",
+   "48x32 button. \"Sun\"",
+   "95x21 button.term-word \"constraint costs\"",
+   "56x21 button.term-word \"boundary\"",
+   "72x27 button.story-ex-btn \"\u203a For experts\"",
+   "120x29 a. \"Build a power line\"",
+   "198x23 button.update-chip \"New version available \u00b7 Reload\""
+  ],
+  "cut": [
+   "Wind [371..426] in scroller",
+   "Sun [432..480] in scroller"
+  ],
+  "size": 390,
+  "step": "13-hidden-story3",
+  "errors": []
+ },
+ {
+  "hscroll": 0,
+  "small": [
+   [
+    "11px Live \u00b7 Sun 07:00",
+    1
+   ],
+   [
+    "11px The map shows prices for the chosen hour; the sun ",
+    1
+   ],
+   [
+    "10px Now",
+    1
+   ],
+   [
+    "10px Forecast",
+    1
+   ],
+   [
+    "10px Hidden grid",
+    1
+   ],
+   [
+    "10px What if",
+    1
+   ],
+   [
+    "10px Proof",
+    1
+   ],
+   [
+    "10px Play",
+    1
+   ],
+   [
+    "10px New version available \u00b7 Reload",
+    1
+   ]
+  ],
+  "tiny": [
+   "56x32 button. \"Price\"",
+   "127x32 button. \"Wind paid to stop\"",
+   "68x32 button. \"Carbon\"",
+   "89x32 button. \"GB regions\"",
+   "55x32 button. \"Wind\"",
+   "48x32 button.on \"Sun\"",
+   "95x21 button.term-word \"day-ahead price\"",
+   "64x21 button.term-word \"below zero\"",
+   "72x27 button.story-ex-btn \"\u203a For experts\"",
+   "194x29 button. \"Show prices at the deepest dip\"",
+   "115x29 a. \"Watch the movie\"",
+   "110x29 button. \"See it over time\"",
+   "87x31 button.story-more \"More detail\"",
+   "198x23 button.update-chip \"New version available \u00b7 Reload\""
+  ],
+  "cut": [
+   "Wind [371..426] in scroller",
+   "Sun [432..480] in scroller"
+  ],
+  "size": 390,
+  "step": "13-hidden-story4",
+  "errors": []
+ },
+ {
+  "hscroll": 0,
+  "small": [
+   [
+    "11px Live \u00b7 Sun 07:00",
+    1
+   ],
+   [
+    "10px MODELLED",
+    1
+   ],
+   [
+    "11px per kWh",
+    1
+   ],
+   [
+    "11px no event yet",
+    1
+   ],
+   [
+    "11px extra, estimated",
+    1
+   ],
+   [
+    "10px Now",
+    1
+   ],
+   [
+    "10px Forecast",
+    1
+   ],
+   [
+    "10px Hidden grid",
+    1
+   ],
+   [
+    "10px What if",
+    1
+   ],
+   [
+    "10px Proof",
+    1
+   ],
+   [
+    "10px Play",
+    1
+   ],
+   [
+    "10px New version available \u00b7 Reload",
+    1
+   ]
+  ],
+  "tiny": [
+   "56x32 button.on \"Price\"",
+   "127x32 button. \"Wind paid to stop\"",
+   "68x32 button. \"Carbon\"",
+   "89x32 button. \"GB regions\"",
+   "55x32 button. \"Wind\"",
+   "48x32 button. \"Sun\"",
+   "70x17 button.term-word \"WHOLESALE\"",
+   "370x39 button.more-btn \"More detail Show\"",
+   "198x23 button.update-chip \"New version available \u00b7 Reload\""
+  ],
+  "cut": [
+   "Wind [371..426] in scroller",
+   "Sun [432..480] in scroller"
+  ],
+  "size": 390,
+  "step": "20-whatif",
+  "errors": []
+ },
+ {
+  "hscroll": 0,
+  "small": [
+   [
+    "11px Live \u00b7 Sun 07:00",
+    1
+   ],
+   [
+    "10px MODELLED",
+    2
+   ],
+   [
+    "11px \u25b2 3.8p per kWh vs now",
+    1
+   ],
+   [
+    "11px +3.8p per kWh",
+    1
+   ],
+   [
+    "11px extra, estimated",
+    1
+   ],
+   [
+    "10px Now",
+    1
+   ],
+   [
+    "10px Forecast",
+    1
+   ],
+   [
+    "10px Hidden grid",
+    1
+   ],
+   [
+    "10px What if",
+    1
+   ],
+   [
+    "10px Proof",
+    1
+   ],
+   [
+    "10px Play",
+    1
+   ],
+   [
+    "10px New version available \u00b7 Reload",
+    1
+   ]
+  ],
+  "tiny": [
+   "56x32 button.on \"Price\"",
+   "127x32 button. \"Wind paid to stop\"",
+   "68x32 button. \"Carbon\"",
+   "89x32 button. \"GB regions\"",
+   "55x32 button. \"Wind\"",
+   "48x32 button. \"Sun\"",
+   "89x28 button.term-word \"wholesale\"",
+   "70x17 button.term-word \"WHOLESALE\"",
+   "370x39 button.more-btn \"More detail Show\"",
+   "198x23 button.update-chip \"New version available \u00b7 Reload\""
+  ],
+  "cut": [
+   "Wind [371..426] in scroller",
+   "Sun [432..480] in scroller"
+  ],
+  "size": 390,
+  "step": "21-whatif-event1",
+  "errors": []
+ },
+ {
+  "hscroll": 0,
+  "small": [
+   [
+    "11px Live \u00b7 Sun 07:00",
+    1
+   ],
+   [
+    "10px MODELLED",
+    2
+   ],
+   [
+    "11px \u25b2 0.4p per kWh vs now",
+    1
+   ],
+   [
+    "11px +0.4p per kWh",
+    1
+   ],
+   [
+    "11px extra, estimated",
+    1
+   ],
+   [
+    "10px Now",
+    1
+   ],
+   [
+    "10px Forecast",
+    1
+   ],
+   [
+    "10px Hidden grid",
+    1
+   ],
+   [
+    "10px What if",
+    1
+   ],
+   [
+    "10px Proof",
+    1
+   ],
+   [
+    "10px Play",
+    1
+   ],
+   [
+    "10px New version available \u00b7 Reload",
+    1
+   ]
+  ],
+  "tiny": [
+   "56x32 button.on \"Price\"",
+   "127x32 button. \"Wind paid to stop\"",
+   "68x32 button. \"Carbon\"",
+   "89x32 button. \"GB regions\"",
+   "55x32 button. \"Wind\"",
+   "48x32 button. \"Sun\"",
+   "89x28 button.term-word \"wholesale\"",
+   "70x17 button.term-word \"WHOLESALE\"",
+   "370x39 button.more-btn \"More detail Show\"",
+   "198x23 button.update-chip \"New version available \u00b7 Reload\""
+  ],
+  "cut": [
+   "Wind [371..426] in scroller",
+   "Sun [432..480] in scroller"
+  ],
+  "size": 390,
+  "step": "22-whatif-event2",
+  "errors": []
+ },
+ {
+  "hscroll": 0,
+  "small": [
+   [
+    "11px Live \u00b7 Sun 07:00",
+    1
+   ],
+   [
+    "10px MODELLED",
+    1
+   ],
+   [
+    "11px \u25b2 0.3p per kWh vs now",
+    1
+   ],
+   [
+    "11px +\u20ac12.6 per MWh",
+    1
+   ],
+   [
+    "11px extra, estimated",
+    1
+   ],
+   [
+    "10px Now",
+    1
+   ],
+   [
+    "10px Forecast",
+    1
+   ],
+   [
+    "10px Hidden grid",
+    1
+   ],
+   [
+    "10px What if",
+    1
+   ],
+   [
+    "10px Proof",
+    1
+   ],
+   [
+    "10px Play",
+    1
+   ],
+   [
+    "10px New version available \u00b7 Reload",
+    1
+   ]
+  ],
+  "tiny": [
+   "56x32 button.on \"Price\"",
+   "127x32 button. \"Wind paid to stop\"",
+   "68x32 button. \"Carbon\"",
+   "89x32 button. \"GB regions\"",
+   "55x32 button. \"Wind\"",
+   "48x32 button. \"Sun\"",
+   "70x17 button.term-word \"WHOLESALE\"",
+   "370x39 button.more-btn \"More detail Show\"",
+   "198x23 button.update-chip \"New version available \u00b7 Reload\""
+  ],
+  "cut": [
+   "France +\u20ac12.6 per MWh [241..394] in hidden",
+   "Modelled \u00b7 French nuclear outage [241..394] in hidden",
+   "Wind [371..426] in scroller",
+   "Sun [432..480] in scroller"
+  ],
+  "size": 390,
+  "step": "23-whatif-event3",
+  "errors": []
+ },
+ {
+  "hscroll": 0,
+  "small": [
+   [
+    "11px Live \u00b7 Sun 07:00",
+    1
+   ],
+   [
+    "10px MODELLED",
+    1
+   ],
+   [
+    "11px \u25bc 0.2p per kWh vs now",
+    1
+   ],
+   [
+    "11px +\u20ac0.0 per MWh",
+    1
+   ],
+   [
+    "11px extra, estimated",
+    1
+   ],
+   [
+    "10px Now",
+    1
+   ],
+   [
+    "10px Forecast",
+    1
+   ],
+   [
+    "10px Hidden grid",
+    1
+   ],
+   [
+    "10px What if",
+    1
+   ],
+   [
+    "10px Proof",
+    1
+   ],
+   [
+    "10px Play",
+    1
+   ],
+   [
+    "10px New version available \u00b7 Reload",
+    1
+   ]
+  ],
+  "tiny": [
+   "56x32 button.on \"Price\"",
+   "127x32 button. \"Wind paid to stop\"",
+   "68x32 button. \"Carbon\"",
+   "89x32 button. \"GB regions\"",
+   "55x32 button. \"Wind\"",
+   "48x32 button. \"Sun\"",
+   "70x17 button.term-word \"WHOLESALE\"",
+   "370x39 button.more-btn \"More detail Show\"",
+   "198x23 button.update-chip \"New version available \u00b7 Reload\""
+  ],
+  "cut": [
+   "Wind [371..426] in scroller",
+   "Sun [432..480] in scroller"
+  ],
+  "size": 390,
+  "step": "24-whatif-event4",
+  "errors": []
+ },
+ {
+  "hscroll": 0,
+  "small": [
+   [
+    "11px Live \u00b7 Sun 07:00",
+    1
+   ],
+   [
+    "10px Britain \u00a3177",
+    1
+   ],
+   [
+    "10px Germany \u20ac220",
+    1
+   ],
+   [
+    "10px Netherlands \u20ac220",
+    1
+   ],
+   [
+    "10px Belgium \u20ac220",
+    1
+   ],
+   [
+    "10px Now",
+    1
+   ],
+   [
+    "10px Forecast",
+    1
+   ],
+   [
+    "10px Hidden grid",
+    1
+   ],
+   [
+    "10px What if",
+    1
+   ],
+   [
+    "10px Proof",
+    1
+   ],
+   [
+    "10px Play",
+    1
+   ],
+   [
+    "10px New version available \u00b7 Reload",
+    1
+   ]
+  ],
+  "tiny": [
+   "56x32 button.on \"Price\"",
+   "127x32 button. \"Wind paid to stop\"",
+   "68x32 button. \"Carbon\"",
+   "89x32 button. \"GB regions\"",
+   "55x32 button. \"Wind\"",
+   "48x32 button. \"Sun\"",
+   "198x23 button.update-chip \"New version available \u00b7 Reload\""
+  ],
+  "cut": [
+   "Wind [371..426] in scroller",
+   "Sun [432..480] in scroller"
+  ],
+  "size": 390,
+  "step": "30-proof",
+  "errors": []
+ },
+ {
+  "hscroll": 0,
+  "small": [
+   [
+    "11px Live \u00b7 Sun 07:00",
+    1
+   ],
+   [
+    "10px PLAY",
+    1
+   ],
+   [
+    "10px QUICK PLAY OR A ROOM CODE",
+    1
+   ],
+   [
+    "10px SOLO OR A ROOM CODE",
+    1
+   ],
+   [
+    "10px Now",
+    1
+   ],
+   [
+    "10px Forecast",
+    1
+   ],
+   [
+    "10px Hidden grid",
+    1
+   ],
+   [
+    "10px What if",
+    1
+   ],
+   [
+    "10px Proof",
+    1
+   ],
+   [
+    "10px Play",
+    1
+   ],
+   [
+    "10px New version available \u00b7 Reload",
+    1
+   ]
+  ],
+  "tiny": [
+   "198x23 button.update-chip \"New version available \u00b7 Reload\""
+  ],
+  "cut": [],
+  "size": 390,
+  "step": "40-play",
+  "errors": []
+ },
+ {
+  "hscroll": 0,
+  "small": [
+   [
+    "10px PUBLISHED",
+    1
+   ],
+   [
+    "10px FORECAST",
+    1
+   ],
+   [
+    "11px Sun 07:30",
+    1
+   ],
+   [
+    "11px Published to Sun 22:30",
+    1
+   ],
+   [
+    "11px Published",
+    1
+   ],
+   [
+    "11px Forecast",
+    1
+   ],
+   [
+    "11px Best windows",
+    1
+   ],
+   [
+    "10px Now",
+    1
+   ],
+   [
+    "10px Forecast",
+    1
+   ],
+   [
+    "10px Hidden grid",
+    1
+   ],
+   [
+    "10px What if",
+    1
+   ],
+   [
+    "10px Proof",
+    1
+   ],
+   [
+    "10px Play",
+    1
+   ],
+   [
+    "10px New version available \u00b7 Reload",
+    1
+   ]
+  ],
+  "tiny": [
+   "198x23 button.update-chip \"New version available \u00b7 Reload\""
+  ],
+  "cut": [],
+  "size": 390,
+  "step": "50-household",
+  "errors": []
+ },
+ {
+  "hscroll": 0,
+  "small": [
+   [
+    "10px PUBLISHED",
+    1
+   ],
+   [
+    "10px FORECAST",
+    1
+   ],
+   [
+    "11px Sun 07:30",
+    1
+   ],
+   [
+    "11px Published to Sun 22:30",
+    1
+   ],
+   [
+    "11px Published",
+    1
+   ],
+   [
+    "11px Forecast",
+    1
+   ],
+   [
+    "11px Best windows",
+    1
+   ],
+   [
+    "10px Now",
+    1
+   ],
+   [
+    "10px Forecast",
+    1
+   ],
+   [
+    "10px Hidden grid",
+    1
+   ],
+   [
+    "10px What if",
+    1
+   ],
+   [
+    "10px Proof",
+    1
+   ],
+   [
+    "10px Play",
+    1
+   ],
+   [
+    "10px New version available \u00b7 Reload",
+    1
+   ]
+  ],
+  "tiny": [
+   "198x23 button.update-chip \"New version available \u00b7 Reload\""
+  ],
+  "cut": [],
+  "size": 390,
+  "step": "51-household-region",
+  "errors": []
+ },
+ {
+  "hscroll": 0,
+  "small": [
+   [
+    "10px WAITING FOR AUCTION",
+    6
+   ],
+   [
+    "10px Now",
+    1
+   ],
+   [
+    "10px Forecast",
+    1
+   ],
+   [
+    "10px Hidden grid",
+    1
+   ],
+   [
+    "10px What if",
+    1
+   ],
+   [
+    "10px Proof",
+    1
+   ],
+   [
+    "10px Play",
+    1
+   ],
+   [
+    "10px New version available \u00b7 Reload",
+    1
+   ]
+  ],
+  "tiny": [
+   "57x26 button.term-word \"auction\"",
+   "80x26 button.term-word \"fingerprint\"",
+   "86x17 button.term-word \"likely range\"",
+   "72x17 button.term-word \"best guess\"",
+   "63x34 button.btn \"Verify\"",
+   "197x34 button.btn \"Alter one digit and re-check\"",
+   "198x23 button.update-chip \"New version available \u00b7 Reload\""
+  ],
+  "cut": [],
+  "size": 390,
+  "step": "60-reveal",
+  "errors": []
+ },
+ {
+  "hscroll": 0,
+  "small": [
+   [
+    "11px loading this hour\u2026",
+    1
+   ],
+   [
+    "11px Forecast made 12 hours ahead by a model that never",
+    1
+   ],
+   [
+    "11px Estimated from accepted bids on Scottish wind farm",
+    1
+   ],
+   [
+    "10px Now",
+    1
+   ],
+   [
+    "10px Forecast",
+    1
+   ],
+   [
+    "10px Hidden grid",
+    1
+   ],
+   [
+    "10px What if",
+    1
+   ],
+   [
+    "10px Proof",
+    1
+   ],
+   [
+    "10px Play",
+    1
+   ],
+   [
+    "10px New version available \u00b7 Reload",
+    1
+   ]
+  ],
+  "tiny": [
+   "124x33 button.on \"Play on the map\"",
+   "107x33 button. \"Event movies\"",
+   "106x33 button.on \"26 Oct storm\"",
+   "76x33 button. \"Dark lull\"",
+   "122x33 button. \"Sunny weekend\"",
+   "105x33 button. \"Windiest day\"",
+   "95x33 button. \"Cable quiet\"",
+   "92x33 button. \"Price spike\"",
+   "120x33 button. \"2022 gas crisis\"",
+   "40x34 button.on \"1\u00d7\"",
+   "40x34 button. \"2\u00d7\"",
+   "40x34 button. \"4\u00d7\"",
+   "362x16 input.rp-slider \"Playhead\"",
+   "91x18 button.term-word \"day-ahead price\"",
+   "134x28 button. \"Britain system price\"",
+   "154x28 button.on \"Britain day-ahead price\"",
+   "59x28 button. \"France\"",
+   "72x28 button. \"Germany\"",
+   "91x28 button. \"Netherlands\"",
+   "67x28 button. \"Belgium\"",
+   "119x28 button. \"Southern Norway\"",
+   "72x17 button.term-word \"best guess\"",
+   "86x17 button.term-word \"likely range\"",
+   "77x24 button.term-word \"likely range\"",
+   "198x23 button.update-chip \"New version available \u00b7 Reload\""
+  ],
+  "cut": [],
+  "size": 390,
+  "step": "70-replay",
+  "errors": []
+ },
+ {
+  "hscroll": 0,
+  "small": [
+   [
+    "11px Britain \u00a319.5",
+    1
+   ],
+   [
+    "11px Germany \u20ac23.4",
+    1
+   ],
+   [
+    "11px Netherlands \u20ac21.4",
+    1
+   ],
+   [
+    "11px Belgium \u20ac26.2",
+    1
+   ],
+   [
+    "11px Zone",
+    1
+   ],
+   [
+    "11px Day-ahead price",
+    1
+   ],
+   [
+    "11px Best guess",
+    1
+   ],
+   [
+    "11px Forecast made 12 hours ahead by a model that never",
+    1
+   ],
+   [
+    "11px Netherlands to Belgium",
+    1
+   ],
+   [
+    "11px Estimated from accepted bids on Scottish wind farm",
+    1
+   ],
+   [
+    "10px Now",
+    1
+   ],
+   [
+    "10px Forecast",
+    1
+   ],
+   [
+    "10px Hidden grid",
+    1
+   ],
+   [
+    "10px What if",
+    1
+   ],
+   [
+    "10px Proof",
+    1
+   ],
+   [
+    "10px Play",
+    1
+   ],
+   [
+    "10px New version available \u00b7 Reload",
+    1
+   ]
+  ],
+  "tiny": [
+   "124x33 button.on \"Play on the map\"",
+   "107x33 button. \"Event movies\"",
+   "106x33 button.on \"26 Oct storm\"",
+   "76x33 button. \"Dark lull\"",
+   "122x33 button. \"Sunny weekend\"",
+   "105x33 button. \"Windiest day\"",
+   "95x33 button. \"Cable quiet\"",
+   "92x33 button. \"Price spike\"",
+   "120x33 button. \"2022 gas crisis\"",
+   "40x34 button.on \"1\u00d7\"",
+   "40x34 button. \"2\u00d7\"",
+   "40x34 button. \"4\u00d7\"",
+   "362x16 input.rp-slider \"Playhead\"",
+   "91x18 button.term-word \"day-ahead price\"",
+   "134x28 button. \"Britain system price\"",
+   "154x28 button.on \"Britain day-ahead price\"",
+   "59x28 button. \"France\"",
+   "72x28 button. \"Germany\"",
+   "91x28 button. \"Netherlands\"",
+   "67x28 button. \"Belgium\"",
+   "119x28 button. \"Southern Norway\"",
+   "72x17 button.term-word \"best guess\"",
+   "86x17 button.term-word \"likely range\"",
+   "77x24 button.term-word \"likely range\"",
+   "198x23 button.update-chip \"New version available \u00b7 Reload\""
+  ],
+  "cut": [],
+  "size": 390,
+  "step": "71-replay-playing",
+  "errors": []
+ },
+ {
+  "hscroll": 0,
+  "small": [],
+  "tiny": [
+   "358x33 a.lb-link \"Try a rehearsal day (invented markets)\""
+  ],
+  "cut": [],
+  "size": 390,
+  "step": "80-lobby",
+  "errors": []
+ },
+ {
+  "hscroll": 0,
+  "small": [
+   [
+    "11px QA k3 3900",
+    1
+   ],
+   [
+    "11px QA k3 3901",
+    1
+   ]
+  ],
+  "tiny": [],
+  "cut": [],
+  "size": 390,
+  "step": "81-quickplay-q1",
+  "errors": []
+ },
+ {
+  "hscroll": 0,
+  "small": [
+   [
+    "11px Live \u00b7 Sun 07:00",
+    1
+   ],
+   [
+    "10px Britain \u00a3177",
+    1
+   ],
+   [
+    "10px LIVE",
+    1
+   ],
+   [
+    "11px GB",
+    1
+   ],
+   [
+    "11px Gas 67%",
+    1
+   ],
+   [
+    "11px Nuclear 19%",
+    1
+   ],
+   [
+    "11px Biomass 11%",
+    1
+   ],
+   [
+    "11px Wind 1%",
+    1
+   ],
+   [
+    "11px FR",
+    1
+   ],
+   [
+    "11px DE",
+    1
+   ],
+   [
+    "11px NL",
+    1
+   ],
+   [
+    "11px BE",
+    1
+   ],
+   [
+    "11px NO2",
+    1
+   ],
+   [
+    "10px MODEL EXPLANATION",
+    1
+   ],
+   [
+    "11px Compared with a typical hour. These are the model\u2019",
+    1
+   ],
+   [
+    "10px \u221224 H TO +24 H",
+    1
+   ],
+   [
+    "9px 150",
+    1
+   ],
+   [
+    "9px 200",
+    1
+   ],
+   [
+    "9px 250",
+    1
+   ],
+   [
+    "9px 300",
+    1
+   ],
+   [
+    "9px 350",
+    1
+   ],
+   [
+    "9px 400",
+    1
+   ],
+   [
+    "9px -24h",
+    1
+   ],
+   [
+    "9px -12h",
+    1
+   ],
+   [
+    "9px now",
+    1
+   ]
+  ],
+  "tiny": [
+   "56x32 button.on \"Price\"",
+   "127x32 button. \"Wind paid to stop\"",
+   "68x32 button. \"Carbon\"",
+   "89x32 button. \"GB regions\"",
+   "55x32 button. \"Wind\"",
+   "48x32 button. \"Sun\"",
+   "89x28 button.term-word \"wholesale\"",
+   "261x19 input. \"\"",
+   "99x15 button.term-word \"Day-ahead price\"",
+   "66x15 button.term-word \"Best guess\"",
+   "79x15 button.term-word \"Likely range\"",
+   "56x35 button.intro-skip \"Skip\""
+  ],
+  "cut": [
+   "GB regions [276..365] in scroller",
+   "Wind [371..426] in scroller",
+   "Sun [432..480] in scroller"
+  ],
+  "size": 360,
+  "step": "01-intro",
+  "errors": []
+ },
+ {
+  "hscroll": 0,
+  "small": [
+   [
+    "11px Live \u00b7 Sun 07:00",
+    1
+   ],
+   [
+    "10px Britain \u00a3177",
+    1
+   ],
+   [
+    "10px Germany \u20ac220",
+    1
+   ],
+   [
+    "10px Netherlands \u20ac220",
+    1
+   ],
+   [
+    "10px Belgium \u20ac220",
+    1
+   ],
+   [
+    "10px LIVE",
+    1
+   ],
+   [
+    "11px GB",
+    1
+   ],
+   [
+    "11px Gas 67%",
+    1
+   ],
+   [
+    "11px Nuclear 19%",
+    1
+   ],
+   [
+    "11px Biomass 11%",
+    1
+   ],
+   [
+    "11px Wind 1%",
+    1
+   ],
+   [
+    "11px FR",
+    1
+   ],
+   [
+    "11px DE",
+    1
+   ],
+   [
+    "11px NL",
+    1
+   ],
+   [
+    "11px BE",
+    1
+   ],
+   [
+    "11px NO2",
+    1
+   ],
+   [
+    "10px MODEL EXPLANATION",
+    1
+   ],
+   [
+    "11px Compared with a typical hour. These are the model\u2019",
+    1
+   ],
+   [
+    "10px \u221224 H TO +24 H",
+    1
+   ],
+   [
+    "9px 150",
+    1
+   ],
+   [
+    "9px 200",
+    1
+   ],
+   [
+    "9px 250",
+    1
+   ],
+   [
+    "9px 300",
+    1
+   ],
+   [
+    "9px 350",
+    1
+   ],
+   [
+    "9px 400",
+    1
+   ]
+  ],
+  "tiny": [
+   "56x32 button.on \"Price\"",
+   "127x32 button. \"Wind paid to stop\"",
+   "68x32 button. \"Carbon\"",
+   "89x32 button. \"GB regions\"",
+   "55x32 button. \"Wind\"",
+   "48x32 button. \"Sun\"",
+   "89x28 button.term-word \"wholesale\"",
+   "261x19 input. \"\"",
+   "99x15 button.term-word \"Day-ahead price\"",
+   "66x15 button.term-word \"Best guess\"",
+   "79x15 button.term-word \"Likely range\""
+  ],
+  "cut": [
+   "GB regions [276..365] in scroller",
+   "Wind [371..426] in scroller",
+   "Sun [432..480] in scroller"
+  ],
+  "size": 360,
+  "step": "02-welcome",
+  "errors": []
+ },
+ {
+  "hscroll": 0,
+  "small": [
+   [
+    "11px Live \u00b7 Sun 07:00",
+    1
+   ],
+   [
+    "10px Britain \u00a3177",
+    1
+   ],
+   [
+    "10px Germany \u20ac220",
+    1
+   ],
+   [
+    "10px Netherlands \u20ac220",
+    1
+   ],
+   [
+    "10px Belgium \u20ac220",
+    1
+   ],
+   [
+    "10px LIVE",
+    1
+   ],
+   [
+    "11px GB",
+    1
+   ],
+   [
+    "11px Gas 67%",
+    1
+   ],
+   [
+    "11px Nuclear 19%",
+    1
+   ],
+   [
+    "11px Biomass 11%",
+    1
+   ],
+   [
+    "11px Wind 1%",
+    1
+   ],
+   [
+    "11px FR",
+    1
+   ],
+   [
+    "11px DE",
+    1
+   ],
+   [
+    "11px NL",
+    1
+   ],
+   [
+    "11px BE",
+    1
+   ],
+   [
+    "11px NO2",
+    1
+   ],
+   [
+    "10px MODEL EXPLANATION",
+    1
+   ],
+   [
+    "11px Compared with a typical hour. These are the model\u2019",
+    1
+   ],
+   [
+    "10px \u221224 H TO +24 H",
+    1
+   ],
+   [
+    "9px 150",
+    1
+   ],
+   [
+    "9px 200",
+    1
+   ],
+   [
+    "9px 250",
+    1
+   ],
+   [
+    "9px 300",
+    1
+   ],
+   [
+    "9px 350",
+    1
+   ],
+   [
+    "9px 400",
+    1
+   ]
+  ],
+  "tiny": [
+   "56x32 button.on \"Price\"",
+   "127x32 button. \"Wind paid to stop\"",
+   "68x32 button. \"Carbon\"",
+   "89x32 button. \"GB regions\"",
+   "55x32 button. \"Wind\"",
+   "48x32 button. \"Sun\"",
+   "89x28 button.term-word \"wholesale\"",
+   "261x19 input. \"\"",
+   "99x15 button.term-word \"Day-ahead price\"",
+   "66x15 button.term-word \"Best guess\"",
+   "79x15 button.term-word \"Likely range\""
+  ],
+  "cut": [
+   "GB regions [276..365] in scroller",
+   "Wind [371..426] in scroller",
+   "Sun [432..480] in scroller"
+  ],
+  "size": 360,
+  "step": "10-now",
+  "errors": []
+ },
+ {
+  "hscroll": 0,
+  "small": [
+   [
+    "11px Live \u00b7 Sun 07:00",
+    1
+   ],
+   [
+    "10px Britain \u00a3177",
+    1
+   ],
+   [
+    "10px Germany \u20ac220",
+    1
+   ],
+   [
+    "10px Netherlands \u20ac220",
+    1
+   ],
+   [
+    "10px Belgium \u20ac220",
+    1
+   ],
+   [
+    "10px \u221224 H TO +24 H",
+    1
+   ],
+   [
+    "9px 150",
+    1
+   ],
+   [
+    "9px 200",
+    1
+   ],
+   [
+    "9px 250",
+    1
+   ],
+   [
+    "9px 300",
+    1
+   ],
+   [
+    "9px 350",
+    1
+   ],
+   [
+    "9px 400",
+    1
+   ],
+   [
+    "9px -24h",
+    1
+   ],
+   [
+    "9px -12h",
+    1
+   ],
+   [
+    "9px now",
+    1
+   ],
+   [
+    "9px +12h",
+    1
+   ],
+   [
+    "9px +24h",
+    1
+   ],
+   [
+    "11px Day-ahead price",
+    1
+   ],
+   [
+    "11px Already auctioned",
+    1
+   ],
+   [
+    "11px Best guess",
+    1
+   ],
+   [
+    "11px Likely range",
+    1
+   ],
+   [
+    "10px MODEL EXPLANATION",
+    1
+   ],
+   [
+    "11px Compared with a typical hour. These are the model\u2019",
+    1
+   ],
+   [
+    "10px LIVE",
+    1
+   ],
+   [
+    "11px 7 Nov 2026",
+    1
+   ]
+  ],
+  "tiny": [
+   "56x32 button.on \"Price\"",
+   "127x32 button. \"Wind paid to stop\"",
+   "68x32 button. \"Carbon\"",
+   "89x32 button. \"GB regions\"",
+   "55x32 button. \"Wind\"",
+   "48x32 button. \"Sun\"",
+   "99x15 button.term-word \"Day-ahead price\"",
+   "66x15 button.term-word \"Best guess\"",
+   "79x15 button.term-word \"Likely range\"",
+   "120x24 input.scrub-date \"Jump to date\"",
+   "34x18 button.scrub-live \"Live\"",
+   "30x26 button.scrub-play \"\u25b6\"",
+   "28x22 button.scrub-pill \"1\u00d7\"",
+   "35x22 button.scrub-pill \"10\u00d7\"",
+   "37x22 button.scrub-pill \"60\u00d7\"",
+   "51x22 button.scrub-pill \"2 days\"",
+   "47x22 button.scrub-pill \"Week\"",
+   "50x22 button.scrub-pill \"Month\"",
+   "40x22 button.scrub-pill \"Year\"",
+   "76x22 button.scrub-pill \"Since 2024\""
+  ],
+  "cut": [
+   "GB regions [276..365] in scroller",
+   "Wind [371..426] in scroller",
+   "Sun [432..480] in scroller"
+  ],
+  "size": 360,
+  "step": "11-forecast",
+  "errors": []
+ },
+ {
+  "hscroll": 0,
+  "small": [
+   [
+    "11px Live \u00b7 Sun 07:00",
+    1
+   ],
+   [
+    "10px Now",
+    1
+   ],
+   [
+    "10px Forecast",
+    1
+   ],
+   [
+    "10px Hidden grid",
+    1
+   ],
+   [
+    "10px What if",
+    1
+   ],
+   [
+    "10px Proof",
+    1
+   ],
+   [
+    "10px Play",
+    1
+   ]
+  ],
+  "tiny": [
+   "56x32 button. \"Price\"",
+   "127x32 button.on \"Wind paid to stop\"",
+   "68x32 button. \"Carbon\"",
+   "89x32 button. \"GB regions\"",
+   "55x32 button. \"Wind\"",
+   "48x32 button. \"Sun\""
+  ],
+  "cut": [
+   "GB regions [276..365] in scroller",
+   "Wind [371..426] in scroller",
+   "Sun [432..480] in scroller"
+  ],
+  "size": 360,
+  "step": "12-hidden",
+  "errors": []
+ },
+ {
+  "hscroll": 0,
+  "small": [
+   [
+    "11px Live \u00b7 Sun 07:00",
+    1
+   ],
+   [
+    "10px ESTIMATED",
+    1
+   ],
+   [
+    "10px Now",
+    1
+   ],
+   [
+    "10px Forecast",
+    1
+   ],
+   [
+    "10px Hidden grid",
+    1
+   ],
+   [
+    "10px What if",
+    1
+   ],
+   [
+    "10px Proof",
+    1
+   ],
+   [
+    "10px Play",
+    1
+   ]
+  ],
+  "tiny": [
+   "56x32 button. \"Price\"",
+   "127x32 button.on \"Wind paid to stop\"",
+   "68x32 button. \"Carbon\"",
+   "89x32 button. \"GB regions\"",
+   "55x32 button. \"Wind\"",
+   "48x32 button. \"Sun\"",
+   "80x21 button.term-word \"constraint bill\"",
+   "215x21 button.term-word \"power line from Scotland to England\"",
+   "72x27 button.story-ex-btn \"\u203a For experts\"",
+   "210x29 a. \"Watch the storm that cost \u00a336.5m\"",
+   "110x29 button. \"See it over time\"",
+   "87x31 button.story-more \"More detail\""
+  ],
+  "cut": [
+   "GB regions [276..365] in scroller",
+   "Wind [371..426] in scroller",
+   "Sun [432..480] in scroller"
+  ],
+  "size": 360,
+  "step": "13-hidden-story1",
+  "errors": []
+ },
+ {
+  "hscroll": 0,
+  "small": [
+   [
+    "11px Live \u00b7 Sun 07:00",
+    1
+   ],
+   [
+    "10px ESTIMATED",
+    1
+   ],
+   [
+    "10px Now",
+    1
+   ],
+   [
+    "10px Forecast",
+    1
+   ],
+   [
+    "10px Hidden grid",
+    1
+   ],
+   [
+    "10px What if",
+    1
+   ],
+   [
+    "10px Proof",
+    1
+   ],
+   [
+    "10px Play",
+    1
+   ]
+  ],
+  "tiny": [
+   "56x32 button. \"Price\"",
+   "127x32 button. \"Wind paid to stop\"",
+   "68x32 button.on \"Carbon\"",
+   "89x32 button. \"GB regions\"",
+   "55x32 button. \"Wind\"",
+   "48x32 button. \"Sun\"",
+   "41x21 button.term-word \"g/kWh\"",
+   "72x27 button.story-ex-btn \"\u203a For experts\"",
+   "87x31 button.story-more \"More detail\""
+  ],
+  "cut": [
+   "GB regions [276..365] in scroller",
+   "Wind [371..426] in scroller",
+   "Sun [432..480] in scroller"
+  ],
+  "size": 360,
+  "step": "13-hidden-story2",
+  "errors": []
+ },
+ {
+  "hscroll": 0,
+  "small": [
+   [
+    "11px Live \u00b7 Sun 07:00",
+    1
+   ],
+   [
+    "10px ESTIMATED",
+    1
+   ],
+   [
+    "10px Now",
+    1
+   ],
+   [
+    "10px Forecast",
+    1
+   ],
+   [
+    "10px Hidden grid",
+    1
+   ],
+   [
+    "10px What if",
+    1
+   ],
+   [
+    "10px Proof",
+    1
+   ],
+   [
+    "10px Play",
+    1
+   ]
+  ],
+  "tiny": [
+   "56x32 button.on \"Price\"",
+   "127x32 button. \"Wind paid to stop\"",
+   "68x32 button. \"Carbon\"",
+   "89x32 button. \"GB regions\"",
+   "55x32 button. \"Wind\"",
+   "48x32 button. \"Sun\"",
+   "95x21 button.term-word \"constraint costs\"",
+   "56x21 button.term-word \"boundary\"",
+   "72x27 button.story-ex-btn \"\u203a For experts\"",
+   "120x29 a. \"Build a power line\""
+  ],
+  "cut": [
+   "GB regions [276..365] in scroller",
+   "Wind [371..426] in scroller",
+   "Sun [432..480] in scroller"
+  ],
+  "size": 360,
+  "step": "13-hidden-story3",
+  "errors": []
+ },
+ {
+  "hscroll": 0,
+  "small": [
+   [
+    "11px Live \u00b7 Sun 07:00",
+    1
+   ],
+   [
+    "11px The map shows prices for the chosen hour; the sun ",
+    1
+   ],
+   [
+    "10px Now",
+    1
+   ],
+   [
+    "10px Forecast",
+    1
+   ],
+   [
+    "10px Hidden grid",
+    1
+   ],
+   [
+    "10px What if",
+    1
+   ],
+   [
+    "10px Proof",
+    1
+   ],
+   [
+    "10px Play",
+    1
+   ]
+  ],
+  "tiny": [
+   "56x32 button. \"Price\"",
+   "127x32 button. \"Wind paid to stop\"",
+   "68x32 button. \"Carbon\"",
+   "89x32 button. \"GB regions\"",
+   "55x32 button. \"Wind\"",
+   "48x32 button.on \"Sun\"",
+   "95x21 button.term-word \"day-ahead price\"",
+   "64x21 button.term-word \"below zero\"",
+   "72x27 button.story-ex-btn \"\u203a For experts\"",
+   "194x29 button. \"Show prices at the deepest dip\"",
+   "115x29 a. \"Watch the movie\"",
+   "110x29 button. \"See it over time\"",
+   "87x31 button.story-more \"More detail\""
+  ],
+  "cut": [
+   "GB regions [276..365] in scroller",
+   "Wind [371..426] in scroller",
+   "Sun [432..480] in scroller"
+  ],
+  "size": 360,
+  "step": "13-hidden-story4",
+  "errors": []
+ },
+ {
+  "hscroll": 0,
+  "small": [
+   [
+    "11px Live \u00b7 Sun 07:00",
+    1
+   ],
+   [
+    "10px MODELLED",
+    1
+   ],
+   [
+    "11px per kWh",
+    1
+   ],
+   [
+    "11px no event yet",
+    1
+   ],
+   [
+    "11px extra, estimated",
+    1
+   ],
+   [
+    "10px Now",
+    1
+   ],
+   [
+    "10px Forecast",
+    1
+   ],
+   [
+    "10px Hidden grid",
+    1
+   ],
+   [
+    "10px What if",
+    1
+   ],
+   [
+    "10px Proof",
+    1
+   ],
+   [
+    "10px Play",
+    1
+   ]
+  ],
+  "tiny": [
+   "56x32 button.on \"Price\"",
+   "127x32 button. \"Wind paid to stop\"",
+   "68x32 button. \"Carbon\"",
+   "89x32 button. \"GB regions\"",
+   "55x32 button. \"Wind\"",
+   "48x32 button. \"Sun\"",
+   "70x17 button.term-word \"WHOLESALE\"",
+   "340x39 button.more-btn \"More detail Show\""
+  ],
+  "cut": [
+   "GB regions [276..365] in scroller",
+   "Wind [371..426] in scroller",
+   "Sun [432..480] in scroller"
+  ],
+  "size": 360,
+  "step": "20-whatif",
+  "errors": []
+ },
+ {
+  "hscroll": 0,
+  "small": [
+   [
+    "11px Live \u00b7 Sun 07:00",
+    1
+   ],
+   [
+    "10px MODELLED",
+    2
+   ],
+   [
+    "11px \u25b2 3.8p per kWh vs now",
+    1
+   ],
+   [
+    "11px +3.8p per kWh",
+    1
+   ],
+   [
+    "11px extra, estimated",
+    1
+   ],
+   [
+    "10px Now",
+    1
+   ],
+   [
+    "10px Forecast",
+    1
+   ],
+   [
+    "10px Hidden grid",
+    1
+   ],
+   [
+    "10px What if",
+    1
+   ],
+   [
+    "10px Proof",
+    1
+   ],
+   [
+    "10px Play",
+    1
+   ]
+  ],
+  "tiny": [
+   "56x32 button.on \"Price\"",
+   "127x32 button. \"Wind paid to stop\"",
+   "68x32 button. \"Carbon\"",
+   "89x32 button. \"GB regions\"",
+   "55x32 button. \"Wind\"",
+   "48x32 button. \"Sun\"",
+   "89x28 button.term-word \"wholesale\"",
+   "70x17 button.term-word \"WHOLESALE\"",
+   "340x39 button.more-btn \"More detail Show\""
+  ],
+  "cut": [
+   "GB regions [276..365] in scroller",
+   "Wind [371..426] in scroller",
+   "Sun [432..480] in scroller"
+  ],
+  "size": 360,
+  "step": "21-whatif-event1",
+  "errors": []
+ },
+ {
+  "hscroll": 0,
+  "small": [
+   [
+    "11px Live \u00b7 Sun 07:00",
+    1
+   ],
+   [
+    "10px MODELLED",
+    2
+   ],
+   [
+    "11px \u25b2 0.4p per kWh vs now",
+    1
+   ],
+   [
+    "11px +0.4p per kWh",
+    1
+   ],
+   [
+    "11px extra, estimated",
+    1
+   ],
+   [
+    "10px Now",
+    1
+   ],
+   [
+    "10px Forecast",
+    1
+   ],
+   [
+    "10px Hidden grid",
+    1
+   ],
+   [
+    "10px What if",
+    1
+   ],
+   [
+    "10px Proof",
+    1
+   ],
+   [
+    "10px Play",
+    1
+   ]
+  ],
+  "tiny": [
+   "56x32 button.on \"Price\"",
+   "127x32 button. \"Wind paid to stop\"",
+   "68x32 button. \"Carbon\"",
+   "89x32 button. \"GB regions\"",
+   "55x32 button. \"Wind\"",
+   "48x32 button. \"Sun\"",
+   "89x28 button.term-word \"wholesale\"",
+   "70x17 button.term-word \"WHOLESALE\"",
+   "340x39 button.more-btn \"More detail Show\""
+  ],
+  "cut": [
+   "GB regions [276..365] in scroller",
+   "Wind [371..426] in scroller",
+   "Sun [432..480] in scroller"
+  ],
+  "size": 360,
+  "step": "22-whatif-event2",
+  "errors": []
+ },
+ {
+  "hscroll": 0,
+  "small": [
+   [
+    "11px Live \u00b7 Sun 07:00",
+    1
+   ],
+   [
+    "10px MODELLED",
+    2
+   ],
+   [
+    "11px \u25b2 0.3p per kWh vs now",
+    1
+   ],
+   [
+    "11px +\u20ac12.6 per MWh",
+    1
+   ],
+   [
+    "11px extra, estimated",
+    1
+   ],
+   [
+    "10px Now",
+    1
+   ],
+   [
+    "10px Forecast",
+    1
+   ],
+   [
+    "10px Hidden grid",
+    1
+   ],
+   [
+    "10px What if",
+    1
+   ],
+   [
+    "10px Proof",
+    1
+   ],
+   [
+    "10px Play",
+    1
+   ]
+  ],
+  "tiny": [
+   "56x32 button.on \"Price\"",
+   "127x32 button. \"Wind paid to stop\"",
+   "68x32 button. \"Carbon\"",
+   "89x32 button. \"GB regions\"",
+   "55x32 button. \"Wind\"",
+   "48x32 button. \"Sun\"",
+   "89x28 button.term-word \"wholesale\"",
+   "70x17 button.term-word \"WHOLESALE\"",
+   "340x39 button.more-btn \"More detail Show\""
+  ],
+  "cut": [
+   "France +\u20ac12.6 per MWh [226..364] in hidden",
+   "Modelled \u00b7 French nuclear outage [226..364] in hidden",
+   "GB regions [276..365] in scroller",
+   "Wind [371..426] in scroller",
+   "Sun [432..480] in scroller"
+  ],
+  "size": 360,
+  "step": "23-whatif-event3",
+  "errors": []
+ },
+ {
+  "hscroll": 0,
+  "small": [
+   [
+    "11px Live \u00b7 Sun 07:00",
+    1
+   ],
+   [
+    "10px MODELLED",
+    2
+   ],
+   [
+    "11px \u25bc 0.2p per kWh vs now",
+    1
+   ],
+   [
+    "11px +\u20ac0.0 per MWh",
+    1
+   ],
+   [
+    "11px extra, estimated",
+    1
+   ],
+   [
+    "10px Now",
+    1
+   ],
+   [
+    "10px Forecast",
+    1
+   ],
+   [
+    "10px Hidden grid",
+    1
+   ],
+   [
+    "10px What if",
+    1
+   ],
+   [
+    "10px Proof",
+    1
+   ],
+   [
+    "10px Play",
+    1
+   ]
+  ],
+  "tiny": [
+   "56x32 button.on \"Price\"",
+   "127x32 button. \"Wind paid to stop\"",
+   "68x32 button. \"Carbon\"",
+   "89x32 button. \"GB regions\"",
+   "55x32 button. \"Wind\"",
+   "48x32 button. \"Sun\"",
+   "89x28 button.term-word \"wholesale\"",
+   "70x17 button.term-word \"WHOLESALE\"",
+   "340x39 button.more-btn \"More detail Show\""
+  ],
+  "cut": [
+   "GB regions [276..365] in scroller",
+   "Wind [371..426] in scroller",
+   "Sun [432..480] in scroller"
+  ],
+  "size": 360,
+  "step": "24-whatif-event4",
+  "errors": []
+ },
+ {
+  "hscroll": 0,
+  "small": [
+   [
+    "11px Live \u00b7 Sun 07:00",
+    1
+   ],
+   [
+    "10px Britain \u00a3177",
+    1
+   ],
+   [
+    "10px Germany \u20ac220",
+    1
+   ],
+   [
+    "10px Netherlands \u20ac220",
+    1
+   ],
+   [
+    "10px Belgium \u20ac220",
+    1
+   ],
+   [
+    "10px BACKTEST",
+    1
+   ],
+   [
+    "10px Now",
+    1
+   ],
+   [
+    "10px Forecast",
+    1
+   ],
+   [
+    "10px Hidden grid",
+    1
+   ],
+   [
+    "10px What if",
+    1
+   ],
+   [
+    "10px Proof",
+    1
+   ],
+   [
+    "10px Play",
+    1
+   ]
+  ],
+  "tiny": [
+   "56x32 button.on \"Price\"",
+   "127x32 button. \"Wind paid to stop\"",
+   "68x32 button. \"Carbon\"",
+   "89x32 button. \"GB regions\"",
+   "55x32 button. \"Wind\"",
+   "48x32 button. \"Sun\"",
+   "99x28 button.term-word \"likely range\"",
+   "51x20 button.term-word \"backtest\""
+  ],
+  "cut": [
+   "GB regions [276..365] in scroller",
+   "Wind [371..426] in scroller",
+   "Sun [432..480] in scroller"
+  ],
+  "size": 360,
+  "step": "30-proof",
+  "errors": []
+ },
+ {
+  "hscroll": 0,
+  "small": [
+   [
+    "11px Live \u00b7 Sun 07:00",
+    1
+   ],
+   [
+    "10px PLAY",
+    1
+   ],
+   [
+    "10px QUICK PLAY OR A ROOM CODE",
+    1
+   ],
+   [
+    "10px SOLO OR A ROOM CODE",
+    1
+   ],
+   [
+    "10px Now",
+    1
+   ],
+   [
+    "10px Forecast",
+    1
+   ],
+   [
+    "10px Hidden grid",
+    1
+   ],
+   [
+    "10px What if",
+    1
+   ],
+   [
+    "10px Proof",
+    1
+   ],
+   [
+    "10px Play",
+    1
+   ]
+  ],
+  "tiny": [],
+  "cut": [],
+  "size": 360,
+  "step": "40-play",
+  "errors": []
+ },
+ {
+  "hscroll": 0,
+  "small": [
+   [
+    "10px PUBLISHED",
+    1
+   ],
+   [
+    "10px FORECAST",
+    1
+   ],
+   [
+    "11px Sun 07:30",
+    1
+   ],
+   [
+    "11px Published to Sun 22:30",
+    1
+   ],
+   [
+    "11px Published",
+    1
+   ],
+   [
+    "11px Forecast",
+    1
+   ],
+   [
+    "11px Best windows",
+    1
+   ],
+   [
+    "10px Now",
+    1
+   ],
+   [
+    "10px Forecast",
+    1
+   ],
+   [
+    "10px Hidden grid",
+    1
+   ],
+   [
+    "10px What if",
+    1
+   ],
+   [
+    "10px Proof",
+    1
+   ],
+   [
+    "10px Play",
+    1
+   ]
+  ],
+  "tiny": [],
+  "cut": [],
+  "size": 360,
+  "step": "50-household",
+  "errors": []
+ },
+ {
+  "hscroll": 0,
+  "small": [
+   [
+    "10px PUBLISHED",
+    1
+   ],
+   [
+    "10px FORECAST",
+    1
+   ],
+   [
+    "11px Sun 07:30",
+    1
+   ],
+   [
+    "11px Published to Sun 22:30",
+    1
+   ],
+   [
+    "11px Published",
+    1
+   ],
+   [
+    "11px Forecast",
+    1
+   ],
+   [
+    "11px Best windows",
+    1
+   ],
+   [
+    "10px Now",
+    1
+   ],
+   [
+    "10px Forecast",
+    1
+   ],
+   [
+    "10px Hidden grid",
+    1
+   ],
+   [
+    "10px What if",
+    1
+   ],
+   [
+    "10px Proof",
+    1
+   ],
+   [
+    "10px Play",
+    1
+   ]
+  ],
+  "tiny": [],
+  "cut": [],
+  "size": 360,
+  "step": "51-household-region",
+  "errors": []
+ },
+ {
+  "hscroll": 0,
+  "small": [
+   [
+    "10px WAITING FOR AUCTION",
+    6
+   ],
+   [
+    "10px Now",
+    1
+   ],
+   [
+    "10px Forecast",
+    1
+   ],
+   [
+    "10px Hidden grid",
+    1
+   ],
+   [
+    "10px What if",
+    1
+   ],
+   [
+    "10px Proof",
+    1
+   ],
+   [
+    "10px Play",
+    1
+   ]
+  ],
+  "tiny": [
+   "57x26 button.term-word \"auction\"",
+   "80x26 button.term-word \"fingerprint\"",
+   "86x17 button.term-word \"likely range\"",
+   "72x17 button.term-word \"best guess\"",
+   "63x34 button.btn \"Verify\"",
+   "197x34 button.btn \"Alter one digit and re-check\""
+  ],
+  "cut": [],
+  "size": 360,
+  "step": "60-reveal",
+  "errors": []
+ },
+ {
+  "hscroll": 0,
+  "small": [
+   [
+    "11px Britain \u00a319.8",
+    1
+   ],
+   [
+    "11px Germany \u20ac30.9",
+    1
+   ],
+   [
+    "11px Netherlands \u20ac31.8",
+    1
+   ],
+   [
+    "11px Belgium \u20ac36.9",
+    1
+   ],
+   [
+    "11px Zone",
+    1
+   ],
+   [
+    "11px Day-ahead price",
+    1
+   ],
+   [
+    "11px Best guess",
+    1
+   ],
+   [
+    "11px Forecast made 12 hours ahead by a model that never",
+    1
+   ],
+   [
+    "11px Netherlands to Belgium",
+    1
+   ],
+   [
+    "11px Estimated from accepted bids on Scottish wind farm",
+    1
+   ],
+   [
+    "10px Now",
+    1
+   ],
+   [
+    "10px Forecast",
+    1
+   ],
+   [
+    "10px Hidden grid",
+    1
+   ],
+   [
+    "10px What if",
+    1
+   ],
+   [
+    "10px Proof",
+    1
+   ],
+   [
+    "10px Play",
+    1
+   ]
+  ],
+  "tiny": [
+   "124x33 button.on \"Play on the map\"",
+   "107x33 button. \"Event movies\"",
+   "106x33 button.on \"26 Oct storm\"",
+   "76x33 button. \"Dark lull\"",
+   "122x33 button. \"Sunny weekend\"",
+   "105x33 button. \"Windiest day\"",
+   "95x33 button. \"Cable quiet\"",
+   "92x33 button. \"Price spike\"",
+   "120x33 button. \"2022 gas crisis\"",
+   "40x34 button.on \"1\u00d7\"",
+   "40x34 button. \"2\u00d7\"",
+   "40x34 button. \"4\u00d7\"",
+   "332x16 input.rp-slider \"Playhead\"",
+   "91x18 button.term-word \"day-ahead price\"",
+   "134x28 button. \"Britain system price\"",
+   "154x28 button.on \"Britain day-ahead price\"",
+   "59x28 button. \"France\"",
+   "72x28 button. \"Germany\"",
+   "91x28 button. \"Netherlands\"",
+   "67x28 button. \"Belgium\"",
+   "119x28 button. \"Southern Norway\"",
+   "72x17 button.term-word \"best guess\"",
+   "86x17 button.term-word \"likely range\"",
+   "77x24 button.term-word \"likely range\""
+  ],
+  "cut": [],
+  "size": 360,
+  "step": "70-replay",
+  "errors": []
+ },
+ {
+  "hscroll": 0,
+  "small": [
+   [
+    "11px Britain \u00a319.6",
+    1
+   ],
+   [
+    "11px Germany \u20ac19.4",
+    1
+   ],
+   [
+    "11px Netherlands \u20ac18.0",
+    1
+   ],
+   [
+    "11px Belgium \u20ac22.6",
+    1
+   ],
+   [
+    "11px Zone",
+    1
+   ],
+   [
+    "11px Day-ahead price",
+    1
+   ],
+   [
+    "11px Best guess",
+    1
+   ],
+   [
+    "11px Forecast made 12 hours ahead by a model that never",
+    1
+   ],
+   [
+    "11px Netherlands to Belgium",
+    1
+   ],
+   [
+    "11px Estimated from accepted bids on Scottish wind farm",
+    1
+   ],
+   [
+    "10px Now",
+    1
+   ],
+   [
+    "10px Forecast",
+    1
+   ],
+   [
+    "10px Hidden grid",
+    1
+   ],
+   [
+    "10px What if",
+    1
+   ],
+   [
+    "10px Proof",
+    1
+   ],
+   [
+    "10px Play",
+    1
+   ]
+  ],
+  "tiny": [
+   "124x33 button.on \"Play on the map\"",
+   "107x33 button. \"Event movies\"",
+   "106x33 button.on \"26 Oct storm\"",
+   "76x33 button. \"Dark lull\"",
+   "122x33 button. \"Sunny weekend\"",
+   "105x33 button. \"Windiest day\"",
+   "95x33 button. \"Cable quiet\"",
+   "92x33 button. \"Price spike\"",
+   "120x33 button. \"2022 gas crisis\"",
+   "40x34 button.on \"1\u00d7\"",
+   "40x34 button. \"2\u00d7\"",
+   "40x34 button. \"4\u00d7\"",
+   "332x16 input.rp-slider \"Playhead\"",
+   "91x18 button.term-word \"day-ahead price\"",
+   "134x28 button. \"Britain system price\"",
+   "154x28 button.on \"Britain day-ahead price\"",
+   "59x28 button. \"France\"",
+   "72x28 button. \"Germany\"",
+   "91x28 button. \"Netherlands\"",
+   "67x28 button. \"Belgium\"",
+   "119x28 button. \"Southern Norway\"",
+   "72x17 button.term-word \"best guess\"",
+   "86x17 button.term-word \"likely range\"",
+   "77x24 button.term-word \"likely range\""
+  ],
+  "cut": [],
+  "size": 360,
+  "step": "71-replay-playing",
+  "errors": []
+ },
+ {
+  "hscroll": 0,
+  "small": [],
+  "tiny": [
+   "328x33 a.lb-link \"Try a rehearsal day (invented markets)\""
+  ],
+  "cut": [],
+  "size": 360,
+  "step": "80-lobby",
+  "errors": []
+ },
+ {
+  "hscroll": 0,
+  "small": [
+   [
+    "11px QA k3 3600",
+    1
+   ],
+   [
+    "11px QA k3 3601",
+    1
+   ]
+  ],
+  "tiny": [],
+  "cut": [],
+  "size": 360,
+  "step": "81-quickplay-q1",
+  "errors": []
+ }
+]
