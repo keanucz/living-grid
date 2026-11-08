@@ -80,6 +80,48 @@ def test_gb_uses_system_price_and_region_letters_map_to_gb():
     assert any(n["topic"] == "Interconnector access" for n in s[1]["grid_notes"])
 
 
+def write_gb_with_carbon():
+    write("GB", "system_price", "elexon", lambda t: 100.0)
+    cache.write("carbon/consumption_intensity", pd.DataFrame({"ts": HOURS, "zone": "GB", "production_gco2_kwh": 190.0,
+                                                              "consumption_gco2_kwh": 190.0, "imports_share": 0.1}))
+
+
+def write_regional(hours, values):
+    rows = [{"ts": t, "region": r, "region_id": 0, "intensity_gco2_kwh": v, "index": "low"} for t in hours for r, v in values.items()]
+    cache.write(dc.REGIONAL_CI, pd.DataFrame(rows))
+
+
+def test_scottish_region_uses_its_own_carbon_and_says_prices_are_gb_wide():
+    write_gb_with_carbon()
+    write_regional(HOURS[-72:], {"N": 10.0, "C": 250.0})
+    gb, n, c = dc.build(["GB", "N", "C"], flexible_share=0, now=NOW)["sites"]
+    assert gb["carbon"]["intensity_g_kwh"] == pytest.approx(190.0)
+    assert n["carbon"]["intensity_g_kwh"] == pytest.approx(10.0) and c["carbon"]["intensity_g_kwh"] == pytest.approx(250.0)
+    assert n["carbon"]["tonnes"] == pytest.approx(gb["carbon"]["tonnes"] * 10 / 190)
+    assert "Region N" in n["carbon"]["basis"] and "72 cached hours" in n["carbon"]["basis"] and "NESO" in n["carbon"]["basis"]
+    assert gb["carbon"]["basis"] == "modelled consumption-based intensity"
+    # one GB price: same cost everywhere, and the response says so
+    assert n["energy"] == gb["energy"]
+    assert n["price_basis"].startswith("GB-wide") and not gb["price_basis"].startswith("GB-wide")
+    assert any(x["topic"] == "GB-wide prices" for x in n["grid_notes"])
+    assert not any(x["topic"] == "GB-wide prices" for x in gb["grid_notes"])
+
+
+def test_regional_carbon_outside_the_price_window_still_applies():
+    write_gb_with_carbon()
+    write_regional(pd.date_range(NOW + pd.Timedelta(hours=1), periods=24, freq="h"), {"N": 5.0})
+    n = dc.build(["N"], now=NOW)["sites"][0]
+    assert n["carbon"]["intensity_g_kwh"] == pytest.approx(5.0)
+
+
+def test_region_without_regional_figures_falls_back_to_gb_and_says_so():
+    write_gb_with_carbon()
+    write_regional(HOURS[-24:], {"C": 250.0})
+    n = dc.build(["N"], now=NOW)["sites"][0]
+    assert n["carbon"]["intensity_g_kwh"] == pytest.approx(190.0)
+    assert n["carbon"]["basis"].startswith("GB-wide") and "region N" in n["carbon"]["basis"]
+
+
 def test_compare_three_sites_and_pick_the_cheapest():
     write("FR", fn=lambda t: 60.0)
     write("GB", "system_price", "elexon", lambda t: 40.0)
