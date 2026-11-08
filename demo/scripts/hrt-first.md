@@ -48,7 +48,7 @@ Three minutes. Spoken lines are in plain text; **clicks are in bold**. Times are
 
 **Switch to the #/reveal tab.**
 
-"Last night at midnight we froze our forecast for Monday. Britain's auction result came in this morning and the continent's is landing now. Here is our forecast, timestamped hours before, next to what the market actually did."
+"This morning, before the auction, we froze our forecast for Monday and put its fingerprint on a public blockchain. Britain's auction result came in at ten and the continent's lands around midday. Here is our forecast, timestamped hours before, next to what the market actually did."
 
 ## 3:00 Close
 
