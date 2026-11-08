@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { actions, getState, setState, useStore } from '../../store/store.js'
+import { WINDOWS, getGhostWind, load as loadGhostWind } from '../../layers/ghostWind/data.js'
 
 // One playhead for the whole replay page: the shared store's `ui.at` (the hour the map shows), the same value the history
 // scrubber (#223) moves. This file only translates between that ISO hour and an index into the replayed window.
@@ -33,6 +34,13 @@ export function usePlayhead(win, ready = () => true) {
   const ref = useRef({ i, win, ready })
   ref.current = { i, win, ready }
 
+  // Ghost wind only where the map has that day's data: the 26 October storm window, never today's last 24 hours (#312).
+  useEffect(() => {
+    const storm = iso(win.start).slice(0, 10) === WINDOWS.storm.from.slice(0, 10)
+    if (storm && getGhostWind().window !== 'storm') loadGhostWind('storm')
+    setState((s) => ({ layers: { ...s.layers, ghostWind: storm } }))
+  }, [win.start])
+
   // Land on the first hour when the window changes or the playhead is somewhere else entirely.
   useEffect(() => {
     if (!inWindow) actions.setAt(atIndex(win, 0))
@@ -65,12 +73,17 @@ export function usePlayhead(win, ready = () => true) {
   }
 }
 
-// While the replay page is open the map is in its plain overview with the layers a replay needs; the previous mode,
-// layers and hour come back when the page closes.
+// While the replay page is open the map is in its plain overview with the layers a replay needs, none of today's
+// overlays (boundary labels, weather): the previous mode, layers and hour come back when the page closes (#312).
+// Ghost wind is switched on by the page only for a day it has data for (useReplayGhostWind).
 export function useReplayShell() {
   useEffect(() => {
     const before = getState()
-    setState((s) => ({ mode: 'overview', layers: { ...s.layers, price: true, flows: true, ghostWind: true, carbon: false, ghost: false, wind: false, solar: false } }))
-    return () => setState({ mode: before.mode, layers: before.layers, at: before.at })
+    const gwBefore = getGhostWind().window
+    setState((s) => ({ mode: 'overview', layers: { ...s.layers, price: true, flows: true, ghostWind: false, carbon: false, ghost: false, wind: false, solar: false, boundaries: false } }))
+    return () => {
+      setState({ mode: before.mode, layers: before.layers, at: before.at })
+      if (gwBefore && gwBefore !== getGhostWind().window) loadGhostWind(gwBefore)
+    }
   }, [])
 }

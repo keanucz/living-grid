@@ -1,5 +1,7 @@
 import { actions, setState, getState } from '../store/store.js'
 
+// Every section sets each layer the Hidden grid stories switch (ghostWind, carbon, boundaries, wind, solar), so none
+// leaks into the next section (#312).
 // Budget per section: the map, one primary panel, one KPI strip. Anything else goes in `more`, which the 'more' panel
 // shows behind one button; a section with a `more` list must also list 'more' in `panels`.
 // The six sections of the app. The same ids, labels and order drive the desktop tabs, the phone tabs and the
@@ -10,11 +12,11 @@ export const SECTIONS = [
   { id: 'now', label: 'Now', question: "Is power cheap right now?", icon: 'globe', mode: 'overview', at: 'now',
     title: 'Is power cheap right now?', blurb: 'Day-ahead prices and the electricity flowing between countries, right now',
     door: 'Europe’s grid right now: prices, and the power flowing between countries',
-    panels: ['zoneList', 'kpis'], layers: { flows: true, ghost: false, ghostWind: false, carbon: false } },
+    panels: ['zoneList', 'kpis'], layers: { flows: true, ghost: false, ghostWind: false, carbon: false, boundaries: false, wind: false, solar: false } },
   { id: 'forecast', label: 'Forecast', question: "Where are prices going?", icon: 'chart', mode: 'overview', at: '+6',
     title: 'Where are prices going?', blurb: 'Our forecast for every zone, with honest uncertainty bands and the reasons behind it',
     door: 'Where prices are heading, with honest bands, and the cheapest hours tonight',
-    panels: ['zoneChart', 'explain', 'scrubber'], layers: { flows: true, ghost: true, ghostWind: false, carbon: false },
+    panels: ['zoneChart', 'explain', 'scrubber'], layers: { flows: true, ghost: true, ghostWind: false, carbon: false, boundaries: false, wind: false, solar: false },
     pages: [{ label: 'Tonight: cheapest hours', href: '#/household', paths: ['/household'] }] },
   { id: 'hidden', label: 'Hidden grid', question: "What’s normally hidden?", icon: 'wind', mode: 'overview', at: 'now',
     title: 'What normally stays hidden', blurb: 'Four things that normally stay hidden: wind paid to switch off, carbon carried in by cable, the grid’s bottlenecks and sunny-day negative prices',
@@ -24,11 +26,11 @@ export const SECTIONS = [
   { id: 'whatif', label: 'What if', question: "What if something breaks?", icon: 'sim', mode: 'simulate', at: 'now',
     title: 'What if the world changes?', blurb: 'Close the Strait of Hormuz or trip a cable, and see prices, the bill in pounds and a battery’s response',
     door: 'Close the Strait of Hormuz, trip a cable, and see the cost across Europe',
-    panels: ['simDock', 'statTiles', 'more'], more: ['battery', 'compute'], layers: { flows: true, ghost: false, ghostWind: false, carbon: false } },
+    panels: ['simDock', 'statTiles', 'more'], more: ['battery', 'compute'], layers: { flows: true, ghost: false, ghostWind: false, carbon: false, boundaries: false, wind: false, solar: false } },
   { id: 'proof', label: 'Proof', question: "Can we trust the forecast?", icon: 'replay', mode: 'overview', at: 'now',
     title: 'How right are we?', blurb: 'Every forecast logged before its outcome, scored against simple baselines',
     door: 'How right are we: scores against baselines, the 26 October replay, the Monday reveal',
-    panels: ['scoreboard'], layers: { flows: true, ghost: false, ghostWind: false, carbon: false },
+    panels: ['scoreboard'], layers: { flows: true, ghost: false, ghostWind: false, carbon: false, boundaries: false, wind: false, solar: false },
     pages: [
       { label: 'Replay: 26 October storm', href: '#/replay', paths: ['/replay'] },
       { label: 'Day-ahead reveal', href: '#/reveal', paths: ['/reveal'] },
