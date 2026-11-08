@@ -32,13 +32,15 @@ export const CARD_IDS = CARDS.map((c) => c.id)
 const gwh = (mwh) => `${(mwh / 1000).toFixed(mwh >= 10000 ? 0 : 1)} GWh`
 const money = (v) => (Math.abs(v) >= 1e6 ? `£${(v / 1e6).toFixed(1)}m` : `£${Math.round(v / 1e3)}k`)
 const pct = (v) => `${Math.round(v * 100)}%`
-// constraintBill notes read 'NESO, 29 Oct (newest, ~1 week lag)': fold the bracket into the outer one.
-const flat = (note) => note.replace(/\s*\((.*)\)/, '; $1')
+// constraintBill notes read 'NESO, 29 Oct (newest, ~1 week lag)': the plain text keeps only the day.
+const billDay = (note) => note.replace(/^NESO,\s*/, '').replace(/\s*\(.*\)/, '')
+
+// Plain text may carry glossary terms as {id:words}; Stories renders them as <Term>. Codes and sources go in `experts`.
 
 // Card 1: wind switched off over Scotland (ghost wind, accepted bids) and how often B6 was over its limit.
 export function windHeadline(gw, infra) {
   const d = gw?.data
-  const out = { value: '…', text: 'Loading the wind that was paid to switch off.', source: 'Elexon accepted bids (BOALF) and NESO constraint costs; an estimate', estimate: true, extra: null }
+  const out = { value: '…', text: 'Loading the wind that was paid to switch off.', source: 'Elexon accepted bids (BOALF) and NESO constraint costs; an estimate', estimate: true, extra: null, experts: [] }
   if (d && !gw.loading) {
     const mwh = d.total_boalf_mwh ?? 0
     const bill = constraintBill(d, gw.window)
@@ -46,15 +48,18 @@ export function windHeadline(gw, infra) {
     out.value = gwh(mwh)
     if (gw.window === 'storm') {
       out.when = '26 October'
-      out.text = `No wind was paid to switch off in the last 24 hours. On 26 October it was ${gwh(mwh)}${bill.gbp ? `, and the day’s constraint bill was ${money(bill.gbp)} (${flat(bill.note)})` : ''}.`
+      out.text = `No wind was paid to switch off in the last 24 hours. On 26 October it was ${gwh(mwh)}${bill.gbp ? `, and that day’s {constraint:constraint bill} was ${money(bill.gbp)}` : ''}.`
     } else {
       out.when = 'last 24 h'
-      out.text = `${mwh ? 'of Scottish wind was paid to switch off in the last 24 hours.' : 'No wind was paid to switch off in the last 24 hours.'}${bill.gbp ? ` The newest published daily constraint bill was ${money(bill.gbp)} (${flat(bill.note)}).` : ''}`
+      out.text = `${mwh ? 'of Scottish wind was paid to switch off in the last 24 hours.' : 'No wind was paid to switch off in the last 24 hours.'}${bill.gbp ? ` The latest published daily {constraint:constraint bill} was ${money(bill.gbp)}, for ${billDay(bill.note)}. These bills come out about a week late.` : ''}`
     }
+    if (bill.gbp) out.experts.push(`Constraint bill: ${bill.note}, NESO daily constraint costs.`)
+    out.experts.push('Wind switched off: Elexon accepted bids (BOALF) for mapped Scottish wind units.')
   }
   const b6 = infra?.data?.boundaries?.find((b) => b.id === 'SCOTEX')
   if (b6?.over_share != null) {
-    out.extra = `B6, the Scotland to England boundary, was forecast over its limit in ${pct(b6.over_share)} of hours over the last ${infra.data.window_days} days (NESO day-ahead flows).${infra.source === 'sample' ? ' Sample figures.' : ''}`
+    out.extra = `The main {boundary:power line from Scotland to England} was expected to be over its limit in ${pct(b6.over_share)} of hours over the last ${infra.data.window_days} days.${infra.source === 'sample' ? ' Sample figures.' : ''}`
+    out.experts.push(`Over its limit: boundary B6 (SCOTEX), NESO day-ahead flows against the limit, last ${infra.data.window_days} days.`)
   }
   return out
 }
@@ -68,7 +73,7 @@ export function carbonHeadline(by, names = {}) {
   if (!rows.length) return { value: '…', text: 'Loading the carbon each zone really consumes.', source, estimate: true }
   const top = rows[0]
   if (top.diff >= FLAG.grams) {
-    return { value: `+${Math.round(top.diff)} g/kWh`, when: 'now', text: `${top.name} generates ${Math.round(top.prod)} g/kWh but consumes ${Math.round(top.cons)} g/kWh: imports add the rest.`, source, estimate: true }
+    return { value: `+${Math.round(top.diff)} g/kWh`, when: 'now', text: `${top.name} generates ${Math.round(top.prod)} {carbon-intensity:g/kWh} but consumes ${Math.round(top.cons)} g/kWh: imports add the rest.`, source, estimate: true }
   }
   return { value: `${top.diff >= 0 ? '+' : '−'}${Math.abs(Math.round(top.diff))} g/kWh`, when: 'now', text: `No zone is much dirtier than its own generation right now; the largest gap is ${top.name}.`, source, estimate: true }
 }
@@ -76,7 +81,7 @@ export function carbonHeadline(by, names = {}) {
 // Card 3: what more Scotland to England capacity would have saved, and the fullest cable.
 export function bottleneckHeadline(infra) {
   const d = infra?.data
-  const out = { value: '…', text: 'Loading the grid bottlenecks.', source: 'NESO day-ahead flows and constraint costs; Elexon flows; an estimate', estimate: true, extra: null }
+  const out = { value: '…', text: 'Loading the grid bottlenecks.', source: 'NESO day-ahead flows and constraint costs; Elexon flows; an estimate', estimate: true, extra: null, experts: [] }
   if (!d) return out
   out.sample = infra.source === 'sample'
   const b6 = d.boundaries?.find((b) => b.id === 'SCOTEX') ?? d.boundaries?.find((b) => b.counterfactual?.length)
@@ -84,13 +89,17 @@ export function bottleneckHeadline(infra) {
   if (w && b6.cf) {
     out.value = money(w.costSaved)
     out.when = `${b6.cf.cost_days} days`
-    out.text = `of constraint cost, and ${gwh(w.windSaved)} of wind, would have been avoided over ${b6.cf.cost_days} days with ${(w.addMw / 1000).toFixed(0)} GW more across ${b6.name}. An upper bound: other Scottish boundaries would still bind.`
+    out.text = `of {constraint:constraint costs}, and ${gwh(w.windSaved)} of wind, could have been saved over ${b6.cf.cost_days} days with ${(w.addMw / 1000).toFixed(0)} GW more room on the ${b6.name} {boundary:boundary}. That is the most it could save: other pinch points in Scotland would still hold power back.`
+    out.experts.push(`Saving: one boundary (${b6.id}) raised by ${w.addMw} MW, avoided volume priced at NESO's average thermal constraint cost per MWh; an upper bound.`)
   } else {
-    out.value = '—'
-    out.text = 'No counterfactual is published yet.'
+    out.value = null
+    out.text = 'No estimate has been published yet.'
   }
   const full = [...(d.interconnectors ?? [])].filter((l) => l.full_import_share != null).sort((a, b) => b.full_import_share - a.full_import_share)[0]
-  if (full) out.extra = `The ${full.name} cable was importing at full capacity in ${pct(full.full_import_share)} of hours (Elexon flows, nominal capacity).`
+  if (full) {
+    out.extra = `The ${full.name} cable was bringing in as much power as it can carry in ${pct(full.full_import_share)} of hours.`
+    out.experts.push('Cable use: Elexon interconnector flows against nominal capacity.')
+  }
   return out
 }
 
@@ -105,9 +114,9 @@ export function sunnyHeadline(ev) {
   const dip = ev.moments?.find((m) => m.label.toLowerCase().includes('deepest'))
   const day = dip ? new Date(dip.ts).toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' }) : ''
   return {
-    value: low ? `−€${Math.abs(Math.round(low.value))}/MWh` : '—',
+    value: low ? `−€${Math.abs(Math.round(low.value))}/MWh` : null,
     when: dip ? new Date(dip.ts).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' }) : '',
-    text: `${day ? `On ${day}, ` : ''}the German day-ahead price was negative for ${hrs ? Math.round(hrs.value) : '—'} hours${peak ? ` as solar peaked at ${(peak.value / 1000).toFixed(1)} GW` : ''}. Generators paid to produce.`,
+    text: `${day ? `On ${day}, ` : ''}the German {day-ahead:day-ahead price} was {negative-price:below zero}${hrs ? ` for ${Math.round(hrs.value)} hours` : ''}${peak ? ` as solar peaked at ${(peak.value / 1000).toFixed(1)} GW` : ''}. Generators paid to produce.`,
     source, estimate: false, dipTs: dip?.ts ?? null,
   }
 }

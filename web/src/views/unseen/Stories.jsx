@@ -6,6 +6,7 @@ import { load as loadGhost, useGhostWind } from '../../layers/ghostWind/data.js'
 import { useInfra } from '../../layers/boundaries/data.js'
 import { load as loadCarbon, getCarbon, intensities } from '../../layers/carbon/data.js'
 import { CARDS, INTROS, windHeadline, carbonHeadline, bottleneckHeadline, sunnyHeadline } from './cards.js'
+import Term from '../../ui/Term.jsx'
 
 // Hidden grid as a small 2x2 picker: icon and title only. Choosing a tile sets the map (layers) and opens that story:
 // the plain intro first, then at most three live facts with their source, then the existing panels behind 'More detail'.
@@ -36,8 +37,34 @@ function TileIcon({ id }) {
   )
 }
 
+// Plain text marks glossary words as {id:words}; render those as <Term>.
+function terms(text) {
+  if (!text) return text
+  return text.split(/(\{[a-z-]+:[^}]+\})/).map((part, i) => {
+    const m = /^\{([a-z-]+):([^}]+)\}$/.exec(part)
+    return m ? <Term key={i} id={m[1]}>{m[2]}</Term> : part
+  })
+}
+
 // A headline whose text continues its number ('of Scottish wind was…') reads as one sentence with the number in front.
-const lead = (h) => (/^[a-z]/.test(h.text) ? <><b className="num">{h.value}</b> {h.text}</> : h.text)
+const lead = (h) => (/^[a-z{]/.test(h.text) && h.value ? <><b className="num">{h.value}</b> {terms(h.text)}</> : terms(h.text))
+
+function Experts({ h }) {
+  const [open, setOpen] = useState(false)
+  return (
+    <div className="story-experts">
+      <button type="button" className="story-ex-btn" aria-expanded={open} onClick={() => setOpen((o) => !o)}>
+        <span aria-hidden="true" className={`story-chev ${open ? 'open' : ''}`}>›</span>For experts
+      </button>
+      {open && (
+        <div className="faint story-src fade-in">
+          {(h.experts ?? []).map((x) => <p key={x}>{x}</p>)}
+          <p>Source: {h.source}</p>
+        </div>
+      )}
+    </div>
+  )
+}
 
 function Detail({ ids, ctx }) {
   const items = PANELS.filter((p) => ids.includes(p.id))
@@ -105,12 +132,12 @@ export default function Stories({ ctx }) {
             <p className="story-intro">{INTROS[c.id]}</p>
             <ul className="story-facts">
               <li>{lead(h)} {h.when && h.value !== '…' && <span className="faint">({h.when})</span>} {h.estimate && <span className="tag hot">{h.sample ? 'Sample data' : 'Estimated'}</span>}</li>
-              {h.extra && <li>{h.extra}</li>}
+              {h.extra && <li>{terms(h.extra)}</li>}
             </ul>
             {c.id === 'wind' && (
-              <p className="story-legend"><span className="story-dot" aria-hidden="true" />Circles: Scottish wind farms; size = wind estimated switched off (paid bids plus the weather-implied gap). Hover one for its figures.</p>
+              <p className="story-legend"><span className="story-dot" aria-hidden="true" />Each circle is a Scottish wind farm. The bigger the circle, the more wind it was paid to switch off (an estimate). Hover one for its figures.</p>
             )}
-            <div className="faint story-src">Source: {h.source}</div>
+            <Experts key={c.id} h={h} />
             {c.id === 'sunny' && (
               <div className="story-actions">
                 {h.dipTs && <button onClick={() => actions.setAt(h.dipTs)}>Show prices at the deepest dip</button>}
@@ -146,6 +173,11 @@ export default function Stories({ ctx }) {
         .story-legend { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-2, var(--text)); }
         .story-dot { flex: none; width: 12px; height: 12px; border-radius: 50%; border: 1.2px solid #5ed6c4; background: rgba(94, 214, 196, .3); }
         .story-src { font-size: 11px; margin-bottom: 6px; }
+        .story-src p { margin: 0 0 4px; }
+        .story-experts { margin: 2px 0 4px; }
+        .story-ex-btn { display: inline-flex; align-items: center; gap: 6px; padding: 4px 0; font-size: 12px; color: var(--text-2, var(--text)); }
+        .story-chev { display: inline-block; transition: transform .15s; }
+        .story-chev.open { transform: rotate(90deg); }
         .story-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 8px 0; }
         .story-actions a, .story-actions button { padding: 5px 12px; border-radius: 999px; background: var(--card-2); color: var(--text); font-size: 12px; }
         .story-actions .story-more { border: 1px solid var(--accent); }
