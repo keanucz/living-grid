@@ -64,7 +64,8 @@ function ZoneCard({ z, fresh }) {
         {hrs.map((h, i) =>
           h.actual != null ? (
             <circle key={h.ts} cx={x(i)} cy={y(h.actual)} r="3.2" className="rv-dot" style={{ animationDelay: `${i * 40}ms` }}
-              fill={h.actual >= h.p10 && h.actual <= h.p90 ? 'var(--text)' : 'var(--hot)'} />
+              // Hits are filled, misses are hollow rings: --hot is white in the monochrome theme, so colour alone cannot tell them apart.
+              fill={h.actual >= h.p10 && h.actual <= h.p90 ? 'var(--text)' : 'var(--bg)'} stroke="var(--text)" strokeWidth={h.actual >= h.p10 && h.actual <= h.p90 ? 0 : 1.5} />
           ) : null,
         )}
       </svg>
@@ -195,7 +196,7 @@ body { overflow: auto; }
 .rv-legend { display: flex; gap: 16px; font-size: 12px; color: var(--text-2); margin-top: 14px; flex-wrap: wrap; }
 .rv-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
 .rv-legend .b { background: rgba(197,240,107,.25); } .rv-legend .m { background: var(--accent); height: 2px; }
-.rv-legend .d { background: var(--text); border-radius: 50%; } .rv-legend .h { background: var(--hot); border-radius: 50%; }
+.rv-legend .d { background: var(--text); border-radius: 50%; } .rv-legend .h { background: transparent; border: 1.5px solid var(--text); border-radius: 50%; box-sizing: border-box; }
 `
 
 export default { path: '/reveal', title: 'Day-ahead reveal', Component: Reveal }
