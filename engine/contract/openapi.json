@@ -2402,6 +2402,18 @@
       "title": "Boundary",
       "type": "string"
      },
+     "etys_boundary": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "description": "ETYS boundary number, e.g. B6 (for experts)",
+      "title": "Etys Boundary"
+     },
      "hours": {
       "title": "Hours",
       "type": "integer"
@@ -2453,6 +2465,7 @@
         "type": "null"
        }
       ],
+      "description": "Plain name, e.g. Scotland to England",
       "title": "Name"
      },
      "overload_mwh": {

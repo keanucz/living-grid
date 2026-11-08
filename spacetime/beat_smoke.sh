@@ -9,7 +9,8 @@ DB=lg-beat-smoke-$$-$RANDOM
 
 spacetime start --listen-addr "127.0.0.1:$PORT" --in-memory --non-interactive >/dev/null 2>&1 &
 SERVER=$!
-trap 'kill $SERVER 2>/dev/null || true' EXIT
+OUT=$(mktemp)
+trap 'kill $SERVER 2>/dev/null || true; rm -f "$OUT"' EXIT
 for _ in $(seq 240); do curl -sf -o /dev/null "$H/v1/ping" && break; sleep 0.5; done
 (cd module && npm install --no-audit --no-fund --silent && spacetime publish --server "$H" -y "$DB" >/dev/null)
 
@@ -17,12 +18,12 @@ field() { python3 -c 'import sys, json; print(json.loads(sys.argv[1])[sys.argv[2
 new_user() { local j; j=$(curl -sf -X POST "$H/v1/identity"); echo "$(field "$j" token) $(field "$j" identity)"; }
 call_as() {
   local tok=$1 code; shift
-  code=$(curl -s -o /tmp/beat_smoke_out -w '%{http_code}' -X POST "$H/v1/database/$DB/call/$1" -H "Authorization: Bearer $tok" -H 'Content-Type: application/json' -d "$2")
-  [ "$code" = "$3" ] || { echo "FAIL $1: expected $3, got $code: $(cat /tmp/beat_smoke_out)" >&2; exit 1; }
+  code=$(curl -s -o "$OUT" -w '%{http_code}' -X POST "$H/v1/database/$DB/call/$1" -H "Authorization: Bearer $tok" -H 'Content-Type: application/json' -d "$2")
+  [ "$code" = "$3" ] || { echo "FAIL $1: expected $3, got $code: $(cat "$OUT")" >&2; exit 1; }
 }
 sql() { spacetime sql --server "$H" "$DB" "$1" 2>/dev/null; }
 count() { sql "$1" | grep -c "$2" || true; }
-wait_for() { for _ in $(seq 90); do [ "$(count "$1" "$2")" = "$3" ] && return 0; sleep 1; done; echo "FAIL waiting for $3 x $2 in $1: $(sql "$1")" >&2; exit 1; }
+wait_for() { for _ in $(seq "${WAIT_N:-90}"); do [ "$(count "$1" "$2")" = "$3" ] && return 0; sleep 1; done; echo "FAIL waiting for $3 x $2 in $1: $(sql "$1")" >&2; exit 1; }
 
 read -r PUB PUB_ID < <(new_user)
 spacetime call --server "$H" "$DB" add_admin "\"$PUB_ID\"" '"smoke"' >/dev/null 2>&1
@@ -80,6 +81,9 @@ wait_for "SELECT revealed FROM beat_call WHERE game_id = $G AND idx = 1" true 1
 wait_for "SELECT state, call_no FROM beat_game WHERE id = $G" 'answering" *| 2' 1
 call_as "$U" beat_answer "[$G,2,\"c\",95]" 200
 wait_for "SELECT state FROM beat_game WHERE id = $G" done 1
+# Sweep (#249): right after the end the answer rows are still there.
+[ "$(count "SELECT key FROM beat_call WHERE game_id = $G" "^ \"$G|")" = 3 ] || { echo "FAIL calls gone right after the end" >&2; exit 1; }
+[ "$(count "SELECT key FROM beat_result WHERE game_id = $G" "^ \"$G|")" = 15 ] || { echo "FAIL results gone right after the end" >&2; exit 1; }
 sql "SELECT day_revealed FROM beat_game WHERE id = $G" | grep -c '2026-10-26' | grep -qv '^0$' || { echo "FAIL day revealed" >&2; exit 1; }
 [ "$(count "SELECT rank FROM game_result WHERE mode = 'beat'" "^ [0-9]")" = 5 ] || { echo "FAIL game_result" >&2; exit 1; }
 sql "SELECT games FROM profile WHERE name = 'Una'" | grep -c '^ 1 ' | grep -qv '^0$' || { echo "FAIL profile" >&2; exit 1; }
@@ -110,4 +114,11 @@ done
 wait_for "SELECT state FROM lobby WHERE id = $L" reveal 1
 call_as "$H1" lobby_rematch '[]' 200
 [ "$(count "SELECT id FROM beat_game WHERE lobby_id = $L" "^ [0-9]")" = 0 ] || { echo "FAIL rematch clears the game" >&2; exit 1; }
+# Sweep (#249): 180 s after the end the solo game keeps its game, players and standings but loses calls, results and picks.
+WAIT_N=240 wait_for "SELECT key FROM beat_call WHERE game_id = $G" "^ \"$G|" 0
+[ "$(count "SELECT key FROM beat_result WHERE game_id = $G" "^ \"$G|")" = 0 ] || { echo "FAIL sweep left beat_result" >&2; exit 1; }
+[ "$(count "SELECT key FROM beat_pick WHERE game_id = $G" "^ \"$G|")" = 0 ] || { echo "FAIL sweep left beat_pick" >&2; exit 1; }
+[ "$(count "SELECT id FROM beat_game WHERE id = $G" "^ $G ")" = 1 ] || { echo "FAIL sweep removed the game" >&2; exit 1; }
+[ "$(count "SELECT key FROM beat_player WHERE game_id = $G" "^ \"$G|")" = 5 ] || { echo "FAIL sweep removed the players" >&2; exit 1; }
+[ "$(count "SELECT rank FROM game_result WHERE mode = 'beat'" "^ [0-9]")" -ge 5 ] || { echo "FAIL sweep removed game_result" >&2; exit 1; }
 echo "beat smoke: PASS"

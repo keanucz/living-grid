@@ -13,22 +13,10 @@
    "overload_mwh": 35802.0,
    "peak_overload_mw": 1500.0,
    "mean_utilisation": 1.024,
-   "name": "B6 (Scotland to England, NESO group SCOTEX)",
+   "name": "Scotland to England",
+   "etys_boundary": "B6",
    "max_capacity_mw": 6800.0,
    "max_capacity_source": "NESO Operational Transparency Forum, 7 October 2026 (https://www.neso.energy/document/388476/download)"
-  },
-  {
-   "boundary": "SSEN-S",
-   "hours": 72,
-   "median_limit_mw": 2000.0,
-   "mean_flow_mw": 1500.0,
-   "hours_over_limit_share": 0.0,
-   "overload_mwh": 0.0,
-   "peak_overload_mw": 0.0,
-   "mean_utilisation": 0.75,
-   "name": null,
-   "max_capacity_mw": null,
-   "max_capacity_source": null
   }
  ],
  "boundary_source": "NESO Data Portal, Day Ahead Constraint Flows and Limits (https://www.neso.energy/data-portal/day-ahead-constraint-flows-and-limits)",
@@ -56,7 +44,7 @@
    "hours_full_export_share": 0.0
   }
  ],
- "interconnector_basis": "Capacities are nominal, hand-entered in data/static/interconnectors.csv; flows are Elexon metered.",
+ "interconnector_basis": "Cable sizes are the published capacities; flows are Elexon metered data.",
  "constraint_costs": {
   "days": 3,
   "from": "2026-10-25T00:00:00Z",

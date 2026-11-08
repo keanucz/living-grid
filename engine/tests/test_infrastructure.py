@@ -132,3 +132,17 @@ def test_the_all_boundaries_file_is_used_once_it_spans_as_long_and_is_capped(mon
     names = [r["boundary"] for r in b["boundaries"]]
     assert len(names) == inf.MAX_BOUNDARIES and "SCOTEX" in names
     assert next(r for r in b["boundaries"] if r["boundary"] == "SCOTEX")["hours"] == 72
+
+
+def test_every_named_boundary_gets_a_plain_name_and_etys_number():
+    from engine.infrastructure import BOUNDARY_NAMES
+    assert set(BOUNDARY_NAMES) == {"SCOTEX", "SSE-SP", "SSEN-S", "SSHARN"}
+    for code, (name, etys) in BOUNDARY_NAMES.items():
+        assert name and code not in name and not name.startswith("NESO"), code
+        assert etys.startswith("B"), code
+
+
+def test_interconnector_basis_has_no_file_path():
+    import inspect
+    from engine import infrastructure
+    assert "data/static" not in inspect.getsource(infrastructure)

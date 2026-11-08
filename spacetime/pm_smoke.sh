@@ -9,7 +9,8 @@ DB=lg-pm-smoke-$$-$RANDOM
 
 spacetime start --listen-addr "127.0.0.1:$PORT" --in-memory --non-interactive >/dev/null 2>&1 &
 SERVER=$!
-trap 'kill $SERVER 2>/dev/null || true' EXIT
+OUT=$(mktemp)
+trap 'kill $SERVER 2>/dev/null || true; rm -f "$OUT"' EXIT
 for _ in $(seq 240); do curl -sf -o /dev/null "$H/v1/ping" && break; sleep 0.5; done
 (cd module && npm install --no-audit --no-fund --silent && spacetime publish --server "$H" -y "$DB" >/dev/null)
 
@@ -17,12 +18,12 @@ field() { python3 -c 'import sys, json; print(json.loads(sys.argv[1])[sys.argv[2
 new_user() { local j; j=$(curl -sf -X POST "$H/v1/identity"); echo "$(field "$j" token) $(field "$j" identity)"; }
 call_as() {
   local tok=$1 code; shift
-  code=$(curl -s -o /tmp/pm_smoke_out -w '%{http_code}' -X POST "$H/v1/database/$DB/call/$1" -H "Authorization: Bearer $tok" -H 'Content-Type: application/json' -d "$2")
-  [ "$code" = "$3" ] || { echo "FAIL $1 $2: expected $3, got $code: $(cat /tmp/pm_smoke_out)" >&2; exit 1; }
+  code=$(curl -s -o "$OUT" -w '%{http_code}' -X POST "$H/v1/database/$DB/call/$1" -H "Authorization: Bearer $tok" -H 'Content-Type: application/json' -d "$2")
+  [ "$code" = "$3" ] || { echo "FAIL $1 $2: expected $3, got $code: $(cat "$OUT")" >&2; exit 1; }
 }
 sql() { spacetime sql --server "$H" "$DB" "$1" 2>/dev/null; }
 count() { sql "$1" | tail -n +3 | grep -c "$2" || true; }
-wait_for() { for _ in $(seq 90); do [ "$(count "$1" "$2")" = "$3" ] && return 0; sleep 1; done; echo "FAIL waiting for $3 x $2 in $1: $(sql "$1")" >&2; exit 1; }
+wait_for() { for _ in $(seq "${WAIT_N:-90}"); do [ "$(count "$1" "$2")" = "$3" ] && return 0; sleep 1; done; echo "FAIL waiting for $3 x $2 in $1: $(sql "$1")" >&2; exit 1; }
 
 read -r PUB PUB_ID < <(new_user)
 spacetime call --server "$H" "$DB" add_admin "\"$PUB_ID\"" '"smoke"' >/dev/null 2>&1
@@ -127,4 +128,17 @@ call_as "$R2" lobby_rematch '[]' 530
 call_as "$R1" lobby_rematch '[]' 200
 [ "$(count "SELECT game_id FROM pm_room WHERE lobby_id = $L" '^ [0-9]')" = 0 ] || { echo "FAIL rematch clears the room game" >&2; exit 1; }
 [ "$(count "SELECT id FROM pm_game WHERE id = $RG" '^ [0-9]')" = 0 ] || { echo "FAIL room game still there after rematch" >&2; exit 1; }
+
+# ---- sweep (#249): a fresh solo game, left running. Right after the end its markets, trades and prices are still there;
+# 180 s later they are gone while the game, the accounts and the standings stay.
+call_as "$U" pm_start '["Una","solar"]' 200
+G3=$(sql "SELECT id FROM pm_game WHERE owner = 0x$UID_" | tail -1 | tr -d ' ')
+wait_for "SELECT state FROM pm_game WHERE id = $G3" 'done' 1
+[ "$(count "SELECT key FROM pm_market WHERE game_id = $G3" "^ \"$G3|")" = 2 ] || { echo "FAIL markets gone right after the end" >&2; exit 1; }
+[ "$(count "SELECT key FROM pm_price WHERE game_id = $G3" "^ \"$G3|")" -ge 2 ] || { echo "FAIL prices gone right after the end" >&2; exit 1; }
+[ "$(count "SELECT key FROM pm_trade WHERE game_id = $G3" "^ \"$G3|")" -ge 1 ] || { echo "FAIL trades gone right after the end" >&2; exit 1; }
+WAIT_N=240 wait_for "SELECT key FROM pm_market WHERE game_id = $G3" "^ \"$G3|" 0
+for t in pm_position pm_trade pm_price; do [ "$(count "SELECT key FROM $t WHERE game_id = $G3" "^ \"$G3|")" = 0 ] || { echo "FAIL sweep left $t" >&2; exit 1; }; done
+[ "$(count "SELECT id FROM pm_game WHERE id = $G3" "^ $G3 ")" = 1 ] || { echo "FAIL sweep removed the game" >&2; exit 1; }
+[ "$(count "SELECT key FROM pm_account WHERE game_id = $G3" "^ \"$G3|")" = 5 ] || { echo "FAIL sweep removed the accounts" >&2; exit 1; }
 echo "pm smoke: PASS"

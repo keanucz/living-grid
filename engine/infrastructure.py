@@ -19,6 +19,16 @@ FLOWS = "neso/boundary_flows"
 FLOWS_ALL = "neso/boundaries_all"
 COSTS = "neso/constraint_costs"
 B6 = "SCOTEX"
+# NESO constraint group -> plain name and ETYS boundary. Mapping from NESO's year-ahead constraint limits dataset
+# ("B6 - SCOTEX", "B4 - SSE-SP2", "B2 - SSEN-S", "B7 - SSHARN3"); descriptions from ETYS 2025 (June 2026): B2 runs from
+# the east coast between Aberdeen and Dundee to near Oban, B4 from the Firth of Tay to the north of Arran, B7a is the
+# Upper North of England (south of Teesside into the Mersey Ring).
+BOUNDARY_NAMES = {
+    "SCOTEX": ("Scotland to England", "B6"),
+    "SSE-SP": ("Central Scotland", "B4"),
+    "SSEN-S": ("North of Scotland", "B2"),
+    "SSHARN": ("Northern England", "B7"),
+}
 EXTRA_MW = (2000, 4000)
 INTERCONNECTOR_GROUPS = {"FR": "France", "NL": "Netherlands", "BE": "Belgium", "NO2": "Norway", "DK1": "Denmark",
                          "SEM": "Ireland and Northern Ireland"}
@@ -162,15 +172,16 @@ def build(extra_mw=EXTRA_MW, flows: pd.DataFrame | None = None, costs: pd.DataFr
     keep = [r for r in boundaries if r["boundary"] == B6 or r["overload_mwh"] > 0]
     boundaries = sorted(keep or boundaries, key=lambda r: (r["boundary"] != B6, -r["overload_mwh"]))[:MAX_BOUNDARIES]
     for r in boundaries:
+        if r["boundary"] in BOUNDARY_NAMES:
+            r["name"], r["etys_boundary"] = BOUNDARY_NAMES[r["boundary"]]
         if r["boundary"] == B6:
-            r["name"] = "B6 (Scotland to England, NESO group SCOTEX)"
             r["max_capacity_mw"] = 6800
             r["max_capacity_source"] = OTF_SOURCE
     return {
         "window": {"from": base["ts"].min().to_pydatetime(), "to": base["ts"].max().to_pydatetime()},
         "boundaries": boundaries, "boundary_source": NESO_FLOW_SOURCE, "etys_capability": caps,
         "interconnectors": interconnectors(actuals, links),
-        "interconnector_basis": "Capacities are nominal, hand-entered in data/static/interconnectors.csv; flows are Elexon metered.",
+        "interconnector_basis": "Cable sizes are the published capacities; flows are Elexon metered data.",
         "constraint_costs": cost_summary(costs) if costs is not None and len(costs) else None,
         "counterfactual": {"boundary": B6, "scenarios": [counterfactual(base, costs, ghost, e) for e in extra_mw],
                            "ghost_wind_source": "Elexon accepted bids on Scottish wind units (estimate, upper bound)"},

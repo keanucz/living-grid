@@ -848,7 +848,8 @@ class InfraBoundary(Model):
     overload_mwh: float = Field(description="Forecast flow above the limit, summed over the window")
     peak_overload_mw: float
     mean_utilisation: float
-    name: str | None = None
+    name: str | None = Field(default=None, description="Plain name, e.g. Scotland to England")
+    etys_boundary: str | None = Field(default=None, description="ETYS boundary number, e.g. B6 (for experts)")
     max_capacity_mw: float | None = None
     max_capacity_source: str | None = None
 
