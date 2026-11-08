@@ -32,8 +32,23 @@ function schedule(ctx: any, kind: string, game: number, seconds: number) {
   ctx.db.beat_tick.insert({ scheduled_id: 0n, scheduled_at: ScheduleAt.time(ctx.timestamp.microsSinceUnixEpoch + BigInt(Math.round(seconds * 1e6))), kind, game_id: game });
 }
 
+// A finished game's answers stay public only for a while: any client can subscribe to these tables, and the same day's
+// questions read the same in every game that draws it. The sweep removes the answer-bearing rows (not the game or its
+// scores) SWEEP_S after the game ends. 'sweep_pm' ticks belong to solo markets games (pm_core) and share this table.
+export const SWEEP_S = 180;
+
 function cancelTicks(ctx: any, game: number) {
-  for (const s of [...ctx.db.beat_tick.iter()]) if (s.game_id === game) ctx.db.beat_tick.scheduled_id.delete(s.scheduled_id);
+  for (const s of [...ctx.db.beat_tick.iter()]) if (s.game_id === game && s.kind !== 'sweep_pm') ctx.db.beat_tick.scheduled_id.delete(s.scheduled_id);
+}
+
+export function scheduleSweep(ctx: any, kind: 'sweep' | 'sweep_pm', game: number) {
+  schedule(ctx, kind, game, SWEEP_S);
+}
+
+export function sweepBeat(ctx: any, game: number) {
+  const g = ctx.db.beat_game.id.find(game);
+  if (!g || g.state !== 'done') return;
+  for (const tbl of ['beat_call', 'beat_result', 'beat_pick']) for (const row of [...ctx.db[tbl].game_id.filter(game)]) ctx.db[tbl].key.delete(row.key);
 }
 
 export function clearBeat(ctx: any, game: number) {
@@ -126,8 +141,10 @@ export function reveal(ctx: any, game: number) {
   });
   const last = idx + 1 >= g.n_calls;
   ctx.db.beat_game.id.update({ ...g, state: last ? 'done' : 'revealing', day_revealed: last ? day : '' });
-  if (last) finish(ctx, ctx.db.beat_game.id.find(game), day);
-  else schedule(ctx, 'open', game, REVEAL_S);
+  if (last) {
+    finish(ctx, ctx.db.beat_game.id.find(game), day);
+    scheduleSweep(ctx, 'sweep', game);
+  } else schedule(ctx, 'open', game, REVEAL_S);
 }
 
 export function openNext(ctx: any, game: number) {

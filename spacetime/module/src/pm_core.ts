@@ -3,6 +3,7 @@ import { Identity } from 'spacetimedb';
 import { MAX_SHARES, START_POINTS, botOrder, clampPrice, fill, mark, points } from './pm_math';
 import { BOT_SPECS, botId, lk } from './market_core';
 import { applyResults } from './profile_core';
+import { scheduleSweep } from './beat_core';
 
 // Solo markets: see tables.ts and pm_math.ts. A game runs on a mystery day from pm_day. Each tick moves the clock one game
 // hour: every open market's price steps to the model's price for that hour, markets whose close hour has come are closed
@@ -44,6 +45,13 @@ export const roomOf = (ctx: any, game: number): number => ctx.db.pm_room.game_id
 export function clearPmForLobby(ctx: any, lobby: number) {
   if (lobby === 0) return;
   for (const r of [...ctx.db.pm_room.lobby_id.filter(lobby)]) clearPm(ctx, r.game_id);
+}
+
+// Remove a finished game's answer-bearing rows (see beat_core SWEEP_S); the game and accounts stay for the standings.
+export function sweepPm(ctx: any, game: number) {
+  const g = ctx.db.pm_game.id.find(game);
+  if (!g || g.state !== 'done') return;
+  for (const tbl of ['pm_market', 'pm_position', 'pm_trade', 'pm_price']) for (const row of [...ctx.db[tbl].game_id.filter(game)]) ctx.db[tbl].key.delete(row.key);
 }
 
 function priceAt(m: PmMarket, hour: number): number {
@@ -188,6 +196,7 @@ export function tickPm(ctx: any, game: number) {
   if (open === 0) {
     ctx.db.pm_game.id.update({ ...g, clock_hour: hour, state: 'done', opened_at: ctx.timestamp, day_revealed: day });
     finishPm(ctx, ctx.db.pm_game.id.find(game), day);
+    scheduleSweep(ctx, 'sweep_pm', game);
   } else {
     ctx.db.pm_game.id.update({ ...g, clock_hour: hour, opened_at: ctx.timestamp });
     schedule(ctx, game, g.seconds_per_hour);

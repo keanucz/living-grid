@@ -5,7 +5,8 @@ import { beat_tick } from '../tables';
 import { ensureProfile } from '../profile_core';
 import { cleanAvatar, cleanName } from '../lobby_core';
 import { MAX_CONFIDENCE, MIN_CONFIDENCE } from '../beat_math';
-import { answerBeat, clearBeat, openNext, reveal, startBeat, BEAT_BOTS, type Call } from '../beat_core';
+import { answerBeat, clearBeat, openNext, reveal, startBeat, sweepBeat, BEAT_BOTS, type Call } from '../beat_core';
+import { sweepPm } from '../pm_core';
 
 // Beat the model. Solo: beat_start() plays five calls against the bots. In a lobby of mode 'beat' the host's Start
 // does the same for everyone in the room (reducers/lobby.ts). beat_answer sends or changes your answer to the open
@@ -40,6 +41,8 @@ export const beat_tick_run = spacetimedb.reducer({ onSchedule: beat_tick }, { ar
   if (!ctx.senderAuth.isInternal) throw new SenderError('scheduled reducer');
   if (arg.kind === 'reveal') reveal(ctx, arg.game_id);
   else if (arg.kind === 'open') openNext(ctx, arg.game_id);
+  else if (arg.kind === 'sweep') sweepBeat(ctx, arg.game_id);
+  else if (arg.kind === 'sweep_pm') sweepPm(ctx, arg.game_id);
 });
 
 // Admin: load or replace one mystery day's five calls (engine/beat/build.py makes them).
