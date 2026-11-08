@@ -146,3 +146,12 @@ def test_interconnector_basis_has_no_file_path():
     import inspect
     from engine import infrastructure
     assert "data/static" not in inspect.getsource(infrastructure)
+
+
+def test_contract_fixture_has_two_boundaries_with_plain_names():
+    import json
+    from pathlib import Path as P
+    fx = json.loads((P(__file__).parents[1] / "contract" / "fixtures" / "infrastructure.json").read_text())
+    names = {b["boundary"]: (b["name"], b["etys_boundary"]) for b in fx["boundaries"]}
+    assert names["SCOTEX"] == ("Scotland to England", "B6")
+    assert names["SSEN-S"] == ("North of Scotland", "B2")

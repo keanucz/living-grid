@@ -642,7 +642,10 @@ def infrastructure() -> dict:
     for t in ts:
         b6 = 4300.0 + 1400 * math.sin(t.hour / 24 * 2 * math.pi)
         rows.append({"ts": t, "boundary": "SCOTEX", "flow_mw": b6, "limit_mw": 4200.0, "utilisation": b6 / 4200})
-        rows.append({"ts": t, "boundary": "SSEN-S", "flow_mw": 1500.0, "limit_mw": 2000.0, "utilisation": 0.75})
+        # Over its 2,000 MW limit for a few hours around the daily peak, so /infrastructure keeps it (it drops
+        # boundaries that never overload) and the fixture covers a second plain name.
+        ssen = 1700.0 + 500 * math.sin(t.hour / 24 * 2 * math.pi)
+        rows.append({"ts": t, "boundary": "SSEN-S", "flow_mw": ssen, "limit_mw": 2000.0, "utilisation": ssen / 2000})
     flows = pd.DataFrame(rows)
     days = [t0 + pd.Timedelta(days=d) for d in range(3)]
     costs = pd.DataFrame({"ts": days, "thermal_cost_gbp": [9.1e6, 36.5e6, 4.2e6], "thermal_volume_mwh": [-61000.0, -240000.0, -30000.0],

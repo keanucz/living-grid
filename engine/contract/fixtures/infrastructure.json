@@ -17,6 +17,20 @@
    "etys_boundary": "B6",
    "max_capacity_mw": 6800.0,
    "max_capacity_source": "NESO Operational Transparency Forum, 7 October 2026 (https://www.neso.energy/document/388476/download)"
+  },
+  {
+   "boundary": "SSEN-S",
+   "hours": 72,
+   "median_limit_mw": 2000.0,
+   "mean_flow_mw": 1700.0,
+   "hours_over_limit_share": 0.292,
+   "overload_mwh": 2817.0,
+   "peak_overload_mw": 200.0,
+   "mean_utilisation": 0.85,
+   "name": "North of Scotland",
+   "etys_boundary": "B2",
+   "max_capacity_mw": null,
+   "max_capacity_source": null
   }
  ],
  "boundary_source": "NESO Data Portal, Day Ahead Constraint Flows and Limits (https://www.neso.energy/data-portal/day-ahead-constraint-flows-and-limits)",
