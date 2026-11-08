@@ -48,6 +48,15 @@ export const slabHeight = (eur) => {
   return 15000 + Math.max(0, Math.min(1.25, t)) * 300000
 }
 export const priceRange = () => range
+// Change colour for the What if map: grey at no change, red for the biggest rise, blue for a fall (EUR/MWh).
+const NONE = [60, 60, 58]
+const RISE = [214, 64, 48]
+const FALL = [70, 120, 190]
+export function changeColor(eur, max) {
+  const t = Math.min(1, Math.abs(eur) / Math.max(1, max))
+  const to = eur < 0 ? FALL : RISE
+  return [...NONE.map((c, i) => Math.round(c + (to[i] - c) * t)), 255]
+}
 // Walls need real diffuse light to read as solid bars; the glass look stays on the flat overview.
 const BAR = { ambient: 0.42, diffuse: 0.78, shininess: 40, specularColor: [90, 90, 84] }
 // Kept for the map callout, which anchors to the top of the focus zone.
@@ -60,9 +69,13 @@ export default {
   order: 10,
   modes: ['overview', 'simulate'],
   defaultOn: true,
-  build({ data, ui, priceOf }) {
+  build({ data, ui, priceOf, scenario }) {
     if (!data.geo) return []
     const sim = ui.mode === 'simulate'
+    // With a world event up, each country is coloured by how much its price moved (the What if key: "Redder =
+    // bigger rise"); heights still show the new price.
+    const change = sim && scenario ? (zone) => (scenario.price_delta_eur?.[zone] ?? 0) * (scenario.scale ?? 1) : null
+    const changeMax = change ? Math.max(10, ...Object.keys(scenario.price_delta_eur ?? {}).map((z) => Math.abs(change(z)))) : 0
     const zoneFeatures = data.geo.features.filter((f) => f.properties.zone)
     if (sim) setRange((data.state?.zones ?? []).map((z) => z.price_eur))
     return [
@@ -76,6 +89,7 @@ export default {
         getElevation: (f) => (sim ? slabHeight(priceOf(f.properties.zone)) : 2500),
         material: sim ? BAR : GLASS,
         getFillColor: (f) => {
+          if (change) return changeColor(change(f.properties.zone), changeMax)
           const p = priceOf(f.properties.zone)
           const on = f.properties.zone === ui.selectedZone
           return p == null ? COLORS.land : priceColor(p, sim ? 255 : on ? 240 : 218)
@@ -87,7 +101,7 @@ export default {
         // No autoHighlight: on some GPUs the hover-highlight pass hid this whole layer except while dragging.
         // No attribute transitions here: on some GPUs an extruded polygon layer with transitions does not draw at all.
         updateTriggers: {
-          getFillColor: [ui.selectedZone, ui.scenario?.ranAt, sim],
+          getFillColor: [ui.selectedZone, ui.scenario?.ranAt, sim, ui.liveResult, !!change],
           getElevation: [sim, ui.scenario?.ranAt, data.state],
           getLineColor: [ui.selectedZone],
           getLineWidth: [ui.selectedZone],
