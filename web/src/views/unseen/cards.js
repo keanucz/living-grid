@@ -2,6 +2,14 @@ import { constraintBill } from '../../layers/ghostWind/data.js'
 import { whatIf } from '../../layers/boundaries/data.js'
 import { FLAG } from '../../layers/carbon/data.js'
 
+// Story intros: Keanu's human-written copy, used verbatim. No numbers on purpose, so they stay true.
+export const INTROS = {
+  wind: 'If Scotland generates more wind power than the grid lines to England can take, wind farms are paid to turn off and gas-fired power stations further south are paid to turn on. We all pay for both through our electricity bills.',
+  carbon: "A country's electricity is only as clean as the power it imports. When a country with a clean grid imports from a dirtier neighbour over an undersea cable, the carbon travels with it, but it never shows up in the importing country's own generation figures.",
+  bottleneck: "Britain's grid has a few pinch points, and the biggest is on the border between Scotland and England. If power can't get through, it's wasted on one side and has to be replaced on the other.",
+  sunny: 'On a sunny Sunday with little demand, Germany generates more power than it can use. Prices fall below zero, and some power plants pay to keep running rather than shut down.',
+}
+
 // The four Hidden grid story cards: what each one switches on, which sourced number it leads with, and where it links.
 // Everything here is pure (data in, text out) so it can be checked without a browser. Numbers come from the loaded
 // API data or the event library, never from this file, and each carries its source.

@@ -174,11 +174,12 @@ function zoneCard(id, ctx) {
 
 function tooltip({ object, layer }, ctx) {
   if (!object || !layer) return null
-  const style = { background: '#1c1c1b', color: '#f2f2ef', borderRadius: '10px', border: '1px solid rgba(255,255,255,.12)', fontSize: '12px', padding: '8px 10px', lineHeight: '1.5', textTransform: 'none' }
+  const style = { background: '#1c1c1b', color: '#f2f2ef', borderRadius: '10px', border: '1px solid rgba(255,255,255,.12)', fontSize: '12px', padding: '8px 10px', lineHeight: '1.5', textTransform: 'none', zIndex: 30 }
   if (layer.id === 'price-zones' || layer.id === 'price-towers') {
     const html = zoneCard(object.properties?.zone ?? object.id, ctx)
     return html && { html, style }
   }
+  if (typeof layer.props.tooltip === 'function') return { html: layer.props.tooltip(object), style }
   if (layer.id === 'assets-blocks') return { html: `<b>${object.name}</b><br/>${object.type} · ${object.mw.toLocaleString('en-GB')} MW<br/><span style="opacity:.6">Approximate location</span>`, style }
   if (layer.id === 'flows-line') return { html: `<b>${object.name}</b><br/>${object.mw ? `${Math.abs(object.mw).toLocaleString('en-GB')} MW ${object.mw > 0 ? `${object.from} → ${object.to}` : `${object.to} → ${object.from}`}` : 'No flow'} · ${object.capacity_mw.toLocaleString('en-GB')} MW cap`, style }
   return null
