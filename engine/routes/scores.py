@@ -1,3 +1,4 @@
+import json
 import os
 from functools import lru_cache
 
@@ -10,9 +11,11 @@ from engine.routes._fixtures import fixture
 from engine.schemas import ScoresResponse
 from pipeline import cache
 from pipeline.models.bots import NAMES as BOT_MODELS
+from pipeline.models.bots import league
 from pipeline.scoring import BASELINES
 
 router = APIRouter(tags=["proof"])
+hidden = APIRouter(tags=["proof"], include_in_schema=False)
 
 SCORES = "scores/scores"
 WALK_FORWARD = "backtest/walk_forward"
@@ -167,3 +170,62 @@ def build_scores() -> dict:
 @router.get("/scores", response_model=ScoresResponse)
 def scores() -> dict:
     return build_scores()
+
+
+EVALUATION = "backtest/evaluation.json"
+POINT_TITLES = {"persistence": "Persistence"}
+
+
+def _evaluation() -> dict:
+    for base in ((cache.DATA, cache.FIXTURES) if cache.offline() else (cache.DATA,)):
+        f = base / f"{EVALUATION}"
+        if f.exists():
+            return json.loads(f.read_text())
+    return {}
+
+
+def _dm_line(dm: list[dict], baseline: str) -> dict | None:
+    rows = [r for r in dm if r.get("target") == HEADLINE_TARGET and r.get("baseline") == baseline]
+    if not rows:
+        return None
+    better = [r for r in rows if r["verdict"] == "model better"]
+    return {"baseline": baseline, "zones": len(rows), "better": len(better),
+            "max_p": max((r["p_value"] for r in better), default=None),
+            "not_significant": sorted(r["zone"] for r in rows if r["verdict"] != "model better")}
+
+
+def techniques(backtest: pd.DataFrame, evaluation: dict | None = None) -> dict:
+    """Day-ahead price, every technique on the same walk-forward rows: n-weighted MAE and P10 to P90 coverage.
+
+    Yesterday appears once (the baseline and the league's bot are the same forecast). Pooled across zones, so GBP
+    and EUR are mixed; the order and the ratios are what to read.
+    """
+    bt = backtest[backtest["target"] == HEADLINE_TARGET] if len(backtest) else backtest
+    if not len(bt):
+        return {"models": [], "hours": 0, "zones": 0, "folds": 0, "dm": [], "note": "No backtest yet"}
+    titles = {s["name"]: s["title"] for s in league.specs()} | POINT_TITLES
+    ours = [m for m in bt["model"].unique() if m not in BASELINES and m not in BOT_MODELS]
+    ours = ours[-1:]
+    keep = ours + list(BOT_MODELS) + ["persistence"]
+    out = []
+    for m, g in bt[bt["model"].isin(keep)].groupby("model"):
+        w = g["n"].to_numpy(dtype=float)
+        cov = g["coverage_p10_p90"].astype(float)
+        ok = cov.notna().to_numpy()
+        out.append({"name": m, "title": titles.get(m, "Our model" if m in ours else m), "ours": m in ours,
+                    "mae": float(np.average(g["mae"], weights=w)), "n": int(w.sum()),
+                    "coverage_p10_p90": float(np.average(cov[ok], weights=w[ok])) if ok.any() else None})
+    out.sort(key=lambda r: r["mae"])
+    dm = (evaluation or {}).get("dm", [])
+    return {"models": out, "hours": max((r["n"] for r in out), default=0), "zones": int(bt["zone"].nunique()),
+            "folds": int(bt["fold"].nunique()),
+            "test_days": ((evaluation or {}).get("config") or {}).get("test_days"), "dm": [d for d in (_dm_line(dm, "persistence"), _dm_line(dm, "yesterday")) if d],
+            "note": "Day-ahead price, same walk-forward folds for every technique; pooled across zones in GBP and EUR per MWh"}
+
+
+@hidden.get("/scores/techniques")
+def scores_techniques() -> dict:
+    return techniques(_read(WALK_FORWARD), _evaluation())
+
+
+router.include_router(hidden)

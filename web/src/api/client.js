@@ -11,7 +11,7 @@ import { withLive } from '../live/index.js'
 // unreachable, slow, or returns something we cannot read, we fall back to bundled fixtures
 // (already in UI shape) so the page always renders.
 const OFFLINE = import.meta.env.VITE_LG_OFFLINE === '1'
-const TIMEOUT_MS = { '/state': 9000, '/scores': 30000, default: 8000 }
+const TIMEOUT_MS = { '/state': 9000, '/scores': 30000, '/scores/techniques': 30000, default: 8000 }
 
 async function fetchLive(path, params = {}) {
   if (OFFLINE) return null
@@ -192,6 +192,7 @@ export const api = {
   ghostWind: (from, to) => raw('/unseen/ghost-wind', { from, to }),
   carbon: (at) => raw('/unseen/carbon', { at }),
   scores: lastGood('/scores'),
+  techniques: lastGood('/scores/techniques'),
   household: (region) => raw('/household', { region }),
   replay: (event) => raw('/replay', { event }),
   reveal: () => raw('/reveal'),

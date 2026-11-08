@@ -2,6 +2,7 @@ import { useState } from 'react'
 import Backtest from '../backtest/Backtest.jsx'
 import Explain from '../../ui/Explain.jsx'
 import Term from '../../ui/Term.jsx'
+import Techniques from './Techniques.jsx'
 import { pct, scoreboard } from './summary.js'
 import { useScores } from './useScores.js'
 
@@ -62,6 +63,7 @@ function Scoreboard() {
         </p>
       )}
       {!s.error && !s.coverage && <p>Scores appear as soon as the first forecasts meet their outcomes.</p>}
+      <Techniques />
       {(s.error || s.coverage) && (
         <p className="score-basis">
           {s.basis === 'live'
