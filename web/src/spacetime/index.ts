@@ -58,6 +58,12 @@ import LobbyStartReducer from "./lobby_start_reducer";
 import LobbyVoteReducer from "./lobby_vote_reducer";
 import MarketBuyReducer from "./market_buy_reducer";
 import MarketSellReducer from "./market_sell_reducer";
+import PmBuyReducer from "./pm_buy_reducer";
+import PmDayDeleteReducer from "./pm_day_delete_reducer";
+import PmDayPutReducer from "./pm_day_put_reducer";
+import PmLeaveReducer from "./pm_leave_reducer";
+import PmSellReducer from "./pm_sell_reducer";
+import PmStartReducer from "./pm_start_reducer";
 import PoolDeleteReducer from "./pool_delete_reducer";
 import PoolPutReducer from "./pool_put_reducer";
 import ProfileSetReducer from "./profile_set_reducer";
@@ -116,6 +122,12 @@ import MyClueOffersRow from "./my_clue_offers_table";
 import MyCluesRow from "./my_clues_table";
 import PlayerRow from "./player_table";
 import PlayerDecisionRow from "./player_decision_table";
+import PmAccountRow from "./pm_account_table";
+import PmGameRow from "./pm_game_table";
+import PmMarketRow from "./pm_market_table";
+import PmPositionRow from "./pm_position_table";
+import PmPriceRow from "./pm_price_table";
+import PmTradeRow from "./pm_trade_table";
 import ProfileRow from "./profile_table";
 import QuickQueueRow from "./quick_queue_table";
 import ScoreRow from "./score_table";
@@ -545,6 +557,96 @@ const tablesSchema = __schema({
       { name: 'player_decision_key_key', constraint: 'unique', columns: ['key'] },
     ],
   }, PlayerDecisionRow),
+  pmAccount: __table({
+    name: 'pm_account',
+    indexes: [
+      { accessor: 'game_id', name: 'pm_account_game_id_idx_btree', algorithm: 'btree', columns: [
+        'gameId',
+      ] },
+      { accessor: 'identity', name: 'pm_account_identity_idx_btree', algorithm: 'btree', columns: [
+        'identity',
+      ] },
+      { accessor: 'key', name: 'pm_account_key_idx_btree', algorithm: 'btree', columns: [
+        'key',
+      ] },
+    ],
+    constraints: [
+      { name: 'pm_account_key_key', constraint: 'unique', columns: ['key'] },
+    ],
+  }, PmAccountRow),
+  pmGame: __table({
+    name: 'pm_game',
+    indexes: [
+      { accessor: 'id', name: 'pm_game_id_idx_btree', algorithm: 'btree', columns: [
+        'id',
+      ] },
+      { accessor: 'owner', name: 'pm_game_owner_idx_btree', algorithm: 'btree', columns: [
+        'owner',
+      ] },
+    ],
+    constraints: [
+      { name: 'pm_game_id_key', constraint: 'unique', columns: ['id'] },
+    ],
+  }, PmGameRow),
+  pmMarket: __table({
+    name: 'pm_market',
+    indexes: [
+      { accessor: 'game_id', name: 'pm_market_game_id_idx_btree', algorithm: 'btree', columns: [
+        'gameId',
+      ] },
+      { accessor: 'key', name: 'pm_market_key_idx_btree', algorithm: 'btree', columns: [
+        'key',
+      ] },
+    ],
+    constraints: [
+      { name: 'pm_market_key_key', constraint: 'unique', columns: ['key'] },
+    ],
+  }, PmMarketRow),
+  pmPosition: __table({
+    name: 'pm_position',
+    indexes: [
+      { accessor: 'game_id', name: 'pm_position_game_id_idx_btree', algorithm: 'btree', columns: [
+        'gameId',
+      ] },
+      { accessor: 'identity', name: 'pm_position_identity_idx_btree', algorithm: 'btree', columns: [
+        'identity',
+      ] },
+      { accessor: 'key', name: 'pm_position_key_idx_btree', algorithm: 'btree', columns: [
+        'key',
+      ] },
+    ],
+    constraints: [
+      { name: 'pm_position_key_key', constraint: 'unique', columns: ['key'] },
+    ],
+  }, PmPositionRow),
+  pmPrice: __table({
+    name: 'pm_price',
+    indexes: [
+      { accessor: 'game_id', name: 'pm_price_game_id_idx_btree', algorithm: 'btree', columns: [
+        'gameId',
+      ] },
+      { accessor: 'key', name: 'pm_price_key_idx_btree', algorithm: 'btree', columns: [
+        'key',
+      ] },
+    ],
+    constraints: [
+      { name: 'pm_price_key_key', constraint: 'unique', columns: ['key'] },
+    ],
+  }, PmPriceRow),
+  pmTrade: __table({
+    name: 'pm_trade',
+    indexes: [
+      { accessor: 'game_id', name: 'pm_trade_game_id_idx_btree', algorithm: 'btree', columns: [
+        'gameId',
+      ] },
+      { accessor: 'key', name: 'pm_trade_key_idx_btree', algorithm: 'btree', columns: [
+        'key',
+      ] },
+    ],
+    constraints: [
+      { name: 'pm_trade_key_key', constraint: 'unique', columns: ['key'] },
+    ],
+  }, PmTradeRow),
   profile: __table({
     name: 'profile',
     indexes: [
@@ -666,6 +768,12 @@ const reducersSchema = __reducers(
   __reducerSchema("lobby_vote", LobbyVoteReducer),
   __reducerSchema("market_buy", MarketBuyReducer),
   __reducerSchema("market_sell", MarketSellReducer),
+  __reducerSchema("pm_buy", PmBuyReducer),
+  __reducerSchema("pm_day_delete", PmDayDeleteReducer),
+  __reducerSchema("pm_day_put", PmDayPutReducer),
+  __reducerSchema("pm_leave", PmLeaveReducer),
+  __reducerSchema("pm_sell", PmSellReducer),
+  __reducerSchema("pm_start", PmStartReducer),
   __reducerSchema("pool_delete", PoolDeleteReducer),
   __reducerSchema("pool_put", PoolPutReducer),
   __reducerSchema("profile_set", ProfileSetReducer),
@@ -735,6 +843,18 @@ type __SchemaWithTableAccessorAliases = Omit<typeof tablesSchema.schemaType, "ta
     readonly "market_round": Omit<typeof tablesSchema.schemaType.tables["marketRound"], "accessorName"> & { readonly accessorName: "market_round" };
     /** @deprecated Use `playerDecision` instead. This alias will be removed in the next major version. */
     readonly "player_decision": Omit<typeof tablesSchema.schemaType.tables["playerDecision"], "accessorName"> & { readonly accessorName: "player_decision" };
+    /** @deprecated Use `pmAccount` instead. This alias will be removed in the next major version. */
+    readonly "pm_account": Omit<typeof tablesSchema.schemaType.tables["pmAccount"], "accessorName"> & { readonly accessorName: "pm_account" };
+    /** @deprecated Use `pmGame` instead. This alias will be removed in the next major version. */
+    readonly "pm_game": Omit<typeof tablesSchema.schemaType.tables["pmGame"], "accessorName"> & { readonly accessorName: "pm_game" };
+    /** @deprecated Use `pmMarket` instead. This alias will be removed in the next major version. */
+    readonly "pm_market": Omit<typeof tablesSchema.schemaType.tables["pmMarket"], "accessorName"> & { readonly accessorName: "pm_market" };
+    /** @deprecated Use `pmPosition` instead. This alias will be removed in the next major version. */
+    readonly "pm_position": Omit<typeof tablesSchema.schemaType.tables["pmPosition"], "accessorName"> & { readonly accessorName: "pm_position" };
+    /** @deprecated Use `pmPrice` instead. This alias will be removed in the next major version. */
+    readonly "pm_price": Omit<typeof tablesSchema.schemaType.tables["pmPrice"], "accessorName"> & { readonly accessorName: "pm_price" };
+    /** @deprecated Use `pmTrade` instead. This alias will be removed in the next major version. */
+    readonly "pm_trade": Omit<typeof tablesSchema.schemaType.tables["pmTrade"], "accessorName"> & { readonly accessorName: "pm_trade" };
     /** @deprecated Use `quickQueue` instead. This alias will be removed in the next major version. */
     readonly "quick_queue": Omit<typeof tablesSchema.schemaType.tables["quickQueue"], "accessorName"> & { readonly accessorName: "quick_queue" };
     /** @deprecated Use `batteryMyPending` instead. This alias will be removed in the next major version. */
@@ -788,6 +908,12 @@ const tableAccessorAliases = {
   "market_question": "marketQuestion",
   "market_round": "marketRound",
   "player_decision": "playerDecision",
+  "pm_account": "pmAccount",
+  "pm_game": "pmGame",
+  "pm_market": "pmMarket",
+  "pm_position": "pmPosition",
+  "pm_price": "pmPrice",
+  "pm_trade": "pmTrade",
   "quick_queue": "quickQueue",
   "battery_my_pending": "batteryMyPending",
   "latest_forecast": "latestForecast",
@@ -857,6 +983,18 @@ export type DbView = __DbViewBase & {
   readonly "market_round": __DbViewBase["marketRound"];
   /** @deprecated Use `playerDecision` instead. This alias will be removed in the next major version. */
   readonly "player_decision": __DbViewBase["playerDecision"];
+  /** @deprecated Use `pmAccount` instead. This alias will be removed in the next major version. */
+  readonly "pm_account": __DbViewBase["pmAccount"];
+  /** @deprecated Use `pmGame` instead. This alias will be removed in the next major version. */
+  readonly "pm_game": __DbViewBase["pmGame"];
+  /** @deprecated Use `pmMarket` instead. This alias will be removed in the next major version. */
+  readonly "pm_market": __DbViewBase["pmMarket"];
+  /** @deprecated Use `pmPosition` instead. This alias will be removed in the next major version. */
+  readonly "pm_position": __DbViewBase["pmPosition"];
+  /** @deprecated Use `pmPrice` instead. This alias will be removed in the next major version. */
+  readonly "pm_price": __DbViewBase["pmPrice"];
+  /** @deprecated Use `pmTrade` instead. This alias will be removed in the next major version. */
+  readonly "pm_trade": __DbViewBase["pmTrade"];
   /** @deprecated Use `quickQueue` instead. This alias will be removed in the next major version. */
   readonly "quick_queue": __DbViewBase["quickQueue"];
   /** @deprecated Use `batteryMyPending` instead. This alias will be removed in the next major version. */
@@ -917,6 +1055,18 @@ export type Tables = __TablesBase & {
   readonly "market_round": __TablesBase["marketRound"];
   /** @deprecated Use `playerDecision` instead. This alias will be removed in the next major version. */
   readonly "player_decision": __TablesBase["playerDecision"];
+  /** @deprecated Use `pmAccount` instead. This alias will be removed in the next major version. */
+  readonly "pm_account": __TablesBase["pmAccount"];
+  /** @deprecated Use `pmGame` instead. This alias will be removed in the next major version. */
+  readonly "pm_game": __TablesBase["pmGame"];
+  /** @deprecated Use `pmMarket` instead. This alias will be removed in the next major version. */
+  readonly "pm_market": __TablesBase["pmMarket"];
+  /** @deprecated Use `pmPosition` instead. This alias will be removed in the next major version. */
+  readonly "pm_position": __TablesBase["pmPosition"];
+  /** @deprecated Use `pmPrice` instead. This alias will be removed in the next major version. */
+  readonly "pm_price": __TablesBase["pmPrice"];
+  /** @deprecated Use `pmTrade` instead. This alias will be removed in the next major version. */
+  readonly "pm_trade": __TablesBase["pmTrade"];
   /** @deprecated Use `quickQueue` instead. This alias will be removed in the next major version. */
   readonly "quick_queue": __TablesBase["quickQueue"];
   /** @deprecated Use `batteryMyPending` instead. This alias will be removed in the next major version. */

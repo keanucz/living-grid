@@ -1,11 +1,33 @@
-import { BeatRound } from './Round.jsx'
-import { DEMO_BANNER, useDemo } from './demo.js'
+import { useState } from 'react'
+import { PmGame } from './pm/PmGame.jsx'
+import { DEMO_BANNER, usePmDemo } from './pm/demo.js'
 
-// #/play?demo=1: the Beat the model screens on a scripted round with invented content. Labelled; no database.
+// #/play?demo=1: the market feed on a scripted day of invented markets. Labelled; no database.
 export function DemoPlay() {
-  const demo = useDemo(true)
+  const demo = usePmDemo()
+  const [err, setErr] = useState(null)
   return (
-    <BeatRound model={demo.model} banner={DEMO_BANNER} onAnswer={demo.answer} onAgain={demo.again} onLeave={() => { location.hash = '#/play' }} />
+    <PmGame
+      model={demo.model}
+      banner={DEMO_BANNER}
+      rehearsal
+      error={err}
+      clearError={() => setErr(null)}
+      onTrade={async (action, marketId, side, shares) => {
+        setErr(null)
+        try {
+          await demo.trade(action, marketId, side, shares)
+          return true
+        } catch (e) {
+          setErr(e.message)
+          return false
+        }
+      }}
+      onAgain={demo.again}
+      onLeave={() => {
+        location.hash = '#/play'
+      }}
+    />
   )
 }
 

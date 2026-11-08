@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { BeatRound } from './Round.jsx'
 import { useBeat } from './useBeat.js'
+import { PmGame } from './pm/PmGame.jsx'
+import { usePm } from './pm/usePm.js'
 
 // The live screens: solo (starts its own game) and room (the lobby started it). Both read the same game through useBeat.
 function useRun() {
@@ -59,4 +61,46 @@ export function BeatRoom({ lobbyId, footer }) {
   const { busy, error, run } = useRun()
   if (beat.model.status === 'idle') return waiting(beat.status, error, 'Getting the first call ready…')
   return <BeatRound model={beat.model} busy={busy} error={error} onAnswer={(o, c) => run(() => beat.answer(o, c))} onAgain={null} onLeave={null} footer={footer} />
+}
+
+// Solo markets: starts its own game, then shows the market feed. Leaving gives the game up.
+export function PmSolo({ name, avatar, onExit }) {
+  const pm = usePm()
+  const { busy, error, run } = useRun()
+  const [err, setErr] = useState(null)
+  const baseline = useRef(null)
+  const started = useRef(false)
+  useEffect(() => {
+    if (pm.status !== 'live') return
+    if (!started.current) {
+      started.current = true
+      baseline.current = pm.gameId ?? 0
+      run(() => pm.start(name, avatar))
+    }
+  }, [pm.status]) // eslint-disable-line react-hooks/exhaustive-deps
+  const fresh = pm.gameId != null && pm.gameId > (baseline.current ?? 0)
+  if (!fresh) return waiting(pm.status, error, 'Opening the markets…')
+  return (
+    <PmGame
+      model={pm.model}
+      busy={busy}
+      error={err ?? error}
+      clearError={() => setErr(null)}
+      onTrade={async (action, marketId, side, shares) => {
+        setErr(null)
+        try {
+          await pm.trade(action, marketId, side, shares)
+          return true
+        } catch (e) {
+          setErr(e?.message || 'That did not go through. Try again.')
+          return false
+        }
+      }}
+      onAgain={() => {
+        baseline.current = pm.gameId
+        run(() => pm.start(name, avatar))
+      }}
+      onLeave={() => pm.leave().finally(onExit)}
+    />
+  )
 }

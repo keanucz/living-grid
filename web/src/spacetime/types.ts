@@ -618,6 +618,106 @@ export const PlayerDecision = __t.object("PlayerDecision", {
 });
 export type PlayerDecision = __Infer<typeof PlayerDecision>;
 
+export const PmAccount = __t.object("PmAccount", {
+  key: __t.string(),
+  gameId: __t.u32(),
+  identity: __t.identity(),
+  name: __t.string(),
+  isBot: __t.bool(),
+  points: __t.f64(),
+  equity: __t.f64(),
+});
+export type PmAccount = __Infer<typeof PmAccount>;
+
+export const PmDay = __t.object("PmDay", {
+  day: __t.string(),
+  regime: __t.string(),
+  startHour: __t.u32(),
+  endHour: __t.u32(),
+  marketsJson: __t.string(),
+});
+export type PmDay = __Infer<typeof PmDay>;
+
+export const PmGame = __t.object("PmGame", {
+  id: __t.u32(),
+  owner: __t.identity(),
+  state: __t.string(),
+  clockHour: __t.u32(),
+  startHour: __t.u32(),
+  endHour: __t.u32(),
+  secondsPerHour: __t.u32(),
+  openedAt: __t.timestamp(),
+  dayRevealed: __t.string(),
+  startedAt: __t.timestamp(),
+});
+export type PmGame = __Infer<typeof PmGame>;
+
+export const PmMarket = __t.object("PmMarket", {
+  key: __t.string(),
+  gameId: __t.u32(),
+  marketId: __t.string(),
+  text: __t.string(),
+  kind: __t.string(),
+  unit: __t.string(),
+  closeHour: __t.u32(),
+  modelNote: __t.string(),
+  status: __t.string(),
+  priceYes: __t.u32(),
+  note: __t.string(),
+  outcome: __t.string(),
+  actualText: __t.string(),
+});
+export type PmMarket = __Infer<typeof PmMarket>;
+
+export const PmPosition = __t.object("PmPosition", {
+  key: __t.string(),
+  gameId: __t.u32(),
+  identity: __t.identity(),
+  marketId: __t.string(),
+  side: __t.string(),
+  shares: __t.f64(),
+  cost: __t.f64(),
+  settled: __t.bool(),
+  payout: __t.f64(),
+});
+export type PmPosition = __Infer<typeof PmPosition>;
+
+export const PmPrice = __t.object("PmPrice", {
+  key: __t.string(),
+  gameId: __t.u32(),
+  marketId: __t.string(),
+  hour: __t.u32(),
+  priceYes: __t.u32(),
+});
+export type PmPrice = __Infer<typeof PmPrice>;
+
+export const PmSecret = __t.object("PmSecret", {
+  gameId: __t.u32(),
+  day: __t.string(),
+});
+export type PmSecret = __Infer<typeof PmSecret>;
+
+export const PmTick = __t.object("PmTick", {
+  scheduledId: __t.u64(),
+  scheduledAt: __t.scheduleAt(),
+  gameId: __t.u32(),
+});
+export type PmTick = __Infer<typeof PmTick>;
+
+export const PmTrade = __t.object("PmTrade", {
+  key: __t.string(),
+  gameId: __t.u32(),
+  seq: __t.u32(),
+  identity: __t.identity(),
+  marketId: __t.string(),
+  side: __t.string(),
+  action: __t.string(),
+  shares: __t.f64(),
+  price: __t.u32(),
+  hour: __t.u32(),
+});
+export type PmTrade = __Infer<typeof PmTrade>;
+
 export const Profile = __t.object("Profile", {
   identity: __t.identity(),
   name: __t.string(),

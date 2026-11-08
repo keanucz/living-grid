@@ -5,6 +5,7 @@ import { DbConnection } from '../../spacetime/index.ts'
 const DB = 'living-grid'
 const TOKEN_KEY = 'lg-game-token'
 const TABLES = ['beat_game', 'beat_call', 'beat_player', 'beat_result']
+const PM_TABLES = ['pm_game', 'pm_market', 'pm_price', 'pm_account', 'pm_position', 'pm_trade']
 const EXTRA = ['meta_leaderboard', 'lobby'] // optional: the final rank, and the room's state
 
 const tokenStore = {
@@ -31,7 +32,10 @@ export function uri() {
 }
 
 // onState({ status, me, conn }) on every change; returns { start, answer, close }. `read` turns conn into rows.
-export function connectBeat({ onState, withToken = true }) {
+export const connectBeat = (opts) => connectTables({ ...opts, tables: TABLES })
+export const connectPm = (opts) => connectTables({ ...opts, tables: PM_TABLES })
+
+function connectTables({ onState, withToken = true, tables }) {
   let identity = null
   let conn = null
   let timer = 0
@@ -46,7 +50,7 @@ export function connectBeat({ onState, withToken = true }) {
     .onConnect((c, id, token) => {
       identity = id
       if (withToken) tokenStore.set(token)
-      const names = [...TABLES, ...EXTRA.filter((n) => c.db[n])]
+      const names = [...tables, ...EXTRA.filter((n) => c.db[n])]
       for (const n of names) {
         const t = c.db[n]
         t.onInsert(() => emit())
@@ -56,17 +60,21 @@ export function connectBeat({ onState, withToken = true }) {
       c.subscriptionBuilder()
         .onApplied(() => emit())
         .onError(() => onState({ status: 'offline' }))
-        .subscribe(TABLES.map((t) => `SELECT * FROM ${t}`))
-      const extra = names.filter((n) => !TABLES.includes(n))
+        .subscribe(tables.map((t) => `SELECT * FROM ${t}`))
+      const extra = names.filter((n) => !tables.includes(n))
       if (extra.length) c.subscriptionBuilder().onApplied(() => emit()).onError(() => emit()).subscribe(extra.map((t) => `SELECT * FROM ${t}`))
     })
     .onConnectError(() => onState({ status: 'offline' }))
     .onDisconnect(() => onState({ status: 'offline' }))
     .build()
-  const call = (name, args) => (conn.reducers[name] ? conn.reducers[name](args) : Promise.reject(new Error('Beat the model is not available on this server yet.')))
+  const call = (name, args) => (conn.reducers[name] ? conn.reducers[name](args) : Promise.reject(new Error('This game is not available on this server yet.')))
   return {
     start: (name, avatar) => call('beatStart', { name, avatar }),
     answer: (gameId, idx, choice, confidence) => call('beatAnswer', { gameId, idx, choice, confidence }),
+    pmStart: (name, avatar) => call('pmStart', { name, avatar }),
+    pmBuy: (gameId, marketId, side, shares) => call('pmBuy', { gameId, marketId, side, shares }),
+    pmSell: (gameId, marketId, side, shares) => call('pmSell', { gameId, marketId, side, shares }),
+    pmLeave: (gameId) => call('pmLeave', { gameId }),
     close: () => {
       clearTimeout(timer)
       conn.disconnect()

@@ -5,7 +5,7 @@ import { connectMarket } from '../market/connection.js'
 import { Phone } from '../market/index.jsx'
 import { BatteryMode } from './BatteryMode.jsx'
 import { DemoPlay, isDemo } from '../play/DemoPlay.jsx'
-import { BeatRoom, BeatSolo } from '../play/Live.jsx'
+import { BeatRoom, PmSolo } from '../play/Live.jsx'
 import { AVATARS, Avatar, avatarIds } from './avatars.jsx'
 import {
   COUNTDOWN_S, QUESTION_COUNTS, SPEEDS, countdownLeft, members, myLobby, normaliseCode, playLink, roundLength, routeCode, screenLink,
@@ -117,7 +117,7 @@ function Landing({ profile, setProfile, queue, onSolo, onHost, onJoinCode, onQui
     <>
       <section className="lb-card lb-quick">
         <h2>Beat the model</h2>
-        <p className="lb-muted">Five calls on a mystery day. Say what you think and how sure you are, then see whether you beat the model and the bots.</p>
+        <p className="lb-muted">Trade yes/no markets on a mystery day against our model. Buy what you think is underpriced, sell before it moves, and see whether you out-earn the model and the bots.</p>
         <Profile profile={profile} setProfile={setProfile} />
         <button className="lb-primary" onClick={onSolo}>Play solo</button>
       </section>
@@ -146,7 +146,7 @@ function Landing({ profile, setProfile, queue, onSolo, onHost, onJoinCode, onQui
           <button className="lb-ghost wide" disabled={code.length !== 4}>Continue</button>
         </form>
       </section>
-      <a className="lb-link" href="#/play?demo=1">Try a rehearsal round (invented calls)</a>
+      <a className="lb-link" href="#/play?demo=1">Try a rehearsal day (invented markets)</a>
     </>
   )
 }
@@ -359,7 +359,7 @@ function Lobby() {
   }
   const join = (code) => run(() => api.current.lobbyJoin(code, profile.name.trim(), profile.avatar ?? avatarIds[0]))
 
-  if (solo) return <BeatSolo name={(profile.name ?? '').trim() || defaultName()} avatar={profile.avatar ?? avatarIds[0]} onExit={() => setSolo(false)} />
+  if (solo) return <PmSolo name={(profile.name ?? '').trim() || defaultName()} avatar={profile.avatar ?? avatarIds[0]} onExit={() => setSolo(false)} />
   let body
   if (s.status === 'connecting') body = <p className="lb-muted">Connecting…</p>
   else if (s.status === 'offline') body = <p className="lb-muted">The game server is out of reach. Check the Wi-Fi and reload.</p>
