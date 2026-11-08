@@ -1,3 +1,4 @@
+import SunNote from './layers/solar/Note.jsx'
 import { useEffect, useMemo, useState } from 'react'
 import MapView from './map/MapView.jsx'
 import TopBar from './shell/TopBar.jsx'
@@ -160,6 +161,7 @@ function MapApp() {
             <div className="bar" style={{ background: `linear-gradient(90deg, ${PRICE_LEGEND.map((s) => s.c).join(',')})` }} />
             <div className="ticks num">{PRICE_LEGEND.map((s) => <span key={s.v}>{s.v}</span>)}</div>
           </div>
+          <SunNote ui={ui} />
           {ui.layers?.coupled && <span className="muted" style={{ fontSize: 11 }}>Prices only, not forecast. Zone borders approximate. Source: Nord Pool.</span>}
         </div>
       </main>

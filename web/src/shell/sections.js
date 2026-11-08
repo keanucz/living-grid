@@ -1,4 +1,5 @@
 import { actions, setState, getState } from '../store/store.js'
+import { sunUp } from '../layers/solar/daylight.js'
 
 // Every section sets each layer the Hidden grid stories switch (ghostWind, carbon, boundaries, wind, solar), so none
 // leaks into the next section (#312).
@@ -16,7 +17,9 @@ export const SECTIONS = [
   { id: 'forecast', label: 'Forecast', question: "Where are prices going?", icon: 'chart', mode: 'overview', at: '+6',
     title: 'The outlook', blurb: 'Our forecast for every zone, with the odds in plain words and the reasons behind it',
     door: 'The outlook: where prices are heading, how sure we are, and the cheapest hours tonight',
-    panels: ['zoneChart', 'explain', 'scrubber'], layers: { flows: true, ghost: true, ghostWind: false, carbon: false, boundaries: false, wind: false, solar: false },
+    panels: ['zoneChart', 'explain', 'scrubber'],
+    // The outlook shows the weather behind the forecast: wind always, sun only when it is daytime at the hour shown.
+    get layers() { return { flows: true, ghost: true, ghostWind: false, carbon: false, boundaries: false, wind: true, solar: sunUp(Date.now() + 6 * 3600e3) } },
     pages: [
       { label: 'Plan around it: cheapest hours tonight', href: '#/household', paths: ['/household'] },
       { label: 'Plan around it: where to put a data centre', href: '#/datacentre', paths: ['/datacentre'] },
