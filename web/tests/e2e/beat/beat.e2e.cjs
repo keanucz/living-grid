@@ -48,12 +48,12 @@ async function readReveal(page) {
   }
 }
 
-function leakCheck(page, cap, events, label) {
+function leakCheck(page, cap, events, label, since = 0) {
   // events: [{ k, revealAt, happened, reason }]; the strings that appear at a reveal must not have been received earlier.
   return Promise.all(events.map(async (e) => {
     for (const [what, s] of [['what happened', e.happened.replace(/^What happened\s*/, '').slice(-40)], ['reason', e.reason.slice(-40)]]) {
       if (!s || s.length < 20) continue
-      const first = cap.firstSeen(s)
+      const first = cap.firstSeen(s, since)
       if (first !== null && first < e.revealAt - 2500) {
         await issue(page, `leak-${label}-call${e.k + 1}-${what.replace(' ', '-')}`, `${label}: ${what} of call ${e.k + 1} reached the client before its reveal`, `"${s}" arrived ${((e.revealAt - first) / 1000).toFixed(1)} s before the reveal was shown`)
       }
@@ -269,6 +269,11 @@ async function anonChecks(page, label) {
   if (open.length) await issue(page, `${label}-sql-open-outcome`, 'An open pm_market row carries an outcome or actual text', JSON.stringify(open[0]).slice(0, 200))
   const early = rowsOf(await q("SELECT day_revealed FROM pm_game WHERE state = 'running'")).filter((r) => r.day_revealed)
   if (early.length) await issue(page, `${label}-sql-day`, 'A running pm_game has day_revealed set', '')
+  const oldCalls = rowsOf(await q('SELECT game_id, text, answer FROM beat_call WHERE revealed = true'))
+  const oldMarkets = rowsOf(await q("SELECT game_id, market_id, outcome FROM pm_market WHERE status = 'closed'"))
+  if (oldCalls.length || oldMarkets.length) {
+    await issue(page, 'sql-finished-games-public', 'Revealed answers of other (finished) games are readable by every client', `${oldCalls.length} beat_call and ${oldMarkets.length} closed pm_market rows, with outcomes; a day's questions repeat between games, so a player can look up an answer before their own reveal`)
+  }
   for (const t of ['pm_day', 'pm_secret', 'beat_pick', 'beat_day']) {
     const r = await q(`SELECT * FROM ${t}`)
     if (r.status === 200) await issue(page, `${label}-sql-${t}`, `Anonymous clients can read ${t}`, '')
@@ -350,6 +355,7 @@ async function room(browser) {
   await screenCtx.page.screenshot({ path: path.join(OUT, 'room-02-screen-waiting.png') })
 
   const t0 = Date.now()
+  const startedAt = t0 - 500
   await host.page.getByRole('button', { name: 'Start game' }).click()
   const events = []
   for (let k = 0; k < 5; k++) {
@@ -398,7 +404,7 @@ async function room(browser) {
     const have = ['E2E Ann', 'E2E Ben'].filter((n) => meta.some((r) => r.name === n))
     if (have.length < 2) await issue(phones[0].page, 'room-meta', 'Room: the meta leaderboard is missing a player after the round', JSON.stringify(meta).slice(0, 200))
   }
-  await leakCheck(phones[0].page, phones[0].cap, events, 'room')
+  await leakCheck(phones[0].page, phones[0].cap, events, 'room', startedAt)
   const endAt = Date.now()
   const day = (await text(phones[0].page.locator('section.bm-end'))).match(/\b20\d\d-\d\d-\d\d\b/)?.[0]
   if (day) for (const c of [hcap, scap, phones[0].cap, phones[1].cap]) {

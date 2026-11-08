@@ -6,6 +6,8 @@ import { LeaderboardRace } from '../../panels/leaderboard/Race.jsx'
 import { connectScreen } from './connection.js'
 import { demoState, DEMO_REPLAY } from './demo.js'
 import { CSS } from './style.js'
+import { connectRoom } from './room/connection.js'
+import { BEAT_CSS, BeatEnd, BeatHeader, BeatPlaying, beatPhase } from './room/BeatScreen.jsx'
 
 // Big screen for the mystery-day market, made for a 1080p projector: #/screen?code=ABCD (one per lobby), or
 // #/screen for the current round. Waiting room with the join QR, then the leaderboard race, the crowd against
@@ -110,7 +112,18 @@ function Header({ s, phase, code, url }) {
   )
 }
 
-function Waiting({ s, url, code, phase }) {
+const MARKET_HOW = [
+  'We replay a real past day of Europe’s grid, one hour at a time, with the date hidden.',
+  'Buy YES or NO on questions about prices and wind. The price is the room’s probability.',
+  'Beat the bots. Points only, no money. Each bot saw only data from before the day.',
+]
+const BEAT_HOW = [
+  'We pick a real past day of Europe’s grid and hide the date.',
+  'Five calls, about 15 seconds each: pick an answer and say how sure you are.',
+  'You score for being right and for knowing how right you are. Beat the model and the bots.',
+]
+
+function Waiting({ s, url, code, phase, how = MARKET_HOW }) {
   const qr = useQr(url, 520)
   const players = s.players ?? []
   return (
@@ -138,11 +151,7 @@ function Waiting({ s, url, code, phase }) {
         </div>
         <div className="sc-how">
           <div className="sc-h2">How it works</div>
-          <ol>
-            <li>We replay a real past day of Europe’s grid, one hour at a time, with the date hidden.</li>
-            <li>Buy YES or NO on questions about prices and wind. The price is the room’s probability.</li>
-            <li>Beat the bots. Points only, no money. Each bot saw only data from before the day.</li>
-          </ol>
+          <ol>{how.map((t) => <li key={t}>{t}</li>)}</ol>
         </div>
         {s.bots?.length > 0 && (
           <div className="sc-against">
@@ -343,7 +352,7 @@ function Reveal({ s }) {
   )
 }
 
-function Screen() {
+function MarketScreen() {
   const code = (param('code') || '').toUpperCase().slice(0, 8) || null
   const demo = param('demo') === '1'
   const [s, bursts] = useScreen(code, demo)
@@ -365,6 +374,40 @@ function Screen() {
       <style>{CSS}</style>
     </div>
   )
+}
+
+// A room of Beat the model plays on its own tables, so its screen reads the lobby and beat_* (room/BeatScreen.jsx);
+// every other room, and #/screen without a code, keeps the market screen.
+function BeatScreen({ room, code }) {
+  const phase = beatPhase(room)
+  const url = useMemo(() => joinUrl(code), [code])
+  useEffect(() => {
+    document.body.classList.add('sc-body')
+    return () => document.body.classList.remove('sc-body')
+  }, [])
+  return (
+    <div className="sc" data-phase={phase === 'answer' || phase === 'reveal' ? 'playing' : phase === 'end' ? 'reveal' : phase}>
+      <BeatHeader room={room} phase={phase} />
+      {(phase === 'waiting' || phase === 'countdown') && <Waiting s={{ players: room.members, bots: [] }} url={url} code={code} phase={phase} how={BEAT_HOW} />}
+      {(phase === 'answer' || phase === 'reveal') && <BeatPlaying room={room} />}
+      {phase === 'end' && <BeatEnd room={room} />}
+      <style>{CSS}{BEAT_CSS}</style>
+    </div>
+  )
+}
+
+function Screen() {
+  const code = (param('code') || '').toUpperCase().slice(0, 8) || null
+  const demo = param('demo') === '1'
+  const [room, setRoom] = useState({ status: 'connecting' })
+  useEffect(() => {
+    if (demo || !code || import.meta.env?.VITE_LG_OFFLINE === '1') return undefined
+    const c = connectRoom({ code, onState: setRoom })
+    return () => c.close()
+  }, [code, demo])
+  if (!demo && code && room.lobby?.mode === 'beat') return <BeatScreen room={room} code={code} />
+  if (!demo && code && room.status === 'connecting') return <div className="sc"><div className="sc-status">Connecting to the game server…</div><style>{CSS}</style></div>
+  return <MarketScreen />
 }
 
 export default { path: '/screen', title: 'Big screen', Component: Screen }

@@ -67,7 +67,7 @@ function capture(page, label) {
       frames.push({ t: Date.now(), text: body.toString('latin1') })
     })
   })
-  return { label, frames, firstSeen: (needle) => frames.find((f) => f.text.includes(needle))?.t ?? null }
+  return { label, frames, firstSeen: (needle, since = 0) => frames.find((f) => f.t >= since && f.text.includes(needle))?.t ?? null }
 }
 
 // Public-table view of the world, as any anonymous client sees it (the strongest check of what can leak).
