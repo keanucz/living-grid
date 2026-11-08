@@ -177,7 +177,9 @@
     }
    ],
    "mae": 4.71,
-   "inside_band_share": 1.0
+   "inside_band_share": 1.0,
+   "baseline_mae": 8.26,
+   "baseline_name": "same hour yesterday"
   },
   {
    "zone": "FR",
@@ -354,7 +356,9 @@
     }
    ],
    "mae": null,
-   "inside_band_share": null
+   "inside_band_share": null,
+   "baseline_mae": null,
+   "baseline_name": null
   },
   {
    "zone": "DE-LU",
@@ -531,7 +535,9 @@
     }
    ],
    "mae": null,
-   "inside_band_share": null
+   "inside_band_share": null,
+   "baseline_mae": null,
+   "baseline_name": null
   },
   {
    "zone": "NL",
@@ -708,7 +714,9 @@
     }
    ],
    "mae": null,
-   "inside_band_share": null
+   "inside_band_share": null,
+   "baseline_mae": null,
+   "baseline_name": null
   },
   {
    "zone": "BE",
@@ -885,7 +893,9 @@
     }
    ],
    "mae": null,
-   "inside_band_share": null
+   "inside_band_share": null,
+   "baseline_mae": null,
+   "baseline_name": null
   },
   {
    "zone": "NO2",
@@ -1062,7 +1072,9 @@
     }
    ],
    "mae": null,
-   "inside_band_share": null
+   "inside_band_share": null,
+   "baseline_mae": null,
+   "baseline_name": null
   }
  ],
  "zones_published": 1,

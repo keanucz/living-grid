@@ -3,6 +3,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 from engine.app import app
+from engine.routes import reveal
 from engine.schemas import RevealResponse
 from pipeline import cache
 
@@ -92,3 +93,28 @@ def test_online_never_serves_the_fixture_as_a_freeze(monkeypatch):
 
 def test_offline_falls_back_to_fixture():
     assert get().frozen_at == FROZEN["frozen_at"].max()
+
+
+def sunday(monkeypatch, zones, offset, drop=0):
+    """Only these cached actuals: Monday's median shifted back 24 h, plus an offset."""
+    f = FROZEN[FROZEN["zone"].isin(zones)].iloc[drop:]
+    a = pd.DataFrame({"ts": (f["ts"] - pd.Timedelta(hours=24)).to_numpy(), "zone": f["zone"].to_numpy(), "series": "price_da",
+                      "value": (f["p50"] + offset).to_numpy(), "unit": "EUR/MWh", "source": "nordpool"})
+    monkeypatch.setattr(reveal.data, "actuals", lambda: a)
+
+
+def test_baseline_same_hour_yesterday(isolated, monkeypatch):
+    write(isolated, "forecasts/frozen_monday", FROZEN)
+    write(isolated, "reveal/results", results(["GB", "FR"], offset=3.0))
+    sunday(monkeypatch, ["GB"], offset=10.0)
+    zones = {z.zone: z for z in get().zones}
+    assert zones["GB"].baseline_mae == pytest.approx(7.0) and zones["GB"].baseline_name == "same hour yesterday"
+    assert zones["FR"].published and zones["FR"].baseline_mae is None  # no Sunday prices for France
+    assert zones["NL"].baseline_mae is None and zones["NL"].baseline_name is None
+
+
+def test_baseline_needs_every_hour(isolated, monkeypatch):
+    write(isolated, "forecasts/frozen_monday", FROZEN)
+    write(isolated, "reveal/results", results(["GB"]))
+    sunday(monkeypatch, ["GB"], offset=10.0, drop=1)
+    assert next(z for z in get().zones if z.zone == "GB").baseline_mae is None

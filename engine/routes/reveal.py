@@ -15,6 +15,8 @@ router = APIRouter(tags=["proof"])
 FROZEN = "forecasts/frozen_monday"
 RESULTS = "reveal/results"
 INSIDE_BAND_ZONE = 0.8  # a zone counts as "inside the band" when at least this share of its hours is
+BASELINE_NAME = "same hour yesterday"
+DAY = pd.Timedelta(hours=24)
 
 
 def _read(name: str) -> pd.DataFrame | None:
@@ -53,14 +55,14 @@ def build() -> dict:
     frozen_at = frozen["frozen_at"].max()
     f = frozen[frozen["frozen_at"] == frozen_at]
     start, end = f["ts"].min(), f["ts"].max() + pd.Timedelta(hours=1)
-    res = _results(start, end).set_index(["zone", "ts"])["value"]
+    res = _results(start - DAY, end).set_index(["zone", "ts"])["value"]
 
     zones, maes, inside_zones = [], [], 0
     for zone in data.ZONES:
         g = f[f["zone"] == zone].sort_values("ts")
         if g.empty:
             continue
-        hours, errs, inside = [], [], []
+        hours, errs, inside, base_errs = [], [], [], []
         for r in g.itertuples():
             actual = res.get((zone, r.ts))
             actual = None if actual is None or pd.isna(actual) else float(actual)
@@ -68,14 +70,19 @@ def build() -> dict:
             if actual is not None:
                 errs.append(abs(actual - r.p50))
                 inside.append(r.p10 <= actual <= r.p90)
+                before = res.get((zone, r.ts - DAY))
+                base_errs.append(None if before is None or pd.isna(before) else abs(actual - float(before)))
         published = len(errs) == len(hours)
         mae = round(sum(errs) / len(errs), 2) if errs else None
         share = round(sum(inside) / len(inside), 2) if inside else None
+        # The naive baseline only counts when the whole published day has a price the day before.
+        base = round(sum(base_errs) / len(base_errs), 2) if published and base_errs and None not in base_errs else None
         if published:
             maes.append(mae)
             inside_zones += share >= INSIDE_BAND_ZONE
         zones.append(
-            {"zone": zone, "currency": data.CURRENCY[zone], "published": published, "hours": hours, "mae": mae, "inside_band_share": share}
+            {"zone": zone, "currency": data.CURRENCY[zone], "published": published, "hours": hours, "mae": mae, "inside_band_share": share,
+             "baseline_mae": base, "baseline_name": BASELINE_NAME if base is not None else None}
         )
     mid = f["ts"].min() + (end - f["ts"].min()) / 2
     return {

@@ -3811,6 +3811,29 @@
    "RevealZone": {
     "additionalProperties": false,
     "properties": {
+     "baseline_mae": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "description": "Mean absolute error of the same hour the day before delivery, from the same price sources; null unless every published hour has one",
+      "title": "Baseline Mae"
+     },
+     "baseline_name": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Baseline Name"
+     },
      "currency": {
       "enum": [
        "GBP",

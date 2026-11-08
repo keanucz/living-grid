@@ -662,6 +662,8 @@ class RevealZone(Model):
     hours: list[RevealHour]
     mae: float | None
     inside_band_share: float | None
+    baseline_mae: float | None = Field(None, description="Mean absolute error of the same hour the day before delivery, from the same price sources; null unless every published hour has one")
+    baseline_name: str | None = None
 
 
 class RevealResponse(Model):

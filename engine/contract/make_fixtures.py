@@ -571,7 +571,9 @@ def reveal() -> dict:
             hrs.append({"ts": iso(t), **b, "actual": round(p50 + rng.uniform(-9, 9), 2) if published else None})
         mae = round(sum(abs(h["actual"] - h["p50"]) for h in hrs) / 24, 2) if published else None
         inside = round(sum(h["p10"] <= h["actual"] <= h["p90"] for h in hrs) / 24, 2) if published else None
-        zs.append({"zone": zone, "currency": CURRENCY[zone], "published": published, "hours": hrs, "mae": mae, "inside_band_share": inside})
+        base = round(sum(abs(h["actual"] - BASE_PRICE[zone] * daily_shape(t - timedelta(hours=24)) * 1.06) for h, t in zip(hrs, hours(start, 24))) / 24, 2) if published else None
+        zs.append({"zone": zone, "currency": CURRENCY[zone], "published": published, "hours": hrs, "mae": mae, "inside_band_share": inside,
+                   "baseline_mae": base, "baseline_name": "same hour yesterday" if published else None})
     pub = [z for z in zs if z["published"]]
     return {
         "delivery_date": day.isoformat(),

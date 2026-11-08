@@ -79,6 +79,12 @@ function ZoneCard({ z, fresh }) {
           <span className="faint">Best guess between {cur}{Math.min(...hrs.map((h) => h.p50)).toFixed(0)} and {cur}{Math.max(...hrs.map((h) => h.p50)).toFixed(0)} across the day</span>
         )}
       </div>
+      {z.published && z.mae != null && z.baseline_mae != null && (
+        <p className="rv-base">
+          Our miss: <b className="num">{cur}{z.mae.toFixed(1)}</b> per MWh. Same hour yesterday: <b className="num">{cur}{z.baseline_mae.toFixed(1)}</b>.
+          {z.mae > z.baseline_mae && ' Copying yesterday would have been closer this time.'}
+        </p>
+      )}
     </article>
   )
 }
@@ -191,6 +197,8 @@ body { overflow: auto; }
 .rv-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
 .rv-foot { display: flex; gap: 16px; font-size: 12px; color: var(--text-2); margin-top: 4px; }
 .rv-foot b { color: var(--text); font-size: 14px; margin-left: 4px; }
+.rv-base { margin: 6px 0 0; font-size: 13px; color: var(--text-2); }
+.rv-base b { color: var(--text); }
 .rv-dot { animation: rvland .5s cubic-bezier(.2,1.4,.4,1) both; }
 @keyframes rvland { from { opacity: 0; transform: translateY(-14px); } to { opacity: 1; transform: none; } }
 .rv-legend { display: flex; gap: 16px; font-size: 12px; color: var(--text-2); margin-top: 14px; flex-wrap: wrap; }
