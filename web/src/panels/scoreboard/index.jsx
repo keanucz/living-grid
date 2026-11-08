@@ -1,10 +1,14 @@
 import { useState } from 'react'
 import Backtest from '../backtest/Backtest.jsx'
+import Explain from '../../ui/Explain.jsx'
+import Term from '../../ui/Term.jsx'
 import { pct, scoreboard } from './summary.js'
 import { useScores } from './useScores.js'
 
 const sharePct = (v) => `${(v * 100).toFixed(0)}%`
+const whole = (v) => Math.round(Math.abs(v * 100))
 
+// Proof, in plain words first: the two live numbers as sentences, the original tiles under "For experts".
 function Scoreboard() {
   const { scores, source } = useScores()
   const [open, setOpen] = useState(false)
@@ -45,37 +49,59 @@ function Scoreboard() {
     })
   }
 
+  const answer = (
+    <>
+      {s.error && (
+        <p>
+          Our price forecasts are <b className="num">{whole(s.error.value)}%</b> {bad ? 'more' : 'less'} wrong than guessing the price stays where it is.
+        </p>
+      )}
+      {s.coverage && (
+        <p>
+          The real price landed inside our <Term id="likely-range">likely range</Term> <b className="num">{whole(s.coverage.value)}%</b> of the time. That is what we aim for.
+        </p>
+      )}
+      {!s.error && !s.coverage && <p>Scores appear as soon as the first forecasts meet their outcomes.</p>}
+    </>
+  )
+
+  const experts = (
+    <>
+      <div className="score-grid" style={{ gridTemplateColumns: `repeat(${tiles.length}, 1fr)` }}>
+        {tiles.map((t) => (
+          <div key={t.label}>
+            <div className="faint score-label">{t.label}{t.tag && <span className="tag" style={{ marginLeft: 6 }}>{t.tag}</span>}</div>
+            <div className={`score-val num ${t.tone}`}>{t.value}</div>
+            <div className="faint score-note">{t.note}</div>
+          </div>
+        ))}
+      </div>
+      <button type="button" className="score-more" onClick={() => setOpen(true)}>Backtest by zone ›</button>
+    </>
+  )
+
   return (
     <>
-      <section className="panel score fade-in" onClick={() => setOpen(true)} role="button" tabIndex={0} onKeyDown={(e) => e.key === 'Enter' && setOpen(true)}>
-        <div className="panel-head">
-          <span>
-            How right are we? <span className="tag" style={{ marginLeft: 8 }}>{source === 'live' ? 'Live' : source === 'cached' ? 'Last good' : 'Fixture'}</span>
-          </span>
-          <span className="muted score-hint">Tap for backtest by zone ›</span>
-        </div>
-        <div className="score-grid" style={{ gridTemplateColumns: `repeat(${tiles.length}, 1fr)` }}>
-          {tiles.map((t) => (
-            <div key={t.label}>
-              <div className="faint score-label">{t.label}{t.tag && <span className="tag" style={{ marginLeft: 6 }}>{t.tag}</span>}</div>
-              <div className={`score-val num ${t.tone}`}>{t.value}</div>
-              <div className="faint score-note">{t.note}</div>
-            </div>
-          ))}
-        </div>
-        <style>{`
-          .score { width: 560px; cursor: pointer; }
-          .score:hover { border-color: var(--line-2); }
-          .score-hint { font-size: 13px; }
-          .score-grid { display: grid; gap: 18px; padding: 4px 18px 18px; }
-          .score-label { font-size: 13px; min-height: 32px; }
-          .score-val { font-size: 46px; font-weight: 700; line-height: 1.05; margin: 6px 0; white-space: nowrap; }
-          .score-val.good { color: var(--down); }
-          .score-val.bad { color: var(--up); }
-          .score-val.warn { color: var(--hot); }
-          .score-note { font-size: 13px; line-height: 1.35; }
-        `}</style>
-      </section>
+      <Explain
+        className="score"
+        question="Can we trust the forecast?"
+        tag={source === 'live' ? 'Live' : source === 'cached' ? 'Last good' : 'Fixture'}
+        answer={answer}
+        experts={experts}
+      />
+      <style>{`
+        .score { width: 560px; }
+        .score-grid { display: grid; gap: 18px; padding: 4px 0 10px; }
+        .score-label { font-size: 13px; min-height: 32px; }
+        .score-val { font-size: 40px; font-weight: 700; line-height: 1.05; margin: 6px 0; white-space: nowrap; color: var(--text); }
+        .score-val.good { color: var(--down); }
+        .score-val.bad { color: var(--up); }
+        .score-val.warn { color: var(--hot); }
+        .score-note { font-size: 13px; line-height: 1.35; }
+        .score-more { all: unset; cursor: pointer; font-size: 13px; color: var(--accent); min-height: 32px; }
+        .score-more:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+        @media (max-width: 700px) { .score { width: 100%; } .score-grid { grid-template-columns: repeat(2, 1fr) !important; } .score-val { font-size: 30px; } }
+      `}</style>
       {open && <Backtest rows={scores.backtest} source={source} onClose={() => setOpen(false)} />}
     </>
   )
