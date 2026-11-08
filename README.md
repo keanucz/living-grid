@@ -112,7 +112,17 @@ Walk-forward backtest on day-ahead prices: twelve folds of seven days (mid-Augus
 
 That's 36% better than persistence on day-ahead prices, pooled over all six zones (12,086 hours). Per zone the model beats persistence everywhere except NO2 (ratio 1.01, level), and beats yesterday in four of six zones; it loses to yesterday in France (1.02) and NO2 (1.09).
 
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/img/readme/error-by-zone-dark.svg">
+  <img alt="Average day-ahead price miss per zone: our model against same-hour-yesterday and price-stays-put" src="docs/img/readme/error-by-zone-light.svg" width="840">
+</picture>
+
 The bands are close to honest but still a little narrow: 78.5% of day-ahead price outcomes landed inside the likely range, between P10 and P90 (target 80%). GB is the widest at 88%; the continental zones sit at 76%.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/img/readme/coverage-dark.svg">
+  <img alt="Share of real outcomes inside the likely range for each target, against the 80% aim" src="docs/img/readme/coverage-light.svg" width="840">
+</picture>
 
 Load, wind and GB system price come from the same twelve folds, purge and calibration, run on main at `388abef` and merged into the same file at about 05:05 UTC on 8 November. Errors are n-weighted across folds and zones: load and wind in MW (five zones, 9,978 hours each), GB system price in £/MWh (1,997 hours).
 
@@ -125,6 +135,16 @@ Load, wind and GB system price come from the same twelve folds, purge and calibr
 Across these 11 zone-and-target pairs the model beats both baselines in 9. It loses to yesterday on NL load (an Energy-Charts data break on 10 October) and to persistence on FR wind.
 
 The replay of 26 October 2026, a stormy day, generated separately from the backtest, shows where the misses cluster: 78 of its 168 hours (46%) landed inside the likely range. The storm caught the model out. NESO puts GB constraint costs that day at £36.5m.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/img/readme/storm-replay-dark.svg">
+  <img alt="26 October storm: actual GB day-ahead price against our best guess and likely range" src="docs/img/readme/storm-replay-light.svg" width="840">
+</picture>
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/img/readme/battery-dark.svg">
+  <img alt="Battery profit as a share of perfect hindsight per zone, for three strategies" src="docs/img/readme/battery-light.svg" width="840">
+</picture>
 
 ### Bot league: which technique wins, and when
 
