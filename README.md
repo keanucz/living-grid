@@ -105,7 +105,7 @@ Walk-forward backtest, six folds of seven days with a 48-hour purge, run on 7 No
 |---|---|
 | Our LightGBM quantile model | **33.0** |
 | Same hour yesterday | 36.6 |
-| Last known price when the forecast was made (persistence) | 43.3 |
+| Last known price when the forecast was made (persistence) | 43.2 |
 
 That's 24% better than persistence on day-ahead prices, pooled over all six zones (6,039 hours). Per zone the model beats persistence everywhere except NO2 (ratio 1.12) and beats yesterday in four of six zones. It loses to yesterday in France and to both baselines in NO2. Across all 17 zone-and-target pairs it beats both baselines in 13; the losses are NL load against yesterday (an Energy-Charts data break on 10 October), FR price against yesterday, NO2 price against both, and FR wind against persistence. The backtest says so.
 
