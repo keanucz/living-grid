@@ -1,0 +1,102 @@
+[
+ {
+  "id": "Title",
+  "seconds": 4,
+  "still": 30
+ },
+ {
+  "id": "LowerThird-Keanu",
+  "seconds": 5,
+  "still": 30
+ },
+ {
+  "id": "LowerThird-Stefan",
+  "seconds": 5,
+  "still": 30
+ },
+ {
+  "id": "LowerThird-Manu",
+  "seconds": 5,
+  "still": 30
+ },
+ {
+  "id": "Beat-now",
+  "seconds": 6,
+  "still": 30
+ },
+ {
+  "id": "Beat-hidden-grid",
+  "seconds": 6,
+  "still": 30
+ },
+ {
+  "id": "Beat-what-if",
+  "seconds": 6,
+  "still": 30
+ },
+ {
+  "id": "Beat-forecast",
+  "seconds": 6,
+  "still": 30
+ },
+ {
+  "id": "Beat-proof",
+  "seconds": 6,
+  "still": 30
+ },
+ {
+  "id": "Beat-tonight",
+  "seconds": 6,
+  "still": 30
+ },
+ {
+  "id": "Beat-meter",
+  "seconds": 6,
+  "still": 30
+ },
+ {
+  "id": "Beat-play",
+  "seconds": 6,
+  "still": 30
+ },
+ {
+  "id": "Beat-reveal",
+  "seconds": 6,
+  "still": 30
+ },
+ {
+  "id": "Callout-constraint-bill",
+  "seconds": 5,
+  "still": 75
+ },
+ {
+  "id": "Callout-hormuz",
+  "seconds": 5,
+  "still": 75
+ },
+ {
+  "id": "Callout-less-wrong",
+  "seconds": 5,
+  "still": 75
+ },
+ {
+  "id": "Callout-in-range",
+  "seconds": 5,
+  "still": 75
+ },
+ {
+  "id": "Callout-battery",
+  "seconds": 5,
+  "still": 75
+ },
+ {
+  "id": "Callout-scored",
+  "seconds": 5,
+  "still": 75
+ },
+ {
+  "id": "EndCard",
+  "seconds": 6,
+  "still": 45
+ }
+]

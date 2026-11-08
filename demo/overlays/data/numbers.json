@@ -1,0 +1,51 @@
+{
+  "fetched_at": "2026-11-08T08:35:11.406Z",
+  "api": "https://htb.stefvuck.dev/api",
+  "values": {
+    "constraint-bill": {
+      "value": 36530869,
+      "unit": "gbp",
+      "source": "/api/replay?event=2026-10-26",
+      "fetched_at": "2026-11-08T08:35:11.405Z"
+    },
+    "hormuz": {
+      "value": 1754592000,
+      "p10": 1052755000,
+      "p90": 2456428000,
+      "gas_pct": 40,
+      "days": 14,
+      "unit": "gbp",
+      "source": "/api/scenarios",
+      "fetched_at": "2026-11-08T08:35:11.390Z"
+    },
+    "less-wrong": {
+      "value": 36.39336488661537,
+      "unit": "pct",
+      "basis": "backtest",
+      "source": "/api/scores",
+      "fetched_at": "2026-11-08T08:35:11.361Z"
+    },
+    "in-range": {
+      "value": 78.48750620552705,
+      "unit": "pct",
+      "basis": "backtest",
+      "source": "/api/scores",
+      "fetched_at": "2026-11-08T08:35:11.361Z"
+    },
+    "battery": {
+      "value": 94.49,
+      "zones": 5,
+      "hours": 155,
+      "unit": "pct",
+      "source": "/api/scores",
+      "fetched_at": "2026-11-08T08:35:11.361Z"
+    },
+    "scored": {
+      "value": 991,
+      "since": "2026-11-07T13:48:44.509972Z",
+      "unit": "count",
+      "source": "/api/scores",
+      "fetched_at": "2026-11-08T08:35:11.361Z"
+    }
+  }
+}
