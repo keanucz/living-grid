@@ -1,27 +1,6 @@
-import { useEffect, useRef, useState } from 'react'
 import { Icon } from '../../shell/icons.jsx'
 import { fmt } from '../../styles/tokens.js'
-
-function useCountUp(target, ms = 1400, key) {
-  const [v, setV] = useState(0)
-  const from = useRef(0)
-  useEffect(() => {
-    const start = performance.now()
-    const a = from.current
-    let raf
-    const tick = (now) => {
-      const t = Math.min(1, (now - start) / ms)
-      const e = 1 - Math.pow(1 - t, 3)
-      const cur = a + (target - a) * e
-      setV(cur)
-      from.current = cur
-      if (t < 1) raf = requestAnimationFrame(tick)
-    }
-    raf = requestAnimationFrame(tick)
-    return () => cancelAnimationFrame(raf)
-  }, [target, key])
-  return v
-}
+import { useCountUp } from '../../ui/useCountUp.js'
 
 // Deltas are compared in EUR so zones rank fairly, but each is shown in its own currency.
 const zoneDelta = (zone, eur) => (zone === 'GB' ? `${fmt.signed(eur / 1.15)} £/MWh` : `${fmt.signed(eur)} €/MWh`)
@@ -31,7 +10,7 @@ function StatTiles({ ctx }) {
   const gb = ctx.stateByZone.GB
   const ranAt = ctx.ui.scenario?.ranAt
   const gbDelta = sc ? (sc.price_delta_eur.GB * sc.scale) / 1.15 : 0
-  const gbNow = useCountUp(gb ? gb.price + gbDelta : 0, 900, ranAt)
+  const gbNow = useCountUp(gb ? gb.price + gbDelta : 0, { ms: 900, key: ranAt })
   const deltas = sc ? Object.entries(sc.price_delta_eur).map(([z, d]) => [z, d * sc.scale]) : []
   const worst = deltas.sort((a, b) => b[1] - a[1])[0]
 

@@ -1,25 +1,6 @@
-import { useEffect, useRef, useState } from 'react'
 import { fmt } from '../../styles/tokens.js'
+import { useCountUp } from '../../ui/useCountUp.js'
 
-const reduced = () => typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
-
-// Counts from 0 to `target` (ease-out) each time `runKey` changes, so the figure visibly builds up.
-export function useCountUp(target, runKey, ms = 1400) {
-  const [v, setV] = useState(reduced() ? target : 0)
-  const raf = useRef(0)
-  useEffect(() => {
-    if (reduced()) return setV(target)
-    const t0 = performance.now()
-    const tick = (t) => {
-      const p = Math.min(1, (t - t0) / ms)
-      setV(target * (1 - Math.pow(1 - p, 3)))
-      if (p < 1) raf.current = requestAnimationFrame(tick)
-    }
-    raf.current = requestAnimationFrame(tick)
-    return () => cancelAnimationFrame(raf.current)
-  }, [target, runKey, ms])
-  return v
-}
 
 export const duration = (h) => (h >= 168 ? `${Math.round(h / 168)} wk` : h >= 48 ? `${Math.round(h / 24)} days` : `${h} h`)
 
@@ -29,7 +10,7 @@ const sym = (c) => (c === 'GBP' ? '£' : '€')
 export function ResultCard({ result, scenario, runKey }) {
   const live = !!result
   const p = live ? result.cost_total_gbp : { p10: scenario.cost_band_gbp?.p10, p50: scenario.cost_gbp, p90: scenario.cost_band_gbp?.p90 }
-  const shown = useCountUp(p.p50 ?? 0, runKey)
+  const shown = useCountUp(p.p50 ?? 0, { key: runKey, fromZero: true })
   const sentence = live ? result.explanation.sentence : scenario.explanation
   const winners = live ? result.winners : scenario.winners.map((who) => ({ who }))
   const losers = live ? result.losers : scenario.losers.map((who) => ({ who }))

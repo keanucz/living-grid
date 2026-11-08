@@ -1,29 +1,9 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect } from 'react'
 import { area, curveMonotoneX } from 'd3-shape'
 import { scaleLinear } from 'd3-scale'
 import { load, useGhostWind, WINDOWS, constraintBill } from '../../layers/ghostWind/data.js'
 import { fmt } from '../../styles/tokens.js'
-
-function useCountUp(target, ms = 1400) {
-  const [v, setV] = useState(0)
-  const from = useRef(0)
-  useEffect(() => {
-    const start = performance.now()
-    const a = from.current
-    let raf
-    const tick = (now) => {
-      // The first frame's timestamp can be a little before `start`; unclamped, the ease dips below zero.
-      const t = Math.min(1, Math.max(0, (now - start) / ms))
-      const cur = a + (target - a) * (1 - Math.pow(1 - t, 3))
-      setV(cur)
-      from.current = cur
-      if (t < 1) raf = requestAnimationFrame(tick)
-    }
-    raf = requestAnimationFrame(tick)
-    return () => cancelAnimationFrame(raf)
-  }, [target, ms])
-  return v
-}
+import { useCountUp } from '../../ui/useCountUp.js'
 
 function Hourly({ regions }) {
   const n = Math.max(0, ...regions.map((r) => r.series?.length ?? 0))
@@ -58,7 +38,7 @@ function ConstraintBill({ ctx }) {
   const gwh = useCountUp(on ? boalf / 1000 : 0)
   const bill = constraintBill(d, gw.window)
   const cost = Math.max(0, bill.gbp ?? 0)
-  const costUp = useCountUp(on ? cost : 0, 1800)
+  const costUp = useCountUp(on ? cost : 0, { ms: 1800 })
   if (!on) return null
 
   const limits = (d?.boundary_flows ?? []).filter((b) => b.limit_mw)

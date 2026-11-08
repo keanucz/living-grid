@@ -80,7 +80,7 @@ export default function Movie({ onOpenReplay }) {
     last.current = performance.now()
     let raf
     const tick = (now) => {
-      const dt = (now - last.current) / 1000
+      const dt = Math.max(0, (now - last.current) / 1000) // the first frame's timestamp can precede `last`
       last.current = now
       let done = false
       setP((v) => { const n = v + (dt * speed) / MOVIE_S; if (n >= 1) { done = true; return 1 } return n })
