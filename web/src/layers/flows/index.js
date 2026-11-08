@@ -35,7 +35,7 @@ function progress(path) {
   return d.map((v) => v / total)
 }
 
-function geometry(zones, sim) {
+export function geometry(zones, sim) {
   const key = `${zones.interconnectors.length}:${sim}`
   if (cache.has(key)) return cache.get(key)
   const at = Object.fromEntries(zones.zones.map((z) => [z.id, z.centroid]))

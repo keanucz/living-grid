@@ -9,7 +9,7 @@ export default function LayersMenu() {
   const ref = useRef(null)
   const mode = useStore((s) => s.mode)
   const layers = useStore((s) => s.layers)
-  const items = LAYERS.filter((l) => l.modes.includes(mode))
+  const items = LAYERS.filter((l) => l.modes.includes(mode) && !l.hidden)
   const on = items.filter((l) => layers[l.id] !== false).length
 
   useEffect(() => {
