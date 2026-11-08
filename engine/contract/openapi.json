@@ -1685,6 +1685,22 @@
    "Headline": {
     "additionalProperties": false,
     "properties": {
+     "basis": {
+      "default": "live",
+      "description": "Where mae_model, mae_persistence and coverage_p10_p90 come from: live scored forecasts, or the walk-forward backtest while fewer than LG_MIN_SCORED day-ahead forecasts are scored",
+      "enum": [
+       "live",
+       "backtest"
+      ],
+      "title": "Basis",
+      "type": "string"
+     },
+     "basis_n": {
+      "default": 0,
+      "description": "Day-ahead hours behind those figures: live scored hours, or backtest hours",
+      "title": "Basis N",
+      "type": "integer"
+     },
      "battery_hours": {
       "anyOf": [
        {

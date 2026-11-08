@@ -116,18 +116,21 @@ def headline(scores: pd.DataFrame, sample: bool, battery: dict,
     mae_model, mae_persistence, coverage, _ = _pooled(live, "mae")
     bt = backtest if backtest is not None and len(backtest) else pd.DataFrame(columns=["fold", "zone", "target", "model"])
     bt = bt[bt["target"] == HEADLINE_TARGET].sort_values(["fold", "zone"])
-    if sample or scored_for(scores, HEADLINE_TARGET) >= min_scored or (bt.empty and total == 0):
+    scored = scored_for(scores, HEADLINE_TARGET)
+    if sample or scored >= min_scored or (bt.empty and total == 0):
+        basis, basis_n = "live", scored
         text = (f"{total} forecasts since {since:%A %H:%M} UTC, all logged before the outcome"
                 if total else "No forecasts have been scored yet")
     else:
         mae_model, mae_persistence, coverage, n_bt = _pooled(bt, "mae")
+        basis, basis_n = "backtest", int(n_bt)
         text = f"Scoring starts as forecasts reach their target hour: {total} scored so far"
         text += (f". Headline figures are from the walk-forward backtest ({n_bt} hours)" if n_bt
                  else ". Headline figures follow once enough are scored")
     return {"mae_model": mae_model, "mae_persistence": mae_persistence, "coverage_p10_p90": coverage,
             "forecasts_scored": total, "since": since.to_pydatetime(), "battery_share_of_perfect": battery.get("share"),
             "battery_hours": battery.get("n_hours"), "battery_note": battery.get("note"),
-            "sentence": text + (SAMPLE_NOTE if sample else "")}
+            "basis": basis, "basis_n": basis_n, "sentence": text + (SAMPLE_NOTE if sample else "")}
 
 
 def backtest_rows(backtest: pd.DataFrame) -> list[dict]:

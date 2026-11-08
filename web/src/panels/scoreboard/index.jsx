@@ -62,6 +62,13 @@ function Scoreboard() {
         </p>
       )}
       {!s.error && !s.coverage && <p>Scores appear as soon as the first forecasts meet their outcomes.</p>}
+      {(s.error || s.coverage) && (
+        <p className="score-basis">
+          {s.basis === 'live'
+            ? <>From {s.basisN.toLocaleString('en-GB')} day-ahead hours scored live, each forecast logged before its outcome.</>
+            : <>From the <Term id="backtest">backtest</Term>: {s.basisN.toLocaleString('en-GB')} hours of past weeks the model never saw, until enough live forecasts are scored.</>}
+        </p>
+      )}
     </>
   )
 
@@ -85,12 +92,13 @@ function Scoreboard() {
       <Explain
         className="score"
         question="Can we trust the forecast?"
-        tag={source === 'live' ? 'Live' : source === 'cached' ? 'Last good' : 'Fixture'}
+        tag={source === 'fixture' ? 'Fixture' : source === 'cached' ? 'Last good' : s.basis === 'live' ? 'Live' : 'Backtest'}
         answer={answer}
         experts={experts}
       />
       <style>{`
         .score { width: 560px; }
+        .ex-a .score-basis { font-size: 13px; font-weight: 400; color: var(--text-3); line-height: 1.45; }
         .score-grid { display: grid; gap: 18px; padding: 4px 0 10px; }
         .score-label { font-size: 13px; min-height: 32px; }
         .score-val { font-size: 40px; font-weight: 700; line-height: 1.05; margin: 6px 0; white-space: nowrap; color: var(--text); }

@@ -51,6 +51,7 @@ def test_one_scored_hour_falls_back_to_the_backtest_headline(offline):
     assert h["forecasts_scored"] == 31
     assert h["sentence"] == ("Scoring starts as forecasts reach their target hour: 31 scored so far. "
                              "Headline figures are from the walk-forward backtest (800 hours)")
+    assert h["basis"] == "backtest" and h["basis_n"] == 800
 
 
 def test_other_targets_do_not_count_towards_the_day_ahead_minimum(offline):
@@ -66,6 +67,7 @@ def test_few_scored_and_no_backtest_shows_zeros_not_the_tiny_sample(offline):
     h = client.get("/scores").json()["headline"]
     assert h["mae_model"] == 0.0 and h["mae_persistence"] == 0.0 and h["coverage_p10_p90"] == 0.0
     assert h["sentence"].startswith("Scoring starts as forecasts reach their target hour: 31 scored so far")
+    assert h["basis"] == "backtest" and h["basis_n"] == 0
 
 
 def test_enough_scored_uses_live_numbers(offline):
@@ -78,11 +80,18 @@ def test_enough_scored_uses_live_numbers(offline):
     h = client.get("/scores").json()["headline"]
     assert h["mae_model"] == 8.0 and h["mae_persistence"] == 10.0 and h["coverage_p10_p90"] == 0.75
     assert h["sentence"].startswith("24 forecasts since")
+    assert h["basis"] == "live" and h["basis_n"] == 24
 
 
 def test_threshold_is_configurable():
     h = route.headline(one_scored(), sample=False, battery={"share": 0.5}, backtest=walk_forward(), min_scored=1)
     assert h["sentence"].startswith("31 forecasts since")
+    assert h["basis"] == "live" and h["basis_n"] == 1  # one day-ahead hour scored; the 30 load forecasts are not behind the price MAE
+
+
+def test_nothing_scored_and_no_backtest_is_live_with_no_hours():
+    h = route.headline(one_scored().iloc[0:0], sample=False, battery={"share": None}, backtest=None)
+    assert h["basis"] == "live" and h["basis_n"] == 0 and h["forecasts_scored"] == 0
 
 
 def test_bot_league_rows_in_the_backtest_do_not_change_the_scores_route(offline):

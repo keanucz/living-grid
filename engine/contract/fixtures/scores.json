@@ -9,6 +9,8 @@
   "battery_share_of_perfect": 0.71,
   "battery_hours": null,
   "battery_note": null,
+  "basis": "live",
+  "basis_n": 0,
   "sentence": "142 forecasts since Saturday noon, all logged before the outcome"
  },
  "live": [

@@ -365,6 +365,11 @@ class Headline(Model):
     )
     battery_hours: int | None = Field(None, description="Zone-hours settled on real prices behind the battery share")
     battery_note: str | None = Field(None, description="Why the battery share is null, or how it was computed")
+    basis: Literal["live", "backtest"] = Field(
+        "live", description="Where mae_model, mae_persistence and coverage_p10_p90 come from: live scored forecasts, or the "
+        "walk-forward backtest while fewer than LG_MIN_SCORED day-ahead forecasts are scored"
+    )
+    basis_n: int = Field(0, description="Day-ahead hours behind those figures: live scored hours, or backtest hours")
     sentence: str
 
 

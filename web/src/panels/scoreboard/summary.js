@@ -74,17 +74,28 @@ export function sinceLabel(since, now = new Date()) {
   return days < 6 ? DAYS[d.getUTCDay()] : d.toISOString().slice(0, 10)
 }
 
+// The headline says where its figures come from (`basis`, engine #285): live scored forecasts, or the walk-forward
+// backtest while too few are scored. The label follows that, never the bare count of forecasts scored.
+export function headlineBasis(h = {}) {
+  if (h.basis === 'live' || h.basis === 'backtest') return { basis: h.basis, n: h.basis_n ?? 0 }
+  return { basis: (h.forecasts_scored ?? 0) > 0 ? 'live' : 'backtest', n: h.forecasts_scored ?? 0 } // older API
+}
+
 export function scoreboard(scores, now = new Date()) {
   const h = scores?.headline ?? {}
   const table = backtestTable(scores?.backtest)
   const bt = backtestSummary(table)
+  const { basis, n } = headlineBasis(h)
+  const label = basis === 'live' ? 'Live' : 'Backtest'
+  const ratio = h.mae_persistence > 0 ? h.mae_model / h.mae_persistence - 1 : null
   const live = (h.forecasts_scored ?? 0) > 0
-  const liveRatio = live && h.mae_persistence > 0 ? h.mae_model / h.mae_persistence - 1 : null
   return {
     live,
+    basis,
+    basisN: n,
     // Negative is better: how much smaller the model's error is than persistence's.
-    error: liveRatio != null ? { value: liveRatio, source: 'Live' } : bt.meanVsPersistence != null ? { value: bt.meanVsPersistence, source: 'Backtest' } : null,
-    coverage: live && h.coverage_p10_p90 > 0 ? { value: h.coverage_p10_p90, source: 'Live' } : bt.coverage != null ? { value: bt.coverage, source: 'Backtest' } : null,
+    error: ratio != null ? { value: ratio, source: label } : bt.meanVsPersistence != null ? { value: bt.meanVsPersistence, source: 'Backtest' } : null,
+    coverage: h.coverage_p10_p90 > 0 ? { value: h.coverage_p10_p90, source: label } : bt.coverage != null ? { value: bt.coverage, source: 'Backtest' } : null,
     scored: h.forecasts_scored ?? 0,
     since: live ? sinceLabel(h.since, now) : null,
     battery: batteryShares(scores?.battery, h),
