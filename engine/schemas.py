@@ -118,6 +118,7 @@ class ZoneState(Model):
     carbon: CarbonNow | None
     load_mw: float | None
     mix_mw: dict[str, float] = Field(description="Generation by fuel in MW, e.g. wind, gas, nuclear")
+    metered_as_of: datetime | None = Field(None, description="Set only when load_mw and mix_mw come from a source that lands a day or two late (Elhub for NO2): the hour they describe, older than `at`. Null means they are the usual near-current metered hour.")
 
 
 class Flow(Model):

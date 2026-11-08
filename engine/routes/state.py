@@ -34,6 +34,8 @@ def build(at: datetime | None = None) -> dict:
 def _compute(t: pd.Timestamp) -> dict:
     prices, forecasts, carbon = data.prices(t), data.forecasts(t), data.carbon_at(t)
     load, mix = data.zone_series(t)
+    d_load, d_mix, d_as_of = data.delayed_series(t, set(load))
+    load, mix = {**d_load, **load}, {**d_mix, **mix}
     zones = [
         {
             "zone": z,
@@ -42,6 +44,7 @@ def _compute(t: pd.Timestamp) -> dict:
             "carbon": carbon.get(z),
             "load_mw": load.get(z),
             "mix_mw": mix.get(z, {}),
+            "metered_as_of": d_as_of[z].to_pydatetime() if z in d_as_of else None,
         }
         for z in data.ZONES
     ]

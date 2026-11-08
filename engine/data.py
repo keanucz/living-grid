@@ -33,6 +33,9 @@ PRICE_SOURCES = ["nordpool", "energycharts", "entsoe", "mid"]
 SOURCES = ["energy_charts", "energycharts", "carbon_intensity", "carbonintensity", "elexon", "nordpool", "entsoe", "octopus", "neso"]
 # Energy-Charts public_power and load for Norway cover the whole country, not the NO2 bidding zone.
 COUNTRY_LEVEL = {("energycharts", "NO2")}
+# Metered data that lands a day or two late (Elhub, for NO2): the hour it describes is shown with its own as_of.
+DELAYED = {("elhub", "NO2")}
+DELAYED_TOLERANCE = pd.Timedelta(days=3)
 AS_OF_TOLERANCE = pd.Timedelta(hours=3)
 METERED_TOLERANCE = pd.Timedelta(hours=6)  # Energy-Charts load and generation run about 3 hours behind
 
@@ -204,6 +207,35 @@ def zone_series(at: pd.Timestamp) -> tuple[dict[str, float], dict[str, dict[str,
         else:
             mix.setdefault(r.zone, {})[r.series.removeprefix("gen_")] = float(r.value)
     return load, mix
+
+
+def delayed_series(at: pd.Timestamp, have: set[str] | frozenset[str] = frozenset()) -> tuple[dict[str, float], dict[str, dict[str, float]], dict[str, pd.Timestamp]]:
+    """(load MW, generation mix MW, hour described) per zone from sources that land a day or two late, within
+    DELAYED_TOLERANCE of `at`, for zones that have no load from the regular path (`have`). The hour is the older of the
+    zone's newest load and generation rows, so the two figures never describe different hours."""
+    a = actuals()
+    a = a[(a["ts"] <= at) & (a["ts"] > at - DELAYED_TOLERANCE)]
+    a = a[(a["series"] == "load") | a["series"].str.startswith("gen_")]
+    keep = pd.MultiIndex.from_arrays([a["source"].astype(str), a["zone"].astype(str)]).isin(list(DELAYED))
+    a = a[keep & ~a["zone"].isin(list(have))]
+    load, mix, as_of = {}, {}, {}
+    for zone, g in a.groupby("zone"):
+        newest = g.groupby("series")["ts"].max()
+        hour = newest[newest.index == "load"].max() if (newest.index == "load").any() else None
+        gen = newest[newest.index.str.startswith("gen_")]
+        if hour is None or gen.empty:
+            continue
+        hour = min(hour, gen.max())
+        rows = g[g["ts"] == hour]
+        if not (rows["series"] == "load").any() or not rows["series"].str.startswith("gen_").any():
+            continue
+        for r in rows.itertuples():
+            if r.series == "load":
+                load[zone] = float(r.value)
+            else:
+                mix.setdefault(zone, {})[r.series.removeprefix("gen_")] = float(r.value)
+        as_of[zone] = hour
+    return load, mix, as_of
 
 
 ZONE_ALIASES = {"IE": "SEM", "NI": "SEM", "DK": "DK1"}
