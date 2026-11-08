@@ -5,6 +5,7 @@ import { actions, useStore } from '../store/store.js'
 import { COLORS, fmt } from '../styles/tokens.js'
 import { Icon, ASSET_ICON } from '../shell/icons.jsx'
 import { towerHeight, GLASS, outlines } from '../layers/price/index.js'
+import { onTop } from '../layers/scenarioFx/index.js'
 
 // Short country names for the price labels on the map; the zone list and hover cards keep the full names.
 const MAP_NAME = { GB: 'Britain', FR: 'France', 'DE-LU': 'Germany', NL: 'Netherlands', BE: 'Belgium', NO2: 'Norway' }
@@ -210,6 +211,8 @@ function Overlay({ viewport, ctx }) {
 
   return (
     <div className="overlay">
+      <style>{`.pin .pin-name { display: none; position: absolute; left: 50%; bottom: calc(100% + 6px); transform: translateX(-50%); white-space: nowrap; padding: 3px 8px; border-radius: 6px; background: #1c1c1b; color: #f2f2ef; border: 1px solid rgba(255,255,255,.14); font-size: 11.5px; font-weight: 500; pointer-events: none; }
+        .pin:hover .pin-name, .pin:focus-within .pin-name { display: block; }`}</style>
       {!sim && ui.section !== 'hidden' && viewport.zoom >= 3 &&
         data.zones.zones.map((z) => {
           const [x, y] = project(z.label_at)
@@ -229,11 +232,13 @@ function Overlay({ viewport, ctx }) {
         data.assets
           ?.filter((a) => (scenario ? scenario.assetType === a.type && a.mw >= 900 : a.mw >= 2400))
           .map((a) => {
-            const [x, y] = viewport.project([...a.coord, 8000 + a.mw * 16])
+            // On the top of its own country's bar, so the pin reads as part of that country.
+            const [x, y] = viewport.project(onTop(data, priceOf, a.coord, 4000))
             return (
               <div key={a.name} className="pin fade-in" title={`${a.name}, ${a.mw} MW (approximate)`}
                 style={{ left: x, top: y - 22, background: `var(--${a.type})` }}>
                 <Icon name={ASSET_ICON[a.type]} size={15} stroke={2.2} />
+                <span className="pin-name">{a.name} · {a.mw.toLocaleString('en-GB')} MW</span>
               </div>
             )
           })}

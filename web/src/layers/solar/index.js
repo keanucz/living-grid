@@ -2,7 +2,8 @@ import { BitmapLayer } from 'deck.gl'
 import { STEP, getField } from '../wind/grid.js'
 
 // Sunshine as soft shading: the modelled shortwave radiation (W/m2) on the 0.5 degree grid, smoothed and drawn as one
-// image under the other layers. Follows the scrubber hour; at night there is nothing to show. Modelled, not measured.
+// image under the other layers, clipped to our six zones so the grid's rectangle and the sea never show.
+// Follows the scrubber hour; at night there is nothing to show. Modelled, not measured.
 const W = 300 // pixels across; rows follow the map's projection so the image lines up
 export const SUN_STOPS = [
   [0, [255, 150, 40]],
@@ -50,9 +51,38 @@ function coverageSample(f, lon, lat) {
   return cover > 0 ? [sum / cover, cover] : [0, 0]
 }
 
-const images = new WeakMap() // field -> { canvas, bounds, any }
+const images = new WeakMap() // field -> { canvas, bounds, any, zones }
+const zoneLists = new WeakMap() // geo -> its zone features, so the clip is built once per geo
+const zonesOf = (geo) => {
+  if (!geo) return null
+  if (!zoneLists.has(geo)) zoneLists.set(geo, geo.features.filter((z) => z.properties?.zone))
+  return zoneLists.get(geo)
+}
 
-function render(f) {
+// Keep only the pixels inside the zones' outlines (GeoJSON Polygon or MultiPolygon rings, lon/lat).
+function clipToZones(ctx, zones, toPx) {
+  if (!zones?.length) return
+  const path = new Path2D()
+  for (const f of zones) {
+    const g = f.geometry
+    const polys = g?.type === 'Polygon' ? [g.coordinates] : g?.type === 'MultiPolygon' ? g.coordinates : []
+    for (const rings of polys) {
+      for (const ring of rings) {
+        ring.forEach(([lon, lat], i) => {
+          const [x, y] = toPx(lon, lat)
+          if (i) path.lineTo(x, y)
+          else path.moveTo(x, y)
+        })
+        path.closePath()
+      }
+    }
+  }
+  ctx.globalCompositeOperation = 'destination-in'
+  ctx.fill(path, 'evenodd')
+  ctx.globalCompositeOperation = 'source-over'
+}
+
+function render(f, zones) {
   const lonMin = f.lon0 - STEP / 2
   const lonMax = f.lon0 + (f.nx - 1) * STEP + STEP / 2
   const latMin = f.lat0 - STEP / 2
@@ -83,7 +113,8 @@ function render(f) {
     }
   }
   ctx.putImageData(img, 0, 0)
-  return { canvas, bounds: [lonMin, latMin, lonMax, latMax], any }
+  clipToZones(ctx, zones, (lon, lat) => [((lon - lonMin) / (lonMax - lonMin)) * W, ((yMax - mercY(lat)) / (yMax - yMin)) * H])
+  return { canvas, bounds: [lonMin, latMin, lonMax, latMax], any, zones }
 }
 
 export default {
@@ -93,10 +124,11 @@ export default {
   order: 45,
   modes: ['overview'],
   defaultOn: false,
-  build({ ui }) {
+  build({ ui, data }) {
     const f = getField(ui.at)
     if (!f) return []
-    if (!images.has(f)) images.set(f, render(f))
+    const zones = zonesOf(data?.geo)
+    if (!images.has(f) || images.get(f).zones !== zones) images.set(f, render(f, zones))
     const im = images.get(f)
     if (!im.any) return []
     return [new BitmapLayer({ id: 'solar-shade', image: im.canvas, bounds: im.bounds, opacity: 1, parameters: { depthTest: false }, pickable: false })]
