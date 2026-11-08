@@ -27,6 +27,7 @@ GETS = {
     "/weather/grid": ("weather_grid", s.WeatherGridResponse),
     "/carbon/costs": ("carbon_costs", s.CarbonCostsResponse),
     "/timeline?from=2026-11-05T00:00:00Z&to=2026-11-07T00:00:00Z&step=day": ("timeline", s.TimelineResponse),
+    "/coupled?at=2026-11-08T08:00:00Z": ("coupled", s.CoupledResponse),
 }
 # Routes that answer 404 until their data is ingested (no sample fallback): the fixture is checked, and the live
 # response only when there is one.

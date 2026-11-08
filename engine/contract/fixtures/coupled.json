@@ -1,0 +1,154 @@
+{
+ "as_of": "2026-11-08T08:52:00Z",
+ "delivery_date": "2026-11-08",
+ "hour_utc": "2026-11-08T08:00:00Z",
+ "unit": "EUR/MWh",
+ "source": "Nord Pool day-ahead (dataportal-api.nordpoolgroup.com)",
+ "note": "Prices only, not forecast. Zone borders approximate.",
+ "zones": [
+  {
+   "zone": "DK1",
+   "name": "Denmark west",
+   "country": "Denmark",
+   "price": 220.35,
+   "day_avg": 243.53,
+   "day_min": 212.13,
+   "day_max": 319.62
+  },
+  {
+   "zone": "DK2",
+   "name": "Denmark east",
+   "country": "Denmark",
+   "price": 225.11,
+   "day_avg": 261.62,
+   "day_min": 217.04,
+   "day_max": 348.76
+  },
+  {
+   "zone": "SE1",
+   "name": "Sweden north",
+   "country": "Sweden",
+   "price": 9.91,
+   "day_avg": 10.04,
+   "day_min": 5.81,
+   "day_max": 14.19
+  },
+  {
+   "zone": "SE2",
+   "name": "Sweden north-central",
+   "country": "Sweden",
+   "price": 7.64,
+   "day_avg": 5.85,
+   "day_min": 2.69,
+   "day_max": 10.49
+  },
+  {
+   "zone": "SE3",
+   "name": "Sweden central",
+   "country": "Sweden",
+   "price": 135.22,
+   "day_avg": 166.12,
+   "day_min": 130.21,
+   "day_max": 234.91
+  },
+  {
+   "zone": "SE4",
+   "name": "Sweden south",
+   "country": "Sweden",
+   "price": 229.56,
+   "day_avg": 270.48,
+   "day_min": 220.98,
+   "day_max": 366.45
+  },
+  {
+   "zone": "FI",
+   "name": "Finland",
+   "country": "Finland",
+   "price": 9.87,
+   "day_avg": 9.87,
+   "day_min": 5.7,
+   "day_max": 14.15
+  },
+  {
+   "zone": "NO1",
+   "name": "Norway east",
+   "country": "Norway",
+   "price": 169.36,
+   "day_avg": 175.77,
+   "day_min": 164.38,
+   "day_max": 198.95
+  },
+  {
+   "zone": "NO3",
+   "name": "Norway middle",
+   "country": "Norway",
+   "price": 90.16,
+   "day_avg": 87.72,
+   "day_min": 81.65,
+   "day_max": 94.14
+  },
+  {
+   "zone": "NO4",
+   "name": "Norway north",
+   "country": "Norway",
+   "price": 10.43,
+   "day_avg": 12.47,
+   "day_min": 5.15,
+   "day_max": 16.98
+  },
+  {
+   "zone": "NO5",
+   "name": "Norway west",
+   "country": "Norway",
+   "price": 171.64,
+   "day_avg": 178.52,
+   "day_min": 166.74,
+   "day_max": 202.63
+  },
+  {
+   "zone": "EE",
+   "name": "Estonia",
+   "country": "Estonia",
+   "price": 133.07,
+   "day_avg": 157.98,
+   "day_min": 40.06,
+   "day_max": 365.05
+  },
+  {
+   "zone": "LV",
+   "name": "Latvia",
+   "country": "Latvia",
+   "price": 243.28,
+   "day_avg": 287.84,
+   "day_min": 176.4,
+   "day_max": 403.59
+  },
+  {
+   "zone": "LT",
+   "name": "Lithuania",
+   "country": "Lithuania",
+   "price": 243.28,
+   "day_avg": 294.1,
+   "day_min": 231.2,
+   "day_max": 403.59
+  },
+  {
+   "zone": "AT",
+   "name": "Austria",
+   "country": "Austria",
+   "price": 220.28,
+   "day_avg": 246.51,
+   "day_min": 211.38,
+   "day_max": 317.07
+  },
+  {
+   "zone": "PL",
+   "name": "Poland",
+   "country": "Poland",
+   "price": 92.62,
+   "day_avg": 199.38,
+   "day_min": 4.55,
+   "day_max": 351.34
+  }
+ ]
+}

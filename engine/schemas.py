@@ -951,3 +951,24 @@ class InfrastructureResponse(Model):
     kind: Kind = "estimated"
     note: str
     sample: bool = False
+
+
+# ---------- GET /coupled ----------
+class CoupledZone(Model):
+    zone: str  # Nord Pool delivery area, e.g. SE1
+    name: str
+    country: str
+    price: float | None  # this hour's day-ahead price; None when the hour is not in the delivery day
+    day_avg: float
+    day_min: float
+    day_max: float
+
+
+class CoupledResponse(Model):
+    as_of: datetime  # when the prices were fetched from Nord Pool
+    delivery_date: date  # CET calendar day
+    hour_utc: datetime
+    unit: Literal["EUR/MWh"] = "EUR/MWh"
+    source: str
+    note: str
+    zones: list[CoupledZone]

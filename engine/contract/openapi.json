@@ -769,6 +769,108 @@
     "title": "Contribution",
     "type": "object"
    },
+   "CoupledResponse": {
+    "additionalProperties": false,
+    "properties": {
+     "as_of": {
+      "format": "date-time",
+      "title": "As Of",
+      "type": "string"
+     },
+     "delivery_date": {
+      "format": "date",
+      "title": "Delivery Date",
+      "type": "string"
+     },
+     "hour_utc": {
+      "format": "date-time",
+      "title": "Hour Utc",
+      "type": "string"
+     },
+     "note": {
+      "title": "Note",
+      "type": "string"
+     },
+     "source": {
+      "title": "Source",
+      "type": "string"
+     },
+     "unit": {
+      "const": "EUR/MWh",
+      "default": "EUR/MWh",
+      "title": "Unit",
+      "type": "string"
+     },
+     "zones": {
+      "items": {
+       "$ref": "#/components/schemas/CoupledZone"
+      },
+      "title": "Zones",
+      "type": "array"
+     }
+    },
+    "required": [
+     "as_of",
+     "delivery_date",
+     "hour_utc",
+     "source",
+     "note",
+     "zones"
+    ],
+    "title": "CoupledResponse",
+    "type": "object"
+   },
+   "CoupledZone": {
+    "additionalProperties": false,
+    "properties": {
+     "country": {
+      "title": "Country",
+      "type": "string"
+     },
+     "day_avg": {
+      "title": "Day Avg",
+      "type": "number"
+     },
+     "day_max": {
+      "title": "Day Max",
+      "type": "number"
+     },
+     "day_min": {
+      "title": "Day Min",
+      "type": "number"
+     },
+     "name": {
+      "title": "Name",
+      "type": "string"
+     },
+     "price": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Price"
+     },
+     "zone": {
+      "title": "Zone",
+      "type": "string"
+     }
+    },
+    "required": [
+     "zone",
+     "name",
+     "country",
+     "price",
+     "day_avg",
+     "day_min",
+     "day_max"
+    ],
+    "title": "CoupledZone",
+    "type": "object"
+   },
    "DataCentreCarbon": {
     "additionalProperties": false,
     "properties": {
@@ -5284,6 +5386,56 @@
     "summary": "Compute",
     "tags": [
      "household"
+    ]
+   }
+  },
+  "/coupled": {
+   "get": {
+    "operationId": "get_coupled_coupled_get",
+    "parameters": [
+     {
+      "in": "query",
+      "name": "at",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "format": "date-time",
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "At"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/CoupledResponse"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Get Coupled",
+    "tags": [
+     "map"
     ]
    }
   },
