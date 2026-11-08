@@ -18,11 +18,11 @@ const OFF = { ghostWind: false, carbon: false, boundaries: false, wind: false, s
 export const CARDS = [
   { id: 'wind', title: 'Scotland’s wind, paid to stop', layers: { ...OFF, ghostWind: true, boundaries: true },
     detail: ['constraintBill'], links: [{ label: 'Watch the storm that cost £36.5m', href: '#/events?e=storm' }],
-    overTime: 'wind' },
+    overTime: 'wind', scene: 'wind' },
   { id: 'carbon', title: 'Carbon that comes in by cable', layers: { ...OFF, carbon: true },
     detail: ['carbonLegend'], links: [] },
   { id: 'bottleneck', title: 'The bottleneck', layers: { ...OFF, boundaries: true },
-    detail: [], links: [{ label: 'Build a power line', href: '#/infrastructure' }] },
+    detail: [], links: [{ label: 'Build a power line', href: '#/infrastructure' }], scene: 'bottleneck' },
   { id: 'sunny', title: 'A sunny Sunday, negative prices', layers: { ...OFF, solar: true },
     detail: ['renewables'], links: [{ label: 'Watch the movie', href: '#/events?e=sunny-weekend' }], overTime: 'solar' },
 ]

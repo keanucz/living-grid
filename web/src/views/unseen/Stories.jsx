@@ -2,11 +2,31 @@ import { useEffect, useMemo, useState } from 'react'
 import { actions, setState } from '../../store/store.js'
 import { PANELS } from '../../panels/registry.js'
 import { openSection } from '../../shell/sections.js'
-import { load as loadGhost, useGhostWind } from '../../layers/ghostWind/data.js'
+import { load as loadGhost, useGhostWind, constraintBill } from '../../layers/ghostWind/data.js'
 import { useInfra } from '../../layers/boundaries/data.js'
 import { load as loadCarbon, getCarbon, intensities } from '../../layers/carbon/data.js'
 import { CARDS, INTROS, windHeadline, carbonHeadline, bottleneckHeadline, sunnyHeadline } from './cards.js'
 import Term from '../../ui/Term.jsx'
+import SceneRunner from './scenes/runner.jsx'
+import windScene from './scenes/wind.js'
+import bottleneckScene from './scenes/bottleneck.js'
+
+import { whatIf } from '../../layers/boundaries/data.js'
+
+// Scene builders by card.scene; each takes the loaded numbers and returns { duration, caption, counter, steps }.
+// A card without a scene (or a scene that is not built yet) shows the static story, as before.
+const SCENES = { wind: windScene, bottleneck: bottleneckScene }
+
+function sceneData(id, gw, infra) {
+  if (id === 'wind') {
+    const bill = gw?.data ? constraintBill(gw.data, gw.window) : { gbp: 0, note: '' }
+    return { billGbp: bill.gbp, windMwh: gw?.data?.total_boalf_mwh ?? 0, label: bill.note.replace(/^NESO,\s*/, '').replace(/\s*\(.*\)/, '') }
+  }
+  const d = infra?.data
+  const b6 = d?.boundaries?.find((b) => b.id === 'SCOTEX') ?? d?.boundaries?.find((b) => b.counterfactual?.length)
+  const w = b6 ? whatIf(b6, 2000) : null
+  return { savedGbp: w?.costSaved ?? 0, savedMwh: w?.windSaved ?? 0, days: b6?.cf?.cost_days }
+}
 
 // Hidden grid as a small 2x2 picker: icon and title only. Choosing a tile sets the map (layers) and opens that story:
 // the plain intro first, then at most three live facts with their source, then the existing panels behind 'More detail'.
@@ -129,6 +149,9 @@ export default function Stories({ ctx }) {
         const h = heads[c.id]
         return (
           <div key={c.id} className="story-body fade-in" role="tabpanel">
+            {SCENES[c.scene] && heads[c.id].value !== '…' && (
+              <SceneRunner key={`${c.id}-${gw.window}`} scene={SCENES[c.scene](sceneData(c.id, gw, infra))} />
+            )}
             <p className="story-intro">{INTROS[c.id]}</p>
             <ul className="story-facts">
               <li>{lead(h)} {h.when && h.value !== '…' && <span className="faint">({h.when})</span>} {h.estimate && <span className="tag hot">{h.sample ? 'Sample data' : 'Estimated'}</span>}</li>
