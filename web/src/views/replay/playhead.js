@@ -1,0 +1,73 @@
+import { useEffect, useRef, useState } from 'react'
+import { actions, getState, setState, useStore } from '../../store/store.js'
+
+// One playhead for the whole replay page: the shared store's `ui.at` (the hour the map shows), the same value the history
+// scrubber (#223) moves. This file only translates between that ISO hour and an index into the replayed window.
+export const HOUR = 3600e3
+export const iso = (ms) => new Date(ms).toISOString().replace('.000Z', 'Z')
+const floorH = (ms) => Math.floor(ms / HOUR) * HOUR
+
+// The window to replay: hourly for up to a week, every 6 h up to a month, daily beyond (so a long event still plays in a minute).
+export function windowFor(startIso, endIso) {
+  const start = floorH(Date.parse(startIso))
+  const end = Math.max(start + HOUR, floorH(Date.parse(endIso)))
+  const span = end - start
+  const stepH = span <= 7 * 24 * HOUR ? 1 : span <= 31 * 24 * HOUR ? 6 : 24
+  const n = Math.min(400, Math.floor(span / (stepH * HOUR)) + 1)
+  return { start, stepH, n }
+}
+
+export const atIndex = (win, i) => iso(win.start + Math.max(0, Math.min(win.n - 1, i)) * win.stepH * HOUR)
+export const indexOf = (win, at) => (at ? Math.max(0, Math.min(win.n - 1, Math.round((Date.parse(at) - win.start) / (win.stepH * HOUR)))) : 0)
+
+export const SPEEDS = [1, 2, 4]
+
+export function usePlayhead(win) {
+  const at = useStore((s) => s.at)
+  const [playing, setPlaying] = useState(false)
+  const [speed, setSpeed] = useState(1)
+  const i = indexOf(win, at)
+  const inWindow = at != null && Date.parse(at) >= win.start - HOUR && Date.parse(at) <= win.start + win.n * win.stepH * HOUR
+  const ref = useRef({ i, win })
+  ref.current = { i, win }
+
+  // Land on the first hour when the window changes or the playhead is somewhere else entirely.
+  useEffect(() => {
+    if (!inWindow) actions.setAt(atIndex(win, 0))
+    setPlaying(false)
+  }, [win.start, win.n]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (!playing) return undefined
+    const id = setInterval(() => {
+      const { i: cur, win: w } = ref.current
+      if (cur >= w.n - 1) return setPlaying(false)
+      actions.setAt(atIndex(w, cur + 1))
+    }, 800 / speed)
+    return () => clearInterval(id)
+  }, [playing, speed])
+
+  return {
+    at: at ?? atIndex(win, 0),
+    i,
+    n: win.n,
+    playing,
+    speed,
+    setSpeed,
+    seek: (idx) => (setPlaying(false), actions.setAt(atIndex(win, idx))),
+    toggle: () => {
+      if (!playing && i >= win.n - 1) actions.setAt(atIndex(win, 0))
+      setPlaying((p) => !p)
+    },
+  }
+}
+
+// While the replay page is open the map is in its plain overview with the layers a replay needs; the previous mode,
+// layers and hour come back when the page closes.
+export function useReplayShell() {
+  useEffect(() => {
+    const before = getState()
+    setState((s) => ({ mode: 'overview', layers: { ...s.layers, price: true, flows: true, ghostWind: true, carbon: false, ghost: false, wind: false, solar: false } }))
+    return () => setState({ mode: before.mode, layers: before.layers, at: before.at })
+  }, [])
+}

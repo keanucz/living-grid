@@ -2,44 +2,132 @@ import { useEffect, useMemo, useState } from 'react'
 import { area, line, curveMonotoneX } from 'd3-shape'
 import { scaleLinear, scaleUtc } from 'd3-scale'
 import { Icon } from '../../shell/icons.jsx'
+import { api, useApi } from '../../api/client.js'
 import { fmt } from '../../styles/tokens.js'
 import Movie from '../events/Movie.jsx'
+import { ReplayMap } from './ReplayMap.jsx'
+import { Readout } from './Readout.jsx'
+import { SPEEDS, atIndex, iso, usePlayhead, useReplayShell, windowFor } from './playhead.js'
+import { useMapState } from './useMapState.js'
 
-const EVENT = '2026-10-26'
+// Replay: the map plays a day with the data, the chart and the readout follow the same playhead (the shared ui.at, which
+// the history scrubber also moves). The default is the 26 October storm with the as-of forecast; every event in the
+// library plays the same way, with its own series in place of the forecast chart.
+const DEFAULT_DAY = ['2026-10-26T00:00:00Z', '2026-10-26T23:00:00Z']
 const W = 900
-const H = 340
+const H = 300
 const P = { l: 52, r: 16, t: 16, b: 30 }
 const TARGET_LABEL = { gb_system_price: 'GB system price', price_da: 'Day-ahead price' }
 const hhmm = (iso) => new Date(iso).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' })
+const day = (iso) => new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' })
+
+// Short chip labels for the library's events; anything new falls back to its own title.
+const SHORT = { storm: '26 Oct storm', dunkelflaute: 'Dark lull', 'sunny-weekend': 'Sunny weekend', 'record-wind': 'Windiest day', 'cable-out': 'Cable quiet', 'price-spike': 'Price spike', 'gas-crisis': '2022 gas crisis' }
+
+const eventFiles = import.meta.glob('../../../../data/events/*.json')
+const loadEvent = (slug) => eventFiles[`../../../../data/events/${slug}.json`]?.().then((m) => m.default ?? m)
+
+function useEvents() {
+  const [events, setEvents] = useState(null)
+  useEffect(() => {
+    loadEvent('index').then((i) => setEvents(i.events)).catch(() => setEvents([]))
+  }, [])
+  return events
+}
+
+function useGhostWind(from, at, playing, i) {
+  const [mwh, setMwh] = useState(null)
+  useEffect(() => {
+    if (playing && i % 3 !== 0) return undefined
+    let live = true
+    const t = setTimeout(() => {
+      api.ghostWind(from, at).then((r) => live && setMwh(r?.data?.total_boalf_mwh ?? null)).catch(() => live && setMwh(null))
+    }, playing ? 0 : 400)
+    return () => {
+      live = false
+      clearTimeout(t)
+    }
+  }, [from, at, playing, i])
+  return mwh
+}
+
+// Event series up to the playhead, one small chart each with its value now.
+function EventSeries({ ev, at }) {
+  const t = Date.parse(at)
+  const COL = ['var(--hot)', 'var(--accent)', 'var(--text)', 'var(--text-2)']
+  return (
+    <div className="rp-evs">
+      {(ev?.series ?? []).map((s, k) => {
+        const pts = s.points.map(([ts, v]) => [Date.parse(ts), v])
+        const lo = Math.min(...pts.map((p) => p[1])), hi = Math.max(...pts.map((p) => p[1]))
+        const x = scaleLinear().domain([pts[0][0], pts.at(-1)[0]]).range([4, 296])
+        const y = scaleLinear().domain([lo - (hi - lo) * 0.08, hi + (hi - lo) * 0.08 || 1]).range([54, 4])
+        const upto = pts.filter((p) => p[0] <= t)
+        const d = line().x((p) => x(p[0])).y((p) => y(p[1])).curve(curveMonotoneX)
+        const last = upto.at(-1)
+        return (
+          <div key={s.label} className="rp-ev">
+            <div className="rp-ev-h"><span>{s.label}</span><b className="num">{last ? `${Math.abs(last[1]) >= 100 ? Math.round(last[1]).toLocaleString('en-GB') : last[1].toFixed(1)} ${s.unit}` : '—'}</b></div>
+            <svg viewBox="0 0 300 58" width="100%" role="img" aria-label={`${s.label} through the event`}>
+              <path d={d(pts)} fill="none" stroke="var(--line-2)" strokeWidth="1.5" />
+              {upto.length > 1 && <path d={d(upto)} fill="none" stroke={COL[k % COL.length]} strokeWidth="2.4" />}
+              {last && <circle cx={x(last[0])} cy={y(last[1])} r="3.6" fill={COL[k % COL.length]} />}
+            </svg>
+          </div>
+        )
+      })}
+    </div>
+  )
+}
 
 function Replay() {
-  const [d, setD] = useState(undefined)
-  const [key, setKey] = useState('GB|price_da')
-  const [i, setI] = useState(23)
-  const [playing, setPlaying] = useState(false)
+  useReplayShell()
+  const events = useEvents()
   const [mode, setMode] = useState('forecast')
+  const [slug, setSlug] = useState('storm')
+  const [key, setKey] = useState('GB|price_da')
+  const [replay, setReplay] = useState(undefined)
+  const [evData, setEvData] = useState(null)
+  const zones = useApi(api.zones)
+  const ev = events?.find((e) => e.slug === slug)
+  const isStorm = slug === 'storm'
 
   useEffect(() => {
     const ctrl = new AbortController()
     const t = setTimeout(() => ctrl.abort(), 20000)
-    fetch(`/api/replay?event=${EVENT}`, { signal: ctrl.signal })
+    fetch('/api/replay?event=2026-10-26', { signal: ctrl.signal })
       .then((r) => (r.ok ? r.json() : null))
       .catch(() => null)
-      .then(setD)
+      .then(setReplay)
       .finally(() => clearTimeout(t))
   }, [])
-
   useEffect(() => {
-    if (!playing) return
-    const id = setInterval(() => setI((v) => (v >= 23 ? (setPlaying(false), 23) : v + 1)), 450)
-    return () => clearInterval(id)
-  }, [playing])
+    setEvData(null)
+    if (slug && !isStorm) loadEvent(slug).then(setEvData).catch(() => setEvData(null))
+  }, [slug, isStorm])
 
-  const s = d?.series?.find((x) => `${x.zone}|${x.target}` === key) ?? d?.series?.[0]
+  const win = useMemo(() => {
+    if (isStorm || !ev) {
+      const pts = replay?.series?.[0]?.points
+      return windowFor(pts?.[0]?.ts ?? DEFAULT_DAY[0], pts?.at(-1)?.ts ?? DEFAULT_DAY[1])
+    }
+    return windowFor(ev.start, ev.end)
+  }, [isStorm, ev, replay])
+  const ph = usePlayhead(win)
+  const map = useMapState(ph.at)
+  const dayStart = iso(Math.floor(Date.parse(ph.at) / 864e5) * 864e5)
+  const wind = useGhostWind(isStorm ? dayStart : iso(win.start), ph.at, ph.playing, ph.i)
+
+  const s = replay?.series?.find((x) => `${x.zone}|${x.target}` === key) ?? replay?.series?.[0]
   const pts = s?.points ?? []
-  const cur = pts[Math.min(i, pts.length - 1)]
-  const shown = pts.slice(0, i + 1)
+  const cur = isStorm ? pts[Math.min(ph.i, pts.length - 1)] : null
+  const shown = pts.slice(0, ph.i + 1)
   const unit = s?.unit?.startsWith('GBP') ? '£' : '€'
+  const explanation = useMemo(() => {
+    const p = [...shown].reverse().find((x) => x.explanation)
+    const e = p?.explanation
+    return e ? `${typeof e === 'string' ? e : e.sentence} (for ${hhmm(p.ts)} UTC)` : null
+  }, [shown.length, replay]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const { x, y } = useMemo(() => {
     const vals = pts.flatMap((p) => [p.actual, p.p10, p.p90]).filter((v) => v != null)
@@ -53,73 +141,96 @@ function Replay() {
   const med = line().x(tx).y((p) => y(p.p50)).curve(curveMonotoneX)(pts)
   const act = line().x(tx).y((p) => y(p.actual)).curve(curveMonotoneX)(shown.filter((p) => p.actual != null))
   const inBand = shown.filter((p) => p.actual != null && p.actual >= p.p10 && p.actual <= p.p90).length
-  const lastExpl = [...shown].reverse().find((p) => p.explanation)?.explanation
 
   return (
     <div className="rp">
       <header className="rp-top">
         <a href="#/" className="rp-back" aria-label="Back to the map"><Icon name="back" /></a>
         <div>
-          <div className="rp-kicker">{mode === 'movies' ? 'Event movies' : 'Replay · out-of-sample'}</div>
-          <h1>{mode === 'movies' ? 'The big days in our data' : (d?.title ?? 'The 26 October storm')}</h1>
+          <div className="rp-kicker">{mode === 'movies' ? 'Event movies' : 'Replay'}</div>
+          <h1>{mode === 'movies' ? 'The big days in our data' : isStorm ? (replay?.title ?? 'The 26 October storm') : (ev?.title ?? 'Replay')}</h1>
           <p>{mode === 'movies'
             ? 'Each movie plays an event from public data, with the moments that mattered and a plain-English script.'
-            : `Would we have seen it coming? Forecasts from a model trained only on data before ${d?.trained_before ?? EVENT}, made 12 hours ahead.`}</p>
+            : isStorm
+              ? `Would we have seen it coming? The map plays the day; forecasts come from a model trained only on data before ${replay?.trained_before ?? '2026-10-26'}, made 12 hours ahead.`
+              : `${ev?.headline ?? ''} The map plays ${ev ? `${day(ev.start)} to ${day(ev.end)}` : 'the event'} from public data.`}</p>
         </div>
       </header>
 
       <div className="rp-tabs rp-mode" role="tablist" aria-label="Replay views">
-        <button role="tab" aria-selected={mode === 'forecast'} className={mode === 'forecast' ? 'on' : ''} onClick={() => setMode('forecast')}>Forecast replay</button>
+        <button role="tab" aria-selected={mode === 'forecast'} className={mode === 'forecast' ? 'on' : ''} onClick={() => setMode('forecast')}>Play on the map</button>
         <button role="tab" aria-selected={mode === 'movies'} className={mode === 'movies' ? 'on' : ''} onClick={() => setMode('movies')}>Event movies</button>
       </div>
 
       {mode === 'movies' && <Movie onOpenReplay={() => setMode('forecast')} />}
-      {mode === 'forecast' && d === undefined && <p className="rp-muted">Loading the replay…</p>}
-      {mode === 'forecast' && d === null && <p className="rp-muted">The replay isn’t available right now.</p>}
 
-      {mode === 'forecast' && s && (
+      {mode === 'forecast' && (
         <>
-          <div className="rp-controls">
-            <div className="rp-tabs">
-              {d.series.map((x) => {
-                const k = `${x.zone}|${x.target}`
-                return <button key={k} className={k === `${s.zone}|${s.target}` ? 'on' : ''} onClick={() => setKey(k)}>{x.zone} <span>{TARGET_LABEL[x.target] ?? x.target}</span></button>
-              })}
+          {events?.length > 0 && (
+            <div className="rp-tabs rp-days" role="tablist" aria-label="Day to replay">
+              {events.map((e) => <button key={e.slug} role="tab" aria-selected={e.slug === slug} className={e.slug === slug ? 'on' : ''} onClick={() => setSlug(e.slug)}>{SHORT[e.slug] ?? e.title}</button>)}
             </div>
-            <button className="rp-play" onClick={() => (i >= 23 && setI(0), setPlaying((p) => !p))}>
-              {!playing && <Icon name="play" size={14} fill="currentColor" />} {playing ? 'Pause' : i >= 23 ? 'Play the day' : 'Resume'}
-            </button>
-          </div>
+          )}
 
           <div className="rp-grid">
-            <section className="rp-chart">
-              <svg viewBox={`0 0 ${W} ${H}`} width="100%" role="img" aria-label="Actual price against forecast band through the day">
-                {y.ticks(5).map((v) => (
-                  <g key={v}>
-                    <line x1={P.l} x2={W - P.r} y1={y(v)} y2={y(v)} stroke="var(--line)" />
-                    <text x={P.l - 8} y={y(v) + 4} textAnchor="end" className="rp-tick">{unit}{v}</text>
-                  </g>
-                ))}
-                {pts.filter((_, k) => k % 3 === 0).map((p) => <text key={p.ts} x={tx(p)} y={H - 8} textAnchor="middle" className="rp-tick">{hhmm(p.ts)}</text>)}
-                <path d={band} fill="var(--accent)" opacity="0.14" />
-                <path d={med} fill="none" stroke="var(--accent)" strokeWidth="2" strokeDasharray="5 4" />
-                {act && <path d={act} fill="none" stroke="var(--text)" strokeWidth="2.6" />}
-                {cur && <line x1={tx(cur)} x2={tx(cur)} y1={P.t} y2={H - P.b} stroke="var(--hot)" strokeWidth="1.5" />}
-                {cur?.actual != null && <circle cx={tx(cur)} cy={y(cur.actual)} r="5" fill="var(--text)" stroke="var(--bg)" strokeWidth="2" />}
-              </svg>
-              <input type="range" min={0} max={pts.length - 1} value={i} onChange={(e) => (setPlaying(false), setI(+e.target.value))} aria-label="Hour of the day" />
-              <div className="rp-legend"><span><i style={{ background: 'var(--text)' }} />What happened</span><span><i style={{ background: 'var(--accent)' }} />Forecast P50, P10–P90 band</span></div>
-            </section>
+            <div className="rp-main">
+              <ReplayMap state={map.data} />
+              <div className="rp-controls">
+                <button className="rp-play" onClick={ph.toggle}>
+                  {!ph.playing && <Icon name="play" size={14} fill="currentColor" />} {ph.playing ? 'Pause' : ph.i >= ph.n - 1 ? 'Play again' : ph.i > 0 ? 'Resume' : 'Play the day'}
+                </button>
+                <div className="rp-speed" role="group" aria-label="Speed">
+                  {SPEEDS.map((v) => <button key={v} className={ph.speed === v ? 'on' : ''} onClick={() => ph.setSpeed(v)}>{v}×</button>)}
+                </div>
+                <span className="rp-time num">{ph.at.slice(5, 16).replace('T', ' ')} UTC</span>
+              </div>
+              <input className="rp-slider" type="range" min={0} max={Math.max(0, ph.n - 1)} value={ph.i} onChange={(e) => ph.seek(+e.target.value)} aria-label="Playhead" />
 
-            <aside className="rp-side">
-              <div className="rp-stat"><span>Hour</span><b className="num">{cur ? `${hhmm(cur.ts)} UTC` : '—'}</b></div>
-              <div className="rp-stat"><span>Actual vs forecast</span><b className="num">{cur?.actual != null ? `${unit}${cur.actual.toFixed(0)}` : '—'} <small>vs {unit}{cur?.p50?.toFixed(0)}</small></b></div>
-              <div className="rp-stat"><span>Inside the band so far</span><b className="num">{inBand} of {shown.filter((p) => p.actual != null).length}</b></div>
-              <div className="rp-stat"><span>GB constraint bill that day</span><b className="num">{d.constraint_cost_gbp ? fmt.money(d.constraint_cost_gbp) : '—'}</b></div>
-              {lastExpl && <div className="rp-why"><span>Why</span><p>{typeof lastExpl === 'string' ? lastExpl : lastExpl.sentence}</p></div>}
-              <p className="rp-sum">{d.summary}</p>
-            </aside>
+              {isStorm && s && (
+                <section className="rp-chart">
+                  <div className="rp-tabs rp-series">
+                    {replay.series.map((q) => {
+                      const k = `${q.zone}|${q.target}`
+                      return <button key={k} className={k === `${s.zone}|${s.target}` ? 'on' : ''} onClick={() => setKey(k)}>{q.zone} <span>{TARGET_LABEL[q.target] ?? q.target}</span></button>
+                    })}
+                  </div>
+                  <svg viewBox={`0 0 ${W} ${H}`} width="100%" role="img" aria-label="Actual price against forecast band through the day">
+                    {y.ticks(5).map((v) => (
+                      <g key={v}>
+                        <line x1={P.l} x2={W - P.r} y1={y(v)} y2={y(v)} stroke="var(--line)" />
+                        <text x={P.l - 8} y={y(v) + 4} textAnchor="end" className="rp-tick">{unit}{v}</text>
+                      </g>
+                    ))}
+                    {pts.filter((_, k) => k % 3 === 0).map((p) => <text key={p.ts} x={tx(p)} y={H - 8} textAnchor="middle" className="rp-tick">{hhmm(p.ts)}</text>)}
+                    <path d={band} fill="var(--accent)" opacity="0.14" />
+                    <path d={med} fill="none" stroke="var(--accent)" strokeWidth="2" strokeDasharray="5 4" />
+                    {act && <path d={act} fill="none" stroke="var(--text)" strokeWidth="2.6" />}
+                    {cur && <line x1={tx(cur)} x2={tx(cur)} y1={P.t} y2={H - P.b} stroke="var(--hot)" strokeWidth="1.5" />}
+                    {cur?.actual != null && <circle cx={tx(cur)} cy={y(cur.actual)} r="5" fill="var(--text)" stroke="var(--bg)" strokeWidth="2" />}
+                  </svg>
+                  <div className="rp-legend"><span><i style={{ background: 'var(--text)' }} />What happened</span><span><i style={{ background: 'var(--accent)' }} />Forecast P50, P10–P90 band</span><span>{inBand} of {shown.filter((p) => p.actual != null).length} hours inside the band</span></div>
+                </section>
+              )}
+              {isStorm && replay === undefined && <p className="rp-muted">Loading the forecast…</p>}
+              {isStorm && replay === null && <p className="rp-muted">The forecast replay isn’t available right now; the map still plays.</p>}
+              {!isStorm && (evData ? <EventSeries ev={evData} at={ph.at} /> : <p className="rp-muted">Loading the event…</p>)}
+              {!isStorm && ev && !ev.replay_available && <p className="rp-foot">No as-of forecast was made for this event, so there is no forecast band, only what happened.</p>}
+            </div>
+
+            <Readout
+              at={ph.at}
+              state={map.data}
+              stateAt={map.at}
+              loading={map.loading}
+              missing={map.missing}
+              replay={isStorm ? replay : null}
+              interconnectors={zones.data?.interconnectors}
+              wind={wind}
+              explanation={isStorm ? explanation : null}
+              events={isStorm && replay?.constraint_cost_gbp ? <div className="rp-stat"><span>GB constraint bill that day</span><b className="num">{fmt.money(replay.constraint_cost_gbp)}</b></div> : null}
+            />
           </div>
+          {isStorm && replay?.summary && <p className="rp-sum">{replay.summary}</p>}
         </>
       )}
       <style>{CSS}</style>
@@ -141,7 +252,7 @@ body { overflow: auto; }
 .rp-tabs button span { font-weight: 400; color: var(--text-3); margin-left: 4px; }
 .rp-tabs button.on { background: var(--accent-dim); color: var(--accent); }
 .rp-play { height: 42px; padding: 0 18px; border-radius: 999px; background: var(--hot); color: #1b0d00; font-weight: 700; display: inline-flex; gap: 8px; align-items: center; }
-.rp-grid { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 16px; }
+.rp-grid { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 16px; align-items: start; }
 @media (max-width: 900px) { .rp-grid { grid-template-columns: 1fr; } }
 .rp-chart, .rp-side { background: var(--panel-solid); border: 1px solid var(--line); border-radius: 20px; padding: 16px; }
 .rp-chart input { width: 100%; margin-top: 8px; accent-color: var(--hot); }
@@ -156,6 +267,23 @@ body { overflow: auto; }
 .rp-sum { font-size: 12px; color: var(--text-3); line-height: 1.5; margin: 0; }
 .rp-muted { color: var(--text-2); }
 .rp-mode { margin-bottom: 16px; }
+.rp-main { display: grid; gap: 12px; min-width: 0; }
+.rp-map { position: relative; height: 440px; border-radius: 20px; overflow: hidden; border: 1px solid var(--line); background: var(--bg-2); }
+.rp-days { margin-bottom: 12px; }
+.rp-speed { display: flex; gap: 4px; } .rp-speed button { min-width: 40px; height: 34px; border-radius: 999px; background: var(--card); color: var(--text-2); font-weight: 600; font-size: 13px; } .rp-speed button.on { background: var(--accent-dim); color: var(--accent); }
+.rp-time { margin-left: auto; color: var(--text-2); font-size: 13px; }
+.rp-controls { margin: 0; }
+.rp-slider { width: 100%; accent-color: var(--hot); margin: 0; }
+.rp-series { margin-bottom: 8px; }
+.rp-zones { width: 100%; border-collapse: collapse; font-size: 13px; } .rp-zones th { text-align: left; font-weight: 500; color: var(--text-3); font-size: 11px; padding: 0 0 4px; } .rp-zones td { padding: 5px 0; border-top: 1px solid var(--line); } .rp-zones td.num { text-align: left; }
+.rp-zones i { font-style: normal; font-weight: 700; margin-left: 4px; } .rp-zones i.in { color: #8fd16a; } .rp-zones i.out { color: var(--hot); }
+.rp-foot { font-size: 11px; color: var(--text-3); line-height: 1.45; margin: 0; }
+.rp-load, .rp-miss { display: block; font-size: 11px; color: var(--text-3); margin-top: 2px; } .rp-miss { color: var(--hot); }
+.rp-stat small { display: block; font-size: 11px; color: var(--text-3); font-weight: 400; margin-top: 2px; }
+.rp-stat b { font-size: 20px; }
+.rp-evs { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 10px; }
+.rp-ev { background: var(--panel-solid); border: 1px solid var(--line); border-radius: 16px; padding: 10px 12px; } .rp-ev-h { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-2); } .rp-ev-h b { color: var(--text); }
+@media (max-width: 900px) { .rp-series button { padding: 6px 10px; font-size: 12px; } .rp-series button span { display: none; } .rp-map { height: 300px; } .rp { padding: 16px 14px 90px; } .rp h1 { font-size: 22px; } .rp-time { width: 100%; margin: 0; } }
 `
 
-export default { path: '/replay', title: 'Replay: 26 October storm', Component: Replay }
+export default { path: '/replay', title: 'Replay', Component: Replay }
