@@ -91,7 +91,10 @@ def bot_probabilities(league: dict | None, zone: str, target: str, ts: str, x: f
     return {}, {}
 
 
-def price_questions(replay: dict, asks=PRICE_QUESTIONS, start: int = 12, end: int = 18, league: dict | None = None) -> list[MarketQuestion]:
+def price_questions(replay: dict, asks=PRICE_QUESTIONS, start: int = 12, end: int = 18, league: dict | None = None,
+                    calibration=None) -> list[MarketQuestion]:
+    """The line is always our median; with a calibration (engine.market.calibrate) the opening probability allows for
+    how the model missed on earlier days, otherwise it is the raw band's."""
     by = {(s["zone"], s["target"]): s for s in replay["series"]}
     out = []
     for zone, target, asked in asks:
@@ -107,12 +110,17 @@ def price_questions(replay: dict, asks=PRICE_QUESTIONS, start: int = 12, end: in
         if bot_p:
             bot_p[bots.OUR_MODEL] = round(prob_above(x, p["p10"], p["p50"], p["p90"]), 3)  # Our model is the replay's own band
             bot_notes[bots.OUR_MODEL] = f"median {sym}{p['p50']:.0f}, 80% range {sym}{p['p10']:.0f} to {sym}{p['p90']:.0f}"
+        raw = round(prob_above(x, p["p10"], p["p50"], p["p90"]), 3)
+        model_p, extra = raw, ""
+        if calibration is not None:
+            cp, why = calibration.prob(zone, target, hour, x, p["p10"], p["p50"], p["p90"], raw)
+            model_p, extra = round(cp, 3), f". {why}"
         out.append(MarketQuestion(
             id=f"{zone}-{target}-{hour:02d}", kind="price", target_hour=hour, unit=s["unit"], threshold=x,
             text=f"Will {ZONE_NAMES.get(zone, zone)}'s {TARGET_NAMES.get(target, target)} be above {sym}{x:.0f}/MWh at {hour:02d}:00?",
-            model_p=round(prob_above(x, p["p10"], p["p50"], p["p90"]), 3),
+            model_p=model_p,
             model_note=f"Our forecast made {(pd.Timestamp(p['ts']) - made).total_seconds() / 3600:.0f} h ahead: "
-                       f"median {sym}{p['p50']:.0f}, 80% range {sym}{p['p10']:.0f} to {sym}{p['p90']:.0f}",
+                       f"median {sym}{p['p50']:.0f}, 80% range {sym}{p['p10']:.0f} to {sym}{p['p90']:.0f}{extra}",
             outcome=bool(p["actual"] > x), actual=float(p["actual"]),
             bot_p=bot_p, bot_notes=bot_notes, series=f"{zone} {TARGET_NAMES.get(target, target)}" if bot_p else "",
             profile=[{"hour": pd.Timestamp(q["ts"]).hour, "p10": q["p10"], "p50": q["p50"], "p90": q["p90"]} for q in s["points"]] if bot_p else [],
@@ -143,10 +151,10 @@ def wind_question(day: pd.Timestamp, boalf: pd.DataFrame, end_hour: int, history
 
 
 def build(replay: dict, boalf: pd.DataFrame | None = None, end_hour: int = 18, start_hour: int = 12,
-          league: dict | None = None, choices: bool = False, net_import: pd.DataFrame | None = None) -> list[MarketQuestion]:
+          league: dict | None = None, choices: bool = False, net_import: pd.DataFrame | None = None, calibration=None) -> list[MarketQuestion]:
     """The day's yes/no questions; with choices=True also the choice questions of engine.market.question_types."""
     day = pd.Timestamp(replay["event"], tz="UTC")
-    qs = price_questions(replay, start=start_hour, end=end_hour, league=league)
+    qs = price_questions(replay, start=start_hour, end=end_hour, league=league, calibration=calibration)
     w = wind_question(day, boalf, end_hour) if boalf is not None else None
     extra = []
     if choices:

@@ -22,6 +22,7 @@ import numpy as np
 import pandas as pd
 
 from engine.market import bots as market_bots
+from engine.market import calibrate
 from engine.market import questions as q
 from engine.replay_days import list_days
 
@@ -162,9 +163,10 @@ def wind_market(day: pd.Timestamp, boalf: pd.DataFrame, start: int, end: int, hi
     }
 
 
-def markets(replay: dict, boalf: pd.DataFrame | None = None, league: dict | None = None, start: int = 12, end: int = 18) -> list[dict]:
+def markets(replay: dict, boalf: pd.DataFrame | None = None, league: dict | None = None, start: int = 12, end: int = 18,
+            calibration=None) -> list[dict]:
     day = pd.Timestamp(replay["event"], tz="UTC")
-    qs = [x for x in q.build(replay, None, end_hour=end, start_hour=start, league=league) if start < x.target_hour <= end and ID.match(x.id)]
+    qs = [x for x in q.build(replay, None, end_hour=end, start_hour=start, league=league, calibration=calibration) if start < x.target_hour <= end and ID.match(x.id)]
     dirs = directions(replay["event"], [x.id for x in qs])
     out = [price_market(x, replay, start, dirs[x.id]) for x in qs]
     w = wind_market(day, boalf, start, end) if boalf is not None else None
@@ -218,13 +220,14 @@ def main() -> None:
         boalf = boalf[boalf["zone"] == "GB"][["ts", "value"]]
     except FileNotFoundError:
         boalf = None
+    replays = {d: rp.load(d) for d in list_days(folder)}
     for d in days:
-        r = rp.load(d)
+        r = replays.get(d) or rp.load(d)
         if r is None:
             log.warning("no replay for %s", d)
             continue
         try:
-            args_ = payload(d, r, boalf=boalf, league=botdata.load(d))
+            args_ = payload(d, r, boalf=boalf, league=botdata.load(d), calibration=calibrate.for_day(d, [x for x in replays.values() if x]))
         except (ValueError, AssertionError) as e:
             log.warning("skipping %s: %s", d, e)
             continue

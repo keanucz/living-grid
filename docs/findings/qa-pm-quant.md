@@ -142,3 +142,29 @@ None of the 65. Wind opens range from 15 to 87. Every price market opens between
 4. **FR day-ahead at 13:00** has one game hour, so it never moves. Either move it later or drop it.
 
 Re-run this audit after any of these: the method is a single scratch script over `engine.pm.build.markets`, about 30 seconds on the runner.
+
+## Follow-up #291: opening prices calibrated for the afternoon bias
+
+Re-run 8 November 2026, after #286, on the same 13 replay days on the runner. Read-only scratch run of `engine.pm.build.markets`. The interval is a 95% bootstrap over days.
+
+**What changed (`engine/market/calibrate.py`):**
+
+- **Opening price:** for each price market it is now the share of earlier misses that would have cleared the line, measured in units of each forecast's own 80% range. The misses are z = (actual − P50) / (P90 − P10), for the same zone and series, within ±2 hours of the market's hour.
+- **No leakage:** the misses come only from replay days strictly before the mystery day. Each of those replays is itself from a model trained before its own day, so the misses are out of sample, and none can see the mystery day.
+- **Shrinkage:** the share is shrunk toward the raw model with a 10-hour prior.
+- **Line unchanged:** it stays at our rounded median, so the model still sets the question.
+- **Fallback:** with fewer than 20 earlier hours the raw model is used and the opening note says so. That applies to the first four days: 28 and 30 September, and 6 and 9 October.
+
+| At the open, per share | Raw (after #286) | Calibrated |
+|---|---|---|
+| Always bet higher (YES on "above", NO on "below"), all 13 days | +0.241 (+0.068 to +0.395) | +0.155 (−0.005 to +0.309) |
+| Always bet higher, the 9 calibrated days | +0.241 (+0.045 to +0.408) | **+0.116 (−0.072 to +0.281)** |
+| Always YES, all markets | +0.045 (−0.046 to +0.140) | +0.041 (−0.048 to +0.137) |
+| Brier score at the open, price markets (9 calibrated days) | 0.249 | **0.208** |
+
+- **Higher opening probabilities:** on the calibrated days the opening probability of "higher" is now 59 to 66 on average per market (range 48 to 74), against about 70% realised. It no longer always opens at 50.
+- **The edge is gone:** its interval now includes zero.
+- **Some edge remains:** a smaller +0.12 per share is left because the 10-hour prior pulls the price toward 50. The prior was not tuned on these 13 days, to avoid fitting the evaluation set.
+- **Fallback days are unchanged:** the four earliest days keep the raw edge. It would close only with residual history from before 28 September (for example, as-of backtest residuals), which the replay files do not hold.
+
+The live game needs a `pm` day reload (`uv run python -m engine.pm.build --all`, admin) for the new opens to apply.
