@@ -1,0 +1,31 @@
+{
+  "name": "living-grid-presentation",
+  "private": true,
+  "version": "0.1.0",
+  "description": "The Living Grid presentation: Remotion compositions, rendered to MP4 and played live in the Remotion Player.",
+  "type": "module",
+  "scripts": {
+    "snapshot": "node scripts/snapshot.mjs",
+    "studio": "remotion studio src/index.ts",
+    "player": "vite --config player/vite.config.ts --host",
+    "render:test": "remotion render src/index.ts Test out/test.mp4 --concurrency=2",
+    "render": "remotion render src/index.ts Deck out/deck.mp4",
+    "typecheck": "tsc --noEmit",
+    "build": "tsc --noEmit && vite build --config player/vite.config.ts"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.541",
+    "@remotion/google-fonts": "4.0.541",
+    "@remotion/player": "4.0.541",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "remotion": "4.0.541"
+  },
+  "devDependencies": {
+    "@types/react": "18.3.12",
+    "@types/react-dom": "18.3.1",
+    "@vitejs/plugin-react": "4.3.4",
+    "typescript": "5.6.3",
+    "vite": "5.4.11"
+  }
+}
