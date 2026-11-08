@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { api } from '../../api/client.js'
 import sample from './sample.json'
+import { Disclosure } from '../../ui/Explain.jsx'
+import Term from '../../ui/Term.jsx'
 
 const LABEL = { wind: 'Wind', solar: 'Solar', demand: 'Demand', gas: 'Gas', carbon: 'Carbon', imports: 'Imports', time_of_day: 'Time of day' }
 const sym = (unit) => (unit?.startsWith('GBP') ? '£' : '€')
@@ -50,8 +52,16 @@ function Explain({ ctx }) {
         ))}
       </div>
       <div className="faint xnote">
-        {when} UTC · forecast {s}{body.prediction.toFixed(1)}/MWh, {signed(body.delta, s)} against the reference.{differs ? ` The map shows ${s}${Math.round(shown.price)} for this hour (published result); the bars explain the forecast.` : ''}
-        {res.sample ? ' Sample figures shown because the API could not be reached.' : ' Attribution of the model’s own number, not a proven cause.'}
+        {res.sample ? 'Sample figures shown because the API could not be reached.' : 'Compared with a typical hour. These are the model’s reasons, not proof of cause.'}
+      </div>
+      <div className="xexp">
+        <Disclosure label="For experts">
+          <p>
+            {when} UTC · <Term id="wholesale">wholesale</Term> forecast {s}{body.prediction.toFixed(1)}/<Term id="mwh">MWh</Term>, {signed(body.delta, s)} against the reference: a typical hour in the next 48 hours.
+            {differs ? ` The map shows ${s}${Math.round(shown.price)} for this hour (published result); the bars explain the forecast.` : ''}
+          </p>
+          <p>Each bar is the model’s own attribution of its number (LightGBM feature contributions, grouped), not a proven cause.</p>
+        </Disclosure>
       </div>
       <style>{`
         .xplain { padding-bottom: 14px; }
@@ -66,6 +76,8 @@ function Explain({ ctx }) {
         .xbar.down { background: var(--accent); }
         .xval { text-align: right; }
         .xnote { font-size: 11px; padding: 10px 18px 0; line-height: 1.4; }
+        .xexp { padding: 4px 18px 0; font-size: 11px; color: var(--text-3); }
+        .xexp p, .xexp .ex-dbody p { margin: 4px 0; line-height: 1.45; font-size: 11.5px; color: var(--text-3); }
       `}</style>
     </section>
   )
