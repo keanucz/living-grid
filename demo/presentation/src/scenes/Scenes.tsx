@@ -156,8 +156,8 @@ export const Product: React.FC = () => {
       },
       {
         seconds: 13.6, kicker: 'The product · What if', sources: [cost, lo, hi], render: () => (
-          <Segment scene="hormuz" title="Close the Strait of Hormuz" clip="hormuz" lines={[sentence ?? 'Gas goes up; so does power.', `Odds: 8 in 10 between ${fmt.bigGbp2(lo.v)} and ${fmt.bigGbp2(hi.v)}.`]}
-            badge={<Badge fig={cost} format={(v) => fmt.bigGbp2(v)} label="Extra cost to consumers" />} />
+          <Segment scene="hormuz" title="Close the Strait of Hormuz" clip="hormuz" lines={[sentence ?? 'Gas goes up; so does power.', `Odds: 8 in 10 between ${fmt.bigGbp(lo.v)} and ${fmt.bigGbp(hi.v)}.`]}
+            badge={<Badge fig={cost} format={(v) => fmt.bigGbp(v)} label="Extra cost to consumers" />} />
         ),
       },
       {
