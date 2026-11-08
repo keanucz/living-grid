@@ -17,6 +17,57 @@ function boxOf(id) {
   return null
 }
 
+// The nearest ancestor that actually scrolls (on phones the section sheet scrolls, not the window).
+function scroller(el) {
+  for (let e = el?.parentElement; e && e !== document.body; e = e.parentElement) {
+    const o = getComputedStyle(e).overflowY
+    if ((o === 'auto' || o === 'scroll') && e.scrollHeight > e.clientHeight + 1) return e
+  }
+  return null
+}
+
+// While a step is up, once its target exists and has stopped moving (sections open and panels load after apply), scroll
+// its container so the target sits in the middle of what is visible there, or its top at the top when it is taller than
+// that. Only when part of it is hidden; at most three times a step, a second apart, so late-loading panels are followed
+// without fighting a viewer who scrolls. useBox re-measures as it scrolls.
+const MAX_SCROLLS = 3
+function useScrollIntoView(id) {
+  useEffect(() => {
+    if (!id) return
+    let last = null
+    let still = 0
+    let done = 0
+    let lastAt = 0
+    let jump = null
+    const h = setInterval(() => {
+      const box = boxOf(id)
+      if (!box) return (last = null)
+      // Its top settling is enough: a result panel that keeps growing below (a count-up, a chart) should not hold it back.
+      still = last && Math.abs(last.t - box.t) < 1 ? still + 1 : 0
+      last = box
+      if (still < 2 || Date.now() - lastAt < 1000) return
+      const el = document.querySelector(`[data-tour="${CSS.escape(id)}"]`)
+      const sc = scroller(el?.firstElementChild ?? el)
+      const view = sc ? sc.getBoundingClientRect() : { top: 0, bottom: innerHeight }
+      const top = Math.max(0, view.top)
+      const bottom = Math.min(innerHeight, view.bottom)
+      const room = bottom - top
+      const tall = box.h > room
+      if (tall ? Math.abs(box.t - top - 8) < 24 : box.t >= top - 1 && box.t + box.h <= bottom + 1) return
+      const delta = tall ? box.t - top - 8 : box.t + box.h / 2 - (top + room / 2)
+      const target = sc ?? document.scrollingElement
+      const from = target.scrollTop
+      target.scrollBy({ top: delta, behavior: 'smooth' })
+      // Some browsers drop smooth scrolls on a busy page: jump if nothing moved.
+      clearTimeout(jump)
+      jump = setTimeout(() => Math.abs(target.scrollTop - from) < 1 && target.scrollBy({ top: delta }), 700)
+      lastAt = Date.now()
+      if (++done >= MAX_SCROLLS) clearInterval(h)
+    }, 150)
+    return () => (clearInterval(h), clearTimeout(jump))
+  }, [id])
+}
+
 function useBox(id) {
   const [box, setBox] = useState(null)
   useEffect(() => {
@@ -62,7 +113,9 @@ export default function Tour() {
   useEffect(() => { startFromHash() }, [])
   const steps = tour ? stepsOf(tour.name) : []
   const step = steps[tour?.i]
-  const box = useBox(step && (step.target ?? step.panel))
+  const target = step && (step.target ?? step.panel)
+  const box = useBox(target)
+  useScrollIntoView(tour ? target : null)
   const vals = useLive(step)
 
   useEffect(() => {
