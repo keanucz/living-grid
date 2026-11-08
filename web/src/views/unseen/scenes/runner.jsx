@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { setState } from '../../../store/store.js'
+import { setState, getState } from '../../../store/store.js'
 import Overlays, { overlayCss } from './overlays.jsx'
 
 // Plays a scene once: a timeline of steps over `duration` ms, ending on a still. See the bus note for the format:
@@ -12,6 +12,20 @@ import Overlays, { overlayCss } from './overlays.jsx'
 //         | { at, count: { to, dur } }     (re)start the counter
 // Reduced motion jumps to the end still (the final state of every step, no tweens, no camera fly).
 // `end` marks the still: steps flagged { end: true } are the ones that define it when skipping; all steps are applied in order.
+// What the scenes have changed on the map, so leaving the section can put it back (see restoreMap).
+const touched = { camera: false, layers: null }
+export function restoreMap() {
+  const s = getState()
+  if (touched.camera) {
+    // The view the section now showing expects: its mode's own camera (flat Europe for the overview). Jump when motion is reduced.
+    dispatchEvent(new CustomEvent('lg-camera', { detail: { to: { mode: s.mode }, duration: reduced() ? 0 : 800 } }))
+  }
+  // Sections preset every scene layer, so only a scene left while still on the Hidden grid needs its layers put back.
+  if (touched.layers && s.section === 'hidden') setState((st) => ({ layers: { ...st.layers, ...touched.layers } }))
+  touched.camera = false
+  touched.layers = null
+}
+
 const reduced = () => typeof matchMedia !== 'undefined' && matchMedia('(prefers-reduced-motion: reduce)').matches
 
 const FORMATS = {
@@ -32,7 +46,11 @@ export default function SceneRunner({ scene: sceneProp, onDone, autoplay = true 
   const run = useRef(0)
 
   const apply = useCallback((s) => {
+    if (s.layers) {
+      touched.layers ??= Object.fromEntries(Object.keys(s.layers).map((k) => [k, !!getState().layers[k]]))
+    }
     if (s.layers) setState((st) => ({ layers: { ...st.layers, ...s.layers } }))
+    if (s.camera) touched.camera = true
     if (s.camera) dispatchEvent(new CustomEvent('lg-camera', { detail: { to: s.camera, duration: s.dur ?? 2200 } }))
     if (s.caption != null) setCaption(s.caption)
     if (s.overlay) {

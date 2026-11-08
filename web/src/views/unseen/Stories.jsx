@@ -7,7 +7,7 @@ import { useInfra } from '../../layers/boundaries/data.js'
 import { load as loadCarbon, getCarbon, intensities } from '../../layers/carbon/data.js'
 import { CARDS, INTROS, windHeadline, carbonHeadline, bottleneckHeadline, sunnyHeadline } from './cards.js'
 import Term from '../../ui/Term.jsx'
-import SceneRunner from './scenes/runner.jsx'
+import SceneRunner, { restoreMap } from './scenes/runner.jsx'
 import windScene from './scenes/wind.js'
 import bottleneckScene from './scenes/bottleneck.js'
 import carbonScene from './scenes/carbon.js'
@@ -110,6 +110,9 @@ export default function Stories({ ctx }) {
     loadCarbon()
     if (!gw.window && !gw.loading) loadGhost('live')
   }, [gw.window, gw.loading])
+
+  // Leaving the section (another tab, a page, the welcome) stops the open scene (the runner unmounts) and puts the camera back.
+  useEffect(() => restoreMap, [])
 
   // Enter on the first card's map state, with nothing open underneath.
   useEffect(() => setLayers('wind'), []) // eslint-disable-line react-hooks/exhaustive-deps
