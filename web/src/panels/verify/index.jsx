@@ -34,6 +34,28 @@ function memoFromLogs(tx) {
   return m ? m[1] : null
 }
 
+// "Try cheating": add 1 to one best guess (GB at 18:00 if the file has it, else the first row), so the viewer can see
+// which number changed. Falls back to the last digit in the file if it is not the forecast CSV.
+function cheat(text) {
+  const lines = text.split('\n')
+  const head = lines[0].split(',')
+  const [iz, it, ip] = ['zone', 'ts', 'p50'].map((k) => head.indexOf(k))
+  if (iz < 0 || it < 0 || ip < 0) return { text: text.replace(/\d(?=[^\d]*$)/, (d) => String((Number(d) + 1) % 10)), changed: null }
+  const rows = lines.map((l) => l.split(','))
+  let i = rows.findIndex((r, k) => k > 0 && r[iz] === 'GB' && /T18:00/.test(r[it] ?? ''))
+  if (i < 0) i = 1
+  const r = rows[i]
+  const was = Number(r[ip])
+  r[ip] = String(was + 1)
+  lines[i] = r.join(',')
+  const when = new Date(r[it])
+  const day = when.toLocaleDateString('en-GB', { weekday: 'short', timeZone: 'UTC' })
+  return { text: lines.join('\n'), changed: `${r[iz]} ${day} ${r[it].slice(11, 16)} best guess ${was.toFixed(2)} → ${(was + 1).toFixed(2)}` }
+}
+
+const fp = (h) => (h ? `${h.slice(0, 8)}…${h.slice(-4)}` : null)
+const hhmm = (iso) => (iso ? new Date(iso).toISOString().slice(11, 16) : null)
+
 const short = (s, n = 8) => (s ? `${s.slice(0, n)}…${s.slice(-n)}` : '—')
 const explorerTx = (sig, cluster) => `https://explorer.solana.com/tx/${sig}${cluster === 'mainnet-beta' ? '' : `?cluster=${cluster}`}`
 
@@ -68,12 +90,13 @@ export function Verify() {
       setResult(null)
       try {
         let text = await fetch(`/api/commitments/file/${rec.id}`).then((r) => (r.ok ? r.text() : Promise.reject(new Error(`file ${r.status}`))))
-        if (altered) text = text.replace(/\d(?=[^\d]*$)/, (d) => String((Number(d) + 1) % 10))
+        let changed = null
+        if (altered) ({ text, changed } = cheat(text))
         const browser = await sha256Hex(new TextEncoder().encode(text))
         const tx = await rpc(data.rpc, 'getTransaction', [rec.signature, { encoding: 'json', maxSupportedTransactionVersion: 0 }])
         const memo = memoFromLogs(tx)
         const onChain = memo?.split('|')[3] ?? null
-        setResult({ browser, onChain, memo, match: !!onChain && onChain === browser, altered, error: tx ? null : 'Transaction not found on chain yet' })
+        setResult({ browser, onChain, memo, match: !!onChain && onChain === browser, altered, changed, error: tx ? null : 'Transaction not found on chain yet' })
       } catch (e) {
         setResult({ error: `Could not verify: ${e.message}` })
       } finally {
@@ -87,15 +110,9 @@ export function Verify() {
     if (rec && !data?.cached) run(tamper)
   }, [rec?.id, tamper]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  const verdict = busy
-    ? 'Checking…'
-    : result?.error
-      ? result.error
-      : result
-        ? result.match
-          ? '✓ Match: this file is exactly what was committed'
-          : '✗ Mismatch: this is not the file that was committed'
-        : null
+  const ready = result && !result.error && !busy
+  const same = ready && result.match
+  const published = hhmm(rec?.posted_at)
 
   const answer = (
     <>
@@ -105,11 +122,34 @@ export function Verify() {
         <p className="faint">No commitment has been posted on chain yet. The first one follows the 23:59 UTC freeze on Saturday.</p>
       )}
       {rec && (
-        <div className={`vf-card ${result?.match ? 'ok' : result && !result.error ? 'bad' : ''}`}>
-          <div className="vf-verdict" role="status">{verdict}</div>
+        <div className={`vf-card ${ready ? (same ? 'ok' : 'bad') : ''}`}>
+          <div className="vf-verdict" role="status">
+            Did we change our forecast after seeing the result?{' '}
+            <b>{busy || !result ? 'Not yet checked' : result.error ? 'Could not check' : same ? 'No.' : 'This copy was changed.'}</b>
+          </div>
+          <div className="vf-pair">
+            <div className="vf-fp">
+              <span>Fingerprint we published{published ? ` at ${published} UTC` : ''} on Solana</span>
+              <code>{fp(result?.onChain) ?? (busy ? 'reading…' : '—')}</code>
+            </div>
+            <div className={`vf-eq ${ready ? (same ? 'ok' : 'bad') : ''}`} aria-hidden="true">{ready ? (same ? '=' : '≠') : '?'}</div>
+            <div className="vf-fp">
+              <span>Fingerprint of the forecast on this page</span>
+              <code>{fp(result?.browser) ?? (busy ? 'working…' : '—')}</code>
+            </div>
+          </div>
+          {result?.error && !busy && <p className="vf-warn">{result.error}</p>}
+          {ready && (
+            <p className="vf-say">
+              {same
+                ? 'Same fingerprint, so this is exactly the forecast we sealed before the auction.'
+                : 'Different fingerprint: even one changed number gives a completely new fingerprint, so any edit would show.'}
+            </p>
+          )}
+          {ready && result.altered && result.changed && <p className="vf-changed">Changed: {result.changed}</p>}
           <div className="vf-actions">
-            <button className="btn" onClick={() => run(tamper)} disabled={busy}>Verify</button>
-            <button className="btn" onClick={() => setTamper((t) => !t)} disabled={busy}>{tamper ? 'Use the real file' : 'Alter one digit and re-check'}</button>
+            <button className="btn" onClick={() => setTamper((t) => !t)} disabled={busy}>{tamper ? 'Undo' : 'Try cheating: change one number'}</button>
+            <a href={explorerTx(rec.signature, data.cluster)} target="_blank" rel="noreferrer">Check it on Solana yourself ↗</a>
           </div>
         </div>
       )}
@@ -181,7 +221,7 @@ const CSS = `
 .vf header p { margin: 0 0 14px; color: var(--text-2); max-width: 720px; }
 .vf-card { border: 1px solid var(--line); border-radius: 16px; padding: 14px; display: grid; gap: 10px; font-size: 15px; }
 .vf-card.ok { border-color: rgba(197,240,107,.5); }
-.vf-card.bad { border-color: var(--hot); }
+.vf-card.bad { border-color: #e5534b; }
 .vf-row { display: flex; gap: 12px; align-items: baseline; flex-wrap: wrap; font-size: 13px; }
 .vf-row > span { color: var(--text-3); min-width: 150px; }
 .vf code { font-size: 12px; word-break: break-all; }
@@ -195,6 +235,16 @@ const CSS = `
 .vf table { width: 100%; border-collapse: collapse; font-size: 12px; }
 .vf th { text-align: left; color: var(--text-3); font-weight: 500; padding: 4px 8px 4px 0; }
 .vf td { padding: 4px 8px 4px 0; border-top: 1px solid var(--line); }
-.vf-warn { color: var(--hot); font-size: 13px; }
-@media (max-width: 700px) { .vf .ex { padding: 14px 14px 8px; border-radius: 18px; } .vf-row > span { min-width: 0; } }
+.vf-warn { color: var(--hot); font-size: 13px; margin: 0; }
+.vf-verdict b { font-weight: 700; }
+.vf-pair { display: grid; grid-template-columns: 1fr auto 1fr; gap: 12px; align-items: center; }
+.vf-fp { border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; display: grid; gap: 6px; min-width: 0; }
+.vf-fp span { font-size: 12px; color: var(--text-3); }
+.vf-fp code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 16px; word-break: break-all; }
+.vf-eq { font-size: 40px; font-weight: 700; line-height: 1; color: var(--text-3); text-align: center; min-width: 36px; }
+.vf-eq.ok { color: #7fd36b; }
+.vf-eq.bad { color: #e5534b; }
+.vf-say { margin: 0; font-size: 14px; }
+.vf-changed { margin: 0; font-size: 13px; color: #e5534b; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+@media (max-width: 700px) { .vf-pair { grid-template-columns: 1fr; justify-items: stretch; } .vf-eq { padding: 2px 0; } .vf .ex { padding: 14px 14px 8px; border-radius: 18px; } .vf-row > span { min-width: 0; } }
 `
