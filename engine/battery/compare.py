@@ -109,24 +109,29 @@ def summarise(zone: str, settled: dict[str, pd.DataFrame], battery: Battery = Ba
 
 
 def pooled_share(results: list[dict], hours: dict[str, int]) -> tuple[float | None, int, str]:
-    """Risk-aware profit over perfect-foresight profit, summed over zones in EUR (not a mean of zone ratios)."""
-    def total(strategy: str) -> float:
-        return sum(
-            r["profit"] * (EUR_PER_GBP if r["currency"] == "GBP" else 1.0) for r in results if r["strategy"] == strategy
-        )
+    """Risk-aware profit over perfect-foresight profit, summed over zones in EUR (not a mean of zone ratios).
 
-    n = sum(hours.values())
-    zones = len(hours)
-    best = total("perfect_foresight")
-    if not zones or n < MIN_HOURS * zones:
-        return None, n, f"Too few settled hours ({n}) on real day-ahead prices to score the batteries yet"
-    if best < MIN_PERFECT_PROFIT * zones:
+    Only zones that have a share of their own are pooled (the rule summarise() uses: enough settled hours and enough
+    perfect-foresight profit). A zone that cannot be scored, such as NO2 when prices were flat, would otherwise add its
+    loss to the pool while adding nothing to the denominator. Returns (share, settled hours of the pooled zones, note).
+    """
+    def profit(zone: str, strategy: str) -> float:
+        return sum(r["profit"] * (EUR_PER_GBP if r["currency"] == "GBP" else 1.0)
+                   for r in results if r["zone"] == zone and r["strategy"] == strategy)
+
+    scored = [z for z, h in hours.items() if h >= MIN_HOURS and profit(z, "perfect_foresight") >= MIN_PERFECT_PROFIT]
+    skipped = sorted(set(hours) - set(scored))
+    if not scored:
+        n = sum(hours.values())
+        if not hours or max(hours.values()) < MIN_HOURS:
+            return None, n, f"Too few settled hours ({n}) on real day-ahead prices to score the batteries yet"
         return None, n, "Prices have been too flat for perfect foresight to earn much, so a share would be noise"
-    return (
-        round(total("risk_aware") / best, 4),
-        n,
-        f"Pooled over {zones} zones and {n} settled hours; energy still stored at the end is valued at the mean real price",
-    )
+    n = sum(hours[z] for z in scored)
+    best = sum(profit(z, "perfect_foresight") for z in scored)
+    note = f"Pooled over {len(scored)} zone{'' if len(scored) == 1 else 's'} and {n} settled hours; energy still stored at the end is valued at the mean real price"
+    if skipped:
+        note += f". Not scored (too flat or too few hours): {', '.join(skipped)}"
+    return round(sum(profit(z, "risk_aware") for z in scored) / best, 4), n, note
 
 
 def load_inputs() -> tuple[pd.DataFrame | None, pd.DataFrame | None]:
