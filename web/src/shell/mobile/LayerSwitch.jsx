@@ -3,7 +3,7 @@ import { actions } from '../../store/store.js'
 // One "unseen" overlay at a time on a phone; Price is the base map with none of them on.
 const OPTIONS = [
   { id: null, label: 'Price' },
-  { id: 'ghostWind', label: 'Ghost wind' },
+  { id: 'ghostWind', label: 'Wind paid to stop' },
   { id: 'carbon', label: 'Carbon' },
   { id: 'gbRegions', label: 'GB regions' },
   { id: 'wind', label: 'Wind' },

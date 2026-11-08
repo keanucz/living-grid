@@ -6,6 +6,7 @@ import { COLORS, fmt } from '../styles/tokens.js'
 import { Icon, ASSET_ICON } from '../shell/icons.jsx'
 import { towerHeight, GLASS, outlines } from '../layers/price/index.js'
 import { onTop } from '../layers/scenarioFx/index.js'
+import { fmtPence } from '../lib/wholesale.js'
 
 // Short country names for the price labels on the map; the zone list and hover cards keep the full names.
 const MAP_NAME = { GB: 'Britain', FR: 'France', 'DE-LU': 'Germany', NL: 'Netherlands', BE: 'Belgium', NO2: 'Norway' }
@@ -300,7 +301,10 @@ function Overlay({ viewport, ctx }) {
           <div className="callout fade-in" key={scenario.type} style={{ left: x, top: y }}>
             <div className="ic"><Icon name="pound" size={18} stroke={2.2} /></div>
             <div>
-              <b>{z.name} {fmt.signed(z.currency === 'GBP' ? d / 1.15 : d)} {z.currency === 'GBP' ? '£' : '€'}/MWh</b>
+              {/* Britain in the units on a bill (wholesale pence per kWh); other zones in euros per MWh. */}
+              <b>{z.currency === 'GBP'
+                ? `Britain ${d < 0 ? '−' : '+'}${fmtPence(d / 1.15)} per kWh wholesale`
+                : `${z.name} ${d < 0 ? '−' : '+'}€${Math.abs(d).toFixed(1)} per MWh`}</b>
               <span>Modelled · {scenario.label}</span>
             </div>
           </div>
