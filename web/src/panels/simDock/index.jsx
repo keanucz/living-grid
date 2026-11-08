@@ -6,6 +6,7 @@ import { sectionById } from '../../shell/sections.js'
 import { actions } from '../../store/store.js'
 import Explain from '../../ui/Explain.jsx'
 import Term from '../../ui/Term.jsx'
+import Intro from './Intro.jsx'
 import compute from '../compute/index.jsx'
 import { RESULT_CSS, ResultCard, duration } from './Result.jsx'
 import { EVENTS, HOUSEHOLD, KEY, answer, why } from './copy.js'
@@ -40,11 +41,13 @@ function SimDock({ ctx }) {
   const mag = mags[armed] ?? sc?.magnitude ?? 0
   const [run, setRun] = useState({ status: 'idle', result: null, key: 0, type: null })
   const narrow = useNarrow()
+  const [intro, setIntro] = useState(null) // { id, key }: the 1.8 s picture of what just happened; never waits for the result
 
   const go = async (id, magnitude) => {
     const s = all?.[id]
     if (!s) return
     const key = Date.now()
+    setIntro({ id, key })
     actions.armScenario(id)
     actions.runScenario(id, magnitude)
     actions.setLiveResult(null, null)
@@ -81,6 +84,7 @@ function SimDock({ ctx }) {
     <>
       {/* The phone shell already shows the section's title and blurb above this panel; the desktop map hides them in this mode. */}
       {!narrow && <header className="wi-head fade-in"><h1>{sectionById.whatif.title}</h1><p>{sectionById.whatif.blurb}</p></header>}
+      {intro && <Intro key={intro.key} id={intro.id} onDone={() => setIntro(null)} />}
       <section className="wi-cards fade-in" aria-label="What if">
         {EVENTS.map((e) => (
           <button key={e.id} className={`wi-card ${e.id === armed && shown ? 'on' : ''}`} onClick={() => go(e.id, mags[e.id] ?? all[e.id]?.magnitude)}
