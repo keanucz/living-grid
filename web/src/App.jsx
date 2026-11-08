@@ -84,7 +84,15 @@ function MapApp() {
   // /state takes seconds, so fetch it only when the hour changes (or a new hour starts); live table updates are
   // overlaid in the browser. Refetching on every SpacetimeDB bump cancelled each response before it landed.
   const hour = ui.at ?? currentHour()
-  const apiState = useApi(() => api.state(ui.at), [hour])
+  // A slow /state (the API restarting after a merge) falls back to the bundled sample; without a retry that sample
+  // would stay up until the hour changes. Try live again every 15 s while the sample is showing.
+  const [retry, setRetry] = useState(0)
+  const apiState = useApi(() => api.state(ui.at), [hour, retry])
+  useEffect(() => {
+    if (apiState.source !== 'fixture') return undefined
+    const t = setTimeout(() => setRetry((n) => n + 1), 15000)
+    return () => clearTimeout(t)
+  }, [apiState])
   const state = useMemo(() => overlayState(apiState, ui.at), [apiState, ui.at, ui.live?.version])
   const scenarios = useApi(api.scenarios)
   const assets = useApi(api.assets)
