@@ -170,10 +170,12 @@ def forecasts(at: pd.Timestamp, targets=("price_da", "gb_system_price")) -> dict
 
 
 def carbon_at(at: pd.Timestamp) -> dict[str, dict]:
+    """Each zone's newest modelled hour at or before `at`. Zones finish at different hours (Energy-Charts runs 2 to 4 hours
+    behind Elexon), so the window is the metered one, as for load and mix, not the 3 h price window."""
     c = carbon()
     if not len(c):
         return {}
-    c = c[(c["ts"] <= at) & (c["ts"] > at - AS_OF_TOLERANCE)].sort_values("ts").groupby("zone").last()
+    c = c[(c["ts"] <= at) & (c["ts"] > at - METERED_TOLERANCE)].sort_values("ts").groupby("zone").last()
     return {
         zone: {
             "production_gco2_kwh": float(r["production_gco2_kwh"]),
