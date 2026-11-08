@@ -95,3 +95,40 @@ def test_neso_boundaries_asks_for_every_group(monkeypatch):
     assert list(out["boundary"]) == ["ESTEX"] and out["utilisation"].iloc[0] == 0.5
     assert neso.BOUNDARIES["SCOTEX"] == "SCOTEX"  # patch undone
     assert "ESTEX" not in neso.BOUNDARIES
+
+
+def _all_boundaries(days, extra=0):
+    ts = pd.date_range(T0, periods=24 * days, freq="h")
+    rows = []
+    for t in ts:
+        rows.append({"ts": t, "boundary": "SCOTEX", "flow_mw": 2000.0, "limit_mw": 3500.0, "utilisation": 2000 / 3500, "fetched_at": T0})
+        for k in range(extra):
+            rows.append({"ts": t, "boundary": f"G{k}", "flow_mw": 5000.0, "limit_mw": 4000.0, "utilisation": 1.25, "fetched_at": T0})
+    return pd.DataFrame(rows)
+
+
+def _links_actuals():
+    return (pd.DataFrame({"ts": [T0], "zone": "GB", "series": "flow_GB_NO2", "value": [-1400.0], "unit": "MW"}),
+            pd.DataFrame({"to_zone": ["NO2"], "capacity_mw": [1400]}))
+
+
+def test_a_one_day_all_boundaries_file_does_not_replace_the_longer_window(monkeypatch):
+    a, links = _links_actuals()
+    frames = {inf.FLOWS: flows(), inf.FLOWS_ALL: _all_boundaries(1), inf.COSTS: costs()}
+    monkeypatch.setattr(inf, "_read", lambda name: frames.get(name))
+    monkeypatch.setattr(inf.boalf, "load_bids", lambda: None)
+    b = inf.build(actuals=a, links=links)
+    b6 = next(r for r in b["boundaries"] if r["boundary"] == "SCOTEX")
+    assert b6["hours"] == 48 and b6["overload_mwh"] == 6000  # the 48 h Scottish file, not the 24 h all-boundaries one
+    assert (b["window"]["to"] - b["window"]["from"]) == pd.Timedelta(hours=47)
+
+
+def test_the_all_boundaries_file_is_used_once_it_spans_as_long_and_is_capped(monkeypatch):
+    a, links = _links_actuals()
+    frames = {inf.FLOWS: flows(), inf.FLOWS_ALL: _all_boundaries(3, extra=12), inf.COSTS: costs()}
+    monkeypatch.setattr(inf, "_read", lambda name: frames.get(name))
+    monkeypatch.setattr(inf.boalf, "load_bids", lambda: None)
+    b = inf.build(actuals=a, links=links)
+    names = [r["boundary"] for r in b["boundaries"]]
+    assert len(names) == inf.MAX_BOUNDARIES and "SCOTEX" in names
+    assert next(r for r in b["boundaries"] if r["boundary"] == "SCOTEX")["hours"] == 72

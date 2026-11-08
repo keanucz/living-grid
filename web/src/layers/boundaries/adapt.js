@@ -63,6 +63,8 @@ export function adapt(d) {
     capacity_mw: num(l.capacity_mw),
     flow_mw: num(l.mean_import_mw) == null ? null : -l.mean_import_mw, // view: positive is GB to the far end
     util: num(l.import_utilisation),
+    full_import_share: num(l.hours_full_import_share),
+    full_export_share: num(l.hours_full_export_share),
     source: { name: d.interconnector_basis, url: null, date },
   }))
   const planned = d.planned_links.map((p) => ({

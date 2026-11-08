@@ -24,6 +24,7 @@ INTERCONNECTOR_GROUPS = {"FR": "France", "NL": "Netherlands", "BE": "Belgium", "
                          "SEM": "Ireland and Northern Ireland"}
 FLOW_SERIES = {"FR": ["GB_FR"], "NL": ["GB_NL"], "BE": ["GB_BE"], "NO2": ["GB_NO2"], "DK1": ["GB_DK1"], "SEM": ["GB_IE", "GB_NI"]}
 FULL_SHARE = 0.9
+MAX_BOUNDARIES = 8  # the table is sorted by overload: the boundaries that matter, not every NESO group
 NESO_FLOW_SOURCE = "NESO Data Portal, Day Ahead Constraint Flows and Limits (https://www.neso.energy/data-portal/day-ahead-constraint-flows-and-limits)"
 NESO_COST_SOURCE = "NESO Data Portal, Constraint Breakdown (https://www.neso.energy/data-portal/constraint-breakdown)"
 OTF_SOURCE = "NESO Operational Transparency Forum, 7 October 2026 (https://www.neso.energy/document/388476/download)"
@@ -140,11 +141,15 @@ def build(extra_mw=EXTRA_MW, flows: pd.DataFrame | None = None, costs: pd.DataFr
     allb = _read(FLOWS_ALL) if flows is None else None
     if scot is None or scot.empty:
         raise LookupError("no NESO boundary flows ingested yet")
-    table_src = scot if allb is None or allb.empty else allb
+    # One dataset for the table, the window and the counterfactual: the all-boundaries file only once it spans at least as
+    # long as the Scottish one (it is newer), so a day of data is never presented as three weeks.
+    span = lambda d: d["ts"].max() - d["ts"].min()  # noqa: E731
+    base = allb if allb is not None and not allb.empty and span(allb) >= span(scot) else scot
+    table_src = base
     costs = _read(COSTS) if costs is None else costs
     if ghost is None:
         bids = boalf.load_bids()
-        ghost = boalf.estimate(scot["ts"].min(), scot["ts"].max(), bids=bids) if bids is not None else None
+        ghost = boalf.estimate(base["ts"].min(), base["ts"].max(), bids=bids) if bids is not None else None
     actuals = data.actuals() if actuals is None else actuals
     links = static.interconnectors() if links is None else links
     caps = {}
@@ -154,18 +159,20 @@ def build(extra_mw=EXTRA_MW, flows: pd.DataFrame | None = None, costs: pd.DataFr
         except (KeyError, LookupError, IndexError):
             pass
     boundaries = boundary_table(table_src)
+    keep = [r for r in boundaries if r["boundary"] == B6 or r["overload_mwh"] > 0]
+    boundaries = sorted(keep or boundaries, key=lambda r: (r["boundary"] != B6, -r["overload_mwh"]))[:MAX_BOUNDARIES]
     for r in boundaries:
         if r["boundary"] == B6:
             r["name"] = "B6 (Scotland to England, NESO group SCOTEX)"
             r["max_capacity_mw"] = 6800
             r["max_capacity_source"] = OTF_SOURCE
     return {
-        "window": {"from": scot["ts"].min().to_pydatetime(), "to": scot["ts"].max().to_pydatetime()},
+        "window": {"from": base["ts"].min().to_pydatetime(), "to": base["ts"].max().to_pydatetime()},
         "boundaries": boundaries, "boundary_source": NESO_FLOW_SOURCE, "etys_capability": caps,
         "interconnectors": interconnectors(actuals, links),
         "interconnector_basis": "Capacities are nominal, hand-entered in data/static/interconnectors.csv; flows are Elexon metered.",
         "constraint_costs": cost_summary(costs) if costs is not None and len(costs) else None,
-        "counterfactual": {"boundary": B6, "scenarios": [counterfactual(scot, costs, ghost, e) for e in extra_mw],
+        "counterfactual": {"boundary": B6, "scenarios": [counterfactual(base, costs, ghost, e) for e in extra_mw],
                            "ghost_wind_source": "Elexon accepted bids on Scottish wind units (estimate, upper bound)"},
         "planned_links": PLANNED, "connections_queue": QUEUE,
         "kind": "estimated", "note": NOTE,
