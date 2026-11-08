@@ -8,6 +8,8 @@ The slope is linear and the merit order is not, so large effects are approximate
 Cross-check: LightGBM pred_contrib wind and solar groups (pipeline.models.explain) on the forecast hours.
 """
 
+from functools import lru_cache
+
 import numpy as np
 import pandas as pd
 
@@ -116,7 +118,8 @@ def _model_check(zone: str, start: pd.Timestamp, end: pd.Timestamp) -> dict | No
         from pipeline.features import latest
         from pipeline.models.explain import explain
 
-        f = latest()
+        # The cached file the scheduler writes; rebuilding features here took ~15-100 s per request and rewrote it.
+        f = latest(rebuild=False)
         f = f[(f["zone"] == zone) & (f["ts"] >= start) & (f["ts"] <= end)]
         if f.empty:
             return None
@@ -197,3 +200,24 @@ def renewables(zone: str, start, end, a: pd.DataFrame | None = None, gas: pd.Ser
         + ("" if has_solar else " Solar output is not metered for this zone in our data, so no solar effect is shown."),
         "source": "Energy-Charts / Nord Pool day-ahead prices, Energy-Charts and Elexon generation and load, yfinance TTF gas",
     }
+
+
+def _inputs_key() -> tuple:
+    """Paths and mtimes of every file renewables() reads; its result only changes when one of them does."""
+    bases = (cache.DATA, cache.FIXTURES) if cache.offline() else (cache.DATA,)
+    files = [f for b in bases for f in sorted((b / "actuals").glob("*.parquet"))]
+    files += [b / f"{name}.parquet" for b in bases for name in ("markets/gas_carbon", "features/latest")]
+    from pipeline.models.quantile import models_dir
+
+    files.append(models_dir())
+    return tuple((str(f), f.stat().st_mtime_ns) for f in files if f.exists())
+
+
+@lru_cache(maxsize=32)
+def _cached(zone: str, start: pd.Timestamp, end: pd.Timestamp, key: tuple) -> dict:
+    return renewables(zone, start, end)
+
+
+def cached_renewables(zone: str, start, end) -> dict:
+    """renewables() memoised on zone, hour range and input file mtimes. The result is shared: read it, never mutate it."""
+    return _cached(zone, data.as_utc(start).floor("h"), data.as_utc(end).floor("h"), _inputs_key())

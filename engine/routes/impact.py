@@ -26,6 +26,6 @@ def renewables(zone: str, from_: datetime | None = Query(None, alias="from"), to
     if start > end:
         raise HTTPException(422, "from must not be after to")
     try:
-        return impact.renewables(zone, start, end)
+        return impact.cached_renewables(zone, start, end)
     except LookupError as e:
         raise HTTPException(404, str(e)) from e
