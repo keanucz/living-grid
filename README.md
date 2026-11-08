@@ -107,22 +107,15 @@ Walk-forward backtest, six folds of seven days with a 48-hour purge, run on 7 No
 | Same hour yesterday | 36.6 |
 | Last known price when the forecast was made (persistence) | 43.2 |
 
-That's 24% better than persistence on day-ahead prices, pooled over all six zones (6,039 hours). Per zone the model beats persistence everywhere except NO2 (ratio 1.12) and beats yesterday in four of six zones. It loses to yesterday in France and to both baselines in NO2. Across all 17 zone-and-target pairs it beats both baselines in 13; the losses are NL load against yesterday (an Energy-Charts data break on 10 October), FR price against yesterday, NO2 price against both, and FR wind against persistence. The backtest says so.
+That's 24% better than persistence on day-ahead prices, pooled over all six zones (6,039 hours). Per zone the model beats persistence everywhere except NO2 (ratio 1.12) and beats yesterday in four of six zones. It loses to yesterday in France and to both baselines in NO2. Across all 17 zone-and-target pairs it beats both baselines in 13; the losses are NL load against yesterday (an Energy-Charts data break on 10 October), FR price against yesterday, NO2 price against both, and FR wind against persistence.
 
-The bands are closer to honest but still a little narrow. After calibration 79.9% of day-ahead price outcomes landed between P10 and P90 (target 80%; 64.0% before). By target: day-ahead price 79.9%, load 80.2%, wind 77.1%, GB system price 73.6%.
+The bands are closer to honest but still a little narrow. After calibration 79.9% of day-ahead price outcomes landed between P10 and P90 (target 80%; 63.3% in the 16:53 run without it). By target: day-ahead price 79.9%, load 80.2%, wind 77.1%, GB system price 73.6%.
 
-Two single-day replays, generated separately from the backtest, show where the misses cluster:
-
-| Day | Hours inside the band |
-|---|---|
-| 2 November 2026 (calm) | 136 of 168 (81%) |
-| 26 October 2026 (storm) | 83 of 168 (49%) |
-
-The storm caught the model out. NESO puts GB constraint costs that day at £36.5m.
+The replay of 26 October 2026, a stormy day, generated separately from the backtest, shows where the misses cluster: 78 of its 168 hours (46%) landed inside the band. The storm caught the model out. NESO puts GB constraint costs that day at £36.5m.
 
 ### Bot league: which technique wins, and when
 
-Four rival forecasters run on exactly the same backtest rows as ours, each trained only on data from before the week it forecasts: **Yesterday** and **Last week** (same hour a day or a week earlier, with a band from their own past errors), **The Engineer** (merit order: price from residual load, gas and carbon) and **The Committee** (a weighted blend of the others, then calibrated). Storm days are the windiest 15% of days by GB wind output: 6 of the 43 days, 26 October among them. Run on 7 November at 20:57 UTC (`python -m pipeline.bot_league`, results in `data/backtest/bot_league.json`).
+Four rival forecasters run on exactly the same backtest rows as ours, each trained only on data from before the week it forecasts: **Yesterday** and **Last week** (same hour a day or a week earlier, with a band from their own past errors), **The Engineer** (merit order: price from residual load, gas and carbon) and **The Committee** (a weighted blend of the others, then calibrated). Storm days are the windiest 15% of days by GB wind output: 6 of the 43 days, 26 October among them. Run on 7 November at 20:57 UTC in an agent's worktree, not on the runner; `python -m pipeline.bot_league` reproduces it into `data/backtest/bot_league.json` in about 14 minutes.
 
 Day-ahead prices (MAE in £ or €/MWh; pinball loss scores the whole P10 to P90 band; lower is better):
 
@@ -155,11 +148,11 @@ Every band is still too narrow in storms: the best catch 66% to 72% of outcomes,
 | Carbon price spike | Raises the EUA price and passes it through gas plants at 0.334 tCO₂/MWh |
 | Storm over Scotland | More Scottish wind than the 6.7 GW B6 boundary can carry: prices fall, but more wind is paid to switch off |
 
-The model has two years of history and has never seen anything like Hormuz closing, so that one uses the merit order instead: a gas plant at 58% efficiency burns 1.72 MWh of gas per MWh of power. The screen says it's an approximation of market coupling, because it is.
+The model has two years of history and has never seen anything like Hormuz closing, so that one uses the merit order instead: a gas plant at 58% efficiency burns 1.72 MWh of gas per MWh of power. The screen says it's an approximation of market coupling.
 
 ### Where the numbers come from
 
-Every constant in the engine (interconnector capacities, plant efficiencies, emission factors, wind farm sizes, boundary limits) lives in `engine/reference/facts/` with its source URL, the exact quote and a confidence rating. Each one was researched with the Parallel Task API, checked by a second independent run, then re-found on the source page with a plain HTTP fetch. 51 of 53 pass. The other two are flagged and the code won't load them.
+Every constant in the engine (interconnector capacities, plant efficiencies, emission factors, wind farm sizes, boundary limits) lives in `engine/reference/facts/` with its source URL, the exact quote and a confidence rating. 53 of them were researched with the Parallel Task API, checked by a second independent run, then re-found on the source page with a plain HTTP fetch; 51 of those pass, and the other two are flagged and the code won't load them. Six more (data-centre hardware and household figures) were entered by hand with their source.
 
 | Source | Used for | Limit we respect |
 |---|---|---|
@@ -178,7 +171,7 @@ Every constant in the engine (interconnector capacities, plant efficiencies, emi
 - Energy-Charts reports load and wind for all of Norway, not just price zone NO2 (load averages about 15 GW against roughly 5 GW for NO2). So the load and wind forecasts cover five zones (GB, FR, DE-LU, NL, BE) and leave NO2 out, rather than log Norway-wide numbers under an NO2 label. Day-ahead prices cover all six zones, and each hourly run logs 816 forecasts instead of 912.
 - Ghost wind (wind paid to switch off) is worked out two ways: from accepted balancing bids, and from the gap between weather-implied and metered output. Both are labelled as estimates.
 - Carbon in imported power uses standard emission factors per fuel, not plant-level data.
-- The 6.7 GW we use for the Scotland-England boundary (B6) is NESO's planning capability: "The boundary capability is limited to 6.7 GW due to thermal constraint on the Harker-Moffat 400kV circuit" ([ETYS 2025](https://www.neso.energy/document/383876/download)). The limit NESO actually runs to is lower and changes daily, because it must secure the worst single fault: "our typical B6 limit is ~6GW but the intact capacity is ~12GW - we always have to operate to secure the worst fault" ([NESO Constraints Collaboration Q&A, Jan 2025](https://www.neso.energy/document/350981/download)). The day-ahead SCOTEX limit we ingest was 3.6 GW on 7 Nov 2026; NESO notes day-ahead limits are sometimes set low when it does not expect the boundary to be congested. The storm scenario uses 6.7 GW, so it understates how often Scotland is cut off.
+- The 6.7 GW we use for the Scotland-England boundary (B6) is NESO's planning capability: "The boundary capability is limited to 6.7 GW due to thermal constraint on the Harker-Moffat 400kV circuit" ([ETYS 2025](https://www.neso.energy/document/383876/download)). The limit NESO actually runs to is lower and changes daily, because it must secure the worst single fault: "our typical B6 limit is ~6GW but the intact capacity is ~12GW - we always have to operate to secure the worst fault" ([NESO Constraints Collaboration Q&A, Jan 2025](https://www.neso.energy/document/350981/download)). The day-ahead SCOTEX limit we ingest was 3.3 to 3.6 GW on 7 Nov 2026; NESO notes day-ahead limits are sometimes set low when it does not expect the boundary to be congested. The storm scenario uses 6.7 GW, so it understates how often Scotland is cut off.
 
 ### Deliberately not built
 
