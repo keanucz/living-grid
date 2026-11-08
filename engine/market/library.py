@@ -344,9 +344,9 @@ class CacheData:
     def get(self, zone: str, series: str) -> pd.Series:
         k = (zone, series)
         if k not in self._c:
+            from engine import data
             a = self.a[(self.a["zone"] == zone) & (self.a["series"] == series)]
-            self._c[k] = (a.assign(ts=pd.to_datetime(a["ts"], utc=True).dt.floor("h")).groupby("ts")["value"].mean().sort_index()
-                          if len(a) else pd.Series(dtype=float))
+            self._c[k] = data.best_rows(a).set_index("ts")["value"].sort_index() if len(a) else pd.Series(dtype=float)
         return self._c[k]
 
 

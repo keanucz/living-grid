@@ -3,6 +3,7 @@
 from functools import lru_cache
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 
 from pipeline import cache, static
@@ -97,6 +98,29 @@ def _as_of(df: pd.DataFrame, at: pd.Timestamp) -> pd.DataFrame:
     """Latest row per (zone, series) with ts in (at - tolerance, at]."""
     df = df[(df["ts"] <= at) & (df["ts"] > at - AS_OF_TOLERANCE)]
     return df.sort_values("ts").groupby(["zone", "series"], as_index=False).last()
+
+
+def price_rank(source: pd.Series) -> pd.Series:
+    """Lower is preferred: PRICE_SOURCES order, unknown sources next, the MID proxy for GB day-ahead always last."""
+    known = [s for s in PRICE_SOURCES if s != "mid"]
+    return source.map({s: i for i, s in enumerate(known)}).fillna(len(known)).where(source != "mid", len(known) + 1)
+
+
+def best_rows(df: pd.DataFrame, series: str | None = None) -> pd.DataFrame:
+    """One row per (zone, hour): each source averaged to the hour, then the preferred source kept (never file order).
+
+    Returns ts (hour, UTC), zone, value, source, plus series and unit when present."""
+    if series is not None:
+        df = df[df["series"] == series]
+    if "source" not in df.columns:
+        df = df.assign(source="unknown")
+    keys = ["zone", "ts", "source"] + [c for c in ("series", "unit") if c in df.columns]
+    if df.empty:
+        return pd.DataFrame(columns=keys + ["value"])
+    h = df.assign(ts=pd.to_datetime(df["ts"], utc=True).dt.floor("h")).groupby(keys, as_index=False, dropna=False)["value"].mean()
+    h = h[np.isfinite(h["value"])]
+    h = h.assign(rank=price_rank(h["source"])).sort_values(["zone", "ts", "rank"], kind="stable")
+    return h.drop_duplicates(["zone", "ts"]).drop(columns="rank").reset_index(drop=True)
 
 
 def prices(at: pd.Timestamp) -> dict[str, dict]:

@@ -87,8 +87,7 @@ def gb_prices(actuals: pd.DataFrame | None = None) -> tuple[pd.Series, pd.Series
     a = a[a["zone"] == "GB"]
 
     def series(name: str) -> pd.Series:
-        s = a[a["series"] == name].groupby("ts")["value"].last().sort_index()
-        return s[np.isfinite(s)]
+        return data.best_rows(a, name).set_index("ts")["value"].sort_index()
 
     final = series(FINAL_SERIES)
     provisional = pd.Series(dtype=float)

@@ -8,6 +8,7 @@ on a forecast.
 
 import pandas as pd
 
+from engine import data
 from engine.battery import baselines
 from engine.battery.optimiser import Battery, optimise, settle
 from engine.ghost_wind.boalf import read_live
@@ -137,8 +138,8 @@ def load_inputs() -> tuple[pd.DataFrame | None, pd.DataFrame | None]:
     for name in names:
         df = read_live(f"actuals/{name}")
         if (df["series"] == TARGET).any():
-            frames.append(df[df["series"] == TARGET])
-    actual = pd.concat(frames, ignore_index=True) if frames else None
+            frames.append(df[df["series"] == TARGET].assign(source=data.source_of(name)))
+    actual = data.best_rows(pd.concat(frames, ignore_index=True)) if frames else None
     if log is not None:
         log = log[log["target"] == TARGET]
     return log, actual
