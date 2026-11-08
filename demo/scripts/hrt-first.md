@@ -30,7 +30,7 @@ Three minutes. Spoken lines are in plain text; **clicks are in bold**. Times are
 
 **Click More detail, then GB on the battery card.**
 
-"A 1 megawatt, 2 megawatt hour battery in each zone trades on our forecasts. We score it only on real outcomes and compare it with a naive rule and with perfect foresight. So far it has made about 98% of what perfect foresight could, against under 90% for the naive rule. The version that plans across the whole band is as good or better in four of five zones."
+"A 1 megawatt, 2 megawatt hour battery in each zone trades on our forecasts. We score it only on real outcomes and compare it with a naive rule and with perfect foresight. So far it has made about 94% of what perfect foresight could, against under 90% for the naive rule. The version that plans across the whole band is as good or better in four of five zones."
 
 ## 2:00 Scoreboard (20 s)
 

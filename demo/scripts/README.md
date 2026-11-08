@@ -45,7 +45,7 @@ Sources: `/api/scores` (as of 06:00 UTC), `/api/scenarios` (pre-computed 21:29 U
 | Carbon, GB at 16:00 UTC Saturday | 370 g/kWh produced, 347 g/kWh consumed, 7.5% imported (modelled) |
 | Hormuz, +40% gas for 14 days | about £1.75bn to consumers (P10 to P90: £1.05bn to £2.46bn); "GB price up £38: gas up 40% (+£38)"; biggest rises in NL, DE-LU and BE (about €41 to €42/MWh), smallest in NO2 (about €6) |
 | Norway link trip, 980 MW recent flow for 24 h | GB up about £4/MWh, about £2.6M to GB consumers (P10 to P90: £1.5M to £3.7M); "GB price up £4: less from Norway (+£4)" |
-| Battery, share of perfect foresight | 97.6% pooled over five zones and 155 settled hours (NO2 not scored); naive rule 87% to 89% |
+| Battery, share of perfect foresight | 94.5% pooled over five zones and 155 settled hours, as of 07:00 UTC (NO2 not scored); naive rule 87% to 89%; Germany 81%, below its naive rule (88%) |
 | Forecasts scored live | 879 by 06:00 UTC Sunday, since 13:48 UTC Saturday; rises every hour |
 | Replay, 26 Oct storm | 78 of 168 zone-hours inside the band (46%) |
 | Replay, 2 Nov (ordinary wind) | 155 of 168 (92%) |
@@ -53,6 +53,7 @@ Sources: `/api/scores` (as of 06:00 UTC), `/api/scenarios` (pre-computed 21:29 U
 
 ## Known weak spots to steer around
 
-- **Risk-aware against median-only battery:** close, not a clean win. Live, risk-aware is ahead in Germany, GB and the Netherlands, level in Belgium and just behind in France (98.6% against 99.1%). Say "as good or better in four of five zones", not "every zone".
+- **Risk-aware against median-only battery:** close, and it moves every hour. At 07:00 UTC risk-aware was ahead in Belgium, Germany, France and GB and level in the Netherlands; at 06:00 it was just behind in France. Say "as good or better in four of five zones", not "every zone".
+- **Germany battery:** at 07:00 UTC it made 81% of perfect foresight, less than the naive rule (88%). Stay on GB on the battery card. If asked about Germany, say plainly that the naive rule beat us there.
 - **The storm:** the band caught only 46% of hours on 26 October. Show it as the honest limit, not something to hide.
 - **Live scoreboard:** the headline figures on Proof are from the backtest (the card says so). Quote the live count of scored forecasts from the screen when you present.
