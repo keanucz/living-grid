@@ -1,12 +1,26 @@
 # The Living Grid
 
-Europe's electricity market, live, with a forecast you can check.
+**A weather forecast for Europe's power grid.**
+
+What it costs now, what happens next, and proof we got it right.
 
 Built at HackTheBurgh XIII (7-8 November 2026) for the HRT track "Best Use of Data for Predictions and Decision Making" and the G-Research track "Making the Unseen Seen".
 
 **Live:** https://htb.stefvuck.dev
 
+## Why it is impressive
+
+1. **A live forecast with odds, for six zones, and proof it works.** Every hour we forecast the day-ahead power price for GB, France, Germany-Luxembourg, the Netherlands, Belgium and southern Norway, with a best guess and a likely range. In a walk-forward backtest (12,086 hours over six zones) the error is 36% lower than persistence, which assumes the price stays where it was (33.3 against 52.3 per MWh, pooled £ and €). 78.5% of outcomes landed inside the 80% range. Every run is hashed and sealed on Solana (devnet) before the result is known, then scored live on reveal day.
+2. **The hidden grid, made visible in money.** Wind paid to switch off, carbon arriving through the cables, and the lines that are full, each shown in pounds. Then the what-ifs: close the Strait of Hormuz or trip the Norway cable and see what it costs and who pays.
+3. **Built by three people running about 15 Claude agents through a task hub.** 330+ tasks merged in about a day, each one landed only when the tests and the web build passed.
+
+**Honest limits.** Weather v2 features cut error in our tests (wind 14.7% lower) but are tested, not live. The Solana seals are on devnet, which a network reset can erase. Modelled and estimated figures are labelled as such on screen. We lose to simple baselines in some places, and the Proof screen shows them.
+
+## In plain terms
+
 Power prices move for reasons you can't see: wind that gets paid to switch off, gas setting the price in GB most hours, cables between countries running flat out. So we put six zones on one map, forecast where prices are heading with a best guess and a likely range around it, and let you break things (close the Strait of Hormuz, trip the Norway cable) to see what it costs. Every forecast gets scored against what actually happened. Including the ones we got wrong.
+
+Think of it as a weather app for the grid: **Now** is current conditions, **Forecast** is the outlook with odds, **Hidden grid** is the radar, **What if** is the warnings, **History** is past storms and record days, **Proof** is whether the forecast was right, **Tonight** and the data centre planner are "do I need an umbrella", and **Play** is beating the forecaster.
 
 ## At a glance
 

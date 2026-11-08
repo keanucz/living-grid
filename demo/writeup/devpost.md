@@ -1,10 +1,20 @@
 # The Living Grid
 
-Electricity is invisible. The Living Grid makes Europe's hidden power system visible, forecasts where it is heading with honest uncertainty, and lets you test what happens when the world changes.
+**A weather forecast for Europe's power grid.**
+
+What it costs now, what happens next, and proof we got it right.
 
 **Live:** https://htb.stefvuck.dev
 
 Tracks: G-Research, "Make the Invisible Visible", and HRT, "Best Use of Data for Predictions & Decision Making".
+
+## Why it is impressive
+
+1. **A live forecast with odds, for six zones, and proof it works.** Every hour we forecast the day-ahead power price for six zones, with a best guess and a likely range. In a walk-forward backtest (12,086 hours over six zones) the error is 36% lower than persistence (33.3 against 52.3 per MWh, pooled £ and €), and 78.5% of outcomes landed inside the 80% range. Every run is hashed and sealed on Solana (devnet) before the result is known, then scored live on reveal day.
+2. **The hidden grid, made visible in money.** Wind paid to switch off, carbon arriving through the cables and the lines that are full, shown in pounds, plus what-ifs such as closing the Strait of Hormuz.
+3. **Built by three people running about 15 Claude agents through a task hub.** 330+ tasks merged in about a day, each landed only when the tests and the web build passed.
+
+Honest limits: weather v2 features cut error in our tests but are tested, not live; the Solana seals are on devnet; modelled and estimated figures are labelled on screen; and we lose to simple baselines in some places, which the Proof screen shows.
 
 ## Inspiration
 
