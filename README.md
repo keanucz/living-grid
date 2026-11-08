@@ -102,7 +102,7 @@ The memo reads `lg1|<freeze or run>|<UTC time>|<sha256>`. The hashed bytes are t
 
 These numbers come from a backtest: the model is tested on past weeks it never saw while it was being built, as if it were forecasting them live. The error (MAE) is the average gap between our best guess and the real price; lower is better. The app's Proof section may show live scored figures instead, with their own basis (#285 labels which); the figures below are the backtest.
 
-Walk-forward backtest on day-ahead prices: twelve folds of seven days (mid-August to 8 November 2026) with a 48-hour purge and the split-conformal band calibration (#92) fitted per fold on held-out training rows. Source: `data/backtest/walk_forward.parquet`, written 8 November 2026 at 02:07 UTC (alongside `bot_league.parquet`). This is the file the app's Proof headline reads, so the figures below match it.
+Walk-forward backtest on day-ahead prices: twelve folds of seven days (mid-August to 8 November 2026) with a 48-hour purge and the split-conformal band calibration (#92) fitted per fold on held-out training rows. Source: `data/backtest/walk_forward.parquet`; its day-ahead price rows were written on 8 November 2026 at 02:07 UTC (alongside `bot_league.parquet`). This is the file the app's Proof headline reads, so the figures below match it.
 
 | Model | Day-ahead price error (MAE) |
 |---|---|
@@ -114,7 +114,15 @@ That's 36% better than persistence on day-ahead prices, pooled over all six zone
 
 The bands are close to honest but still a little narrow: 78.5% of day-ahead price outcomes landed inside the likely range, between P10 and P90 (target 80%). GB is the widest at 88%; the continental zones sit at 76%.
 
-Load, wind and GB system price were last backtested in the six-fold run of 7 November at about 23:45 UTC on main at `2919ad8` (four targets, 6,039 day-ahead hours; that file has since been replaced by the run above). There, across all 17 zone-and-target pairs, the model beat both baselines in 13; the losses were NL load against yesterday (an Energy-Charts data break on 10 October), FR price against yesterday, NO2 price against both, and FR wind against persistence. Coverage by target: load 80.2%, wind 77.1%, GB system price 73.6%.
+Load, wind and GB system price come from the same twelve folds, purge and calibration, run on main at `388abef` and merged into the same file at about 05:05 UTC on 8 November. Errors are n-weighted across folds and zones: load and wind in MW (five zones, 9,978 hours each), GB system price in £/MWh (1,997 hours).
+
+| Target | Our model | Same hour yesterday | Persistence | Inside the likely range |
+|---|---|---|---|---|
+| Load (MW) | **1,211** | 1,854 | 5,068 | 80.5% |
+| Wind (MW) | **2,113** | 3,532 | 2,860 | 76.3% |
+| GB system price (£/MWh) | **43.4** | 56.5 | 62.7 | 76.6% |
+
+Across these 11 zone-and-target pairs the model beats both baselines in 9. It loses to yesterday on NL load (an Energy-Charts data break on 10 October) and to persistence on FR wind.
 
 The replay of 26 October 2026, a stormy day, generated separately from the backtest, shows where the misses cluster: 78 of its 168 hours (46%) landed inside the likely range. The storm caught the model out. NESO puts GB constraint costs that day at £36.5m.
 
