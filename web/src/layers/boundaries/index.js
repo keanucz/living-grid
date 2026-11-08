@@ -12,6 +12,9 @@ export const gaugeColor = (u, alpha = 255) => {
   return [c.r, c.g, c.b, alpha]
 }
 const Z = 7100
+// Phones: a short label (no cost, 'over limit 34%') wrapped to a narrow box, so it fits a 390 px map.
+const NARROW = typeof innerWidth !== 'undefined' && innerWidth < 700
+const shortStatus = (r) => plainStatus(r).replace(/^Over the limit in (\S+) of hours$/, 'over limit $1').replace(/^Over the limit on average$/, 'over limit')
 const money = (v) => (v >= 1e6 ? `£${(v / 1e6).toFixed(1)}m` : `£${Math.round(v / 1e3)}k`)
 
 export default {
@@ -53,10 +56,15 @@ export default {
       }),
       new TextLayer({
         id: 'boundaries-labels',
-        data: rows,
+        // Phones label the boundaries and the busy links only; the Channel links' labels would sit on top of each other.
+        data: NARROW ? rows.filter((r) => r.kind === 'boundary' || utilisation(r) >= 0.8) : rows,
         getPosition: (r) => [...r.line[Math.floor(r.line.length / 2)], Z],
-        getText: (r) => `${r.name}: ${plainStatus(r).replace(/^Over/, 'over')}${r.cost_gbp_window != null ? ` · ${money(r.cost_gbp_window)}` : ''}${tag}`,
-        getSize: 12,
+        getText: (r) =>
+          NARROW
+            ? `${r.name}: ${shortStatus(r)}${tag}`
+            : `${r.name}: ${plainStatus(r).replace(/^Over/, 'over')}${r.cost_gbp_window != null ? ` · ${money(r.cost_gbp_window)}` : ''}${tag}`,
+        ...(NARROW ? { maxWidth: 11, wordBreak: 'break-word' } : {}),
+        getSize: NARROW ? 10 : 12,
         sizeUnits: 'pixels',
         getColor: [244, 244, 240, 240],
         background: true,
