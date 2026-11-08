@@ -65,7 +65,9 @@ def _wide(df: pd.DataFrame, series: str | list[str], zones=None, combine="sum") 
         d = d[d["zone"].isin(zones)]
     if d.empty:
         return pd.DataFrame()
-    agg = d.groupby(["ts", "zone"])["value"].agg(combine if combine != "sum" else lambda v: v.sum(min_count=1))
+    g = d.groupby(["ts", "zone"])["value"]
+    # sum(min_count=1) is the vectorised form of "sum, but an all-NaN group stays NaN"; a Python lambda per group took ~100 s.
+    agg = g.sum(min_count=1) if combine == "sum" else g.agg(combine)
     return agg.unstack("zone").sort_index()
 
 

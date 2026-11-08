@@ -175,3 +175,49 @@ def test_offline_latest_serves_fixture(monkeypatch, tmp_path):
 def test_power_curve():
     f = build.power_curve(np.array([0.0, 3.0, 7.5, 12.0, 20.0, 26.0]))
     assert f[0] == 0 and f[1] == 0 and 0 < f[2] < 1 and f[3] == 1 and f[4] == 1 and f[5] == 0
+
+
+def _old_wide(df, series, zones=None):
+    """The previous implementation: a Python lambda per (ts, zone) group."""
+    series = [series] if isinstance(series, str) else series
+    d = df[df["series"].isin(series)]
+    if zones is not None:
+        d = d[d["zone"].isin(zones)]
+    return d.groupby(["ts", "zone"])["value"].agg(lambda v: v.sum(min_count=1)).unstack("zone").sort_index()
+
+
+def _wide_frame(n_hours=300, seed=5):
+    rng = np.random.default_rng(seed)
+    ts = pd.date_range("2026-01-01", periods=n_hours, freq="h", tz="UTC")
+    rows = []
+    for zone in ("GB", "FR", "NL"):
+        for s in ("gen_wind_onshore", "gen_wind_offshore", "load"):
+            v = rng.normal(1000, 200, n_hours)
+            v[rng.random(n_hours) < 0.1] = np.nan
+            rows.append(pd.DataFrame({"ts": ts, "zone": zone, "series": s, "value": v}))
+    df = pd.concat(rows, ignore_index=True)
+    # an hour where both wind series are NaN for FR: the sum must stay NaN, not become 0
+    both = (df["zone"] == "FR") & df["series"].str.startswith("gen_wind") & (df["ts"] == ts[7])
+    df.loc[both, "value"] = np.nan
+    return df
+
+
+def test_wide_is_identical_to_the_lambda_version_including_all_nan_groups():
+    from pipeline.features import build
+
+    df = _wide_frame()
+    for series, zones in (("load", None), (["gen_wind_onshore", "gen_wind_offshore"], None), (["gen_wind_onshore", "gen_wind_offshore"], ["GB", "FR"])):
+        pd.testing.assert_frame_equal(build._wide(df, series, zones), _old_wide(df, series, zones))
+    both = build._wide(df, ["gen_wind_onshore", "gen_wind_offshore"])
+    assert np.isnan(both.loc[pd.Timestamp("2026-01-01 07:00", tz="UTC"), "FR"])  # all-NaN group stays NaN
+
+
+def test_wide_is_vectorised():
+    import time
+
+    from pipeline.features import build
+
+    df = _wide_frame(n_hours=24 * 365 * 2)  # ~100k groups; the lambda version needs ~minutes for this on a loaded box
+    t0 = time.perf_counter()
+    build._wide(df, ["gen_wind_onshore", "gen_wind_offshore"])
+    assert time.perf_counter() - t0 < 10
