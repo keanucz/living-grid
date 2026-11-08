@@ -59,7 +59,7 @@ function Scoreboard() {
       )}
       {s.coverage && (
         <p>
-          The real price landed inside our <Term id="likely-range">likely range</Term> <b className="num">{whole(s.coverage.value)}%</b> of the time. That is what we aim for.
+          {s.basis === 'live' ? 'Live so far, the' : 'The'} real price landed inside our <Term id="likely-range">likely range</Term> <b className="num">{whole(s.coverage.value)}%</b> of the time, against the 80% we aim for.{s.basis === 'live' && s.coverage.value < 70 ? ' Our live ranges are too narrow so far.' : ''}
         </p>
       )}
       {!s.error && !s.coverage && <p>Scores appear as soon as the first forecasts meet their outcomes.</p>}
