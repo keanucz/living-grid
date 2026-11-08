@@ -20,7 +20,7 @@ export const CARDS = [
     detail: ['constraintBill'], links: [{ label: 'Watch the storm that cost £36.5m', href: '#/events?e=storm' }],
     overTime: 'wind', scene: 'wind' },
   { id: 'carbon', title: 'Carbon that comes in by cable', layers: { ...OFF, carbon: true },
-    detail: ['carbonLegend'], links: [] },
+    detail: ['carbonLegend'], links: [], scene: 'carbon' },
   { id: 'bottleneck', title: 'The bottleneck', layers: { ...OFF, boundaries: true },
     detail: [], links: [{ label: 'Build a power line', href: '#/infrastructure' }], scene: 'bottleneck' },
   { id: 'sunny', title: 'A sunny Sunday, negative prices', layers: { ...OFF, solar: true },

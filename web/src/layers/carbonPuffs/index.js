@@ -42,7 +42,7 @@ export default {
     const puffs = links.flatMap((d) =>
       Array.from({ length: PER_LINK }, (_, i) => {
         const u = (((el * (0.05 + d.mw / 60000) + i / PER_LINK + (hash(d.id) % 100) / 100) % 1) + 1) % 1
-        return { pos: [d.a[0] + (d.b[0] - d.a[0]) * u, d.a[1] + (d.b[1] - d.a[1]) * u, Z], u, g: d.g, r: 12000 + Math.min(14000, d.g * 55) }
+        return { pos: [d.a[0] + (d.b[0] - d.a[0]) * u, d.a[1] + (d.b[1] - d.a[1]) * u, Z], u, g: d.g, r: 18000 + Math.min(20000, d.g * 70) }
       }),
     )
     const tags = links.map((d) => ({ at: d.a, text: `${d.from} ${Math.round(d.g)} g/kWh` }))
@@ -50,7 +50,7 @@ export default {
     return [
       new ScatterplotLayer({
         id: 'carbon-puffs', data: puffs, getPosition: (d) => d.pos, getRadius: (d) => d.r * (0.7 + 0.5 * d.u),
-        getFillColor: (d) => [168, 168, 160, Math.round(150 * Math.sin(Math.PI * Math.min(1, d.u * 1.05)) + 30)],
+        getFillColor: (d) => [168, 168, 160, Math.round(190 * Math.sin(Math.PI * Math.min(1, d.u * 1.05)) + 40)],
         radiusUnits: 'meters', parameters: { depthTest: false }, updateTriggers: { getPosition: time, getRadius: time, getFillColor: time },
       }),
       new TextLayer({

@@ -10,14 +10,21 @@ import Term from '../../ui/Term.jsx'
 import SceneRunner from './scenes/runner.jsx'
 import windScene from './scenes/wind.js'
 import bottleneckScene from './scenes/bottleneck.js'
+import carbonScene from './scenes/carbon.js'
+import { carbonImports, tonnesPerHour } from '../../layers/carbonPuffs/index.js'
 
 import { whatIf } from '../../layers/boundaries/data.js'
 
 // Scene builders by card.scene; each takes the loaded numbers and returns { duration, caption, counter, steps }.
 // A card without a scene (or a scene that is not built yet) shows the static story, as before.
-const SCENES = { wind: windScene, bottleneck: bottleneckScene }
+const SCENES = { wind: windScene, bottleneck: bottleneckScene, carbon: carbonScene }
 
-function sceneData(id, gw, infra) {
+function sceneData(id, gw, infra, ctx) {
+  if (id === 'carbon') {
+    const by = intensities(ctx.stateByZone, getCarbon().zones)
+    const tonnes = tonnesPerHour(carbonImports(ctx.data.zones, ctx.data.state?.flows, by))
+    return { tonnes, ready: tonnes > 0 }
+  }
   if (id === 'wind') {
     const bill = gw?.data ? constraintBill(gw.data, gw.window) : { gbp: 0, note: '' }
     return { billGbp: bill.gbp, windMwh: gw?.data?.total_boalf_mwh ?? 0, label: bill.note.replace(/^NESO,\s*/, '').replace(/\s*\(.*\)/, '') }
@@ -149,8 +156,8 @@ export default function Stories({ ctx }) {
         const h = heads[c.id]
         return (
           <div key={c.id} className="story-body fade-in" role="tabpanel">
-            {SCENES[c.scene] && heads[c.id].value !== '…' && (
-              <SceneRunner key={`${c.id}-${gw.window}`} scene={SCENES[c.scene](sceneData(c.id, gw, infra))} />
+            {SCENES[c.scene] && heads[c.id].value !== '…' && sceneData(c.id, gw, infra, ctx).ready !== false && (
+              <SceneRunner key={`${c.id}-${gw.window}`} scene={SCENES[c.scene](sceneData(c.id, gw, infra, ctx))} />
             )}
             <p className="story-intro">{INTROS[c.id]}</p>
             <ul className="story-facts">
