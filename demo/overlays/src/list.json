@@ -55,6 +55,11 @@
   "still": 30
  },
  {
+  "id": "Beat-datacentre",
+  "seconds": 6,
+  "still": 30
+ },
+ {
   "id": "Beat-play",
   "seconds": 6,
   "still": 30
