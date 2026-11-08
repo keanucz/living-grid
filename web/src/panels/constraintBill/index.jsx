@@ -121,7 +121,7 @@ function ConstraintBill({ ctx }) {
         .gwnote { margin: -4px 18px 10px; font-size: 12px; color: var(--text-2); }
         .gwchart { padding: 0 18px 14px; margin-top: -6px; }
         .gwbounds { padding: 0 18px 16px; display: grid; gap: 6px; font-size: 12px; }
-        .gwbounds > div { display: grid; grid-template-columns: 32px 1fr 110px; gap: 10px; align-items: center; }
+        .gwbounds > div { display: grid; grid-template-columns: 64px 1fr 96px; gap: 10px; align-items: center; white-space: nowrap; }
         .gwbar { height: 6px; border-radius: 3px; background: var(--card-2); overflow: hidden; }
         .gwbar i { display: block; height: 100%; background: var(--wind); }
       `}</style>
