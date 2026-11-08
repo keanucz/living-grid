@@ -118,6 +118,8 @@ export default {
         getTextAnchor: 'middle',
         getAlignmentBaseline: 'center',
         getPixelOffset: [0, 30], // sits under the price label instead of on top of it
+        // Zones are extruded glass slabs now; without this the slabs hide every label but GB's.
+        parameters: { depthTest: false },
         parameters: { depthTest: false },
         updateTriggers: { getText: [live.zones, data.state], getSize: [live.zones, data.state], getColor: [live.zones, data.state], getBackgroundColor: [live.zones, data.state] },
       }),
