@@ -9,7 +9,7 @@ import { onTop } from '../layers/scenarioFx/index.js'
 import { fmtPence } from '../lib/wholesale.js'
 
 // Short country names for the price labels on the map; the zone list and hover cards keep the full names.
-const MAP_NAME = { GB: 'Britain', FR: 'France', 'DE-LU': 'Germany', NL: 'Netherlands', BE: 'Belgium', NO2: 'Norway' }
+const MAP_NAME = { GB: 'Britain', FR: 'France', 'DE-LU': 'Germany', NL: 'Netherlands', BE: 'Belgium', NO2: 'S. Norway' }
 
 // Soft ambient plus a high point light over the North Sea: flat country slabs pick up a moving
 // specular sheen as the map pans, which reads as glass/epoxy rather than flat paint.
