@@ -6,27 +6,28 @@ Built at HackTheBurgh XIII (7-8 November 2026) for the HRT track "Best Use of Da
 
 **Live:** https://htb.stefvuck.dev
 
-Power prices move for reasons you can't see: wind that gets paid to switch off, gas setting the price in GB most hours, cables between countries running flat out. So we put six zones on one map, forecast where prices are heading with honest uncertainty bands, and let you break things (close the Strait of Hormuz, trip the Norway cable) to see what it costs. Every forecast gets scored against what actually happened. Including the ones we got wrong.
+Power prices move for reasons you can't see: wind that gets paid to switch off, gas setting the price in GB most hours, cables between countries running flat out. So we put six zones on one map, forecast where prices are heading with a best guess and a likely range around it, and let you break things (close the Strait of Hormuz, trip the Norway cable) to see what it costs. Every forecast gets scored against what actually happened. Including the ones we got wrong.
 
 ## At a glance
 
 ```mermaid
 flowchart LR
-    D["Public data<br/>prices, weather,<br/>flows, gas"] --> F["Hourly forecast<br/>with P10 to P90 bands"]
-    F --> M["Live map<br/>prices and flows now"]
-    F --> G["Forecast ghost<br/>the next 24 hours"]
-    F --> S["Simulate an event<br/>the cost in pounds"]
+    D["Public data<br/>prices, weather,<br/>flows, gas"] --> F["Hourly forecast<br/>best guess and<br/>likely range"]
+    F --> M["Now<br/>prices and flows"]
+    F --> G["Forecast<br/>the next 24 hours"]
+    F --> S["What if<br/>an event's cost in pounds"]
     F --> B["Batteries and households<br/>when to charge"]
-    F --> SC["Scoreboard<br/>checked against<br/>what happened"]
+    F --> SC["Proof<br/>checked against<br/>what happened"]
     M & G & S & B & SC --> P["Grid operators,<br/>battery owners,<br/>households on<br/>dynamic tariffs"]
 ```
 
-The map shows GB, France, Germany-Luxembourg, the Netherlands, Belgium and southern Norway (NO2), coloured by this hour's day-ahead price, with arcs for electricity moving through the interconnectors. On the evening of 7 November that was £268/MWh in GB, €322 across the four coupled continental zones and €205 in NO2.
+The map shows GB, France, Germany-Luxembourg, the Netherlands, Belgium and southern Norway (NO2), coloured by this hour's day-ahead price, with arcs for electricity moving through the interconnectors (the cables that link one country's grid to another's). The day-ahead price is set in an auction the day before, and it's what we forecast. On the evening of 7 November that was £268/MWh in GB, €322 across the four coupled continental zones and €205 in NO2. A megawatt-hour (MWh) is 1,000 kWh, the unit on your bill. These are wholesale prices: what energy suppliers pay. A household bill adds network costs and other charges, and only follows wholesale changes later.
 
-- **Overview:** this hour's price, demand, generation mix, carbon intensity and flows for each zone.
-- **Forecast:** a translucent ghost of where prices are heading over the next 24 hours. The P10 to P90 band gets wider the further out you look.
-- **Simulate:** pick an event, see what it costs in pounds or euros and which zones take the hit.
-- **Scoreboard:** our forecasts against simple guesses. Only forecasts logged before the outcome count.
+- **Now:** this hour's price, demand, generation mix, carbon intensity and flows for each zone.
+- **Forecast:** a translucent ghost of where prices are heading over the next 24 hours. It shows our best guess (the single most likely price) and a likely range around it (P10 to P90), which should hold the real price 8 times out of 10. The range gets wider the further out you look.
+- **Hidden grid:** Scottish wind paid to switch off when a boundary is full (a boundary is the group of power lines between two areas, such as Scotland and England), and the constraint cost: what the grid pays generators on each side of a full line, which ends up on everyone's bills.
+- **What if:** pick an event, see what it costs in pounds or euros and which zones take the hit.
+- **Proof:** our forecasts against simple guesses, such as persistence: assume the price stays where it was when the forecast was made. Only forecasts logged before the outcome count. Each frozen forecast has a fingerprint, a short code from the forecast file that changes completely if one digit does, posted on a public blockchain so anyone can check we did not change it.
 - **Batteries:** a 1 MW / 2 MWh battery in each zone trading on our forecasts, against a naive rule and against perfect foresight.
 - **Replay:** the 26 October storm, played back by a model that never saw that day.
 - **Household:** the cheapest window tonight to charge your car or run the dishwasher.
@@ -99,6 +100,8 @@ The memo reads `lg1|<freeze or run>|<UTC time>|<sha256>`. The hashed bytes are t
 
 ### Results
 
+These numbers come from a backtest: the model is tested on past weeks it never saw while it was being built, as if it were forecasting them live. The error (MAE) is the average gap between our best guess and the real price; lower is better. The app's Proof section may show live scored figures instead, with their own basis (#285 labels which); the figures below are the backtest.
+
 Walk-forward backtest, six folds of seven days with a 48-hour purge, run on 7 November 2026 at about 23:45 UTC on main at `2919ad8`, with the split-conformal band calibration (#92) fitted per fold on held-out training rows. Source: `data/backtest/walk_forward.parquet`.
 
 | Model | Day-ahead price error (MAE) |
@@ -109,9 +112,9 @@ Walk-forward backtest, six folds of seven days with a 48-hour purge, run on 7 No
 
 That's 24% better than persistence on day-ahead prices, pooled over all six zones (6,039 hours). Per zone the model beats persistence everywhere except NO2 (ratio 1.12) and beats yesterday in four of six zones. It loses to yesterday in France and to both baselines in NO2. Across all 17 zone-and-target pairs it beats both baselines in 13; the losses are NL load against yesterday (an Energy-Charts data break on 10 October), FR price against yesterday, NO2 price against both, and FR wind against persistence.
 
-The bands are closer to honest but still a little narrow. After calibration 79.9% of day-ahead price outcomes landed between P10 and P90 (target 80%; 63.3% in the 16:53 run without it). By target: day-ahead price 79.9%, load 80.2%, wind 77.1%, GB system price 73.6%.
+The bands are closer to honest but still a little narrow. After calibration 79.9% of day-ahead price outcomes landed inside the likely range, between P10 and P90 (target 80%; 63.3% in the 16:53 run without it). By target: day-ahead price 79.9%, load 80.2%, wind 77.1%, GB system price 73.6%.
 
-The replay of 26 October 2026, a stormy day, generated separately from the backtest, shows where the misses cluster: 78 of its 168 hours (46%) landed inside the band. The storm caught the model out. NESO puts GB constraint costs that day at £36.5m.
+The replay of 26 October 2026, a stormy day, generated separately from the backtest, shows where the misses cluster: 78 of its 168 hours (46%) landed inside the likely range. The storm caught the model out. NESO puts GB constraint costs that day at £36.5m.
 
 ### Bot league: which technique wins, and when
 
