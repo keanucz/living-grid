@@ -20,6 +20,12 @@ const byId = Object.fromEntries(PANELS.map((p) => [p.id, p]))
 export default function MobileShell({ ctx, at, source }) {
   const [tab, setTab] = useState(() => (sectionById[ctx.ui.section] ? ctx.ui.section : 'now'))
   const t = TABS.find((x) => x.id === tab)
+  // The tour (and any other caller of openSection) moves the store's section; the tab follows it.
+  useEffect(() => {
+    const s = sectionById[ctx.ui.section]
+    if (s && !s.href && s.id !== tab) setTab(s.id)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ctx.ui.section])
   useEffect(() => {
     if (!t.mode) return
     setState((st) => ({ mode: t.mode, section: t.id, layers: { ...st.layers, ...t.layers } }))
@@ -59,7 +65,7 @@ export default function MobileShell({ ctx, at, source }) {
             {t.title && <div className="m-head"><b>{t.title}</b><span>{t.blurb}</span></div>}
             {t.panels.map((id) => {
               const P = byId[id]
-              return P ? <P.Component key={id} ctx={ctx} /> : null
+              return P ? <div key={id} data-tour={id} style={{ display: 'contents' }}><P.Component ctx={ctx} /></div> : null
             })}
             {t.pages?.map((pg) => <a key={pg.href} className="m-link" href={pg.href}>{pg.label} <Icon name="arrowUpRight" size={14} /></a>)}
           </>

@@ -17,7 +17,7 @@ export default function TopBar({ at: stateAt, source, page }) {
       <div className="brand">The Living Grid <small>Europe</small></div>
       <nav className="tabs" aria-label="Sections">
         {SECTIONS.map((t) => (
-          <button key={t.id} className={`${current === t.id ? 'on' : ''}`} aria-current={current === t.id ? 'page' : undefined} onClick={() => openSection(t.id)}>
+          <button key={t.id} data-tour={`tab-${t.id}`} className={`${current === t.id ? 'on' : ''}`} aria-current={current === t.id ? 'page' : undefined} onClick={() => openSection(t.id)}>
             {t.label}
           </button>
         ))}

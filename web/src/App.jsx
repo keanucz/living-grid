@@ -13,6 +13,7 @@ import PhoneNav from './shell/mobile/PhoneNav.jsx'
 import { useNarrow } from './shell/mobile/useNarrow.js'
 import { normaliseResult } from './api/normalise.js'
 import Welcome, { initWelcome } from './shell/Welcome.jsx'
+import { Tour } from './tour/index.js'
 
 const ASSET_FOR = { hormuz: 'gas', nuclear_outage: 'nuclear', scottish_storm: 'wind', interconnector_trip: 'hydro' }
 const SLOTS = ['left', 'bottomRight', 'bottom', 'right']
@@ -44,6 +45,10 @@ function useHashView() {
 }
 
 export default function App() {
+  return <><Screen /><Tour /></>
+}
+
+function Screen() {
   const view = useHashView()
   const narrow = useNarrow()
   if (view) {
@@ -131,7 +136,7 @@ function MapApp() {
         {SLOTS.map((slot) => (
           <div key={slot} className={`slot slot-${slot}`}>
             {PANELS.filter((p) => p.slot === slot && inSection(p)).map((p) => (
-              <p.Component key={p.id} ctx={ctx} />
+              <div key={p.id} data-tour={p.id} style={{ display: 'contents' }}><p.Component ctx={ctx} /></div>
             ))}
           </div>
         ))}

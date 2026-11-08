@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { Icon } from './icons.jsx'
 import { setState } from '../store/store.js'
 import { SECTIONS, openSection } from './sections.js'
+import { resumable, start } from '../tour/index.js'
 
 const SEEN = 'lg-welcomed'
 
@@ -42,7 +43,14 @@ export function choose(id) {
   openSection(id)
 }
 
+export function takeTour() {
+  const r = resumable('main')
+  close()
+  start('main', { i: r?.i ?? 0 })
+}
+
 export default function Welcome() {
+  const resume = resumable('main')
   useEffect(() => {
     const onKey = (e) => e.key === 'Escape' && choose('now')
     addEventListener('keydown', onKey)
@@ -53,6 +61,11 @@ export default function Welcome() {
       <div className="wel-box fade-in">
         <div className="wel-kicker"><span className="wel-logo"><Icon name="bolt" size={16} stroke={2.4} /></span>The Living Grid</div>
         <h1 id="wel-h">Where to?</h1>
+        <button className="wel-tour" onClick={takeTour}>
+          <span className="wel-ic"><Icon name="play" size={20} /></span>
+          <span><b>{resume ? `Resume the tour (step ${resume.i + 1})` : 'Take the 3-minute tour'}</b>
+            <small>Prices, the forecast, the hidden grid, a world event and the proof, with the app set up for you</small></span>
+        </button>
         <div className="wel-doors">
           {SECTIONS.map((s, i) => (
             <button key={s.id} className="wel-door" onClick={() => choose(s.id)} autoFocus={i === 0}>
@@ -76,6 +89,11 @@ const CSS = `
 .wel-kicker { display: flex; align-items: center; gap: 10px; color: var(--text-2); font-weight: 500; }
 .wel-logo { width: 28px; height: 28px; border-radius: 8px; display: grid; place-items: center; background: var(--accent); color: var(--accent-ink); }
 .wel h1 { font-size: 40px; font-weight: 500; letter-spacing: -0.025em; margin: 14px 0 24px; }
+.wel-tour { display: flex; align-items: center; gap: 14px; width: 100%; text-align: left; padding: 14px 18px; margin-bottom: 12px; border-radius: 14px;
+  background: var(--accent-dim); border: 1px solid var(--accent); }
+.wel-tour b { display: block; font-size: 17px; font-weight: 600; }
+.wel-tour small { color: var(--text-2); font-size: 13px; }
+.wel-tour:hover, .wel-tour:focus-visible { background: #232a14; outline: none; }
 .wel-doors { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
 .wel-door { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; text-align: left; padding: 18px;
   min-height: 150px; border-radius: 14px; background: var(--panel-solid); border: 1px solid var(--line-2);

@@ -20,7 +20,7 @@ export default function LayerSwitch({ layers }) {
     }
   }
   return (
-    <div className="m-layers" role="group" aria-label="Map layer">
+    <div className="m-layers" data-tour="layers" role="group" aria-label="Map layer">
       {OPTIONS.map((o) => (
         <button key={o.label} className={o.id === active ? 'on' : ''} aria-pressed={o.id === active} onClick={() => choose(o.id)}>
           {o.label}

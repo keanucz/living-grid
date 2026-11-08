@@ -26,7 +26,7 @@ export default function LayersMenu() {
 
   return (
     <div className="lm" ref={ref}>
-      <button className={`chip lm-btn ${open ? 'open' : ''}`} onClick={() => setOpen(!open)} aria-expanded={open} aria-haspopup="menu">
+      <button data-tour="layers" className={`chip lm-btn ${open ? 'open' : ''}`} onClick={() => setOpen(!open)} aria-expanded={open} aria-haspopup="menu">
         <Icon name="layers" size={15} /> Layers <span className="num lm-n">{on}</span>
       </button>
       {open && (
