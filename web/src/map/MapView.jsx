@@ -191,7 +191,7 @@ function Overlay({ viewport, ctx }) {
 
   return (
     <div className="overlay">
-      {!sim && ui.section !== 'unseen' && viewport.zoom >= 3 &&
+      {!sim && ui.section !== 'hidden' && viewport.zoom >= 3 &&
         data.zones.zones.map((z) => {
           const [x, y] = project(z.label_at)
           const st = ctx.stateByZone[z.id]

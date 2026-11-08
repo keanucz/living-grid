@@ -1,33 +1,31 @@
 import { useEffect, useState } from 'react'
 import MapView from '../../map/MapView.jsx'
 import { PANELS } from '../../panels/registry.js'
-import { VIEWS } from '../../views/index.js'
-import { actions } from '../../store/store.js'
+import { setState } from '../../store/store.js'
 import { Icon } from '../icons.jsx'
+import { SECTIONS, sectionById } from '../sections.js'
+import PhoneNav from './PhoneNav.jsx'
 import PlayHub from './PlayHub.jsx'
 import LayerSwitch from './LayerSwitch.jsx'
 import '../../styles/mobile.css'
 
-// Phone layout (< 700 px): map on top, a bottom sheet with tabs that reuse the desktop panels.
-// Tap a zone (or its label) to select it; the Map tab then shows its chart and the "why" card.
-const TABS = [
-  { id: 'map', label: 'Map', icon: 'globe', mode: 'overview', panels: ['zoneList', 'explain', 'zoneChart', 'constraintBill', 'renewables'] },
-  { id: 'events', label: 'Events', icon: 'sim', mode: 'simulate', panels: ['simDock', 'statTiles'] },
-  { id: 'scores', label: 'Scores', icon: 'chart', mode: 'overview', panels: ['kpis', 'scoreboard', 'botLeague', 'battery', 'compute', 'leaderboard'] },
-  { id: 'tonight', label: 'Tonight', icon: 'phone', mode: 'overview', view: '/household' },
-  { id: 'play', label: 'Play', icon: 'play', mode: 'overview', hub: true },
-]
+// Phone layout (< 700 px): map on top, a bottom sheet with one tab per section (shell/sections.js, the same six as the
+// desktop tabs and the welcome doors). Tap a zone (or its label) to select it; the sheet then shows its chart and the "why" card.
+// Panels come from the section; the phone keeps the zone chart and the "why" card on the Now tab so a tap has an answer.
+const PHONE_PANELS = { now: ['zoneList', 'explain', 'zoneChart', 'kpis'] }
+const TABS = SECTIONS.map((s) => ({ ...s, panels: PHONE_PANELS[s.id] ?? s.panels ?? [] }))
 
 const byId = Object.fromEntries(PANELS.map((p) => [p.id, p]))
 
 export default function MobileShell({ ctx, at, source }) {
-  const [tab, setTab] = useState(() => (ctx.ui.mode === 'simulate' ? 'events' : 'map'))
+  const [tab, setTab] = useState(() => (sectionById[ctx.ui.section] ? ctx.ui.section : 'now'))
   const t = TABS.find((x) => x.id === tab)
   useEffect(() => {
-    if (ctx.ui.mode !== t.mode) actions.setMode(t.mode)
+    if (!t.mode) return
+    setState((st) => ({ mode: t.mode, section: t.id, layers: { ...st.layers, ...t.layers } }))
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tab])
-  const View = t.hub ? PlayHub : t.view && VIEWS.find((v) => v.path === t.view)?.Component
+  const View = t.href ? PlayHub : null
   const when = at ? new Date(at).toLocaleString('en-GB', { weekday: 'short', hour: '2-digit', minute: '2-digit', timeZone: 'UTC' }) : '…'
   const sel = ctx.zoneById[ctx.ui.selectedZone]
   const st = ctx.stateByZone[ctx.ui.selectedZone]
@@ -45,8 +43,8 @@ export default function MobileShell({ ctx, at, source }) {
       {!View && (
         <section className="m-map">
           <MapView ctx={ctx} />
-          {tab === 'map' && <LayerSwitch layers={ctx.ui.layers} />}
-          {sel && st && tab === 'map' && (
+          {tab !== 'play' && <LayerSwitch layers={ctx.ui.layers} />}
+          {sel && st && tab !== 'play' && (
             <div className="m-sel">
               <b>{sel.name}</b>
               <span className="num">{st.currency === 'GBP' ? '£' : '€'}{Math.round(st.price)}/MWh</span>
@@ -56,20 +54,19 @@ export default function MobileShell({ ctx, at, source }) {
       )}
 
       <section className={`m-sheet ${View ? 'full' : ''}`}>
-        {View ? <View /> : t.panels.map((id) => {
-          const P = byId[id]
-          return P ? <P.Component key={id} ctx={ctx} /> : null
-        })}
+        {View ? <View /> : (
+          <>
+            {t.title && <div className="m-head"><b>{t.title}</b><span>{t.blurb}</span></div>}
+            {t.panels.map((id) => {
+              const P = byId[id]
+              return P ? <P.Component key={id} ctx={ctx} /> : null
+            })}
+            {t.pages?.map((pg) => <a key={pg.href} className="m-link" href={pg.href}>{pg.label} <Icon name="arrowUpRight" size={14} /></a>)}
+          </>
+        )}
       </section>
 
-      <nav className="m-tabs" aria-label="Sections">
-        {TABS.map((x) => (
-          <button key={x.id} className={x.id === tab ? 'on' : ''} onClick={() => setTab(x.id)} aria-current={x.id === tab}>
-            <Icon name={x.icon} size={18} />
-            <span>{x.label}</span>
-          </button>
-        ))}
-      </nav>
+      <PhoneNav current={tab} onSelect={setTab} />
     </div>
   )
 }

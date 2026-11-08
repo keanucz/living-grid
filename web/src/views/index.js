@@ -11,3 +11,11 @@ export function matchView(hash) {
   const path = (hash || '').replace(/^#/, '').split('?')[0] || '/'
   return VIEWS.find((v) => v.path === path || (v.prefix && path.startsWith(`${v.path}/`))) ?? null
 }
+
+// One game entrance: the old market and room-game pages now live behind #/play.
+const REDIRECTS = { '/market': '#/play', '/game': '#/play' }
+
+export function redirectOf(hash) {
+  const path = (hash || '').replace(/^#/, '').split('?')[0]
+  return REDIRECTS[path] ?? null
+}

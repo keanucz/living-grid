@@ -3,14 +3,9 @@ import { Icon } from '../icons.jsx'
 // Phone entry to the games: big, obvious cards; the always-on room game first so nobody lands on a dead end.
 const GAMES = [
   {
-    href: '#/game', icon: 'battery', kicker: 'Always on · half-hour turns',
-    title: 'Beat the forecast battery',
-    blurb: 'Run a battery for real GB prices: charge, hold or sell each half-hour. Can you beat our forecast?',
-  },
-  {
-    href: '#/play', icon: 'chart', kicker: 'With friends · quick play or a room code',
-    title: 'Predict the grid',
-    blurb: 'A real past day with its date hidden, replayed hour by hour. Join a quick game, or start a room and share the code.',
+    href: '#/play', icon: 'chart', kicker: 'Solo or with friends · quick play or a room code',
+    title: 'Beat the model',
+    blurb: 'Call the grid on a real past day with its date hidden, against our forecasters. Play solo, join a quick game, or start a room and share the code.',
   },
 ]
 

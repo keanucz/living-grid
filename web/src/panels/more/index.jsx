@@ -6,7 +6,7 @@ import { sectionById } from '../../shell/sections.js'
 // shell/sections.js, so each section shows its one primary panel and one KPI strip and everything else sits here.
 function More({ ctx }) {
   const [open, setOpen] = useState(false)
-  const ids = sectionById[ctx.ui.section ?? 'overview']?.more ?? []
+  const ids = sectionById[ctx.ui.section ?? 'now']?.more ?? []
   const items = PANELS.filter((p) => ids.includes(p.id))
   if (!items.length) return null
   return (

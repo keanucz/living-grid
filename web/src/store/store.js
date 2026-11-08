@@ -2,7 +2,7 @@ import { useSyncExternalStore } from 'react'
 
 const initial = {
   mode: 'overview', // 'overview' | 'simulate'
-  section: 'overview', // see shell/sections.js
+  section: 'now', // see shell/sections.js
   at: null, // ISO hour shown on the map; null = latest
   selectedZone: 'GB',
   layers: {}, // id -> boolean, filled from the layer registry defaults
