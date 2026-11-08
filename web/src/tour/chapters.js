@@ -88,7 +88,7 @@ export const CHAPTERS = [
       caption: '{tonight_line}',
       fallback: 'Tonight’s cheapest hours for your region, and what they save against the price cap.' },
     { id: 'turn.play', section: 'play', ms: 11000,
-      caption: 'Now beat the model: call the grid on a real day whose date is hidden, against our forecasters. The date is revealed when the round ends.' },
+      caption: 'Your turn. Beat the model: five quick calls about a real, hidden day. Market day: buy and sell yes/no bets on a hidden day while our model sets the prices.' },
   ] },
 ]
 

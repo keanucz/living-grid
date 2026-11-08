@@ -115,26 +115,30 @@ function Landing({ profile, setProfile, queue, onSolo, onHost, onJoinCode, onQui
   const waiting = queue?.waiting?.beat ?? 0
   return (
     <>
+      <section className="lb-card">
+        <Profile profile={profile} setProfile={setProfile} />
+      </section>
       <section className="lb-card lb-quick">
         <h2>Beat the model</h2>
-        <p className="lb-muted">Trade yes/no markets on a mystery day against our model. Buy what you think is underpriced, sell before it moves, and see whether you out-earn the model and the bots.</p>
-        <Profile profile={profile} setProfile={setProfile} />
-        <button className="lb-primary" onClick={onSolo}>Play solo</button>
-      </section>
-      <section className="lb-card">
-        <h2>Play with others</h2>
+        <p className="lb-muted">Five quick calls about a real, hidden day. Say how sure you are; see if you beat our model.</p>
         {queue?.mine ? (
           <>
             <p className="lb-muted"><b>Looking for another player…</b> {waiting} waiting. The game starts a few seconds after a second person arrives. Ask a friend to scan the same QR code.</p>
             <button className="lb-ghost wide" onClick={onCancel}>Cancel</button>
           </>
         ) : (
-          <>
-            <p className="lb-muted">Quick play matches you with whoever is waiting. Or host a room and share its code.</p>
-            <button className="lb-ghost wide" onClick={onQuick}>Quick play{waiting ? ` · ${waiting} waiting` : ''}</button>
-            <button className="lb-ghost wide" style={{ marginTop: 8 }} onClick={onHost}>Host a room</button>
-          </>
+          <button className="lb-primary" onClick={onQuick}>Quick play{waiting ? ` · ${waiting} waiting` : ''}</button>
         )}
+      </section>
+      <section className="lb-card lb-quick">
+        <h2>Market day</h2>
+        <p className="lb-muted">Buy and sell yes/no bets on a hidden day while our model sets the prices.</p>
+        <button className="lb-primary" onClick={onSolo}>Play Market day solo</button>
+      </section>
+      <section className="lb-card">
+        <h2>Play with others</h2>
+        <p className="lb-muted">Or host a room and share its code.</p>
+        <button className="lb-ghost wide" onClick={onHost}>Host a room</button>
       </section>
       <section className="lb-card">
         <h2>Join with a code</h2>
@@ -152,8 +156,8 @@ function Landing({ profile, setProfile, queue, onSolo, onHost, onJoinCode, onQui
 }
 
 const MODES = [
-  { value: 'pm', label: 'Markets', note: 'Yes/no markets on a mystery day: buy and sell against the model, and see who earns most' },
-  { value: 'beat', label: 'Beat the model', note: 'Five calls on a mystery day: call it, say how sure you are, and see if you beat the model and the bots' },
+  { value: 'pm', label: 'Market day', note: 'Buy and sell yes/no bets on a hidden day while our model sets the prices.' },
+  { value: 'beat', label: 'Beat the model', note: 'Five quick calls about a real, hidden day. Say how sure you are; see if you beat our model.' },
   { value: 'battery', label: 'Battery', note: 'Charge, hold or discharge a 1 MW battery against two planning agents' },
 ]
 
@@ -165,7 +169,7 @@ function HostForm({ profile, setProfile, busy, onCreate, onBack }) {
       <h2>Host a game</h2>
       <Profile profile={profile} setProfile={setProfile} autoFocus />
       <Segmented label="Game" options={MODES} value={mode} onChange={setMode} />
-      <p className="lb-muted">{MODES.find((m) => m.value === mode).note}. The code and QR appear in the waiting room.</p>
+      <p className="lb-muted">{MODES.find((m) => m.value === mode).note.replace(/\.$/, '')}. The code and QR appear in the waiting room.</p>
       <button className="lb-primary" disabled={busy || !ok} onClick={() => onCreate({ mode })}>Create game</button>
       <button className="lb-link" onClick={onBack}>Back</button>
     </section>

@@ -2,11 +2,8 @@ import { Icon } from '../icons.jsx'
 
 // Phone entry to the games: big, obvious cards; the always-on room game first so nobody lands on a dead end.
 const GAMES = [
-  {
-    href: '#/play', icon: 'chart', kicker: 'Solo or with friends · quick play or a room code',
-    title: 'Beat the model',
-    blurb: 'Call the grid on a real past day with its date hidden, against our forecasters. Play solo, join a quick game, or start a room and share the code.',
-  },
+  { href: '#/play', icon: 'chart', kicker: 'Quick play or a room code', title: 'Beat the model', blurb: 'Five quick calls about a real, hidden day. Say how sure you are; see if you beat our model.' },
+  { href: '#/play', icon: 'pound', kicker: 'Solo or a room code', title: 'Market day', blurb: 'Buy and sell yes/no bets on a hidden day while our model sets the prices.' },
 ]
 
 export default function PlayHub() {
@@ -16,7 +13,7 @@ export default function PlayHub() {
       <h2 className="ph-title">Think you can read the grid?</h2>
       <p className="ph-sub">Points only, no money. Your name goes on the big-screen leaderboard.</p>
       {GAMES.map((g) => (
-        <a key={g.href} className="ph-card" href={g.href}>
+        <a key={g.title} className="ph-card" href={g.href}>
           <span className="ph-ic"><Icon name={g.icon} size={22} /></span>
           <span className="ph-body">
             <span className="ph-k">{g.kicker}</span>

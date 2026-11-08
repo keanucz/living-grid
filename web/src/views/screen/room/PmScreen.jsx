@@ -84,8 +84,8 @@ export function PmHeader({ room, phase }) {
     <header className="sc-top">
       <div className="sc-logo"><Icon name="bolt" size={30} stroke={2.2} /></div>
       <div className="sc-titles">
-        <div className="sc-kicker">The Living Grid · Markets</div>
-        <h1>{phase === 'end' ? 'The day revealed' : 'Beat the model’s prices'}</h1>
+        <div className="sc-kicker">The Living Grid · Market day</div>
+        <h1>{phase === 'end' ? 'The day revealed' : 'Market day'}</h1>
       </div>
       <span className={`sc-pill ${phase === 'end' ? 'reveal' : phase}`}>{label}</span>
       {room.lobby && <div className="sc-code" aria-label="Room code"><small>Room</small>{room.lobby.code}</div>}
