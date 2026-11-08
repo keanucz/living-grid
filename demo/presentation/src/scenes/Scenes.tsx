@@ -195,13 +195,13 @@ export const Proof: React.FC = () => {
           <>
             <Title size={76}>Scored in public. It wins, and it ties.</Title>
             <Bars format={(v) => fmt.n(v, 1)} items={[{ label: 'Our model, error per MWh', fig: m, strong: true }, { label: 'Assume it stays put', fig: pr }]} />
-            <Line delay={20} size={30} color={COLORS.text3}>{`${fmt.pct(imp.v)} smaller error. Backtest of ${fmt.n(hrs.v)} hours, six zones, pooled £ and €.`}</Line>
+            <Line delay={20} size={30} color={COLORS.text2}>{`${fmt.pct(imp.v)} smaller error. Backtest of ${fmt.n(hrs.v)} hours, six zones, pooled £ and €.`}</Line>
             <Row gap={90}>
               <Big fig={cov} format={(v) => fmt.pct(v, 1)} label={`Outcomes inside our forecast band. Aim: ${X.coverageTarget}% (8 in 10)`} delay={40} size={100} />
-              <Big fig={n} format={(v) => fmt.n(v)} label="Scored live, each logged first (separate from the backtest)" delay={52} size={100} />
-              <Big fig={share} format={(v) => fmt.pct(v)} label={`Battery profit vs perfect foresight, 5 zones, ${fmt.n(F.batteryHours())} hours`} delay={64} size={100} />
+              <Big fig={n} format={(v) => fmt.n(v)} label="Scored live, logged first" delay={52} size={100} />
+              <Big fig={share} format={(v) => fmt.pct(v)} label={`Battery vs perfect foresight (5 zones, ${fmt.n(F.batteryHours())} h)`} delay={64} size={100} />
             </Row>
-            <Line delay={80} size={30} color={COLORS.text2}>{`Next: adding gusts, cloud, rain and alert weather cut day-ahead price error ${fmt.n(wp.v, 1)}% and wind error ${fmt.n(ww.v, 1)}% (${F.weatherFolds() ?? '–'}-fold backtest, ${F.weatherWindow() ?? '–'}; price better in ${F.weatherPriceZones() ?? '–'} zones; narrower ranges; not live yet).`}</Line>
+            <Line delay={80} size={30} color={COLORS.text2}>{`Not live yet: gusts, cloud, rain and alert weather cut day-ahead price error ${fmt.n(wp.v, 1)}% and wind error ${fmt.n(ww.v, 1)}% (${F.weatherFolds() ?? '–'}-fold backtest, ${F.weatherWindow() ?? '–'}; price better in ${F.weatherPriceZones() ?? '–'} zones; narrower ranges).`}</Line>
             <Caption delay={90}>Against a strong day-ahead rival it is a tie. We say so.</Caption>
           </>
         ),

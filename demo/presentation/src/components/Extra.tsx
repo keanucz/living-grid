@@ -53,7 +53,7 @@ export const project = (W: number, H: number) => {
 const ringPath = (r: number[][], p: ReturnType<typeof project>) => r.map((c, i) => `${i ? 'L' : 'M'}${p(c).map((n) => n.toFixed(1)).join(',')}`).join('') + 'Z'
 const features = geo as unknown as { zone: string | null; name: string; polys: number[][][][] }[]
 
-const CENTRES: Record<string, [number, number]> = { GB: [-2.2, 53.6], FR: [2.4, 46.9], 'DE-LU': [10.2, 51.3], NL: [5.5, 52.3], BE: [4.6, 50.6], NO2: [8.2, 59.3] }
+const CENTRES: Record<string, [number, number]> = { GB: [-2.2, 53.6], FR: [2.4, 46.9], 'DE-LU': [10.8, 51.3], NL: [4.4, 52.9], BE: [3.2, 50.3], NO2: [8.2, 59.3] }
 const UK_SCOTLAND: [number, number] = [-4.2, 57.2]
 
 /** Europe drawn from the site's own boundaries. Zones are filled on the site's fixed price scale; labels show the price. */
@@ -89,8 +89,8 @@ export const EuropeMap: React.FC<{ prices?: ZonePrice[]; width?: number; height?
         const l = lit(z.zone)
         return (
           <g key={z.zone} opacity={l} transform={`translate(${x},${y})`}>
-            <rect x={-62} y={-24} width={124} height={48} rx={10} fill="rgba(10,10,10,0.88)" stroke={COLORS.line2} />
-            <text x={0} y={9} textAnchor="middle" fontFamily={FONT} fontSize={26} fontWeight={600} fill={COLORS.text}>{z.zone} {z.gbp ? '£' : '€'}{Math.round(z.price)}</text>
+            <rect x={-76} y={-26} width={152} height={52} rx={10} fill="rgba(10,10,10,0.88)" stroke={COLORS.line2} />
+            <text x={0} y={9} textAnchor="middle" fontFamily={FONT} fontSize={28} fontWeight={600} fill={COLORS.text}>{z.zone} {z.gbp ? '£' : '€'}{Math.round(z.price)}</text>
           </g>
         )
       })}

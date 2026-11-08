@@ -16,7 +16,7 @@ export const Stage: React.FC<{ kicker?: string; sources?: Fig[]; children: React
         {kicker && <div style={{ fontFamily: MONO, fontSize: 28, letterSpacing: '0.08em', textTransform: 'uppercase', color: COLORS.text3, marginBottom: 18 }}>{kicker}</div>}
         {children}
       </AbsoluteFill>
-      <div style={{ position: 'absolute', left: 120, right: 120, bottom: 30, display: 'flex', justifyContent: 'space-between', fontFamily: MONO, fontSize: 24, color: COLORS.text3 }}>
+      <div style={{ position: 'absolute', left: 120, right: 120, bottom: 30, display: 'flex', justifyContent: 'space-between', fontFamily: MONO, fontSize: 28, color: COLORS.text3 }}>
         <span>The Living Grid</span>
         <span>{uniq.length ? `Source: ${uniq.join(', ')} · ${generatedAt.slice(0, 16).replace('T', ' ')} UTC` : ''}</span>
       </div>
