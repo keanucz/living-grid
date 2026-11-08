@@ -160,6 +160,7 @@ function MapApp() {
             <div className="bar" style={{ background: `linear-gradient(90deg, ${PRICE_LEGEND.map((s) => s.c).join(',')})` }} />
             <div className="ticks num">{PRICE_LEGEND.map((s) => <span key={s.v}>{s.v}</span>)}</div>
           </div>
+          {ui.layers?.coupled && <span className="muted" style={{ fontSize: 11 }}>Prices only, not forecast. Zone borders approximate. Source: Nord Pool.</span>}
         </div>
       </main>
       {forced.length > 0 && (

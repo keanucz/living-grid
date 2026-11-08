@@ -8,6 +8,7 @@ const OPTIONS = [
   { id: 'gbRegions', label: 'GB regions' },
   { id: 'wind', label: 'Wind' },
   { id: 'solar', label: 'Sun' },
+  { id: 'coupled', label: 'Coupled market' },
 ]
 const OVERLAYS = OPTIONS.map((o) => o.id).filter(Boolean)
 
