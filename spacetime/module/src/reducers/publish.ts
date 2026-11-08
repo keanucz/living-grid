@@ -1,5 +1,5 @@
 import { t, SenderError } from 'spacetimedb/server';
-import { Timestamp } from 'spacetimedb';
+import { Identity, Timestamp } from 'spacetimedb';
 import spacetimedb from '../schema';
 import { requireAdmin } from '../auth';
 
@@ -203,8 +203,8 @@ export const prune_before = spacetimedb.reducer({ before_us: t.i64() }, (ctx, { 
   for (const r of [...ctx.db.battery_action.iter()]) if (old(r.ts)) ctx.db.battery_action.key.delete(r.key);
 });
 
-// Delete rows by primary key from a publisher-owned table, so the publisher can reconcile the
-// database with its live sources (e.g. remove sample rows pushed before #84). Admin only.
+// Delete rows by primary key, admin only: publisher-owned tables, so the publisher can reconcile the database with
+// its live sources (e.g. remove sample rows pushed before #84), and the leaderboards' game rows.
 const DELETABLE: Record<string, (ctx: any, key: string) => void> = {
   zone: (ctx, k) => ctx.db.zone.code.delete(k),
   actual: (ctx, k) => ctx.db.actual.key.delete(k),
@@ -214,11 +214,18 @@ const DELETABLE: Record<string, (ctx: any, key: string) => void> = {
   carbon: (ctx, k) => ctx.db.carbon.key.delete(k),
   battery: (ctx, k) => ctx.db.battery.key.delete(k),
   battery_action: (ctx, k) => ctx.db.battery_action.key.delete(k),
+  // Game rows the leaderboards read, so the admin can remove QA and test players before judging.
+  // Keys: game_result '<lobby>|<round>|<identity hex>', market_account '<lobby>|<identity hex>', profile and player
+  // the identity hex.
+  game_result: (ctx, k) => ctx.db.game_result.key.delete(k),
+  market_account: (ctx, k) => ctx.db.market_account.key.delete(k),
+  profile: (ctx, k) => ctx.db.profile.identity.delete(Identity.fromString(k)),
+  player: (ctx, k) => ctx.db.player.identity.delete(Identity.fromString(k)),
 };
 
 export const delete_keys = spacetimedb.reducer({ table: t.string(), keys: t.array(t.string()) }, (ctx, { table, keys }) => {
   requireAdmin(ctx);
   const del = DELETABLE[table];
-  if (!del) throw new SenderError(`delete_keys: table ${table} is not publisher-owned`);
+  if (!del) throw new SenderError(`delete_keys: table ${table} cannot be deleted by key`);
   for (const k of keys) del(ctx, k);
 });

@@ -121,4 +121,7 @@ spacetime call --server http://127.0.0.1:3000 living-grid add_admin '"<identity 
 forecast, score, ghost_wind, carbon, battery, battery_action. On start, `python -m engine.publisher` reads each of those
 tables (`SELECT key FROM ...`), rebuilds the keys its live sources would produce over the window `prune_before` keeps,
 and deletes the rest. A table whose live source is missing is emptied, so sample rows never outlive a restart.
+The admin can also delete game rows the leaderboards read, to remove QA or test players before judging: `game_result`
+(key `<lobby>|<round>|<identity hex>`), `market_account` (`<lobby>|<identity hex>`), `profile` and `player` (identity hex),
+e.g. `spacetime call living-grid delete_keys '"profile"' '["<identity hex>"]'`. The publisher never touches these.
 Key formats live in `engine/publisher/rows.py` (`KEYS`) and must match the reducers; a test checks them.

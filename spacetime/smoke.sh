@@ -55,4 +55,11 @@ sql "SELECT * FROM actual" | grep -q '83.5' || { echo "FAIL actual upsert" >&2; 
 [ "$(sql "SELECT * FROM latest_forecast" | grep -c smoke)" = 1 ] || { echo "FAIL latest_forecast" >&2; exit 1; }
 sql "SELECT * FROM intervention" | grep -q hormuz || { echo "FAIL intervention" >&2; exit 1; }
 sql "SELECT * FROM leaderboard" | grep -q Ada || { echo "FAIL leaderboard" >&2; exit 1; }
+
+# The admin can remove a test player from the leaderboards by key; anonymous callers cannot.
+ANON_ID=$(python3 -c 'import sys, json; print(json.loads(sys.argv[1])["identity"])' "$ANON")
+anon delete_keys "[\"player\",[\"$ANON_ID\"]]" 530
+call delete_keys "[\"player\",[\"$ANON_ID\"]]" 200
+call delete_keys '["game_result",["0|0|none"]]' 200
+sql "SELECT * FROM leaderboard" | grep -q Ada && { echo "FAIL delete_keys player" >&2; exit 1; }
 echo "smoke: PASS"
