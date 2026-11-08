@@ -14,7 +14,7 @@ from collections.abc import Callable
 import pandas as pd
 
 from pipeline import cache, commit_chain, features, forecast_log
-from pipeline.ingest import boalf, carbon_intensity, elexon, energy_charts, markets, metered, neso, neso_boundaries, nordpool, octopus, open_meteo, uk_ets, weather_grid
+from pipeline.ingest import boalf, carbon_intensity, elexon, elhub, energy_charts, markets, metered, neso, neso_boundaries, nordpool, octopus, open_meteo, uk_ets, weather_grid
 from pipeline.models import quantile
 
 log = logging.getLogger("pipeline.scheduler")
@@ -59,6 +59,8 @@ def refresh(now: pd.Timestamp) -> list[str]:
         "neso_boundaries": lambda: neso_boundaries.run(now - pd.Timedelta(days=1), ahead),
         "weather_grid": every(6, weather_grid.NAME, now, lambda: weather_grid.write(weather_grid.fetch(past_days=1))),
         "uk_ets": every(24, uk_ets.NAME, now, uk_ets.run),
+        # NO2 metered load and production (Elhub). Hours land D+1 to D+2, so look back 5 days: the overlap fills the lag.
+        "elhub": lambda: elhub.run(now - pd.Timedelta(days=5), now),
     }
     failed = []
     for name, job in jobs.items():

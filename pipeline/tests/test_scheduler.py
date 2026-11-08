@@ -4,7 +4,7 @@ import pandas as pd
 import pytest
 
 from pipeline import cache, forecast_log, scheduler
-from pipeline.ingest import boalf, carbon_intensity, elexon, energy_charts, markets, metered, neso, neso_boundaries, nordpool, octopus, open_meteo, uk_ets, weather_grid
+from pipeline.ingest import boalf, carbon_intensity, elexon, elhub, energy_charts, markets, metered, neso, neso_boundaries, nordpool, octopus, open_meteo, uk_ets, weather_grid
 
 T1 = pd.Timestamp("2026-11-07T14:00Z")
 T2 = pd.Timestamp("2026-11-07T15:00Z")
@@ -54,7 +54,7 @@ def test_refresh_is_skipped_offline(monkeypatch):
 
     for mod, fn in ((elexon, "run"), (energy_charts, "fetch"), (nordpool, "run"), (markets, "run"), (carbon_intensity, "run"), (octopus, "run"),
                     (boalf, "run"), (metered, "run"), (neso, "run"), (neso_boundaries, "run"), (weather_grid, "fetch"),
-                    (uk_ets, "run")):
+                    (uk_ets, "run"), (elhub, "run")):
         monkeypatch.setattr(mod, fn, boom)
     assert scheduler.refresh(T1) == []
 
@@ -83,15 +83,16 @@ def test_failing_source_does_not_stop_the_forecast(monkeypatch):
     monkeypatch.setattr(neso_boundaries, "run", ok("nb"))
     monkeypatch.setattr(weather_grid, "fetch", boom)
     monkeypatch.setattr(uk_ets, "run", ok("ets"))
+    monkeypatch.setattr(elhub, "run", ok("el"))
     assert scheduler.refresh(T1) == ["elexon", "neso", "weather_grid"]
-    assert called == ["ec", "np", "mk", "ci", "oc", "om", "bo", "me", "nb", "ets"]
+    assert called == ["ec", "np", "mk", "ci", "oc", "om", "bo", "me", "nb", "ets", "el"]
     monkeypatch.setenv("LG_OFFLINE", "1")
     assert scheduler.run_once(now=T1, do_refresh=False) > 0
 
 
 def _stub_hourly_sources(monkeypatch):
     for mod, fn in ((elexon, "run"), (energy_charts, "fetch"), (nordpool, "run"), (markets, "run"), (carbon_intensity, "run"),
-                    (octopus, "run"), (boalf, "run"), (metered, "run"), (neso, "run"), (neso_boundaries, "run")):
+                    (octopus, "run"), (boalf, "run"), (metered, "run"), (neso, "run"), (neso_boundaries, "run"), (elhub, "run")):
         monkeypatch.setattr(mod, fn, lambda *a, **k: None)
     monkeypatch.setattr(open_meteo, "fetch_live", lambda *a, **k: None)
     monkeypatch.setattr(open_meteo, "write", lambda *a, **k: None)
@@ -150,3 +151,16 @@ def test_once_cli(monkeypatch):
     monkeypatch.setattr(scheduler, "run_once", lambda do_refresh: real(now=T1, do_refresh=do_refresh))
     scheduler.main(["--once", "--no-refresh"])
     assert cache.exists("forecasts/log")
+
+
+def test_elhub_is_refreshed_hourly_over_five_days_because_hours_land_a_day_or_two_late(monkeypatch):
+    monkeypatch.delenv("LG_OFFLINE")
+    _stub_hourly_sources(monkeypatch)
+    monkeypatch.setattr(weather_grid, "fetch", lambda *a, **k: pd.DataFrame())
+    monkeypatch.setattr(weather_grid, "write", lambda df: weather_grid.NAME)
+    monkeypatch.setattr(uk_ets, "run", lambda *a, **k: None)
+    seen = []
+    monkeypatch.setattr(elhub, "run", lambda start, end, *a, **k: seen.append((start, end)))
+    scheduler.refresh(T1)
+    scheduler.refresh(T1 + pd.Timedelta(hours=1))
+    assert seen == [(T1 - pd.Timedelta(days=5), T1), (T1 + pd.Timedelta(hours=1) - pd.Timedelta(days=5), T1 + pd.Timedelta(hours=1))]
