@@ -231,7 +231,7 @@ export default function Intro() {
         {mode === 'deck' && t < 3.1 && <DeckGL views={view} viewState={{ pylon: pose(Math.min(t, 3.1)) }} controller={false} layers={layers} style={{ position: 'absolute', inset: 0 }} />}
       </div>
       {captions.map(([text, o]) => <div key={text} className="intro-caption" style={{ opacity: Math.min(1, o) }}>{text}</div>)}
-      <div className="intro-title" style={{ opacity: title }}>This is the living grid of Europe<small>A weather forecast for Europe’s power grid.</small></div>
+      <div className="intro-title" style={{ opacity: title }}>This is the living grid of Europe<small>Your daily weather report for power</small></div>
       <button className="intro-skip" onClick={() => finish(true)}>Skip</button>
       <style>{`
         .intro { position: fixed; inset: 0; z-index: 70; cursor: pointer; }
