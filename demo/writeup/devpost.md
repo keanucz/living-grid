@@ -4,7 +4,7 @@ Electricity is invisible. The Living Grid makes Europe's hidden power system vis
 
 **Live:** https://htb.stefvuck.dev
 
-Tracks: G-Research, "Making the Unseen Seen", and HRT, "Best Use of Data for Predictions and Decision Making".
+Tracks: G-Research, "Make the Invisible Visible", and HRT, "Best Use of Data for Predictions & Decision Making".
 
 ## Inspiration
 
@@ -26,9 +26,9 @@ Power prices in Britain and across Europe swing by hundreds of pounds a megawatt
 
 Python 3.12 fetches and caches every public source as parquet: Energy-Charts, Nord Pool, Elexon Insights, Open-Meteo, NESO, the Carbon Intensity API, Octopus Agile, and Yahoo Finance for TTF gas and EUA carbon. A scheduler builds features and appends forecasts to an append-only log at five past each hour; every row carries `made_at`. A scorer joins forecasts to outcomes only where the forecast was made first. FastAPI serves state, explanations, interventions, replay and scores. SpacetimeDB 2.14 holds the live shared state so every screen updates at once. The front end is React with deck.gl 9.4 and MapLibre 5.24.
 
-The three of us each ran one to three Claude Code agents on a shared VPS. They took small, path-scoped tasks from a shared board, and a merge queue landed each one only when the tests and the web build passed.
+The three of us each ran several Claude Code agents, up to six at a time, on a shared VPS. They took small, path-scoped tasks from a shared board, and a merge queue landed each one only when the tests and the web build passed.
 
-Every constant in the engine (interconnector capacities, plant efficiencies, emission factors, boundary limits) is stored with its source URL, the quote it came from and a confidence rating. 51 of 53 pass an independent re-check; the code refuses to load the other two.
+Every constant in the engine (interconnector capacities, plant efficiencies, emission factors, boundary limits) is stored with its source URL, the quote it came from and a confidence rating. 51 of the 53 researched constants pass an independent re-check (for one of them, NESO's 26 October constraint cost, a person re-ran NESO's own query); the code refuses to load the other two. Six more were entered by hand with their source.
 
 ## Results
 
