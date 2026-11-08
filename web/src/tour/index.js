@@ -27,7 +27,7 @@ export function verifyTours(opts = {}) {
       const target = s.target ?? s.panel
       if (target && !panels.has(target) && !FIXED.has(target)) problems.push(`${where}: unknown target "${target}"`)
       if (s.panel && !panels.has(s.panel)) problems.push(`${where}: unknown panel "${s.panel}"`)
-      if (opts.dom && target && !document.querySelector(`[data-tour="${CSS.escape(target)}"]`)) problems.push(`${where}: no [data-tour="${target}"] on screen`)
+      if (opts.dom && target && target !== 'map' && !document.querySelector(`[data-tour="${CSS.escape(target)}"]`)) problems.push(`${where}: no [data-tour="${target}"] on screen`)
       for (const k of (s.say.match(/\{(\w+)\}/g) ?? []).map((m) => m.slice(1, -1))) if (!s.live?.[k]) problems.push(`${where}: caption uses {${k}} without a live entry`)
     })
   }

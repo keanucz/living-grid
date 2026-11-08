@@ -10,6 +10,7 @@ const hourIso = (offsetH) => {
   return d.toISOString().replace('.000Z', 'Z')
 }
 let ranEvent = false
+export const CAMERA = { home: { longitude: 3.6, latitude: 54.2, zoom: 3.15, pitch: 0, bearing: 0 } }
 
 export const stepsOf = (name) => TOURS[name]?.steps ?? []
 
@@ -21,6 +22,7 @@ export async function apply(step) {
     return
   }
   if (step.section && sectionById[step.section]) openSection(step.section)
+  if (step.camera !== undefined) setTimeout(() => dispatchEvent(new CustomEvent('lg-camera', { detail: step.camera ?? CAMERA.home })), 400)
   if (step.layers) setState({ layers: { ...getState().layers, ...step.layers } })
   if (step.at != null) actions.setAt(step.at === 'now' ? null : /^[+-]\d+$/.test(step.at) ? hourIso(Number(step.at)) : step.at)
   if (step.event) {
@@ -38,7 +40,7 @@ export function go(i) {
   const t = getTour()
   if (!t) return
   const steps = stepsOf(t.name)
-  if (i >= steps.length) return finish()
+  if (i >= steps.length) return t.autoplay ? go(0) : finish()
   const next = { ...t, i: Math.max(0, i) }
   setTour(next)
   save(next)

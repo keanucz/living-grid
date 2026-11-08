@@ -79,6 +79,16 @@ export default function MapView({ ctx }) {
     setViewState((v) => ({ ...v, ...target, transitionDuration: 1600, transitionInterpolator: new FlyToInterpolator({ speed: 1.4 }) }))
   }, [ui.mode, ctx.scenario?.focus])
 
+  // The tour's camera moves (tour/engine.js): a smooth fly-to to { longitude, latitude, zoom, pitch?, bearing?, duration? }.
+  useEffect(() => {
+    const on = (e) => {
+      const { duration = 2200, ...to } = e.detail ?? {}
+      setViewState((v) => clampView({ ...v, ...to, transitionDuration: duration, transitionInterpolator: new FlyToInterpolator({ speed: 1.2 }) }))
+    }
+    addEventListener('lg-camera', on)
+    return () => removeEventListener('lg-camera', on)
+  }, [])
+
   const zoom = (d) =>
     setViewState((v) => clampView({ ...v, zoom: v.zoom + d, transitionDuration: 300, transitionInterpolator: new FlyToInterpolator() }))
   const north = () =>
