@@ -32,6 +32,17 @@ The map shows GB, France, Germany-Luxembourg, the Netherlands, Belgium and south
 - **Replay:** the 26 October storm, played back by a model that never saw that day.
 - **Household:** the cheapest window tonight to charge your car or run the dishwasher.
 
+## Screenshots
+
+From the live site, 8 November 2026 (1920x1080).
+
+<table>
+<tr><td width="50%"><img src="docs/img/screenshots/now.jpg" alt="Now: is power cheap right now? Six countries coloured by this hour's price, with cable flows"><br><sub>Now: is power cheap right now? Six countries coloured by this hour's price, with cable flows</sub></td><td width="50%"><img src="docs/img/screenshots/hidden-grid.jpg" alt="Hidden grid: Scottish wind paid to switch off, and the Scotland to England line over its limit"><br><sub>Hidden grid: Scottish wind paid to switch off, and the Scotland to England line over its limit</sub></td></tr>
+<tr><td width="50%"><img src="docs/img/screenshots/what-if-hormuz.jpg" alt="What if: the Strait of Hormuz closes, prices rise across Europe, with the bill in pounds"><br><sub>What if: the Strait of Hormuz closes, prices rise across Europe, with the bill in pounds</sub></td><td width="50%"><img src="docs/img/screenshots/forecast.jpg" alt="Forecast: where prices are going, with a likely range and the reasons behind the price"><br><sub>Forecast: where prices are going, with a likely range and the reasons behind the price</sub></td></tr>
+<tr><td width="50%"><img src="docs/img/screenshots/proof.jpg" alt="Proof: how right we are against simple baselines"><br><sub>Proof: how right we are against simple baselines</sub></td><td width="50%"><img src="docs/img/screenshots/where-the-grid-is-full.jpg" alt="Where the grid is full: each power line, how full it was, and what that cost"><br><sub>Where the grid is full: each power line, how full it was, and what that cost</sub></td></tr>
+<tr><td width="50%"><img src="docs/img/screenshots/tonight.jpg" alt="Tonight: the cheapest hours to charge a car or run the dishwasher, by region"><br><sub>Tonight: the cheapest hours to charge a car or run the dishwasher, by region</sub></td><td width="50%"><img src="docs/img/screenshots/esp32-meter.jpg" alt="The ESP32 meter: price now, the next 24 hours, and what to run later"><br><sub>The ESP32 meter: price now, the next 24 hours, and what to run later</sub></td></tr>
+</table>
+
 ## How it works
 
 ### Who built what
