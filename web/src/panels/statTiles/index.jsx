@@ -30,14 +30,12 @@ function StatTiles({ ctx }) {
   const sc = ctx.scenario
   const gb = ctx.stateByZone.GB
   const ranAt = ctx.ui.scenario?.ranAt
-  const cost = useCountUp(sc ? sc.cost_gbp * sc.scale : 0, 1600, ranAt)
   const gbDelta = sc ? (sc.price_delta_eur.GB * sc.scale) / 1.15 : 0
   const gbNow = useCountUp(gb ? gb.price + gbDelta : 0, 900, ranAt)
   const deltas = sc ? Object.entries(sc.price_delta_eur).map(([z, d]) => [z, d * sc.scale]) : []
   const worst = deltas.sort((a, b) => b[1] - a[1])[0]
 
   const items = [
-    { label: 'Extra wholesale cost', value: sc ? fmt.money(cost) : '—', note: sc ? `over ${sc.hours >= 168 ? `${Math.round(sc.hours / 168)} weeks` : `${sc.hours} h`}` : 'Run a scenario', hot: true },
     { label: 'GB price', value: gb ? `£${gbNow.toFixed(1)}` : '—', delta: sc ? gbDelta : null, note: 'per MWh now' },
     { label: 'Hardest hit', value: worst ? worst[0] : '—', note: worst ? zoneDelta(worst[0], worst[1]) : 'no event' },
     { label: 'Ghost wind', value: `${sc?.ghost_wind_mwh ? ((sc.ghost_wind_mwh * sc.scale) / 1000).toFixed(1) : '0.0'} GWh`, note: 'paid to switch off' },
@@ -67,6 +65,7 @@ function StatTiles({ ctx }) {
         .klabel { font-size: 12px; }
         .kval { font-size: 26px; font-weight: 600; margin: 6px 0 4px; white-space: nowrap; }
         .knote { font-size: 12px; }
+        .impact .kgrid { grid-template-columns: repeat(3, 1fr); }
         .impact .panel-head > span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
       `}</style>
     </section>

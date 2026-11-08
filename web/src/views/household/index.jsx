@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { api } from '../../api/client.js'
 import { Icon } from '../../shell/icons.jsx'
 import Savings from './Savings.jsx'
+import qr from '../../panels/qr/index.jsx'
 
 const TZ = 'Europe/London'
 const t = (iso) => new Date(iso).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', timeZone: TZ })
@@ -68,6 +69,7 @@ function Household() {
           <h1>Cheapest power tonight</h1>
         </div>
       </header>
+      <div className="hh-qr"><qr.Component /></div>
 
       <label className="hh-region">
         <span>Your region</span>
@@ -117,6 +119,8 @@ function Household() {
 const CSS = `
 body { overflow: auto; }
 .hh { max-width: 520px; margin: 0 auto; padding: 20px 16px 40px; min-height: 100%; }
+.hh-qr { display: none; margin-bottom: 14px; }
+@media (min-width: 900px) { .hh-qr { display: block; max-width: 420px; } }
 .hh-top { display: flex; gap: 12px; align-items: center; margin-bottom: 18px; }
 .hh-logo { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; background: var(--accent); color: var(--accent-ink); flex: none; }
 .hh-kicker { font-size: 12px; color: var(--text-3); }

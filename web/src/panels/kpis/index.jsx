@@ -14,15 +14,15 @@ function Kpis({ ctx }) {
   const avg = wavg((z) => z.price_eur)
   const avgChange = wavg((z) => z.change_24h_eur)
   const cheapest = [...zs].sort((a, b) => a.price_eur - b.price_eur)[0]
-  const gb = zs.find((z) => z.zone === 'GB')
   const carbon = wavg((z) => z.carbon?.consumption_gco2_kwh)
+  const carbonZones = zs.filter((z) => z.carbon?.consumption_gco2_kwh != null).length
   const flowing = (ctx.data.state.flows ?? []).reduce((a, f) => a + Math.abs(f.mw), 0)
 
   const items = [
     { label: 'Average price', value: avg != null ? `€${avg.toFixed(1)}` : '—', delta: avgChange, note: 'per MWh' },
     { label: 'Cheapest', value: `${cheapest.zone} €${cheapest.price_eur.toFixed(0)}`, note: ctx.zoneById[cheapest.zone]?.name ?? '' },
-    { label: (gb?.net_import_mw ?? 0) >= 0 ? 'GB importing' : 'GB exporting', value: gb?.net_import_mw != null ? fmt.gw(Math.abs(gb.net_import_mw)) : '—', note: `${fmt.gw(flowing)} crossing borders` },
-    { label: 'Carbon', value: carbon != null ? `${carbon.toFixed(0)} g` : '—', note: 'per kWh consumed' },
+    { label: 'Crossing borders', value: fmt.gw(flowing), note: 'all interconnectors' },
+    { label: 'Europe carbon', value: carbon != null ? `${carbon.toFixed(0)} g` : '—', note: carbonZones < zs.length ? `per kWh consumed, ${carbonZones} of ${zs.length} zones` : 'per kWh consumed, average' },
   ]
   return (
     <section className="panel kpis fade-in">

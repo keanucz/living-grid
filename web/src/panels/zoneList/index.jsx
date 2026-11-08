@@ -54,8 +54,8 @@ function Row({ z, st, on }) {
             {mix.length === 0 && <span className="faint">No generation mix for this hour</span>}
           </div>
           <div className="zfacts">
-            <div><span className="faint">Net {st.net_import_mw >= 0 ? 'import' : 'export'}</span><b className="num">{st.net_import_mw != null ? fmt.gw(Math.abs(st.net_import_mw)) : '—'}</b></div>
-            <div><span className="faint">Carbon</span><b className="num">{st.carbon?.consumption_gco2_kwh != null ? `${Math.round(st.carbon.consumption_gco2_kwh)} g/kWh` : '—'}</b></div>
+            <div><span className="faint">{z.id.replace('-LU', '')} net {st.net_import_mw >= 0 ? 'import' : 'export'}</span><b className="num">{st.net_import_mw != null ? fmt.gw(Math.abs(st.net_import_mw)) : '—'}</b></div>
+            <div><span className="faint">{z.id.replace('-LU', '')} carbon</span><b className="num">{st.carbon?.consumption_gco2_kwh != null ? `${Math.round(st.carbon.consumption_gco2_kwh)} g/kWh` : '—'}</b></div>
           </div>
         </div>
       )}
