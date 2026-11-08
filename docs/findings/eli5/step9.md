@@ -71,3 +71,57 @@ The four judges (HRT trading engineer, G-Research quant, Bank of Scotland custom
 - #293: Replay and Reveal code names.
 - #294: zone codes and the €/MWh legend on the map, plus the Forecast legend.
 - #295: What if impact tiles, and the Where the grid is full expert text.
+
+## Round 2 (task #298)
+
+Run on 8 November 2026 from 05:05 to 05:25 UTC on https://htb.stefvuck.dev. The deployed web tree was 2ef6857a, which is the `web/` tree of 9b0ec7b and includes #279, #292, #293, #294 and #295. The method was the same as round 1: one Chromium under `nice -n 19`, closed afterwards; 1440×900 desktop, then 390×844 phone with touch; a fresh Welcome; a 10 s wait on every section; "Gas gets dearer" run on What if. The server load average was about 27 during the run.
+
+**No page errors, no console errors and no HTTP errors. No horizontal overflow on phone.** A deploy landed during the run (#306), so from Forecast onwards every screen shows "New version available · Reload", sitting over the price legend.
+
+### The 10-second test
+
+| Section | Round 1 | Round 2 | Notes |
+|---|---|---|---|
+| Welcome | Yes | **Yes** | Unchanged. |
+| Now | Yes | **Yes** | The map labels now say Britain, Germany and Norway (#294), and the legend reads "Wholesale price, € per MWh". The zone list still shows the badges `NO2` and `DE`, and "GB carbon 341 g/kWh" has no Term. |
+| Forecast | Mostly | **Mostly** | The legend is now "Day-ahead price · Already auctioned · Best guess · Likely range", with no P-codes. There is still no answer sentence, so you have to read the chart. The footnote under "Why this price" reads "11-08 11:00 UTC · forecast £197.7/MWh, −£13 against the reference … Attribution of the model’s own number, not a proven cause." |
+| Hidden grid | No | **Yes, after one tap** | The tiles still show no numbers (that is #292's choice). One tap gives a plain intro, then "No wind was paid to switch off in the last 24 hours. The latest published daily constraint bill was £18.8m, for 29 Oct." BOALF, NESO and B6 are gone from the open text. Rough edge: "(last 24 h) ESTIMATED" comes after "These bills come out about a week late", so it seems to label the bill. |
+| What if | Yes, after one tap | **Yes** | Desktop now opens with "What if the world changes?". The tiles are in pence: "BRITAIN, WHOLESALE 21.7p ▲ 3.8p per kWh vs now", "HIT HARDEST Great Britain +3.8p per kWh". The map callout still reads "Great Britain +38.3 £/MWh" (#301 is open). |
+| Proof | Yes | **Yes** | "Can we trust the forecast?" tagged BACKTEST, with "From the backtest: 12,086 hours of past weeks the model never saw, until enough live forecasts are scored." (#285). On desktop the card was not yet on screen at 10 s under this load. |
+| Play | Yes | **Yes** | Unchanged. |
+| Tonight | Yes | **Yes** | At 05:00 only one card shows ("Run the dishwasher · Sun 05:30–06:30 · 31.9p/kWh average"); "Charge your car" is gone. "Cheapest power tonight" reads oddly at 5 am. Both depend on the data and the time, so no task. |
+| Where the grid is full | Partly | **Yes** | Plain cards: "Northern England · Over the limit in 67% of hours · 7.3 GW used of 5.8 GW allowed". The SSEN-S, SSHARN and NESO text is under For experts. Minor: "Scotland to England" is printed twice on its card. |
+| Replay | Partly | **Mostly** | The summary is plain ("Our model was trained only on data before 26 October 2026 … 78 of 168 hours landed inside our likely range"), and "1 of 1 hour" is fixed. Two problems: the series chips read "GB GB system price", "DE-LU Day-ahead price" and "NO2 Day-ahead price"; and the map shows **today's** boundary labels and wind circles (see below). |
+| Reveal | Yes | **Yes** | "Best guess between £197 and £270 across the day", and the legend reads "Frozen likely range / Frozen best guess". No codes. |
+
+### Code names and units still visible before "For experts"
+
+| Seen where | Text on screen | Suggested words |
+|---|---|---|
+| Replay, series chips | "GB **GB system price**", "**DE-LU** Day-ahead price", "**NO2** Day-ahead price" | "Britain, system price", "Germany", "Norway" |
+| Now, zone list | badges "**NO2**", "**DE**"; "GB carbon 341 **g/kWh**" | Drop the badges, or use the names; wrap carbon in the `carbon-intensity` Term. |
+| Forecast, Why this price | "**11-08 11:00 UTC** · forecast £197.7/MWh, −£13 **against the reference** … **Attribution of the model’s own number**, not a proven cause." | Move under For experts; plain: "Compared with a typical hour. These are the model’s reasons, not proof of cause." |
+| What if, map callout | "Great Britain +38.3 **£/MWh**" | Already #301. |
+| Phone, layer chips | "**Ghost wind**" | Already #301. |
+| Replay, side tile | "WIND PAID TO SWITCH OFF, THAT DAY SO FAR **3,256 MWh**" | Fine with a `mwh` Term, or "3.3 GWh" with the `gw` style. Low priority. |
+
+### Broken or rough
+
+- **Hidden grid map layers leak into later sections.** Hidden grid sets `layers.boundaries: true` (`web/src/shell/sections.js:22`), and no other section sets it back to false. So after Hidden grid, Proof and the 26 October Replay map both show "Scotland to England: over the limit in 34% of hours", "Norway: 82% full" and the Scottish wind circles. On the Replay those are **today's** 21-day figures over a 26 October map, which reads as data for that day. A judge following the demo path will always see this.
+- **"New version available · Reload" covers the price legend** whenever a deploy lands while the page is open. It is harmless, but it would show during the 12:30 demo if anything merges after the screens are opened.
+- **Proof was slow:** the card was not on screen after 10 s on desktop. The load average was 27, so this is mostly the box, not the page.
+
+### Per judge, one line
+
+- **HRT trading engineer:** What if now speaks in pence on every tile; only the map callout still says £/MWh.
+- **G-Research quant:** Replay and Reveal are clean in words. Replay's map borrowing today's boundary labels is the one thing that would make them doubt the replay.
+- **Bank of Scotland customer:** Now, What if and Tonight pass. Forecast still has no sentence to read.
+- **Metaview product judge:** 9 of 11 sections pass the 10-second test (Forecast and Replay are "Mostly"), up from 7 in round 1.
+
+### Fix tasks added (lane C)
+
+None of them changes the selectors used by the fallback recorder (section tabs, `.wi-card`, `#/replay .rp-play`, the `#/reveal` structure).
+
+- #312: reset the Hidden grid map layers when leaving it (Proof and Replay show today’s boundary labels).
+- #313: Replay series chips use zone and target names instead of codes.
+- #314: Forecast "Why this price" footnote in plain words, with the timestamp and model detail under For experts.
