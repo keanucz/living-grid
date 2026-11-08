@@ -1,9 +1,10 @@
 from datetime import UTC, datetime
+from functools import lru_cache
 
 import pandas as pd
 from fastapi import APIRouter
 
-from engine import data
+from engine import data, timeline
 from engine.schemas import StateResponse
 from pipeline import cache
 
@@ -17,8 +18,20 @@ def default_at() -> pd.Timestamp:
     return min(now, latest.floor("h")) if latest is not None else now
 
 
+@lru_cache(maxsize=2048)
+def _past(t: pd.Timestamp, sig: tuple) -> dict:
+    return _compute(t)
+
+
 def build(at: datetime | None = None) -> dict:
+    """Hours more than an hour in the past are cached per cache-file state, so scrubbing history is a lookup."""
     t = data.as_utc(at) if at else default_at()
+    if t < data.as_utc(datetime.now(UTC)).floor("h") - pd.Timedelta(hours=1):
+        return _past(t, timeline._signature())
+    return _compute(t)
+
+
+def _compute(t: pd.Timestamp) -> dict:
     prices, forecasts, carbon = data.prices(t), data.forecasts(t), data.carbon_at(t)
     load, mix = data.zone_series(t)
     zones = [

@@ -135,6 +135,48 @@ class StateResponse(Model):
     flows: list[Flow]
 
 
+# ---------- GET /timeline?from=&to=&step= ----------
+
+
+class TimelineZone(Model):
+    price: list[float | None] = Field(description="Day-ahead price per step in the zone's currency; GB before Sep 2026 is the Elexon market index (see price_proxy)")
+    price_proxy: list[bool] = Field(description="True where the price is a proxy rather than the auction result")
+    wind_share: list[float | None] = Field(description="Wind as a share of generation, 0 to 1")
+    solar_share: list[float | None] = Field(description="Solar as a share of generation, 0 to 1; no GB series")
+    carbon: list[float | None] = Field(description="Modelled consumption carbon intensity, gCO2/kWh")
+    net_import_mw: list[float | None] = Field(description="Net imports, positive when the zone imports")
+
+
+class TimelineEvent(Model):
+    slug: str
+    title: str
+    kind: str
+    headline: str
+    start: datetime
+    end: datetime
+    replay_available: bool
+
+
+class TimelineCoverage(Model):
+    first: datetime | None
+    last: datetime | None
+    share: float = Field(description="Share of hours in the cached range that have a value")
+
+
+class TimelineResponse(Model):
+    from_: datetime = Field(alias="from")
+    to: datetime
+    step: Literal["hour", "day"]
+    ts: list[datetime]
+    zones: dict[str, TimelineZone]
+    events: list[TimelineEvent]
+    coverage: dict[str, dict[str, TimelineCoverage]] = Field(description="series -> zone -> coverage over the whole cache")
+    kind: Kind = "actual"
+    note: str
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True, serialize_by_alias=True)
+
+
 # ---------- GET /explain?zone=&ts= ----------
 
 

@@ -27,7 +27,7 @@ CONTINENTAL_LINKS = [
     ("nl-no2", "NorNed", "NL", "NO2", 700, (6.8, 53.4), (6.8, 58.2)),
     ("de-no2", "NordLink", "DE-LU", "NO2", 1400, (9.3, 54.0), (7.0, 58.3)),
 ]
-PRICE_SOURCES = ["nordpool", "energycharts", "entsoe"]
+PRICE_SOURCES = ["nordpool", "energycharts", "entsoe", "mid"]
 # File stems are <source>_<rest>; some sources contain an underscore. Normalised by dropping underscores.
 SOURCES = ["energy_charts", "energycharts", "carbon_intensity", "carbonintensity", "elexon", "nordpool", "entsoe", "octopus", "neso"]
 # Energy-Charts public_power and load for Norway cover the whole country, not the NO2 bidding zone.
@@ -107,7 +107,8 @@ def prices(at: pd.Timestamp) -> dict[str, dict]:
     out = {}
     for zone, g in a.groupby("zone"):
         r = g.iloc[-1]
-        out[zone] = {"value": float(r["value"]), "unit": r["unit"], "kind": "actual", "source": r["source"]}
+        kind = "estimated" if r["source"] == "mid" else "actual"
+        out[zone] = {"value": float(r["value"]), "unit": r["unit"], "kind": kind, "source": r["source"]}
     return out
 
 

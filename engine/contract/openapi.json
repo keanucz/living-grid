@@ -4104,6 +4104,275 @@
     "title": "StateResponse",
     "type": "object"
    },
+   "TimelineCoverage": {
+    "additionalProperties": false,
+    "properties": {
+     "first": {
+      "anyOf": [
+       {
+        "format": "date-time",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "First"
+     },
+     "last": {
+      "anyOf": [
+       {
+        "format": "date-time",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Last"
+     },
+     "share": {
+      "description": "Share of hours in the cached range that have a value",
+      "title": "Share",
+      "type": "number"
+     }
+    },
+    "required": [
+     "first",
+     "last",
+     "share"
+    ],
+    "title": "TimelineCoverage",
+    "type": "object"
+   },
+   "TimelineEvent": {
+    "additionalProperties": false,
+    "properties": {
+     "end": {
+      "format": "date-time",
+      "title": "End",
+      "type": "string"
+     },
+     "headline": {
+      "title": "Headline",
+      "type": "string"
+     },
+     "kind": {
+      "title": "Kind",
+      "type": "string"
+     },
+     "replay_available": {
+      "title": "Replay Available",
+      "type": "boolean"
+     },
+     "slug": {
+      "title": "Slug",
+      "type": "string"
+     },
+     "start": {
+      "format": "date-time",
+      "title": "Start",
+      "type": "string"
+     },
+     "title": {
+      "title": "Title",
+      "type": "string"
+     }
+    },
+    "required": [
+     "slug",
+     "title",
+     "kind",
+     "headline",
+     "start",
+     "end",
+     "replay_available"
+    ],
+    "title": "TimelineEvent",
+    "type": "object"
+   },
+   "TimelineResponse": {
+    "additionalProperties": false,
+    "properties": {
+     "coverage": {
+      "additionalProperties": {
+       "additionalProperties": {
+        "$ref": "#/components/schemas/TimelineCoverage"
+       },
+       "type": "object"
+      },
+      "description": "series -> zone -> coverage over the whole cache",
+      "title": "Coverage",
+      "type": "object"
+     },
+     "events": {
+      "items": {
+       "$ref": "#/components/schemas/TimelineEvent"
+      },
+      "title": "Events",
+      "type": "array"
+     },
+     "from": {
+      "format": "date-time",
+      "title": "From",
+      "type": "string"
+     },
+     "kind": {
+      "default": "actual",
+      "enum": [
+       "actual",
+       "forecast",
+       "modelled",
+       "estimated",
+       "scenario"
+      ],
+      "title": "Kind",
+      "type": "string"
+     },
+     "note": {
+      "title": "Note",
+      "type": "string"
+     },
+     "step": {
+      "enum": [
+       "hour",
+       "day"
+      ],
+      "title": "Step",
+      "type": "string"
+     },
+     "to": {
+      "format": "date-time",
+      "title": "To",
+      "type": "string"
+     },
+     "ts": {
+      "items": {
+       "format": "date-time",
+       "type": "string"
+      },
+      "title": "Ts",
+      "type": "array"
+     },
+     "zones": {
+      "additionalProperties": {
+       "$ref": "#/components/schemas/TimelineZone"
+      },
+      "title": "Zones",
+      "type": "object"
+     }
+    },
+    "required": [
+     "from",
+     "to",
+     "step",
+     "ts",
+     "zones",
+     "events",
+     "coverage",
+     "note"
+    ],
+    "title": "TimelineResponse",
+    "type": "object"
+   },
+   "TimelineZone": {
+    "additionalProperties": false,
+    "properties": {
+     "carbon": {
+      "description": "Modelled consumption carbon intensity, gCO2/kWh",
+      "items": {
+       "anyOf": [
+        {
+         "type": "number"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "title": "Carbon",
+      "type": "array"
+     },
+     "net_import_mw": {
+      "description": "Net imports, positive when the zone imports",
+      "items": {
+       "anyOf": [
+        {
+         "type": "number"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "title": "Net Import Mw",
+      "type": "array"
+     },
+     "price": {
+      "description": "Day-ahead price per step in the zone's currency; GB before Sep 2026 is the Elexon market index (see price_proxy)",
+      "items": {
+       "anyOf": [
+        {
+         "type": "number"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "title": "Price",
+      "type": "array"
+     },
+     "price_proxy": {
+      "description": "True where the price is a proxy rather than the auction result",
+      "items": {
+       "type": "boolean"
+      },
+      "title": "Price Proxy",
+      "type": "array"
+     },
+     "solar_share": {
+      "description": "Solar as a share of generation, 0 to 1; no GB series",
+      "items": {
+       "anyOf": [
+        {
+         "type": "number"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "title": "Solar Share",
+      "type": "array"
+     },
+     "wind_share": {
+      "description": "Wind as a share of generation, 0 to 1",
+      "items": {
+       "anyOf": [
+        {
+         "type": "number"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "title": "Wind Share",
+      "type": "array"
+     }
+    },
+    "required": [
+     "price",
+     "price_proxy",
+     "wind_share",
+     "solar_share",
+     "carbon",
+     "net_import_mw"
+    ],
+    "title": "TimelineZone",
+    "type": "object"
+   },
    "ValidationError": {
     "properties": {
      "ctx": {
@@ -5660,6 +5929,87 @@
      }
     },
     "summary": "State",
+    "tags": [
+     "map"
+    ]
+   }
+  },
+  "/timeline": {
+   "get": {
+    "operationId": "get_timeline_timeline_get",
+    "parameters": [
+     {
+      "in": "query",
+      "name": "from",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "format": "date-time",
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "From"
+      }
+     },
+     {
+      "in": "query",
+      "name": "to",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "format": "date-time",
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "To"
+      }
+     },
+     {
+      "in": "query",
+      "name": "step",
+      "required": false,
+      "schema": {
+       "default": "day",
+       "enum": [
+        "hour",
+        "day"
+       ],
+       "title": "Step",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/TimelineResponse"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Get Timeline",
     "tags": [
      "map"
     ]

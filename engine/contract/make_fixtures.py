@@ -653,6 +653,43 @@ def infrastructure() -> dict:
     return {**inf.build(flows=flows, costs=costs, ghost=ghost, actuals=actuals, links=links), "sample": True}
 
 
+def timeline() -> dict:
+    days = [NOW.replace(hour=0) - timedelta(days=2 - i) for i in range(3)]
+    zones = {
+        z: {
+            "price": [BASE_PRICE[z] + 5.0 * i for i in range(3)],
+            "price_proxy": [z == "GB"] * 3,
+            "wind_share": [0.2 + 0.1 * i for i in range(3)],
+            "solar_share": [None if z == "GB" else 0.05] * 3,
+            "carbon": [CARBON[z][1]] * 3,
+            "net_import_mw": [(-500.0 if z == "FR" else 300.0) + 50 * i for i in range(3)],
+        }
+        for z in ZONES
+    }
+    cov = {"first": iso(days[0]), "last": iso(days[-1]), "share": 1.0}
+    return {
+        "from": iso(days[0]),
+        "to": iso(days[-1]),
+        "step": "day",
+        "ts": [iso(d) for d in days],
+        "zones": zones,
+        "events": [
+            {
+                "slug": "storm",
+                "title": "The storm that cost £36.5 million",
+                "kind": "storm",
+                "headline": "£36,530,869 of constraint costs in a day",
+                "start": iso(days[0]),
+                "end": iso(days[-1]),
+                "replay_available": True,
+            }
+        ],
+        "coverage": {k: {z: cov for z in ZONES} for k in ("price", "wind_share", "solar_share", "carbon", "net_import_mw")},
+        "kind": "actual",
+        "note": "Sample data. Prices are day-ahead; GB before September 2026 is the Elexon market index proxy.",
+    }
+
+
 def build() -> dict[str, tuple[type, dict]]:
     z = zones()
     st = state(z)
@@ -676,6 +713,7 @@ def build() -> dict[str, tuple[type, dict]]:
         "impact_renewables": (s.ImpactResponse, impact_renewables()),
         "carbon_costs": (s.CarbonCostsResponse, carbon_costs()),
         "infrastructure": (s.InfrastructureResponse, infrastructure()),
+        "timeline": (s.TimelineResponse, timeline()),
     }
 
 

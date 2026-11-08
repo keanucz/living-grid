@@ -20,7 +20,7 @@ from dataclasses import dataclass
 import pandas as pd
 
 from pipeline import cache
-from pipeline.ingest import boalf, elexon, energy_charts, markets, nordpool, open_meteo
+from pipeline.ingest import boalf, elexon, energy_charts, markets, mid_proxy, nordpool, open_meteo
 
 log = logging.getLogger("pipeline.backfill")
 
@@ -46,6 +46,7 @@ SOURCES: dict[str, Source] = {
         Source("open_meteo", open_meteo.run, 31),
         Source("markets", markets.run, 100000, fixed_start=markets.HISTORY_START),
         Source("boalf", boalf.run, 7),
+        Source("mid_proxy", mid_proxy.run, 30),
     )
 }
 
