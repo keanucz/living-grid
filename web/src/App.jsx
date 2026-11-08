@@ -119,7 +119,7 @@ function MapApp() {
   if (narrow) return <MobileShell ctx={ctx} at={state.data?.at} source={state.source} />
 
   return (
-    <div className={`app mode-${ui.mode}`}>
+    <div className={`app mode-${ui.mode}${section.title && ui.mode !== 'simulate' && section.pages?.length ? ' with-links' : ''}`}>
       <main className="main">
         <MapView ctx={ctx} />
         <TopBar at={state.data?.at} source={state.source} />

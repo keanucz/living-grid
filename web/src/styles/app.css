@@ -261,6 +261,11 @@ h1, .headline h1, .kval, .sim-name, .tile b { letter-spacing: -0.012em; }
 /* judge QA: long view blurbs wrap within the gap above the left column */
 .headline p { max-width: 640px; }
 .slot-left { top: 182px; }
+/* Headline links (Tonight, Where the grid is full, Replay, Reveal) sat under .slot-left (same z-index, later in
+   the DOM), so clicks hit the empty column. The headline stays pointer-events: none, so lifting it only exposes
+   the links; the column also starts below them when a section has links. */
+.headline { z-index: 4; }
+.app.with-links .slot-left { top: 222px; }
 
 /* ---------- one navigation (shell/TopBar, LayersMenu, PageFrame) ---------- */
 .lm { position: relative; flex: none; }
