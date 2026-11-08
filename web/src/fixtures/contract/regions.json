@@ -1,0 +1,776 @@
+{
+ "at": "2026-11-07T13:00:00Z",
+ "regions": [
+  {
+   "region": "A",
+   "name": "East England",
+   "centroid": [
+    0.586,
+    52.24
+   ],
+   "carbon_gco2_kwh": 248.0,
+   "carbon_index": "very high",
+   "mix": [
+    {
+     "fuel": "gas",
+     "perc": 60.4
+    },
+    {
+     "fuel": "nuclear",
+     "perc": 17.7
+    },
+    {
+     "fuel": "solar",
+     "perc": 10.8
+    },
+    {
+     "fuel": "biomass",
+     "perc": 8.2
+    },
+    {
+     "fuel": "wind",
+     "perc": 1.9
+    },
+    {
+     "fuel": "imports",
+     "perc": 1.0
+    },
+    {
+     "fuel": "coal",
+     "perc": 0.0
+    },
+    {
+     "fuel": "hydro",
+     "perc": 0.0
+    },
+    {
+     "fuel": "other",
+     "perc": 0.0
+    }
+   ],
+   "carbon_kind": "modelled",
+   "agile_now_p_kwh": 19.5,
+   "agile_tonight_min_p_kwh": 15.43,
+   "agile_tonight_min_at": "2026-11-08T06:00:00Z",
+   "agile_tonight_avg_p_kwh": 16.86,
+   "agile_kind": "forecast",
+   "ghost_wind_mwh_24h": null
+  },
+  {
+   "region": "B",
+   "name": "East Midlands",
+   "centroid": [
+    -0.821,
+    52.693
+   ],
+   "carbon_gco2_kwh": 299.0,
+   "carbon_index": "very high",
+   "mix": [
+    {
+     "fuel": "gas",
+     "perc": 70.4
+    },
+    {
+     "fuel": "biomass",
+     "perc": 17.9
+    },
+    {
+     "fuel": "solar",
+     "perc": 6.4
+    },
+    {
+     "fuel": "imports",
+     "perc": 2.2
+    },
+    {
+     "fuel": "nuclear",
+     "perc": 1.9
+    },
+    {
+     "fuel": "wind",
+     "perc": 1.3
+    },
+    {
+     "fuel": "coal",
+     "perc": 0.0
+    },
+    {
+     "fuel": "hydro",
+     "perc": 0.0
+    },
+    {
+     "fuel": "other",
+     "perc": 0.0
+    }
+   ],
+   "carbon_kind": "modelled",
+   "agile_now_p_kwh": 18.57,
+   "agile_tonight_min_p_kwh": 14.69,
+   "agile_tonight_min_at": "2026-11-08T06:00:00Z",
+   "agile_tonight_avg_p_kwh": 16.05,
+   "agile_kind": "forecast",
+   "ghost_wind_mwh_24h": null
+  },
+  {
+   "region": "C",
+   "name": "London",
+   "centroid": [
+    -0.057,
+    51.526
+   ],
+   "carbon_gco2_kwh": 266.0,
+   "carbon_index": "very high",
+   "mix": [
+    {
+     "fuel": "gas",
+     "perc": 64.6
+    },
+    {
+     "fuel": "solar",
+     "perc": 12.2
+    },
+    {
+     "fuel": "nuclear",
+     "perc": 9.4
+    },
+    {
+     "fuel": "imports",
+     "perc": 6.7
+    },
+    {
+     "fuel": "biomass",
+     "perc": 5.6
+    },
+    {
+     "fuel": "wind",
+     "perc": 1.4
+    },
+    {
+     "fuel": "hydro",
+     "perc": 0.1
+    },
+    {
+     "fuel": "coal",
+     "perc": 0.0
+    },
+    {
+     "fuel": "other",
+     "perc": 0.0
+    }
+   ],
+   "carbon_kind": "modelled",
+   "agile_now_p_kwh": 18.57,
+   "agile_tonight_min_p_kwh": 14.69,
+   "agile_tonight_min_at": "2026-11-08T06:00:00Z",
+   "agile_tonight_avg_p_kwh": 16.05,
+   "agile_kind": "forecast",
+   "ghost_wind_mwh_24h": null
+  },
+  {
+   "region": "D",
+   "name": "North Wales, Merseyside and Cheshire",
+   "centroid": [
+    -3.455,
+    52.977
+   ],
+   "carbon_gco2_kwh": 124.0,
+   "carbon_index": "moderate",
+   "mix": [
+    {
+     "fuel": "nuclear",
+     "perc": 42.9
+    },
+    {
+     "fuel": "gas",
+     "perc": 31.2
+    },
+    {
+     "fuel": "wind",
+     "perc": 11.8
+    },
+    {
+     "fuel": "solar",
+     "perc": 9.6
+    },
+    {
+     "fuel": "imports",
+     "perc": 4.0
+    },
+    {
+     "fuel": "biomass",
+     "perc": 0.5
+    },
+    {
+     "fuel": "coal",
+     "perc": 0.0
+    },
+    {
+     "fuel": "hydro",
+     "perc": 0.0
+    },
+    {
+     "fuel": "other",
+     "perc": 0.0
+    }
+   ],
+   "carbon_kind": "modelled",
+   "agile_now_p_kwh": 20.43,
+   "agile_tonight_min_p_kwh": 16.16,
+   "agile_tonight_min_at": "2026-11-08T06:00:00Z",
+   "agile_tonight_avg_p_kwh": 17.66,
+   "agile_kind": "forecast",
+   "ghost_wind_mwh_24h": null
+  },
+  {
+   "region": "E",
+   "name": "West Midlands",
+   "centroid": [
+    -2.476,
+    52.317
+   ],
+   "carbon_gco2_kwh": 285.0,
+   "carbon_index": "very high",
+   "mix": [
+    {
+     "fuel": "gas",
+     "perc": 72.2
+    },
+    {
+     "fuel": "nuclear",
+     "perc": 12.7
+    },
+    {
+     "fuel": "solar",
+     "perc": 9.5
+    },
+    {
+     "fuel": "wind",
+     "perc": 2.5
+    },
+    {
+     "fuel": "imports",
+     "perc": 2.3
+    },
+    {
+     "fuel": "biomass",
+     "perc": 0.7
+    },
+    {
+     "fuel": "coal",
+     "perc": 0.0
+    },
+    {
+     "fuel": "hydro",
+     "perc": 0.0
+    },
+    {
+     "fuel": "other",
+     "perc": 0.0
+    }
+   ],
+   "carbon_kind": "modelled",
+   "agile_now_p_kwh": 19.5,
+   "agile_tonight_min_p_kwh": 15.43,
+   "agile_tonight_min_at": "2026-11-08T06:00:00Z",
+   "agile_tonight_avg_p_kwh": 16.86,
+   "agile_kind": "forecast",
+   "ghost_wind_mwh_24h": null
+  },
+  {
+   "region": "F",
+   "name": "North East England",
+   "centroid": [
+    -1.797,
+    54.749
+   ],
+   "carbon_gco2_kwh": 1.0,
+   "carbon_index": "very low",
+   "mix": [
+    {
+     "fuel": "imports",
+     "perc": 49.7
+    },
+    {
+     "fuel": "nuclear",
+     "perc": 41.2
+    },
+    {
+     "fuel": "wind",
+     "perc": 7.3
+    },
+    {
+     "fuel": "solar",
+     "perc": 1.7
+    },
+    {
+     "fuel": "biomass",
+     "perc": 0.0
+    },
+    {
+     "fuel": "hydro",
+     "perc": 0.0
+    },
+    {
+     "fuel": "gas",
+     "perc": 0.0
+    },
+    {
+     "fuel": "coal",
+     "perc": 0.0
+    },
+    {
+     "fuel": "other",
+     "perc": 0.0
+    }
+   ],
+   "carbon_kind": "modelled",
+   "agile_now_p_kwh": 19.5,
+   "agile_tonight_min_p_kwh": 15.43,
+   "agile_tonight_min_at": "2026-11-08T06:00:00Z",
+   "agile_tonight_avg_p_kwh": 16.86,
+   "agile_kind": "forecast",
+   "ghost_wind_mwh_24h": null
+  },
+  {
+   "region": "G",
+   "name": "North West England",
+   "centroid": [
+    -2.564,
+    54.183
+   ],
+   "carbon_gco2_kwh": 75.0,
+   "carbon_index": "low",
+   "mix": [
+    {
+     "fuel": "nuclear",
+     "perc": 56.0
+    },
+    {
+     "fuel": "gas",
+     "perc": 18.4
+    },
+    {
+     "fuel": "imports",
+     "perc": 12.6
+    },
+    {
+     "fuel": "wind",
+     "perc": 7.9
+    },
+    {
+     "fuel": "solar",
+     "perc": 3.3
+    },
+    {
+     "fuel": "biomass",
+     "perc": 1.7
+    },
+    {
+     "fuel": "coal",
+     "perc": 0.0
+    },
+    {
+     "fuel": "hydro",
+     "perc": 0.0
+    },
+    {
+     "fuel": "other",
+     "perc": 0.0
+    }
+   ],
+   "carbon_kind": "modelled",
+   "agile_now_p_kwh": 19.5,
+   "agile_tonight_min_p_kwh": 15.43,
+   "agile_tonight_min_at": "2026-11-08T06:00:00Z",
+   "agile_tonight_avg_p_kwh": 16.86,
+   "agile_kind": "forecast",
+   "ghost_wind_mwh_24h": null
+  },
+  {
+   "region": "H",
+   "name": "Southern England",
+   "centroid": [
+    -1.518,
+    51.262
+   ],
+   "carbon_gco2_kwh": 289.0,
+   "carbon_index": "very high",
+   "mix": [
+    {
+     "fuel": "gas",
+     "perc": 71.4
+    },
+    {
+     "fuel": "solar",
+     "perc": 14.7
+    },
+    {
+     "fuel": "biomass",
+     "perc": 5.3
+    },
+    {
+     "fuel": "nuclear",
+     "perc": 3.8
+    },
+    {
+     "fuel": "imports",
+     "perc": 3.7
+    },
+    {
+     "fuel": "wind",
+     "perc": 1.1
+    },
+    {
+     "fuel": "coal",
+     "perc": 0.0
+    },
+    {
+     "fuel": "hydro",
+     "perc": 0.0
+    },
+    {
+     "fuel": "other",
+     "perc": 0.0
+    }
+   ],
+   "carbon_kind": "modelled",
+   "agile_now_p_kwh": 19.5,
+   "agile_tonight_min_p_kwh": 15.43,
+   "agile_tonight_min_at": "2026-11-08T06:00:00Z",
+   "agile_tonight_avg_p_kwh": 16.86,
+   "agile_kind": "forecast",
+   "ghost_wind_mwh_24h": null
+  },
+  {
+   "region": "J",
+   "name": "South East England",
+   "centroid": [
+    0.394,
+    51.14
+   ],
+   "carbon_gco2_kwh": 268.0,
+   "carbon_index": "very high",
+   "mix": [
+    {
+     "fuel": "gas",
+     "perc": 63.5
+    },
+    {
+     "fuel": "imports",
+     "perc": 16.3
+    },
+    {
+     "fuel": "solar",
+     "perc": 11.7
+    },
+    {
+     "fuel": "nuclear",
+     "perc": 4.5
+    },
+    {
+     "fuel": "biomass",
+     "perc": 2.8
+    },
+    {
+     "fuel": "wind",
+     "perc": 1.0
+    },
+    {
+     "fuel": "hydro",
+     "perc": 0.3
+    },
+    {
+     "fuel": "coal",
+     "perc": 0.0
+    },
+    {
+     "fuel": "other",
+     "perc": 0.0
+    }
+   ],
+   "carbon_kind": "modelled",
+   "agile_now_p_kwh": 20.43,
+   "agile_tonight_min_p_kwh": 16.16,
+   "agile_tonight_min_at": "2026-11-08T06:00:00Z",
+   "agile_tonight_avg_p_kwh": 17.66,
+   "agile_kind": "forecast",
+   "ghost_wind_mwh_24h": null
+  },
+  {
+   "region": "K",
+   "name": "South Wales",
+   "centroid": [
+    -4.143,
+    51.908
+   ],
+   "carbon_gco2_kwh": 377.0,
+   "carbon_index": "very high",
+   "mix": [
+    {
+     "fuel": "gas",
+     "perc": 95.7
+    },
+    {
+     "fuel": "solar",
+     "perc": 4.1
+    },
+    {
+     "fuel": "wind",
+     "perc": 0.2
+    },
+    {
+     "fuel": "biomass",
+     "perc": 0.0
+    },
+    {
+     "fuel": "coal",
+     "perc": 0.0
+    },
+    {
+     "fuel": "imports",
+     "perc": 0.0
+    },
+    {
+     "fuel": "hydro",
+     "perc": 0.0
+    },
+    {
+     "fuel": "other",
+     "perc": 0.0
+    },
+    {
+     "fuel": "nuclear",
+     "perc": 0.0
+    }
+   ],
+   "carbon_kind": "modelled",
+   "agile_now_p_kwh": 20.43,
+   "agile_tonight_min_p_kwh": 16.16,
+   "agile_tonight_min_at": "2026-11-08T06:00:00Z",
+   "agile_tonight_avg_p_kwh": 17.66,
+   "agile_kind": "forecast",
+   "ghost_wind_mwh_24h": null
+  },
+  {
+   "region": "L",
+   "name": "South West England",
+   "centroid": [
+    -3.621,
+    50.767
+   ],
+   "carbon_gco2_kwh": 312.0,
+   "carbon_index": "very high",
+   "mix": [
+    {
+     "fuel": "gas",
+     "perc": 79.1
+    },
+    {
+     "fuel": "solar",
+     "perc": 20.6
+    },
+    {
+     "fuel": "wind",
+     "perc": 0.3
+    },
+    {
+     "fuel": "biomass",
+     "perc": 0.0
+    },
+    {
+     "fuel": "coal",
+     "perc": 0.0
+    },
+    {
+     "fuel": "imports",
+     "perc": 0.0
+    },
+    {
+     "fuel": "hydro",
+     "perc": 0.0
+    },
+    {
+     "fuel": "other",
+     "perc": 0.0
+    },
+    {
+     "fuel": "nuclear",
+     "perc": 0.0
+    }
+   ],
+   "carbon_kind": "modelled",
+   "agile_now_p_kwh": 21.36,
+   "agile_tonight_min_p_kwh": 16.9,
+   "agile_tonight_min_at": "2026-11-08T06:00:00Z",
+   "agile_tonight_avg_p_kwh": 18.46,
+   "agile_kind": "forecast",
+   "ghost_wind_mwh_24h": null
+  },
+  {
+   "region": "M",
+   "name": "Yorkshire",
+   "centroid": [
+    -1.055,
+    53.745
+   ],
+   "carbon_gco2_kwh": 179.0,
+   "carbon_index": "high",
+   "mix": [
+    {
+     "fuel": "biomass",
+     "perc": 54.0
+    },
+    {
+     "fuel": "gas",
+     "perc": 28.8
+    },
+    {
+     "fuel": "imports",
+     "perc": 6.6
+    },
+    {
+     "fuel": "nuclear",
+     "perc": 5.5
+    },
+    {
+     "fuel": "wind",
+     "perc": 3.1
+    },
+    {
+     "fuel": "solar",
+     "perc": 2.0
+    },
+    {
+     "fuel": "coal",
+     "perc": 0.0
+    },
+    {
+     "fuel": "hydro",
+     "perc": 0.0
+    },
+    {
+     "fuel": "other",
+     "perc": 0.0
+    }
+   ],
+   "carbon_kind": "modelled",
+   "agile_now_p_kwh": 18.57,
+   "agile_tonight_min_p_kwh": 14.69,
+   "agile_tonight_min_at": "2026-11-08T06:00:00Z",
+   "agile_tonight_avg_p_kwh": 16.05,
+   "agile_kind": "forecast",
+   "ghost_wind_mwh_24h": null
+  },
+  {
+   "region": "N",
+   "name": "South and Central Scotland",
+   "centroid": [
+    -3.456,
+    55.531
+   ],
+   "carbon_gco2_kwh": 0.0,
+   "carbon_index": "very low",
+   "mix": [
+    {
+     "fuel": "nuclear",
+     "perc": 70.9
+    },
+    {
+     "fuel": "wind",
+     "perc": 25.2
+    },
+    {
+     "fuel": "solar",
+     "perc": 3.8
+    },
+    {
+     "fuel": "biomass",
+     "perc": 0.0
+    },
+    {
+     "fuel": "coal",
+     "perc": 0.0
+    },
+    {
+     "fuel": "imports",
+     "perc": 0.0
+    },
+    {
+     "fuel": "hydro",
+     "perc": 0.0
+    },
+    {
+     "fuel": "gas",
+     "perc": 0.0
+    },
+    {
+     "fuel": "other",
+     "perc": 0.0
+    }
+   ],
+   "carbon_kind": "modelled",
+   "agile_now_p_kwh": 19.5,
+   "agile_tonight_min_p_kwh": 15.43,
+   "agile_tonight_min_at": "2026-11-08T06:00:00Z",
+   "agile_tonight_avg_p_kwh": 16.86,
+   "agile_kind": "forecast",
+   "ghost_wind_mwh_24h": null
+  },
+  {
+   "region": "P",
+   "name": "North Scotland",
+   "centroid": [
+    -3.921,
+    56.987
+   ],
+   "carbon_gco2_kwh": 0.0,
+   "carbon_index": "very low",
+   "mix": [
+    {
+     "fuel": "wind",
+     "perc": 92.3
+    },
+    {
+     "fuel": "solar",
+     "perc": 7.7
+    },
+    {
+     "fuel": "biomass",
+     "perc": 0.0
+    },
+    {
+     "fuel": "coal",
+     "perc": 0.0
+    },
+    {
+     "fuel": "gas",
+     "perc": 0.0
+    },
+    {
+     "fuel": "imports",
+     "perc": 0.0
+    },
+    {
+     "fuel": "hydro",
+     "perc": 0.0
+    },
+    {
+     "fuel": "other",
+     "perc": 0.0
+    },
+    {
+     "fuel": "nuclear",
+     "perc": 0.0
+    }
+   ],
+   "carbon_kind": "modelled",
+   "agile_now_p_kwh": 22.28,
+   "agile_tonight_min_p_kwh": 17.63,
+   "agile_tonight_min_at": "2026-11-08T06:00:00Z",
+   "agile_tonight_avg_p_kwh": 19.27,
+   "agile_kind": "forecast",
+   "ghost_wind_mwh_24h": null
+  }
+ ],
+ "note": "Carbon intensity and generation mix are the Carbon Intensity API's regional model (modelled). GB has one wholesale price, so regions differ in carbon and in retail and network charges, not wholesale. Agile is a retail tariff incl. VAT: published rates where released, our forecast beyond them."
+}

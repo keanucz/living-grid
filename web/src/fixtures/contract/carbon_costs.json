@@ -1,0 +1,173 @@
+{
+ "at": "2026-11-07T12:00:00Z",
+ "zones": [
+  {
+   "zone": "GB",
+   "name": "Great Britain",
+   "ts": "2026-11-07T12:00:00Z",
+   "currency": "GBP",
+   "consumption_gco2_kwh": 171.0,
+   "production_gco2_kwh": 182.0,
+   "carbon_price_per_t": 60.17,
+   "carbon_price": {
+    "value": 60.17,
+    "currency": "GBP",
+    "scheme": "UK ETS",
+    "as_of": "2026-09-01T00:00:00Z",
+    "basis": "monthly average of the UKA December futures",
+    "source": "DESNZ UK ETS Cost Containment Mechanism monthly average prices (gov.uk, OGL v3.0)"
+   },
+   "carbon_cost_per_mwh": 10.29,
+   "appraisal_value_per_t": 316.9,
+   "appraisal_cost_per_mwh": 54.19,
+   "unpriced_gap_per_mwh": 43.9,
+   "household_per_year": 25.72,
+   "data_centre_per_year": 901323.0,
+   "household_unpriced_per_year": 109.75,
+   "data_centre_unpriced_per_year": 3845713.0
+  },
+  {
+   "zone": "FR",
+   "name": "France",
+   "ts": "2026-11-07T12:00:00Z",
+   "currency": "EUR",
+   "consumption_gco2_kwh": 52.0,
+   "production_gco2_kwh": 38.0,
+   "carbon_price_per_t": 78.4,
+   "carbon_price": {
+    "value": 78.4,
+    "currency": "EUR",
+    "scheme": "EU ETS",
+    "as_of": "2026-11-06T00:00:00Z",
+    "basis": "daily settlement-style price",
+    "source": "EU ETS allowance (yfinance CO2.L, daily, EUR/t)"
+   },
+   "carbon_cost_per_mwh": 4.08,
+   "appraisal_value_per_t": 364.4,
+   "appraisal_cost_per_mwh": 18.95,
+   "unpriced_gap_per_mwh": 14.87,
+   "household_per_year": 10.19,
+   "data_centre_per_year": 357128.0,
+   "household_unpriced_per_year": 37.18,
+   "data_centre_unpriced_per_year": 1302947.0
+  },
+  {
+   "zone": "DE-LU",
+   "name": "Germany and Luxembourg",
+   "ts": "2026-11-07T12:00:00Z",
+   "currency": "EUR",
+   "consumption_gco2_kwh": 371.0,
+   "production_gco2_kwh": 392.0,
+   "carbon_price_per_t": 78.4,
+   "carbon_price": {
+    "value": 78.4,
+    "currency": "EUR",
+    "scheme": "EU ETS",
+    "as_of": "2026-11-06T00:00:00Z",
+    "basis": "daily settlement-style price",
+    "source": "EU ETS allowance (yfinance CO2.L, daily, EUR/t)"
+   },
+   "carbon_cost_per_mwh": 29.09,
+   "appraisal_value_per_t": 364.4,
+   "appraisal_cost_per_mwh": 135.21,
+   "unpriced_gap_per_mwh": 106.12,
+   "household_per_year": 72.72,
+   "data_centre_per_year": 2547969.0,
+   "household_unpriced_per_year": 265.3,
+   "data_centre_unpriced_per_year": 9296023.0
+  },
+  {
+   "zone": "NL",
+   "name": "Netherlands",
+   "ts": "2026-11-07T12:00:00Z",
+   "currency": "EUR",
+   "consumption_gco2_kwh": 302.0,
+   "production_gco2_kwh": 318.0,
+   "carbon_price_per_t": 78.4,
+   "carbon_price": {
+    "value": 78.4,
+    "currency": "EUR",
+    "scheme": "EU ETS",
+    "as_of": "2026-11-06T00:00:00Z",
+    "basis": "daily settlement-style price",
+    "source": "EU ETS allowance (yfinance CO2.L, daily, EUR/t)"
+   },
+   "carbon_cost_per_mwh": 23.68,
+   "appraisal_value_per_t": 364.4,
+   "appraisal_cost_per_mwh": 110.06,
+   "unpriced_gap_per_mwh": 86.38,
+   "household_per_year": 59.19,
+   "data_centre_per_year": 2074088.0,
+   "household_unpriced_per_year": 215.96,
+   "data_centre_unpriced_per_year": 7567113.0
+  },
+  {
+   "zone": "BE",
+   "name": "Belgium",
+   "ts": "2026-11-07T12:00:00Z",
+   "currency": "EUR",
+   "consumption_gco2_kwh": 168.0,
+   "production_gco2_kwh": 154.0,
+   "carbon_price_per_t": 78.4,
+   "carbon_price": {
+    "value": 78.4,
+    "currency": "EUR",
+    "scheme": "EU ETS",
+    "as_of": "2026-11-06T00:00:00Z",
+    "basis": "daily settlement-style price",
+    "source": "EU ETS allowance (yfinance CO2.L, daily, EUR/t)"
+   },
+   "carbon_cost_per_mwh": 13.17,
+   "appraisal_value_per_t": 364.4,
+   "appraisal_cost_per_mwh": 61.23,
+   "unpriced_gap_per_mwh": 48.05,
+   "household_per_year": 32.93,
+   "data_centre_per_year": 1153797.0,
+   "household_unpriced_per_year": 120.13,
+   "data_centre_unpriced_per_year": 4209520.0
+  },
+  {
+   "zone": "NO2",
+   "name": "Southern Norway",
+   "ts": "2026-11-07T12:00:00Z",
+   "currency": "EUR",
+   "consumption_gco2_kwh": 41.0,
+   "production_gco2_kwh": 12.0,
+   "carbon_price_per_t": 78.4,
+   "carbon_price": {
+    "value": 78.4,
+    "currency": "EUR",
+    "scheme": "EU ETS",
+    "as_of": "2026-11-06T00:00:00Z",
+    "basis": "daily settlement-style price",
+    "source": "EU ETS allowance (yfinance CO2.L, daily, EUR/t)"
+   },
+   "carbon_cost_per_mwh": 3.21,
+   "appraisal_value_per_t": 364.4,
+   "appraisal_cost_per_mwh": 14.94,
+   "unpriced_gap_per_mwh": 11.73,
+   "household_per_year": 8.04,
+   "data_centre_per_year": 281581.0,
+   "household_unpriced_per_year": 29.32,
+   "data_centre_unpriced_per_year": 1027323.0
+  }
+ ],
+ "household": {
+  "kwh_per_year": 2500.0,
+  "source": "Ofgem, Review of typical domestic consumption values: decision (27 May 2026): medium electricity, single-rate, 2,500 kWh a year from 1 July 2026"
+ },
+ "data_centre": {
+  "mw": 10.0,
+  "hours_per_year": 8760.0,
+  "note": "flat load all year, an assumption you can change"
+ },
+ "appraisal": {
+  "gbp_per_t": 316.9,
+  "price_base": "2025 prices",
+  "source": "DESNZ, Valuation of energy use and greenhouse gas emissions for appraisal (updated 2 Nov 2026): carbon value for appraisal, 2026, £316.9/tCO2e in 2025 prices (Data Table 3 central series)"
+ },
+ "eur_per_gbp": 1.15,
+ "kind": "estimated",
+ "note": "Estimates. Carbon intensity is modelled (standard emission factors, average not marginal). Carbon cost is intensity x the zone's carbon price; imports are valued at the importer's own price. The appraisal value is the UK government's social value of a tonne, not a market price; continental figures use a fixed £/€ rate.",
+ "sample": true
+}

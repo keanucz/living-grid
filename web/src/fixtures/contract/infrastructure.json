@@ -1,0 +1,153 @@
+{
+ "window": {
+  "from": "2026-10-25T00:00:00Z",
+  "to": "2026-10-27T23:00:00Z"
+ },
+ "boundaries": [
+  {
+   "boundary": "SCOTEX",
+   "hours": 72,
+   "median_limit_mw": 4200.0,
+   "mean_flow_mw": 4300.0,
+   "hours_over_limit_share": 0.542,
+   "overload_mwh": 35802.0,
+   "peak_overload_mw": 1500.0,
+   "mean_utilisation": 1.024,
+   "name": "Scotland to England",
+   "etys_boundary": "B6",
+   "max_capacity_mw": 6800.0,
+   "max_capacity_source": "NESO Operational Transparency Forum, 7 October 2026 (https://www.neso.energy/document/388476/download)"
+  },
+  {
+   "boundary": "SSEN-S",
+   "hours": 72,
+   "median_limit_mw": 2000.0,
+   "mean_flow_mw": 1700.0,
+   "hours_over_limit_share": 0.292,
+   "overload_mwh": 2817.0,
+   "peak_overload_mw": 200.0,
+   "mean_utilisation": 0.85,
+   "name": "North of Scotland",
+   "etys_boundary": "B2",
+   "max_capacity_mw": null,
+   "max_capacity_source": null
+  }
+ ],
+ "boundary_source": "NESO Data Portal, Day Ahead Constraint Flows and Limits (https://www.neso.energy/data-portal/day-ahead-constraint-flows-and-limits)",
+ "etys_capability": {
+  "B6": {
+   "mw": 6700.0,
+   "source": "https://www.neso.energy/sites/neso.energy/files/documents/ETYS%202025_June%202026_Final_0.pdf",
+   "label": "ETYS 2025 boundary capability"
+  },
+  "B4": {
+   "mw": 4000.0,
+   "source": "https://www.neso.energy/sites/neso.energy/files/documents/ETYS%202025_June%202026_Final_0.pdf",
+   "label": "ETYS 2025 boundary capability"
+  }
+ },
+ "interconnectors": [
+  {
+   "zone": "NO2",
+   "name": "Norway",
+   "capacity_mw": 1400.0,
+   "hours": 72,
+   "mean_import_mw": 1300.0,
+   "import_utilisation": 0.929,
+   "hours_full_import_share": 1.0,
+   "hours_full_export_share": 0.0
+  }
+ ],
+ "interconnector_basis": "Cable sizes are the published capacities; flows are Elexon metered data.",
+ "constraint_costs": {
+  "days": 3,
+  "from": "2026-10-25T00:00:00Z",
+  "to": "2026-10-27T00:00:00Z",
+  "total_cost_gbp": 57500000.0,
+  "thermal_cost_gbp": 49800000.0,
+  "thermal_volume_mwh": 331000.0,
+  "thermal_gbp_per_mwh": 150.5,
+  "source": "NESO Data Portal, Constraint Breakdown (https://www.neso.energy/data-portal/constraint-breakdown)"
+ },
+ "counterfactual": {
+  "boundary": "SCOTEX",
+  "scenarios": [
+   {
+    "extra_mw": 2000.0,
+    "hours": 72,
+    "overload_mwh": 35802.0,
+    "avoided_overload_mwh": 35802.0,
+    "hours_still_over_limit": 0,
+    "hours_over_limit_now": 39,
+    "avoided_cost_gbp": 5266065.0,
+    "avoided_cost_days": 3,
+    "avoided_wind_mwh": 28642.0,
+    "scotland_wind_switched_off_mwh": 28642.0,
+    "avoided_cost_window_overload_mwh": 35802.0,
+    "thermal_volume_in_window_mwh": 331000.0,
+    "wind_window_hours": 72
+   },
+   {
+    "extra_mw": 4000.0,
+    "hours": 72,
+    "overload_mwh": 35802.0,
+    "avoided_overload_mwh": 35802.0,
+    "hours_still_over_limit": 0,
+    "hours_over_limit_now": 39,
+    "avoided_cost_gbp": 5266065.0,
+    "avoided_cost_days": 3,
+    "avoided_wind_mwh": 28642.0,
+    "scotland_wind_switched_off_mwh": 28642.0,
+    "avoided_cost_window_overload_mwh": 35802.0,
+    "thermal_volume_in_window_mwh": 331000.0,
+    "wind_window_hours": 72
+   }
+  ],
+  "ghost_wind_source": "Elexon accepted bids on Scottish wind units (estimate, upper bound)"
+ },
+ "planned_links": [
+  {
+   "id": "egl1",
+   "name": "Eastern Green Link 1 (Torness to Hawthorn Pit)",
+   "capacity_mw": 2000.0,
+   "operational": "2029",
+   "status": "under construction (started 2025)",
+   "source": "https://www.easterngreenlink1.co.uk/"
+  },
+  {
+   "id": "egl2",
+   "name": "Eastern Green Link 2 (Peterhead to Drax)",
+   "capacity_mw": 2000.0,
+   "operational": "2029",
+   "status": "under construction (two years in, 6 Nov 2026)",
+   "source": "http://www.sse.com/news-and-views/2026/11/eastern-green-link-2-marks-two-years-of-construction"
+  },
+  {
+   "id": "egl3",
+   "name": "Eastern Green Link 3 (Peterhead to Walpole)",
+   "capacity_mw": 2000.0,
+   "operational": null,
+   "status": "proposed; Ofgem approved updated delivery dates and early funding in December 2025",
+   "source": "https://www.ofgem.gov.uk/press-release/ofgem-agrees-early-investment-and-updated-dates-proposed-electricity-superhighways"
+  },
+  {
+   "id": "egl4",
+   "name": "Eastern Green Link 4 (Westfield to Walpole)",
+   "capacity_mw": 2000.0,
+   "operational": null,
+   "status": "proposed; Ofgem approved updated delivery dates and early funding in December 2025",
+   "source": "https://www.ofgem.gov.uk/press-release/ofgem-agrees-early-investment-and-updated-dates-proposed-electricity-superhighways"
+  }
+ ],
+ "connections_queue": {
+  "before_reform_gw": "more than 700",
+  "new_pipeline_generation_storage_gw": 283.0,
+  "new_pipeline_demand_gw": 99.0,
+  "aligned_with_clean_power_2030_gw": 132.0,
+  "as_of": "2025-12-08",
+  "source": "NESO, 'NESO implements electricity grid connection reforms' (8 December 2025), https://www.neso.energy/neso-implements-electricity-grid-connection-reforms-unlock-investment-great-britain"
+ },
+ "kind": "estimated",
+ "note": "Estimates. Boundary flows are NESO day-ahead forecasts, not metered flows, over a short window. The counterfactual changes one limit and prices the avoided volume at NESO's average thermal cost per MWh for that day; it ignores other boundaries that would then bind and the market response. The Scottish boundaries are nested (SSEN-S, SSE-SP and SSHARN also exceed their limits in the same window), so avoided cost and wind are upper bounds. Accepted wind bids include non-constraint actions, so avoided wind is an upper bound too.",
+ "sample": true
+}

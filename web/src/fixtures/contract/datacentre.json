@@ -1,0 +1,122 @@
+{
+ "generated_at": "2026-11-07T12:00:00Z",
+ "gpus": 1000,
+ "gpu_type": "h100",
+ "kw_per_gpu": 1.275,
+ "pue": 1.5,
+ "utilisation": 0.6,
+ "flexible_share": 0.2,
+ "eur_per_gbp": 1.15,
+ "sites": [
+  {
+   "location": "FR",
+   "zone": "FR",
+   "name": "FR",
+   "currency": "EUR",
+   "peak_it_kw": 1275.0,
+   "facility_kw_avg": 1147.5,
+   "annual_mwh": 10052.1,
+   "price_basis": "day-ahead price",
+   "price_days": 365,
+   "energy": {
+    "mean_price_local_mwh": 63.67,
+    "cost_local": 640000.0,
+    "cost_eur": 640000.0,
+    "cost_flex_local": 600000.0,
+    "cost_flex_eur": 600000.0,
+    "saving_flex_local": 40000.0,
+    "saving_flex_eur": 40000.0,
+    "saving_flex_pct": 6.25
+   },
+   "carbon": {
+    "intensity_g_kwh": 55.0,
+    "tonnes": 553.0,
+    "tonnes_flex": 559.0,
+    "eua_eur_t": 72.0,
+    "cost_eur": 39816.0,
+    "basis": "modelled consumption-based intensity"
+   },
+   "next_job": {
+    "start": "2026-11-07T02:00:00Z",
+    "end": "2026-11-07T08:00:00Z",
+    "hours": 6,
+    "kw": 229.5,
+    "saving_eur": {
+     "p10": 4.0,
+     "p50": 9.0,
+     "p90": 15.0
+    },
+    "kind": "forecast"
+   },
+   "grid_notes": [
+    {
+     "topic": "Interconnector access",
+     "text": "Illustrative fixture note.",
+     "source": "data/static/interconnectors.csv"
+    },
+    {
+     "topic": "Connection queue and boundary limits",
+     "text": "Not in our data yet.",
+     "source": "none"
+    }
+   ],
+   "kind": "estimated"
+  },
+  {
+   "location": "N",
+   "zone": "GB",
+   "name": "South and Central Scotland (GB region N)",
+   "currency": "GBP",
+   "peak_it_kw": 1275.0,
+   "facility_kw_avg": 1147.5,
+   "annual_mwh": 10052.1,
+   "price_basis": "day-ahead price",
+   "price_days": 365,
+   "energy": {
+    "mean_price_local_mwh": 78.59,
+    "cost_local": 790000.0,
+    "cost_eur": 908500.0,
+    "cost_flex_local": 745000.0,
+    "cost_flex_eur": 856750.0,
+    "saving_flex_local": 45000.0,
+    "saving_flex_eur": 51750.0,
+    "saving_flex_pct": 5.7
+   },
+   "carbon": {
+    "intensity_g_kwh": 180.0,
+    "tonnes": 1809.0,
+    "tonnes_flex": 1827.0,
+    "eua_eur_t": 72.0,
+    "cost_eur": 130248.0,
+    "basis": "modelled consumption-based intensity"
+   },
+   "next_job": {
+    "start": "2026-11-07T02:00:00Z",
+    "end": "2026-11-07T08:00:00Z",
+    "hours": 6,
+    "kw": 229.5,
+    "saving_eur": {
+     "p10": 4.0,
+     "p50": 9.0,
+     "p90": 15.0
+    },
+    "kind": "forecast"
+   },
+   "grid_notes": [
+    {
+     "topic": "Interconnector access",
+     "text": "Illustrative fixture note.",
+     "source": "data/static/interconnectors.csv"
+    },
+    {
+     "topic": "Connection queue and boundary limits",
+     "text": "Not in our data yet.",
+     "source": "none"
+    }
+   ],
+   "kind": "estimated"
+  }
+ ],
+ "cheapest_site": "FR",
+ "note": "Illustrative fixture values; see the live endpoint for the real method and caveats."
+}

@@ -1,0 +1,70 @@
+{
+ "ts": "2026-11-07T12:00:00Z",
+ "available_from": "2026-11-05T12:00:00Z",
+ "available_to": "2026-11-09T12:00:00Z",
+ "step_deg": 2.0,
+ "lats": [
+  54.0,
+  54.0,
+  54.0,
+  56.0,
+  56.0,
+  56.0,
+  58.0,
+  58.0,
+  58.0
+ ],
+ "lons": [
+  -4.0,
+  -2.0,
+  0.0,
+  -4.0,
+  -2.0,
+  0.0,
+  -4.0,
+  -2.0,
+  0.0
+ ],
+ "wind_speed_dms": [
+  92,
+  104,
+  118,
+  121,
+  136,
+  150,
+  143,
+  158,
+  171
+ ],
+ "wind_dir_deg": [
+  245,
+  250,
+  255,
+  240,
+  248,
+  252,
+  236,
+  244,
+  250
+ ],
+ "shortwave_wm2": [
+  212,
+  220,
+  231,
+  168,
+  175,
+  183,
+  120,
+  126,
+  131
+ ],
+ "units": {
+  "wind_speed_dms": "tenths of m/s at 100 m",
+  "wind_dir_deg": "degrees the wind blows from",
+  "shortwave_wm2": "W/m2"
+ },
+ "kind": "modelled",
+ "source": "Open-Meteo (model analysis and forecast), sample",
+ "note": "Sample grid for the contract, not data.",
+ "sample": true
+}

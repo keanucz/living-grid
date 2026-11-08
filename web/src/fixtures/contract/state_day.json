@@ -1,0 +1,3509 @@
+{
+ "date": "2026-11-07",
+ "hours": [
+  {
+   "at": "2026-11-07T00:00:00Z",
+   "zones": [
+    {
+     "zone": "GB",
+     "price": {
+      "value": 83.91877716560563,
+      "unit": "GBP/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 120.0,
+      "consumption_gco2_kwh": 150.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 28429.85101265004,
+     "mix_mw": {
+      "gas": 4583.117777973316,
+      "wind": 1081.622005370621
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "FR",
+     "price": {
+      "value": 68.42075337619083,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 140.0,
+      "consumption_gco2_kwh": 165.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 32014.083459976202,
+     "mix_mw": {
+      "gas": 4461.90041141535,
+      "wind": 9086.815356501964
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "DE-LU",
+     "price": {
+      "value": 82.23266214422625,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 160.0,
+      "consumption_gco2_kwh": 180.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 31855.32582582424,
+     "mix_mw": {
+      "gas": 6534.538979196864,
+      "wind": 8867.036677595985
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "NL",
+     "price": {
+      "value": 79.41390203612889,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 180.0,
+      "consumption_gco2_kwh": 195.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 33833.85181552479,
+     "mix_mw": {
+      "gas": 4910.28082169859,
+      "wind": 11536.601131869953
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "BE",
+     "price": {
+      "value": 73.85492321545193,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 200.0,
+      "consumption_gco2_kwh": 210.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 33282.31474356024,
+     "mix_mw": {
+      "gas": 3339.7888763869096,
+      "wind": 5401.03575916954
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "NO2",
+     "price": {
+      "value": 53.928291060249734,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 220.0,
+      "consumption_gco2_kwh": 225.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": null,
+     "mix_mw": {},
+     "metered_as_of": null
+    }
+   ],
+   "flows": [
+    {
+     "interconnector_id": "nsl",
+     "from_zone": "GB",
+     "to_zone": "NO2",
+     "mw": -1246.8,
+     "capacity_mw": 1400.0,
+     "kind": "actual"
+    }
+   ]
+  },
+  {
+   "at": "2026-11-07T01:00:00Z",
+   "zones": [
+    {
+     "zone": "GB",
+     "price": {
+      "value": 75.32672638425115,
+      "unit": "GBP/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 120.0,
+      "consumption_gco2_kwh": 150.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 29091.02966799776,
+     "mix_mw": {
+      "gas": 5180.706699201919,
+      "wind": 7742.015342691531
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "FR",
+     "price": {
+      "value": 77.56782685824777,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 140.0,
+      "consumption_gco2_kwh": 165.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 37483.50309331202,
+     "mix_mw": {
+      "gas": 6396.578646330556,
+      "wind": 5280.12001071864
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "DE-LU",
+     "price": {
+      "value": 65.22429117859315,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 160.0,
+      "consumption_gco2_kwh": 180.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 22403.755043973597,
+     "mix_mw": {
+      "gas": 4787.408207316483,
+      "wind": 5665.644962607169
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "NL",
+     "price": {
+      "value": 81.78604610731513,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 180.0,
+      "consumption_gco2_kwh": 195.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 26374.923970659285,
+     "mix_mw": {
+      "gas": 5853.166391551312,
+      "wind": 11941.485188653813
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "BE",
+     "price": {
+      "value": 80.96336909425546,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 200.0,
+      "consumption_gco2_kwh": 210.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 28393.3273913973,
+     "mix_mw": {
+      "gas": 4595.652253986248,
+      "wind": 1400.0052283564346
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "NO2",
+     "price": {
+      "value": 92.77771912274318,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 220.0,
+      "consumption_gco2_kwh": 225.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": null,
+     "mix_mw": {},
+     "metered_as_of": null
+    }
+   ],
+   "flows": [
+    {
+     "interconnector_id": "nsl",
+     "from_zone": "GB",
+     "to_zone": "NO2",
+     "mw": -1222.3,
+     "capacity_mw": 1400.0,
+     "kind": "actual"
+    }
+   ]
+  },
+  {
+   "at": "2026-11-07T02:00:00Z",
+   "zones": [
+    {
+     "zone": "GB",
+     "price": {
+      "value": 17.08100722948717,
+      "unit": "GBP/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 120.0,
+      "consumption_gco2_kwh": 150.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 29115.862594244085,
+     "mix_mw": {
+      "gas": 4801.862689439156,
+      "wind": 5834.579001536975
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "FR",
+     "price": {
+      "value": 111.42537443217049,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 140.0,
+      "consumption_gco2_kwh": 165.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 32367.889139083323,
+     "mix_mw": {
+      "gas": 6788.11128893266,
+      "wind": 9289.305833468858
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "DE-LU",
+     "price": {
+      "value": 77.03475440305765,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 160.0,
+      "consumption_gco2_kwh": 180.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 35390.849215449634,
+     "mix_mw": {
+      "gas": 6571.7828126714685,
+      "wind": 8135.998747232518
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "NL",
+     "price": {
+      "value": 61.19221318886027,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 180.0,
+      "consumption_gco2_kwh": 195.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 29842.68058693078,
+     "mix_mw": {
+      "gas": 7634.360187974269,
+      "wind": 9965.452789634828
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "BE",
+     "price": {
+      "value": 58.487109815818,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 200.0,
+      "consumption_gco2_kwh": 210.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 26519.310519182975,
+     "mix_mw": {
+      "gas": 4659.369363003975,
+      "wind": 3731.7094300929652
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "NO2",
+     "price": {
+      "value": 62.89382305018765,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 220.0,
+      "consumption_gco2_kwh": 225.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": null,
+     "mix_mw": {},
+     "metered_as_of": null
+    }
+   ],
+   "flows": [
+    {
+     "interconnector_id": "nsl",
+     "from_zone": "GB",
+     "to_zone": "NO2",
+     "mw": -1319.9,
+     "capacity_mw": 1400.0,
+     "kind": "actual"
+    }
+   ]
+  },
+  {
+   "at": "2026-11-07T03:00:00Z",
+   "zones": [
+    {
+     "zone": "GB",
+     "price": {
+      "value": 66.53267760383409,
+      "unit": "GBP/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 120.0,
+      "consumption_gco2_kwh": 150.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 30438.377471992673,
+     "mix_mw": {
+      "gas": 3287.6094832166755,
+      "wind": 6925.228879251025
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "FR",
+     "price": {
+      "value": 97.23509751426889,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 140.0,
+      "consumption_gco2_kwh": 165.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 30223.242185634208,
+     "mix_mw": {
+      "gas": 4359.351977118424,
+      "wind": 3265.0045471721332
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "DE-LU",
+     "price": {
+      "value": 30.056342677323627,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 160.0,
+      "consumption_gco2_kwh": 180.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 32392.10812437555,
+     "mix_mw": {
+      "gas": 5026.941462702202,
+      "wind": 12172.308508891008
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "NL",
+     "price": {
+      "value": 91.36960407492292,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 180.0,
+      "consumption_gco2_kwh": 195.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 23112.485079079845,
+     "mix_mw": {
+      "gas": 5292.05952474991,
+      "wind": 8117.4048025546745
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "BE",
+     "price": {
+      "value": 42.16263981819733,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 200.0,
+      "consumption_gco2_kwh": 210.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 22424.771453952744,
+     "mix_mw": {
+      "gas": 5249.186259713936,
+      "wind": 3241.847326121185
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "NO2",
+     "price": {
+      "value": 107.34614189751197,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 220.0,
+      "consumption_gco2_kwh": 225.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": null,
+     "mix_mw": {},
+     "metered_as_of": null
+    }
+   ],
+   "flows": [
+    {
+     "interconnector_id": "nsl",
+     "from_zone": "GB",
+     "to_zone": "NO2",
+     "mw": -1208.0,
+     "capacity_mw": 1400.0,
+     "kind": "actual"
+    }
+   ]
+  },
+  {
+   "at": "2026-11-07T04:00:00Z",
+   "zones": [
+    {
+     "zone": "GB",
+     "price": {
+      "value": 78.7874763649732,
+      "unit": "GBP/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 120.0,
+      "consumption_gco2_kwh": 150.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 23627.956485017563,
+     "mix_mw": {
+      "gas": 4968.32962246483,
+      "wind": 906.9469084757457
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "FR",
+     "price": {
+      "value": 71.81966449444505,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 140.0,
+      "consumption_gco2_kwh": 165.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 23255.52550655234,
+     "mix_mw": {
+      "gas": 5609.481138645912,
+      "wind": 3437.5936569485975
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "DE-LU",
+     "price": {
+      "value": 51.71481323692353,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 160.0,
+      "consumption_gco2_kwh": 180.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 35373.37195078599,
+     "mix_mw": {
+      "gas": 4860.067278530668,
+      "wind": 5298.76821967383
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "NL",
+     "price": {
+      "value": 66.51756626281697,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 180.0,
+      "consumption_gco2_kwh": 195.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 32605.972241373263,
+     "mix_mw": {
+      "gas": 5186.538427094142,
+      "wind": 3970.5596277600353
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "BE",
+     "price": {
+      "value": 75.83362872799196,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 200.0,
+      "consumption_gco2_kwh": 210.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 28425.373152396063,
+     "mix_mw": {
+      "gas": 5407.172853012255,
+      "wind": 2346.5245246252525
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "NO2",
+     "price": {
+      "value": 48.22372945689682,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 220.0,
+      "consumption_gco2_kwh": 225.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": null,
+     "mix_mw": {},
+     "metered_as_of": null
+    }
+   ],
+   "flows": [
+    {
+     "interconnector_id": "nsl",
+     "from_zone": "GB",
+     "to_zone": "NO2",
+     "mw": -1434.9,
+     "capacity_mw": 1400.0,
+     "kind": "actual"
+    }
+   ]
+  },
+  {
+   "at": "2026-11-07T05:00:00Z",
+   "zones": [
+    {
+     "zone": "GB",
+     "price": {
+      "value": 82.8327246500827,
+      "unit": "GBP/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 120.0,
+      "consumption_gco2_kwh": 150.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 29058.406592139636,
+     "mix_mw": {
+      "gas": 6315.727283092753,
+      "wind": 4904.65792582371
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "FR",
+     "price": {
+      "value": 70.78560264750102,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 140.0,
+      "consumption_gco2_kwh": 165.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 31551.828344060807,
+     "mix_mw": {
+      "gas": 6071.126948591645,
+      "wind": 6613.989631793089
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "DE-LU",
+     "price": {
+      "value": 89.07099497971886,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 160.0,
+      "consumption_gco2_kwh": 180.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 28465.196475699664,
+     "mix_mw": {
+      "gas": 5860.3444217866845,
+      "wind": 4900.759967707319
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "NL",
+     "price": {
+      "value": 76.42741978758099,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 180.0,
+      "consumption_gco2_kwh": 195.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 25674.068101437417,
+     "mix_mw": {
+      "gas": 3539.9484237765278,
+      "wind": 10328.252364648784
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "BE",
+     "price": {
+      "value": 55.7072827237652,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 200.0,
+      "consumption_gco2_kwh": 210.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 29876.38698965481,
+     "mix_mw": {
+      "gas": 4679.581978061828,
+      "wind": 7306.101585046323
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "NO2",
+     "price": {
+      "value": 76.55947559311029,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 220.0,
+      "consumption_gco2_kwh": 225.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": null,
+     "mix_mw": {},
+     "metered_as_of": null
+    }
+   ],
+   "flows": [
+    {
+     "interconnector_id": "nsl",
+     "from_zone": "GB",
+     "to_zone": "NO2",
+     "mw": -1128.4,
+     "capacity_mw": 1400.0,
+     "kind": "actual"
+    }
+   ]
+  },
+  {
+   "at": "2026-11-07T06:00:00Z",
+   "zones": [
+    {
+     "zone": "GB",
+     "price": {
+      "value": 41.746605862365165,
+      "unit": "GBP/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 120.0,
+      "consumption_gco2_kwh": 150.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 26582.417927383714,
+     "mix_mw": {
+      "gas": 3549.472562687489,
+      "wind": 4200.428658805417
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "FR",
+     "price": {
+      "value": 73.74511498705188,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 140.0,
+      "consumption_gco2_kwh": 165.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 22213.286352931173,
+     "mix_mw": {
+      "gas": 4033.060259425467,
+      "wind": 3893.003562608824
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "DE-LU",
+     "price": {
+      "value": 26.78582395444638,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 160.0,
+      "consumption_gco2_kwh": 180.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 28817.175114670696,
+     "mix_mw": {
+      "gas": 6587.589164188636,
+      "wind": 9635.830629665687
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "NL",
+     "price": {
+      "value": 52.29348019546217,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 180.0,
+      "consumption_gco2_kwh": 195.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 22774.561915665578,
+     "mix_mw": {
+      "gas": 5875.009482998499,
+      "wind": 5831.617336677094
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "BE",
+     "price": {
+      "value": 38.91296693972233,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 200.0,
+      "consumption_gco2_kwh": 210.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 29663.782568662064,
+     "mix_mw": {
+      "gas": 6705.329478154912,
+      "wind": 4064.3029861042805
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "NO2",
+     "price": {
+      "value": 79.81604284271823,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 220.0,
+      "consumption_gco2_kwh": 225.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": null,
+     "mix_mw": {},
+     "metered_as_of": null
+    }
+   ],
+   "flows": [
+    {
+     "interconnector_id": "nsl",
+     "from_zone": "GB",
+     "to_zone": "NO2",
+     "mw": -1225.9,
+     "capacity_mw": 1400.0,
+     "kind": "actual"
+    }
+   ]
+  },
+  {
+   "at": "2026-11-07T07:00:00Z",
+   "zones": [
+    {
+     "zone": "GB",
+     "price": {
+      "value": 68.05616809915173,
+      "unit": "GBP/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 120.0,
+      "consumption_gco2_kwh": 150.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 33538.34013025042,
+     "mix_mw": {
+      "gas": 4638.362376837748,
+      "wind": 3407.3636557899904
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "FR",
+     "price": {
+      "value": 118.08823501140401,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 140.0,
+      "consumption_gco2_kwh": 165.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 24363.863655375513,
+     "mix_mw": {
+      "gas": 5532.554112749665,
+      "wind": 8026.353196106491
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "DE-LU",
+     "price": {
+      "value": 101.16521303702908,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 160.0,
+      "consumption_gco2_kwh": 180.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 25494.171660994725,
+     "mix_mw": {
+      "gas": 4487.848318312111,
+      "wind": 7482.526494398828
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "NL",
+     "price": {
+      "value": 49.59743099479512,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 180.0,
+      "consumption_gco2_kwh": 195.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 29763.13266290105,
+     "mix_mw": {
+      "gas": 4630.891504182094,
+      "wind": 5793.37347071078
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "BE",
+     "price": {
+      "value": 92.64202678483191,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 200.0,
+      "consumption_gco2_kwh": 210.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 29624.83228809532,
+     "mix_mw": {
+      "gas": 1790.9357455442082,
+      "wind": 67.8815499389766
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "NO2",
+     "price": {
+      "value": 46.88386123389659,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 220.0,
+      "consumption_gco2_kwh": 225.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": null,
+     "mix_mw": {},
+     "metered_as_of": null
+    }
+   ],
+   "flows": [
+    {
+     "interconnector_id": "nsl",
+     "from_zone": "GB",
+     "to_zone": "NO2",
+     "mw": -1008.4,
+     "capacity_mw": 1400.0,
+     "kind": "actual"
+    }
+   ]
+  },
+  {
+   "at": "2026-11-07T08:00:00Z",
+   "zones": [
+    {
+     "zone": "GB",
+     "price": {
+      "value": 55.53702304858401,
+      "unit": "GBP/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 120.0,
+      "consumption_gco2_kwh": 150.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 26917.605293740562,
+     "mix_mw": {
+      "gas": 5997.1700966857225,
+      "wind": 0.0
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "FR",
+     "price": {
+      "value": 69.29937643567831,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 140.0,
+      "consumption_gco2_kwh": 165.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 33418.55700987506,
+     "mix_mw": {
+      "gas": 4952.183127866659,
+      "wind": 6780.263232387161
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "DE-LU",
+     "price": {
+      "value": 36.34758811565228,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 160.0,
+      "consumption_gco2_kwh": 180.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 40147.71828052755,
+     "mix_mw": {
+      "gas": 4634.357567066062,
+      "wind": 8013.99946596767
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "NL",
+     "price": {
+      "value": 113.38829638250056,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 180.0,
+      "consumption_gco2_kwh": 195.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 34422.73983465139,
+     "mix_mw": {
+      "gas": 6248.010564362645,
+      "wind": 5126.318604482206
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "BE",
+     "price": {
+      "value": 78.46503428944561,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 200.0,
+      "consumption_gco2_kwh": 210.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 25512.761491092297,
+     "mix_mw": {
+      "gas": 4999.753229124559,
+      "wind": 8090.768409357639
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "NO2",
+     "price": {
+      "value": 123.04929109641196,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 220.0,
+      "consumption_gco2_kwh": 225.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": null,
+     "mix_mw": {},
+     "metered_as_of": null
+    }
+   ],
+   "flows": [
+    {
+     "interconnector_id": "nsl",
+     "from_zone": "GB",
+     "to_zone": "NO2",
+     "mw": -1074.7,
+     "capacity_mw": 1400.0,
+     "kind": "actual"
+    }
+   ]
+  },
+  {
+   "at": "2026-11-07T09:00:00Z",
+   "zones": [
+    {
+     "zone": "GB",
+     "price": {
+      "value": 59.77906901436002,
+      "unit": "GBP/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 120.0,
+      "consumption_gco2_kwh": 150.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 32308.186989202783,
+     "mix_mw": {
+      "gas": 3395.2023398792403,
+      "wind": 4995.379553588846
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "FR",
+     "price": {
+      "value": 72.40799029088177,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 140.0,
+      "consumption_gco2_kwh": 165.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 32824.94024054665,
+     "mix_mw": {
+      "gas": 4195.96338429036,
+      "wind": 3231.086346410704
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "DE-LU",
+     "price": {
+      "value": 98.91846256660669,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 160.0,
+      "consumption_gco2_kwh": 180.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 29298.183098371406,
+     "mix_mw": {
+      "gas": 4758.752892950241,
+      "wind": 4475.332802158258
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "NL",
+     "price": {
+      "value": 67.32238238653812,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 180.0,
+      "consumption_gco2_kwh": 195.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 23902.212207152497,
+     "mix_mw": {
+      "gas": 4934.440324272541,
+      "wind": 6275.885697054887
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "BE",
+     "price": {
+      "value": 90.16321341582035,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 200.0,
+      "consumption_gco2_kwh": 210.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 29734.904458537527,
+     "mix_mw": {
+      "gas": 3928.123382426904,
+      "wind": 5665.720293879879
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "NO2",
+     "price": {
+      "value": 116.5101691814888,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 220.0,
+      "consumption_gco2_kwh": 225.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": null,
+     "mix_mw": {},
+     "metered_as_of": null
+    }
+   ],
+   "flows": [
+    {
+     "interconnector_id": "nsl",
+     "from_zone": "GB",
+     "to_zone": "NO2",
+     "mw": -1332.9,
+     "capacity_mw": 1400.0,
+     "kind": "actual"
+    }
+   ]
+  },
+  {
+   "at": "2026-11-07T10:00:00Z",
+   "zones": [
+    {
+     "zone": "GB",
+     "price": {
+      "value": 106.52246558465197,
+      "unit": "GBP/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 120.0,
+      "consumption_gco2_kwh": 150.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 36097.749810907044,
+     "mix_mw": {
+      "gas": 5273.957506262238,
+      "wind": 8691.912864498572
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "FR",
+     "price": {
+      "value": 88.81472668213164,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 140.0,
+      "consumption_gco2_kwh": 165.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 29400.244006604462,
+     "mix_mw": {
+      "gas": 4261.778096931613,
+      "wind": 6218.596802835301
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "DE-LU",
+     "price": {
+      "value": 58.8625741780169,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 160.0,
+      "consumption_gco2_kwh": 180.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 36350.132768327785,
+     "mix_mw": {
+      "gas": 5124.1536904877585,
+      "wind": 11772.609397028227
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "NL",
+     "price": {
+      "value": 87.29200890889504,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 180.0,
+      "consumption_gco2_kwh": 195.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 25647.857658446293,
+     "mix_mw": {
+      "gas": 7611.283555714777,
+      "wind": 4694.355295235831
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "BE",
+     "price": {
+      "value": 55.26762646435158,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 200.0,
+      "consumption_gco2_kwh": 210.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 29845.306481859578,
+     "mix_mw": {
+      "gas": 5198.770152715229,
+      "wind": 7070.511835057616
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "NO2",
+     "price": {
+      "value": 68.41040595977292,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 220.0,
+      "consumption_gco2_kwh": 225.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": null,
+     "mix_mw": {},
+     "metered_as_of": null
+    }
+   ],
+   "flows": [
+    {
+     "interconnector_id": "nsl",
+     "from_zone": "GB",
+     "to_zone": "NO2",
+     "mw": -1105.7,
+     "capacity_mw": 1400.0,
+     "kind": "actual"
+    }
+   ]
+  },
+  {
+   "at": "2026-11-07T11:00:00Z",
+   "zones": [
+    {
+     "zone": "GB",
+     "price": {
+      "value": 59.81163311670259,
+      "unit": "GBP/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 120.0,
+      "consumption_gco2_kwh": 150.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 28745.614954873497,
+     "mix_mw": {
+      "gas": 3409.805271569845,
+      "wind": 7142.993165591215
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "FR",
+     "price": {
+      "value": 76.98073887283863,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 140.0,
+      "consumption_gco2_kwh": 165.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 23159.955575391137,
+     "mix_mw": {
+      "gas": 5100.551722800817,
+      "wind": 4946.1669354379
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "DE-LU",
+     "price": {
+      "value": 99.47477710856153,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 160.0,
+      "consumption_gco2_kwh": 180.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 27410.830194450882,
+     "mix_mw": {
+      "gas": 3649.3876855922745,
+      "wind": 11128.77240478098
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "NL",
+     "price": {
+      "value": 79.15523913081569,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 180.0,
+      "consumption_gco2_kwh": 195.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 27026.900435786876,
+     "mix_mw": {
+      "gas": 2025.625245293801,
+      "wind": 5748.653491880681
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "BE",
+     "price": {
+      "value": 63.548530204083555,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 200.0,
+      "consumption_gco2_kwh": 210.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 35162.24815121271,
+     "mix_mw": {
+      "gas": 5331.139756919418,
+      "wind": 6317.164634099949
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "NO2",
+     "price": {
+      "value": 99.29302913911309,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 220.0,
+      "consumption_gco2_kwh": 225.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": null,
+     "mix_mw": {},
+     "metered_as_of": null
+    }
+   ],
+   "flows": [
+    {
+     "interconnector_id": "nsl",
+     "from_zone": "GB",
+     "to_zone": "NO2",
+     "mw": -1253.1,
+     "capacity_mw": 1400.0,
+     "kind": "actual"
+    }
+   ]
+  },
+  {
+   "at": "2026-11-07T12:00:00Z",
+   "zones": [
+    {
+     "zone": "GB",
+     "price": {
+      "value": 79.18695737636199,
+      "unit": "GBP/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 120.0,
+      "consumption_gco2_kwh": 150.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 27593.694991506134,
+     "mix_mw": {
+      "gas": 6701.9457512506615,
+      "wind": 4197.160171002581
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "FR",
+     "price": {
+      "value": 75.06789430085693,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 140.0,
+      "consumption_gco2_kwh": 165.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 28514.6059324366,
+     "mix_mw": {
+      "gas": 5044.780230437949,
+      "wind": 8747.498487531142
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "DE-LU",
+     "price": {
+      "value": 83.27378018962,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 160.0,
+      "consumption_gco2_kwh": 180.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 30655.364769332402,
+     "mix_mw": {
+      "gas": 6542.009090099431,
+      "wind": 7697.84336661825
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "NL",
+     "price": {
+      "value": 68.9713699309454,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 180.0,
+      "consumption_gco2_kwh": 195.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 25482.013414631987,
+     "mix_mw": {
+      "gas": 4555.100959767388,
+      "wind": 2746.2026738182153
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "BE",
+     "price": {
+      "value": 55.02392431949586,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 200.0,
+      "consumption_gco2_kwh": 210.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 37466.933817409445,
+     "mix_mw": {
+      "gas": 3632.2566852578166,
+      "wind": 7894.964202445124
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "NO2",
+     "price": {
+      "value": 89.4669017417553,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 220.0,
+      "consumption_gco2_kwh": 225.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": null,
+     "mix_mw": {},
+     "metered_as_of": null
+    }
+   ],
+   "flows": [
+    {
+     "interconnector_id": "nsl",
+     "from_zone": "GB",
+     "to_zone": "NO2",
+     "mw": -1193.8,
+     "capacity_mw": 1400.0,
+     "kind": "actual"
+    }
+   ]
+  },
+  {
+   "at": "2026-11-07T13:00:00Z",
+   "zones": [
+    {
+     "zone": "GB",
+     "price": {
+      "value": 102.10974668457935,
+      "unit": "GBP/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 120.0,
+      "consumption_gco2_kwh": 150.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 30765.72903650437,
+     "mix_mw": {
+      "gas": 8469.232072819794,
+      "wind": 5955.372085049099
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "FR",
+     "price": {
+      "value": 52.14832142122359,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 140.0,
+      "consumption_gco2_kwh": 165.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 27285.046727135905,
+     "mix_mw": {
+      "gas": 4151.765070013494,
+      "wind": 4102.3410504653875
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "DE-LU",
+     "price": {
+      "value": 41.57912649271278,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 160.0,
+      "consumption_gco2_kwh": 180.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 23314.59005371968,
+     "mix_mw": {
+      "gas": 4399.3855523325,
+      "wind": 8052.869514441712
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "NL",
+     "price": {
+      "value": 67.30097574156952,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 180.0,
+      "consumption_gco2_kwh": 195.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 31517.71155333834,
+     "mix_mw": {
+      "gas": 6322.222458201889,
+      "wind": 4879.008885778444
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "BE",
+     "price": {
+      "value": 57.8339533235488,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 200.0,
+      "consumption_gco2_kwh": 210.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 29452.043892328835,
+     "mix_mw": {
+      "gas": 4038.5765051967614,
+      "wind": 6114.056241046607
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "NO2",
+     "price": {
+      "value": 14.661013416368547,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 220.0,
+      "consumption_gco2_kwh": 225.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": null,
+     "mix_mw": {},
+     "metered_as_of": null
+    }
+   ],
+   "flows": [
+    {
+     "interconnector_id": "nsl",
+     "from_zone": "GB",
+     "to_zone": "NO2",
+     "mw": -1095.5,
+     "capacity_mw": 1400.0,
+     "kind": "actual"
+    }
+   ]
+  },
+  {
+   "at": "2026-11-07T14:00:00Z",
+   "zones": [
+    {
+     "zone": "GB",
+     "price": {
+      "value": 65.40998918141744,
+      "unit": "GBP/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 120.0,
+      "consumption_gco2_kwh": 150.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 29991.883889563887,
+     "mix_mw": {
+      "gas": 8033.382926368646,
+      "wind": 8270.400240714027
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "FR",
+     "price": {
+      "value": 79.7119632990363,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 140.0,
+      "consumption_gco2_kwh": 165.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 32547.36298452084,
+     "mix_mw": {
+      "gas": 4361.08233739976,
+      "wind": 4682.48071358136
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "DE-LU",
+     "price": {
+      "value": 111.22871873896136,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 160.0,
+      "consumption_gco2_kwh": 180.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 28468.531404932924,
+     "mix_mw": {
+      "gas": 5693.665185166796,
+      "wind": 0.0
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "NL",
+     "price": {
+      "value": 95.75206478613966,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 180.0,
+      "consumption_gco2_kwh": 195.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 26770.530219822056,
+     "mix_mw": {
+      "gas": 4473.961704372519,
+      "wind": 12841.669409849466
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "BE",
+     "price": {
+      "value": 84.88519794373505,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 200.0,
+      "consumption_gco2_kwh": 210.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 26934.776195296454,
+     "mix_mw": {
+      "gas": 6188.880084877766,
+      "wind": 9708.607450434634
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "NO2",
+     "price": {
+      "value": 86.25995040693977,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 220.0,
+      "consumption_gco2_kwh": 225.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": null,
+     "mix_mw": {},
+     "metered_as_of": null
+    }
+   ],
+   "flows": [
+    {
+     "interconnector_id": "nsl",
+     "from_zone": "GB",
+     "to_zone": "NO2",
+     "mw": -1165.2,
+     "capacity_mw": 1400.0,
+     "kind": "actual"
+    }
+   ]
+  },
+  {
+   "at": "2026-11-07T15:00:00Z",
+   "zones": [
+    {
+     "zone": "GB",
+     "price": {
+      "value": 77.20745126039601,
+      "unit": "GBP/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 120.0,
+      "consumption_gco2_kwh": 150.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 26025.534610641153,
+     "mix_mw": {
+      "gas": 4671.228983340294,
+      "wind": 0.0
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "FR",
+     "price": {
+      "value": 68.91046942563952,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 140.0,
+      "consumption_gco2_kwh": 165.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 39030.922129710125,
+     "mix_mw": {
+      "gas": 6670.005857510507,
+      "wind": 9633.710716129004
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "DE-LU",
+     "price": {
+      "value": 116.0426788880653,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 160.0,
+      "consumption_gco2_kwh": 180.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 33935.01963360011,
+     "mix_mw": {
+      "gas": 3761.7911416641127,
+      "wind": 7913.129380491625
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "NL",
+     "price": {
+      "value": 72.45330988665225,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 180.0,
+      "consumption_gco2_kwh": 195.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 27113.941054159193,
+     "mix_mw": {
+      "gas": 3811.7403964918085,
+      "wind": 5791.217916114159
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "BE",
+     "price": {
+      "value": 60.425634591626356,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 200.0,
+      "consumption_gco2_kwh": 210.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 29740.071480952145,
+     "mix_mw": {
+      "gas": 5523.5844029764785,
+      "wind": 7274.948369931677
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "NO2",
+     "price": {
+      "value": 78.46639800416878,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 220.0,
+      "consumption_gco2_kwh": 225.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": null,
+     "mix_mw": {},
+     "metered_as_of": null
+    }
+   ],
+   "flows": [
+    {
+     "interconnector_id": "nsl",
+     "from_zone": "GB",
+     "to_zone": "NO2",
+     "mw": -1148.6,
+     "capacity_mw": 1400.0,
+     "kind": "actual"
+    }
+   ]
+  },
+  {
+   "at": "2026-11-07T16:00:00Z",
+   "zones": [
+    {
+     "zone": "GB",
+     "price": {
+      "value": 82.76160358123701,
+      "unit": "GBP/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 120.0,
+      "consumption_gco2_kwh": 150.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 31843.67766285352,
+     "mix_mw": {
+      "gas": 6110.29869311094,
+      "wind": 5626.3903595800875
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "FR",
+     "price": {
+      "value": 109.15319440475557,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 140.0,
+      "consumption_gco2_kwh": 165.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 30867.721951818625,
+     "mix_mw": {
+      "gas": 5320.740702765475,
+      "wind": 12715.780167727538
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "DE-LU",
+     "price": {
+      "value": 78.35487734999482,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 160.0,
+      "consumption_gco2_kwh": 180.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 24993.024737702013,
+     "mix_mw": {
+      "gas": 5538.205929213341,
+      "wind": 5417.674238324031
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "NL",
+     "price": {
+      "value": 76.2139087957177,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 180.0,
+      "consumption_gco2_kwh": 195.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 32333.221594729242,
+     "mix_mw": {
+      "gas": 4601.179091390626,
+      "wind": 5284.018305684711
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "BE",
+     "price": {
+      "value": 88.90165722050686,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 200.0,
+      "consumption_gco2_kwh": 210.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 27569.514898982252,
+     "mix_mw": {
+      "gas": 3979.6273450962835,
+      "wind": 7176.202870165211
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "NO2",
+     "price": {
+      "value": 82.08043383686326,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 220.0,
+      "consumption_gco2_kwh": 225.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": null,
+     "mix_mw": {},
+     "metered_as_of": null
+    }
+   ],
+   "flows": [
+    {
+     "interconnector_id": "nsl",
+     "from_zone": "GB",
+     "to_zone": "NO2",
+     "mw": -1151.3,
+     "capacity_mw": 1400.0,
+     "kind": "actual"
+    }
+   ]
+  },
+  {
+   "at": "2026-11-07T17:00:00Z",
+   "zones": [
+    {
+     "zone": "GB",
+     "price": {
+      "value": 81.59454435637655,
+      "unit": "GBP/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 120.0,
+      "consumption_gco2_kwh": 150.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 38062.064213901635,
+     "mix_mw": {
+      "gas": 5181.496592750234,
+      "wind": 7629.600441544313
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "FR",
+     "price": {
+      "value": 96.3272125675291,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 140.0,
+      "consumption_gco2_kwh": 165.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 26882.75548787153,
+     "mix_mw": {
+      "gas": 6327.6415498824235,
+      "wind": 11997.025992683808
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "DE-LU",
+     "price": {
+      "value": 73.15209319569199,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 160.0,
+      "consumption_gco2_kwh": 180.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 34288.91017973845,
+     "mix_mw": {
+      "gas": 5587.389523625502,
+      "wind": 7301.717117484666
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "NL",
+     "price": {
+      "value": 80.55553892986198,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 180.0,
+      "consumption_gco2_kwh": 195.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 26977.941476125263,
+     "mix_mw": {
+      "gas": 2930.106878588994,
+      "wind": 7597.122837315158
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "BE",
+     "price": {
+      "value": 88.49389813545541,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 200.0,
+      "consumption_gco2_kwh": 210.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 27030.264737015004,
+     "mix_mw": {
+      "gas": 8059.836439012914,
+      "wind": 7229.60075304767
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "NO2",
+     "price": {
+      "value": 53.07812700432054,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 220.0,
+      "consumption_gco2_kwh": 225.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": null,
+     "mix_mw": {},
+     "metered_as_of": null
+    }
+   ],
+   "flows": [
+    {
+     "interconnector_id": "nsl",
+     "from_zone": "GB",
+     "to_zone": "NO2",
+     "mw": -1275.4,
+     "capacity_mw": 1400.0,
+     "kind": "actual"
+    }
+   ]
+  },
+  {
+   "at": "2026-11-07T18:00:00Z",
+   "zones": [
+    {
+     "zone": "GB",
+     "price": {
+      "value": 49.373604339557666,
+      "unit": "GBP/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 120.0,
+      "consumption_gco2_kwh": 150.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 28967.552018937102,
+     "mix_mw": {
+      "gas": 5153.158844103927,
+      "wind": 8046.3858757025255
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "FR",
+     "price": {
+      "value": 79.3964096747517,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 140.0,
+      "consumption_gco2_kwh": 165.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 25317.79387878712,
+     "mix_mw": {
+      "gas": 6802.733347906131,
+      "wind": 6189.669034981825
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "DE-LU",
+     "price": {
+      "value": 76.00332585073409,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 160.0,
+      "consumption_gco2_kwh": 180.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 31348.95126339385,
+     "mix_mw": {
+      "gas": 4368.977889803999,
+      "wind": 8047.378235538294
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "NL",
+     "price": {
+      "value": 109.41270800630004,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 180.0,
+      "consumption_gco2_kwh": 195.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 31731.120391122888,
+     "mix_mw": {
+      "gas": 5178.4306575346545,
+      "wind": 8124.365465110386
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "BE",
+     "price": {
+      "value": 130.62902467200257,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 200.0,
+      "consumption_gco2_kwh": 210.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 29765.399392311432,
+     "mix_mw": {
+      "gas": 8463.766472742624,
+      "wind": 1630.08677229384
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "NO2",
+     "price": {
+      "value": 73.26632384448988,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 220.0,
+      "consumption_gco2_kwh": 225.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": null,
+     "mix_mw": {},
+     "metered_as_of": null
+    }
+   ],
+   "flows": [
+    {
+     "interconnector_id": "nsl",
+     "from_zone": "GB",
+     "to_zone": "NO2",
+     "mw": -1265.2,
+     "capacity_mw": 1400.0,
+     "kind": "actual"
+    }
+   ]
+  },
+  {
+   "at": "2026-11-07T19:00:00Z",
+   "zones": [
+    {
+     "zone": "GB",
+     "price": {
+      "value": 81.9035057594252,
+      "unit": "GBP/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 120.0,
+      "consumption_gco2_kwh": 150.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 29188.495215741346,
+     "mix_mw": {
+      "gas": 7321.635591406745,
+      "wind": 11102.19062103009
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "FR",
+     "price": {
+      "value": 96.7095255816836,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 140.0,
+      "consumption_gco2_kwh": 165.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 29775.62287692691,
+     "mix_mw": {
+      "gas": 5883.263389459323,
+      "wind": 6656.564121204673
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "DE-LU",
+     "price": {
+      "value": 55.621191930531346,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 160.0,
+      "consumption_gco2_kwh": 180.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 25824.196300062977,
+     "mix_mw": {
+      "gas": 8031.334149495713,
+      "wind": 4976.124695675174
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "NL",
+     "price": {
+      "value": 97.01277436582845,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 180.0,
+      "consumption_gco2_kwh": 195.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 26114.459312471827,
+     "mix_mw": {
+      "gas": 8660.692760259835,
+      "wind": 2658.69342248378
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "BE",
+     "price": {
+      "value": 45.180273853329766,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 200.0,
+      "consumption_gco2_kwh": 210.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 25826.78227539074,
+     "mix_mw": {
+      "gas": 2806.3062815594676,
+      "wind": 5506.09274458884
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "NO2",
+     "price": {
+      "value": 75.54353091544257,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 220.0,
+      "consumption_gco2_kwh": 225.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": null,
+     "mix_mw": {},
+     "metered_as_of": null
+    }
+   ],
+   "flows": [
+    {
+     "interconnector_id": "nsl",
+     "from_zone": "GB",
+     "to_zone": "NO2",
+     "mw": -1142.3,
+     "capacity_mw": 1400.0,
+     "kind": "actual"
+    }
+   ]
+  },
+  {
+   "at": "2026-11-07T20:00:00Z",
+   "zones": [
+    {
+     "zone": "GB",
+     "price": {
+      "value": 113.97058554353845,
+      "unit": "GBP/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 120.0,
+      "consumption_gco2_kwh": 150.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 25820.271905723657,
+     "mix_mw": {
+      "gas": 3021.230635723769,
+      "wind": 9405.137037289442
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "FR",
+     "price": {
+      "value": 71.50326120717126,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 140.0,
+      "consumption_gco2_kwh": 165.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 29292.82722594565,
+     "mix_mw": {
+      "gas": 8406.329470073648,
+      "wind": 10600.375986847981
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "DE-LU",
+     "price": {
+      "value": 107.46466899392294,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 160.0,
+      "consumption_gco2_kwh": 180.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 27993.610914297307,
+     "mix_mw": {
+      "gas": 5556.559941862856,
+      "wind": 928.5545994387476
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "NL",
+     "price": {
+      "value": 89.56500669319982,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 180.0,
+      "consumption_gco2_kwh": 195.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 25151.445943138842,
+     "mix_mw": {
+      "gas": 6717.547247340092,
+      "wind": 5378.523651590265
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "BE",
+     "price": {
+      "value": 102.19755944587614,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 200.0,
+      "consumption_gco2_kwh": 210.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 32424.42700462007,
+     "mix_mw": {
+      "gas": 5452.692440450515,
+      "wind": 5222.050531351507
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "NO2",
+     "price": {
+      "value": 109.70235543030796,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 220.0,
+      "consumption_gco2_kwh": 225.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": null,
+     "mix_mw": {},
+     "metered_as_of": null
+    }
+   ],
+   "flows": [
+    {
+     "interconnector_id": "nsl",
+     "from_zone": "GB",
+     "to_zone": "NO2",
+     "mw": -1109.3,
+     "capacity_mw": 1400.0,
+     "kind": "actual"
+    }
+   ]
+  },
+  {
+   "at": "2026-11-07T21:00:00Z",
+   "zones": [
+    {
+     "zone": "GB",
+     "price": {
+      "value": 41.32138304678794,
+      "unit": "GBP/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 120.0,
+      "consumption_gco2_kwh": 150.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 31276.353806746192,
+     "mix_mw": {
+      "gas": 6582.941896199172,
+      "wind": 6937.688504238741
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "FR",
+     "price": {
+      "value": 106.30315896067367,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 140.0,
+      "consumption_gco2_kwh": 165.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 25393.923361890113,
+     "mix_mw": {
+      "gas": 3762.043952354157,
+      "wind": 5626.695581266106
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "DE-LU",
+     "price": {
+      "value": 66.42770170674532,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 160.0,
+      "consumption_gco2_kwh": 180.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 28163.737293178347,
+     "mix_mw": {
+      "gas": 7665.393384466077,
+      "wind": 7103.623695222705
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "NL",
+     "price": {
+      "value": 65.91071516616896,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 180.0,
+      "consumption_gco2_kwh": 195.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 22658.202843236308,
+     "mix_mw": {
+      "gas": 3336.4863402270958,
+      "wind": 8754.827522804295
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "BE",
+     "price": {
+      "value": 77.76280095278955,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 200.0,
+      "consumption_gco2_kwh": 210.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 29584.33780326369,
+     "mix_mw": {
+      "gas": 8763.491653448587,
+      "wind": 6622.640163481453
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "NO2",
+     "price": {
+      "value": 88.36067650977536,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 220.0,
+      "consumption_gco2_kwh": 225.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": null,
+     "mix_mw": {},
+     "metered_as_of": null
+    }
+   ],
+   "flows": [
+    {
+     "interconnector_id": "nsl",
+     "from_zone": "GB",
+     "to_zone": "NO2",
+     "mw": -1228.2,
+     "capacity_mw": 1400.0,
+     "kind": "actual"
+    }
+   ]
+  },
+  {
+   "at": "2026-11-07T22:00:00Z",
+   "zones": [
+    {
+     "zone": "GB",
+     "price": {
+      "value": 101.48456720053996,
+      "unit": "GBP/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 120.0,
+      "consumption_gco2_kwh": 150.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 25012.09510116949,
+     "mix_mw": {
+      "gas": 4926.536007266399,
+      "wind": 6905.92801834628
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "FR",
+     "price": {
+      "value": 79.86501098320933,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 140.0,
+      "consumption_gco2_kwh": 165.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 30465.42094276874,
+     "mix_mw": {
+      "gas": 6212.614389623438,
+      "wind": 3070.9525885879007
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "DE-LU",
+     "price": {
+      "value": 78.72023968270808,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 160.0,
+      "consumption_gco2_kwh": 180.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 29801.922648229993,
+     "mix_mw": {
+      "gas": 6438.708385847188,
+      "wind": 3775.849042678815
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "NL",
+     "price": {
+      "value": 45.45078199983836,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 180.0,
+      "consumption_gco2_kwh": 195.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 37444.81114764691,
+     "mix_mw": {
+      "gas": 3689.988376507561,
+      "wind": 6809.512887216317
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "BE",
+     "price": {
+      "value": 79.64925674672507,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 200.0,
+      "consumption_gco2_kwh": 210.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 31000.03322743981,
+     "mix_mw": {
+      "gas": 6175.8479437773385,
+      "wind": 1923.917507111125
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "NO2",
+     "price": {
+      "value": 79.86112424493341,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": null,
+     "carbon": {
+      "production_gco2_kwh": 220.0,
+      "consumption_gco2_kwh": 225.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": null,
+     "mix_mw": {},
+     "metered_as_of": null
+    }
+   ],
+   "flows": [
+    {
+     "interconnector_id": "nsl",
+     "from_zone": "GB",
+     "to_zone": "NO2",
+     "mw": -1190.0,
+     "capacity_mw": 1400.0,
+     "kind": "actual"
+    }
+   ]
+  },
+  {
+   "at": "2026-11-07T23:00:00Z",
+   "zones": [
+    {
+     "zone": "GB",
+     "price": {
+      "value": 82.98385064241452,
+      "unit": "GBP/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": {
+      "p10": 91.55293570613392,
+      "p50": 106.55293570613392,
+      "p90": 121.55293570613392,
+      "made_at": "2026-11-07T23:00:00Z",
+      "horizon_h": 1,
+      "target": "price_da",
+      "kind": "forecast"
+     },
+     "carbon": {
+      "production_gco2_kwh": 120.0,
+      "consumption_gco2_kwh": 150.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 25572.275902594065,
+     "mix_mw": {
+      "gas": 7112.810930906213,
+      "wind": 8360.8360439838
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "FR",
+     "price": {
+      "value": 94.58455885451035,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": {
+      "p10": 69.21127577709419,
+      "p50": 84.21127577709419,
+      "p90": 99.21127577709419,
+      "made_at": "2026-11-07T23:00:00Z",
+      "horizon_h": 1,
+      "target": "price_da",
+      "kind": "forecast"
+     },
+     "carbon": {
+      "production_gco2_kwh": 140.0,
+      "consumption_gco2_kwh": 165.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 25396.34591475655,
+     "mix_mw": {
+      "gas": 4522.784040453363,
+      "wind": 6350.626792308895
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "DE-LU",
+     "price": {
+      "value": 60.16758991992391,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": {
+      "p10": 68.78501975075957,
+      "p50": 83.78501975075957,
+      "p90": 98.78501975075957,
+      "made_at": "2026-11-07T23:00:00Z",
+      "horizon_h": 1,
+      "target": "price_da",
+      "kind": "forecast"
+     },
+     "carbon": {
+      "production_gco2_kwh": 160.0,
+      "consumption_gco2_kwh": 180.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 27855.42413622763,
+     "mix_mw": {
+      "gas": 4006.5877894159003,
+      "wind": 5009.4177218269815
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "NL",
+     "price": {
+      "value": 103.73824829338255,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": {
+      "p10": 66.19196920468197,
+      "p50": 81.19196920468197,
+      "p90": 96.19196920468197,
+      "made_at": "2026-11-07T23:00:00Z",
+      "horizon_h": 1,
+      "target": "price_da",
+      "kind": "forecast"
+     },
+     "carbon": {
+      "production_gco2_kwh": 180.0,
+      "consumption_gco2_kwh": 195.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 28718.963871476015,
+     "mix_mw": {
+      "gas": 4392.90828646632,
+      "wind": 6365.862130505316
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "BE",
+     "price": {
+      "value": 43.75340445233472,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": {
+      "p10": 68.85483933892715,
+      "p50": 83.85483933892715,
+      "p90": 98.85483933892715,
+      "made_at": "2026-11-07T23:00:00Z",
+      "horizon_h": 1,
+      "target": "price_da",
+      "kind": "forecast"
+     },
+     "carbon": {
+      "production_gco2_kwh": 200.0,
+      "consumption_gco2_kwh": 210.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": 29268.239856117314,
+     "mix_mw": {
+      "gas": 5331.59021436882,
+      "wind": 10902.344330678734
+     },
+     "metered_as_of": null
+    },
+    {
+     "zone": "NO2",
+     "price": {
+      "value": 118.2242499477735,
+      "unit": "EUR/MWh",
+      "kind": "actual",
+      "source": "energycharts"
+     },
+     "forecast": {
+      "p10": 78.41658720456726,
+      "p50": 93.41658720456726,
+      "p90": 108.41658720456726,
+      "made_at": "2026-11-07T23:00:00Z",
+      "horizon_h": 1,
+      "target": "price_da",
+      "kind": "forecast"
+     },
+     "carbon": {
+      "production_gco2_kwh": 220.0,
+      "consumption_gco2_kwh": 225.0,
+      "imports_share": 0.15,
+      "kind": "modelled"
+     },
+     "load_mw": null,
+     "mix_mw": {},
+     "metered_as_of": null
+    }
+   ],
+   "flows": [
+    {
+     "interconnector_id": "nsl",
+     "from_zone": "GB",
+     "to_zone": "NO2",
+     "mw": -1302.8,
+     "capacity_mw": 1400.0,
+     "kind": "actual"
+    }
+   ]
+  }
+ ]
+}
