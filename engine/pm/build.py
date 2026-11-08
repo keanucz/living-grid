@@ -137,7 +137,7 @@ def wind_market(day: pd.Timestamp, boalf: pd.DataFrame, start: int, end: int, hi
     actual = _gwh(s, day, end)
     prices, reasons = {}, {}
     note = ""
-    for h in range(start, end - 1):
+    for h in range(start, end):
         so_far = _gwh(s, day, h)
         need = y - so_far
         if need < 0:
@@ -155,7 +155,7 @@ def wind_market(day: pd.Timestamp, boalf: pd.DataFrame, start: int, end: int, hi
         else:
             reasons[str(h)] = f"{line[0].upper()}{line[1:]}."
     return {
-        "id": f"GB-wind-off-{end:02d}", "kind": "ghost_wind", "direction": "above", "unit": "GWh", "close_hour": end - 1,
+        "id": f"GB-wind-off-{end:02d}", "kind": "ghost_wind", "direction": "above", "unit": "GWh", "close_hour": end,
         "text": f"Will Britain pay wind farms to switch off more than {y:.0f} GWh between midnight and {end:02d}:00?",
         "model_note": note, "outcome": "yes" if actual > y else "no",
         "actual_text": f"{'Yes' if actual > y else 'No'}: it was {actual:.1f} GWh, against the line at {y:g}.",

@@ -188,7 +188,7 @@ def test_price_questions_use_a_round_threshold_near_the_median_and_hide_nothing_
 def test_wind_question_is_history_based_and_says_so():
     q = questions.wind_question(pd.Timestamp("2026-10-26", tz="UTC"), boalf_history(4000.0), end_hour=18)
     # past days to 18:00: 18 x 3 GWh = 54 or 18 x 1 GWh = 18 GWh, half each; today 72 GWh
-    assert q.unit == "GWh" and q.target_hour == 17 and q.actual == pytest.approx(72.0)
+    assert q.unit == "GWh" and q.target_hour == 18 and q.actual == pytest.approx(72.0)  # settles when its window ends (#303)
     assert q.outcome is True and "History only, not a forecast" in q.model_note
     assert 0 < q.model_p < 1
 

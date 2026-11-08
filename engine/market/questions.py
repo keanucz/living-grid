@@ -128,24 +128,37 @@ def price_questions(replay: dict, asks=PRICE_QUESTIONS, start: int = 12, end: in
     return out
 
 
-def wind_question(day: pd.Timestamp, boalf: pd.DataFrame, end_hour: int, history_days: int = 30) -> MarketQuestion | None:
-    """boalf: ts, value (MWh of accepted bids for wind units per hour, GB)."""
+def wind_question(day: pd.Timestamp, boalf: pd.DataFrame, end_hour: int, history_days: int = 30, start_hour: int = 12) -> MarketQuestion | None:
+    """Will Britain pay wind farms to switch off more than Y GWh between midnight and end_hour? Asked at start_hour.
+
+    boalf: ts, value (MWh of accepted bids for wind units per hour, GB). Wind switched off only adds up, so (as in the
+    Market day wind market, #286) the line is set above what is already off at start_hour, and the probability is the
+    share of past days on which at least the missing amount followed between start_hour and end_hour. The question
+    states the amount so far and the note states that basis. It settles on the whole window, at end_hour."""
     if boalf is None or boalf.empty:
         return None
     s = boalf.set_index(pd.to_datetime(boalf["ts"], utc=True))["value"].sort_index()
-    upto = lambda d: s[d : d + pd.Timedelta(hours=end_hour) - pd.Timedelta(seconds=1)].sum() / 1000  # noqa: E731
+    upto = lambda d, h: s[d : d + pd.Timedelta(hours=h) - pd.Timedelta(seconds=1)].sum() / 1000  # noqa: E731
     days = [day - pd.Timedelta(days=i) for i in range(1, history_days + 1)]
-    past = np.array([upto(d) for d in days if len(s[d : d + pd.Timedelta(hours=end_hour - 1)])])
+    days = [d for d in days if len(s[d : d + pd.Timedelta(hours=end_hour - 1)]) >= end_hour]
     today = s[day : day + pd.Timedelta(hours=end_hour - 1)]
-    if len(past) < 10 or len(today) < end_hour:
+    if len(days) < 10 or len(today) < end_hour:
         return None
-    y = nice(float(np.median(past)), 5.0)
-    actual = float(today.sum() / 1000)
+    later = np.array([upto(d, end_hour) - upto(d, start_hour) for d in days])
+    now = float(upto(day, start_hour))
+    y = nice(now + float(np.median(later)), 5.0)
+    while y <= now:
+        y += 5.0
+    need = y - now
+    k = int((later > need).sum())
+    actual = float(upto(day, end_hour))
     return MarketQuestion(
-        id=f"GB-wind-off-{end_hour:02d}", kind="ghost_wind", target_hour=end_hour - 1, unit="GWh", threshold=y,
-        text=f"Will Britain pay wind farms to switch off more than {y:.0f} GWh between midnight and {end_hour:02d}:00?",
-        model_p=round(float(np.clip((past > y).mean(), P_FLOOR, P_CEIL)), 3),
-        model_note=f"History only, not a forecast: {int((past > y).sum())} of the previous {len(past)} days went above {y:.0f} GWh",
+        id=f"GB-wind-off-{end_hour:02d}", kind="ghost_wind", target_hour=end_hour, unit="GWh", threshold=y,
+        text=(f"By {start_hour:02d}:00 Britain had paid wind farms to switch off {now:.1f} GWh. "
+              f"Will it be more than {y:.0f} GWh between midnight and {end_hour:02d}:00?"),
+        model_p=round(float(np.clip(k / len(later), P_FLOOR, P_CEIL)), 3),
+        model_note=(f"History only, not a forecast: {now:.1f} GWh already switched off by {start_hour:02d}:00, and on {k} of "
+                    f"the previous {len(later)} days at least {need:.1f} GWh more followed by {end_hour:02d}:00"),
         outcome=bool(actual > y), actual=actual,
     )
 
@@ -155,7 +168,7 @@ def build(replay: dict, boalf: pd.DataFrame | None = None, end_hour: int = 18, s
     """The day's yes/no questions; with choices=True also the choice questions of engine.market.question_types."""
     day = pd.Timestamp(replay["event"], tz="UTC")
     qs = price_questions(replay, start=start_hour, end=end_hour, league=league, calibration=calibration)
-    w = wind_question(day, boalf, end_hour) if boalf is not None else None
+    w = wind_question(day, boalf, end_hour, start_hour=start_hour) if boalf is not None else None
     extra = []
     if choices:
         from engine.market import question_types

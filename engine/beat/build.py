@@ -209,7 +209,7 @@ def which_zone_call(replay: dict, league: dict | None, hour: int = 17, start: in
 def calls(replay: dict, boalf: pd.DataFrame | None = None, net_import: pd.DataFrame | None = None, league: dict | None = None,
           start: int = 12, end: int = 18) -> list[dict]:
     day = pd.Timestamp(replay["event"], tz="UTC")
-    wind = q.wind_question(day, boalf, end) if boalf is not None else None
+    wind = q.wind_question(day, boalf, end, start_hour=start) if boalf is not None else None
     flow = qt.import_export(day, net_import, 19, start, end)
     made = [price_band_call(replay, league, 18, start, end), battery_call(replay, league, 17, start, end),
             _from_question(flow, "import_export") if flow else None, which_zone_call(replay, league, 17, start, end),

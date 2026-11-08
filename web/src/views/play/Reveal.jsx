@@ -33,7 +33,7 @@ export function RevealCard({ call, reveal, phaseUntil, last, onFinish }) {
           )
         })}
       </ul>
-      {reveal.model.reason && <p className="bm-reason"><span>Why the model said {optionLabel(call, reveal.model.option)}</span> {reveal.model.reason}</p>}
+      {reveal.model.reason && <p className="bm-reason"><span>{reveal.model.confidence <= 50 ? 'Why the model called it even' : `Why the model said ${optionLabel(call, reveal.model.option)}`}</span> {reveal.model.reason}</p>}
       {!last && next != null && <div className="bm-next num" role="timer">Next call in {next}…</div>}
       {last && onFinish && <button className="bm-primary" onClick={onFinish}>See your result</button>}
       {last && !onFinish && <div className="bm-next">That was the last call.</div>}
